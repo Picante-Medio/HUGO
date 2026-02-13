@@ -7,17 +7,14 @@
 
 #include "Ecs.h"
 
-class EntityList {
-  struct EntityData {
-    std::vector<std::bitset<MAX_COMPONENTS>> componentMask; //Makes checking if a component is in an entity constant
-    std::vector<std::array<int, MAX_COMPONENTS>> componentDirections; //Component directions in the dense table
-  };
+class EntityTable {
+  std::vector<std::bitset<MAX_COMPONENTS>> componentMask; //Makes checking if a component is in an entity constant
+  std::vector<std::array<int, MAX_COMPONENTS>> componentDirections; //Component directions in the dense table
 
-  EntityData entityData;
   std::queue<EntityID> availableEntitySpaces;
 
 public:
-  EntityList();
+  EntityTable();
 
   // Manejo de entidades
   EntityID createEntity();

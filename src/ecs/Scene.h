@@ -8,7 +8,7 @@
 #include "System.h"
 
 class Scene {
-  EntityList entityIndexes;
+  EntityTable entityIndexes;
   ComponentDenseTable components;
   std::vector<System> systems;
 

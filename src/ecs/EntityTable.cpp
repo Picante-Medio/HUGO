@@ -3,59 +3,59 @@
 #include <utility>
 #include <vector>
 
-EntityList::EntityList() 
+EntityTable::EntityTable() 
 {}
 
-EntityID EntityList::createEntity() {
+EntityID EntityTable::createEntity() {
   EntityID newID;
   if (!availableEntitySpaces.empty()) {
     newID = availableEntitySpaces.front();
     availableEntitySpaces.pop();
   }
   else {
-    entityData.componentDirections.push_back(std::array<int, MAX_COMPONENTS>());
-    entityData.componentMask.push_back(std::bitset<MAX_COMPONENTS>());
-    newID = entityData.componentMask.size() - 1;
+    componentDirections.push_back(std::array<int, MAX_COMPONENTS>());
+    componentMask.push_back(std::bitset<MAX_COMPONENTS>());
+    newID = componentMask.size() - 1;
   }
 
   return newID;
 }
 
-void EntityList::removeEntity(EntityID entity) {
-  entityData.componentMask[entity].reset();
+void EntityTable::removeEntity(EntityID entity) {
+  componentMask[entity].reset();
   availableEntitySpaces.push(entity);
 }
 
 void 
-EntityList::registerComponent(EntityID entity, ComponentID componentID, ComponentID componentDirection) {
-  entityData.componentMask[entity][componentID] = 1;
-  entityData.componentDirections[entity][componentID] = componentDirection;
+EntityTable::registerComponent(EntityID entity, ComponentID componentID, ComponentID componentDirection) {
+  componentMask[entity][componentID] = 1;
+  componentDirections[entity][componentID] = componentDirection;
 }
 
 void 
-EntityList::deRegisterComponent(EntityID entity, ComponentID componentID) {
-  entityData.componentMask[entity][componentID] = 0;
+EntityTable::deRegisterComponent(EntityID entity, ComponentID componentID) {
+  componentMask[entity][componentID] = 0;
 }
 
 bool 
-EntityList::hasComponent(EntityID entity, ComponentID componentID) const {
-  return entityData.componentMask[entity][componentID];
+EntityTable::hasComponent(EntityID entity, ComponentID componentID) const {
+  return componentMask[entity][componentID];
 }
 
 unsigned int 
-EntityList::getComponentIndex(EntityID entity, ComponentID componentID) const {
-  return entityData.componentDirections[entity][componentID];
+EntityTable::getComponentIndex(EntityID entity, ComponentID componentID) const {
+  return componentDirections[entity][componentID];
 }
 
 
 std::vector<std::pair<ComponentID, unsigned int>> 
-EntityList::getAllComponentIndexes(EntityID entity) {
+EntityTable::getAllComponentIndexes(EntityID entity) {
   std::vector<std::pair<ComponentID, unsigned int>> list;
 
   for(ComponentID id = 0; id < MAX_COMPONENTS; ++id) {
-    if(entityData.componentMask[entity][id]) continue;
+    if(componentMask[entity][id]) continue;
 
-    list.push_back({id, entityData.componentDirections[entity][id]});
+    list.push_back({id, componentDirections[entity][id]});
   }
 
   return list;

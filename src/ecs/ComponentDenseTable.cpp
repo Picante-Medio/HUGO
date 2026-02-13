@@ -3,7 +3,7 @@
 
 ComponentDenseTable::ComponentDenseTable()
 {
-  last.fill(0u);
+  lastAlive.fill(0u);
 }
 
 Component& 
@@ -13,21 +13,21 @@ ComponentDenseTable::getComponent(ComponentID componentID, unsigned int directio
 
 void
 ComponentDenseTable::removeComponent(ComponentID componentID, unsigned int direction) {
-  Component temp = components[componentID][last[componentID]];
-  components[componentID][last[componentID]] = components[componentID][direction];
+  Component temp = components[componentID][lastAlive[componentID]];
+  components[componentID][lastAlive[componentID]] = components[componentID][direction];
   components[componentID][direction] = temp;
-  last[componentID]--;
+  lastAlive[componentID]--;
 }
 
-unsigned int
+ComponentIndex
 ComponentDenseTable::addComponent(ComponentID componentID, Component component) {
-  last[componentID]++;
+  lastAlive[componentID]++;
 
-  if(last[componentID] == components[componentID].size()) 
+  if(lastAlive[componentID] == components[componentID].size()) 
     components[componentID].push_back(component);
 
   else
-    components[componentID][last[componentID]] = component;
+    components[componentID][lastAlive[componentID]] = component;
 
-  return last[componentID];
+  return lastAlive[componentID];
 }
