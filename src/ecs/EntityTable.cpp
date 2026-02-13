@@ -43,13 +43,13 @@ EntityList::hasComponent(EntityID entity, ComponentID componentID) const {
 }
 
 unsigned int 
-EntityList::getComponentDirection(EntityID entity, ComponentID componentID) const {
+EntityList::getComponentIndex(EntityID entity, ComponentID componentID) const {
   return entityData.componentDirections[entity][componentID];
 }
 
 
 std::vector<std::pair<ComponentID, unsigned int>> 
-EntityList::getAllComponentDirections(EntityID entity) {
+EntityList::getAllComponentIndexes(EntityID entity) {
   std::vector<std::pair<ComponentID, unsigned int>> list;
 
   for(ComponentID id = 0; id < MAX_COMPONENTS; ++id) {

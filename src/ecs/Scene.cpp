@@ -19,8 +19,8 @@ Scene::createEntity() {
 
 void 
 Scene::removeEntity(EntityID entity) {
-  std::vector<std::pair<ComponentID, unsigned int>> componentsToDelete = entityDirections.getAllComponentDirections(entity);
-  entityDirections.removeEntity(entity);
+  std::vector<std::pair<ComponentID, unsigned int>> componentsToDelete = entityDirections.getAllComponentIndexes(entity);
+
 
   for(auto [componentID, direction] : componentsToDelete)
     components.removeComponent(componentID, direction);
