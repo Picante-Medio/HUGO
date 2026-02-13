@@ -10,7 +10,7 @@
 class EntityList {
   struct EntityData {
     std::vector<std::bitset<MAX_COMPONENTS>> componentMask; //Makes checking if a component is in an entity constant
-    std::vector<std::array<int, MAX_COMPONENTS>> componentDirections; //Component direction table
+    std::vector<std::array<int, MAX_COMPONENTS>> componentDirections; //Component directions in the dense table
   };
 
   EntityData entityData;
@@ -28,5 +28,5 @@ public:
   void deRegisterComponent(EntityID entity, ComponentID componentID);
 
   bool hasComponent(EntityID entity, ComponentID componentID) const;
-  int getComponentDirection(EntityID entity, ComponentID componentID) const;
+  unsigned int getComponentDirection(EntityID entity, ComponentID componentID) const;
 };

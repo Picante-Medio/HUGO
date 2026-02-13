@@ -1,9 +1,8 @@
 #include "EntityTable.h"
+#include <vector>
 
 EntityList::EntityList() 
-{
-
-}
+{}
 
 EntityID EntityList::createEntity() {
   EntityID newID;
@@ -41,7 +40,7 @@ EntityList::hasComponent(EntityID entity, ComponentID componentID) const {
   return entityData.componentMask[entity][componentID];
 }
 
-int 
+unsigned int 
 EntityList::getComponentDirection(EntityID entity, ComponentID componentID) const {
   return entityData.componentDirections[entity][componentID];
 }
