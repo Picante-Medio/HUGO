@@ -3,7 +3,6 @@
 ComponentDenseTable::ComponentDenseTable()
 {}
 
-
 Component& 
 ComponentDenseTable::getComponent(ComponentID componentID, unsigned int direction) {
   return components[componentID][direction];

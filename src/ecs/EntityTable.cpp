@@ -1,4 +1,6 @@
 #include "EntityTable.h"
+#include "Ecs.h"
+#include <utility>
 #include <vector>
 
 EntityList::EntityList() 
@@ -43,4 +45,18 @@ EntityList::hasComponent(EntityID entity, ComponentID componentID) const {
 unsigned int 
 EntityList::getComponentDirection(EntityID entity, ComponentID componentID) const {
   return entityData.componentDirections[entity][componentID];
+}
+
+
+std::vector<std::pair<ComponentID, unsigned int>> 
+EntityList::getAllComponentDirections(EntityID entity) {
+  std::vector<std::pair<ComponentID, unsigned int>> list;
+
+  for(ComponentID id = 0; id < MAX_COMPONENTS; ++id) {
+    if(entityData.componentMask[entity][id]) continue;
+
+    list.push_back({id, entityData.componentDirections[entity][id]});
+  }
+
+  return list;
 }

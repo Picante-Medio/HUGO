@@ -29,4 +29,7 @@ public:
 
   bool hasComponent(EntityID entity, ComponentID componentID) const;
   unsigned int getComponentDirection(EntityID entity, ComponentID componentID) const;
+
+  // Used to delete all components of a dead entity
+  std::vector<std::pair<ComponentID, unsigned int>> getAllComponentDirections(EntityID entity);
 };

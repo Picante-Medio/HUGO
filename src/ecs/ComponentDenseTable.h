@@ -8,7 +8,7 @@
 class ComponentDenseTable {
   std::vector<std::array<Component, MAX_COMPONENTS>> components; // Components packed and alligned in memory
   std::vector<unsigned long int> last; // Índice del último componente válido de la lista
-  
+
 public:
   ComponentDenseTable();
 
