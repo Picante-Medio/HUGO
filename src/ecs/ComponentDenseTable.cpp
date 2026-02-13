@@ -11,7 +11,7 @@ ComponentDenseTable::getComponent(ComponentID componentID, unsigned int directio
   return components[componentID][direction];
 }
 
-void 
+void
 ComponentDenseTable::removeComponent(ComponentID componentID, unsigned int direction) {
   Component temp = components[componentID][last[componentID]];
   components[componentID][last[componentID]] = components[componentID][direction];

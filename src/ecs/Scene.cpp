@@ -7,10 +7,16 @@ Scene::Scene()
 {}
 
 void 
-Scene::update(double dt) {}
+Scene::update(double dt) {
+  for(System system : systems) 
+    system.update(dt);
+}
 
 void 
-Scene::fixedUpdate(double dt) {}
+Scene::fixedUpdate(double dt) {
+  for(System system : systems) 
+    system.fixedUpdate(dt);
+}
 
 EntityID 
 Scene::createEntity() {

@@ -1,12 +1,16 @@
 #pragma once
 
+#include <vector>
+
 #include "Ecs.h"
 #include "ComponentDenseTable.h"
 #include "EntityTable.h"
+#include "System.h"
 
 class Scene {
   EntityList entityDirections;
   ComponentDenseTable components;
+  std::vector<System> systems;
 
 public:
   Scene();
