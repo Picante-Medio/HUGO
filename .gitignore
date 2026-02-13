@@ -1,0 +1,21 @@
+# Directories
+[Bb]uild/*
+[Bb]in/*
+.vscode/*
+.obsidian/*
+.git/*
+
+# Ficheros
+*.dll
+*.so
+*.obj
+*.a
+*.lib
+*.exe
+*.out
+*.o
+*.pdb
+
+# Runfiles y demás
+./project.godot
+./run.sh
