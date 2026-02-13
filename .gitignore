@@ -1,13 +1,21 @@
 # Directories
 [Bb]uild/*
-[Bb]in/*
-.vscode/*
-.obsidian/*
-.git/*
+HUGO/[Bb]uild/*
+#[Bb]in/*
+**/.vscode/*
+**/.obsidian/*
+**/.git/*
+
+#Dependencias compiladas
+HUGO/[Dd]ependencies/*
+
+#Presets duplicados
+HUGO/CMakePresets.json
 
 # Ficheros
 *.dll
 *.so
+*.so*
 *.obj
 *.a
 *.lib
@@ -15,7 +23,21 @@
 *.out
 *.o
 *.pdb
+*.clangd
+*.log
+
+#Outs en linux
+HUGO/bin/HUGO*
 
 # Runfiles y demás
-./project.godot
-./run.sh
+**/project.godot
+
+#Ignores de Godot
+.godot/
+/android/
+*.editorconfig
+*.import
+*.uid
+
+#Ignores internos
+HUGO/.gitignore
