@@ -20,13 +20,15 @@ Scene::fixedUpdate(double dt) {
 
 EntityID 
 Scene::createEntity() {
-  return entityDirections.createEntity();
+  return entityIndexes.createEntity();
 }
 
 void
 Scene::removeEntity(EntityID entity) {
-  std::vector<std::pair<ComponentID, unsigned int>> componentsToDelete = entityDirections.getAllComponentIndexes(entity);
+  std::vector<std::pair<ComponentID, unsigned int>> componentsToDelete = entityIndexes.getAllComponentIndexes(entity);
 
   for(auto [componentID, direction] : componentsToDelete)
     components.removeComponent(componentID, direction);
+
+  entityIndexes.removeEntity(entity);
 }
