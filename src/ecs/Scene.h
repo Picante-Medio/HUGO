@@ -14,6 +14,13 @@ class Scene {
   ComponentDenseTable componentTable;
   std::vector<System> systems;
 
+
+  template<typename T>
+  T& getComponent(EntityID entity) {
+    ComponentID componentID = getComponentId<T>();
+    return componentTable.getComponent<T>(entityIndexes.getDenseListIndex(entity, componentID));
+  }
+
 public:
   Scene();
 
@@ -47,6 +54,30 @@ public:
 
   template<typename ...Ts>
   Query<Ts...> query() {
+    Query<Ts...> returnedQuery;
+
     // Expandir los parámetros del pack para obtener las N denselists
+    std::vector<ComponentID> ids = getAllComponentIds<Ts...>();
+
+    int smallestListIndex = 0;
+    DenseListIndex smallestSize = componentTable.getCount(ids[0]);
+    for(int i = 1; i < ids.size(); ++i)
+      if(componentTable.getCount(ids[i]) < smallestSize) smallestListIndex = i;
+    ComponentID componentID = ids[smallestListIndex];
+
+    std::vector<EntityID> potentialEntities = componentTable.affectedEntities(componentID);
+    for(EntityID entity : potentialEntities) {
+      bool affected = true;
+      for(ComponentID id : ids) {
+        if(!entityIndexes.hasComponent(entity, id)) {
+          affected = false; 
+          break;
+        }
+
+        if(affected) returnedQuery.push_back(getComponent<Ts>(entity)...);
+      }
+    }
+
+    return returnedQuery;
   }
 };

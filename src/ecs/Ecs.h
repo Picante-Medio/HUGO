@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 // Entities are just numbers
 using EntityID = unsigned long int;
 
@@ -34,4 +36,9 @@ template<typename T>
 static ComponentID getComponentId() {
   static ComponentID index = getNextID();
   return index;
+}
+
+template<typename... Ts>
+std::vector<int> getAllComponentIds() {
+    return { getComponentId<Ts>()... };
 }

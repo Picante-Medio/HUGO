@@ -12,6 +12,7 @@ class IDenseList {
 public:
   virtual DenseListIndex getCount() const = 0;
   virtual EntityID remove(DenseListIndex index) = 0;
+  virtual std::vector<EntityID> getAffectedEntities() const = 0;
 };
 
 /**
@@ -75,4 +76,7 @@ public:
 
     return components[index];
   }
+
+
+  std::vector<EntityID> getAffectedEntities() const override { return entityIdList; }
 };

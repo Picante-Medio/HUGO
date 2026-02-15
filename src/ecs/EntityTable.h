@@ -68,7 +68,6 @@ public:
   */
   bool hasComponent(EntityID entity, ComponentID componentID) const;
 
-
   /** 
   * @param entity the entity that the component is attached to
   * @param componentID the unique ID of the type of the component
