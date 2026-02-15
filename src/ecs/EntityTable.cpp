@@ -46,7 +46,7 @@ EntityTable::hasComponent(EntityID entity, ComponentID componentID) const {
   return componentMask[entity][componentID];
 }
 
-unsigned int 
+DenseListIndex 
 EntityTable::getDenseListIndex(EntityID entity, ComponentID componentID) const {
   return componentDirections[entity][componentID];
 }
