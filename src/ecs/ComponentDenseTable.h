@@ -15,17 +15,6 @@ class ComponentDenseTable {
   std::array<std::unique_ptr<IDenseList>, MAX_COMPONENTS> componentLists; // Components packed and alligned in memory
 
   /**
-  * @brief auxiliar function that casts an IDenseList to a DenseList of a certain type
-  * @tparam the type of component that the casted list stores
-  * @return a pointer to the specified type of dense list
-  */
-  template<typename T>
-  std::unique_ptr<DenseList<T>> getComponentList() {
-    ComponentID cmpID = getComponentId<T>();
-    std::unique_ptr<DenseList<T>> list = static_cast<std::unique_ptr<DenseList<T>>>(componentLists[cmpID]);
-  }
-
-  /**
   * @brief auxiliar function that creates a DenseList of the specified type if it does not exist yet
   * @tparam the type of component that the casted list stores
   */
@@ -33,8 +22,19 @@ class ComponentDenseTable {
   void ensureListExists() {
     ComponentID componentID = getComponentId<T>();
     if(componentLists[componentID] != nullptr) return;
-
     componentLists[componentID] = std::make_unique<DenseList<T>>();
+  }
+
+  /**
+  * @brief auxiliar function that casts an IDenseList to a DenseList of a certain type
+  * @tparam the type of component that the casted list stores
+  * @return a pointer to the specified type of dense list
+  */
+  template<typename T>
+  std::unique_ptr<DenseList<T>> getComponentList() {
+    ensureListExists<T>();
+    ComponentID cmpID = getComponentId<T>();
+    std::unique_ptr<DenseList<T>> list = static_cast<std::unique_ptr<DenseList<T>>>(componentLists[cmpID]);
   }
 
 public:
@@ -57,7 +57,6 @@ public:
   */
   template<typename T>
   T& getComponent(DenseListIndex index) {
-    ensureListExists<T>();
     return getComponentList<T>()->getComponent(index);
   }
 
@@ -70,7 +69,6 @@ public:
   */
   template<typename T>
   DenseListIndex addComponent(const T& component, EntityID entity) {
-    ensureListExists<T>();
     return getComponentList<T>()->addComponent(component, entity);
   }
 
@@ -83,7 +81,6 @@ public:
   */
   template<typename T>
   EntityID removeComponent(DenseListIndex index) {
-    ensureListExists<T>();
     removeComponent(getComponentId<T>(), index);
   };
 
@@ -95,7 +92,6 @@ public:
   */
   template<typename T>
   T& getCount() const {
-    ensureListExists<T>();
     return getCount(getComponentId<T>());
   }
 };

@@ -6,6 +6,7 @@
 #include "Ecs.h"
 #include "ComponentDenseTable.h"
 #include "EntityTable.h"
+#include "Query.h"
 #include "System.h"
 
 class Scene {
@@ -42,5 +43,10 @@ public:
     entityIndexes.deRegisterComponent(entity, id);
     EntityID toUpdate = componentTable.removeComponent<T>();
     entityIndexes.updateDenseListIndex(toUpdate, id, oldIndex);
+  }
+
+  template<typename ...Ts>
+  Query<Ts...> query() {
+    // Expandir los parámetros del pack para obtener las N denselists
   }
 };
