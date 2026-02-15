@@ -21,12 +21,14 @@ public:
   void removeEntity(EntityID entity);
 
   // Manejo de componentes
-  void registerComponent(EntityID entity, ComponentID componentID, ComponentID componentDirection);
+  void registerComponent(EntityID entity, ComponentID componentID, ComponentIndex index);
   void deRegisterComponent(EntityID entity, ComponentID componentID);
+  void updateComponentIndex(EntityID entity, ComponentID componentID, ComponentIndex index);
 
   bool hasComponent(EntityID entity, ComponentID componentID) const;
   unsigned int getComponentIndex(EntityID entity, ComponentID componentID) const;
 
   // Used to delete all components of a dead entity
-  std::vector<std::pair<ComponentID, unsigned int>> getAllComponentIndexes(EntityID entity);
+  std::vector<std::pair<ComponentID, ComponentIndex>> getAllComponentIndexes(EntityID entity);
 };
+

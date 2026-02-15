@@ -1,5 +1,6 @@
 #pragma once
 
+#include <utility>
 #include <vector>
 
 #include "Ecs.h"
@@ -9,7 +10,7 @@
 
 class Scene {
   EntityTable entityIndexes;
-  ComponentDenseTable components;
+  ComponentDenseTable componentTable;
   std::vector<System> systems;
 
 public:
@@ -28,11 +29,16 @@ public:
   // Component handling
   template<typename T, typename ...Ts>
   void addComponent(EntityID entity, Ts &&... args) {
-
+    T component(entity, std::forward<Ts>(args)...);
+    ComponentID id = getComponentId<T>();
   }
 
   template<typename T>
   void removeComponent(EntityID entity) {
-
+    ComponentID id = getComponentId<T>();
+    ComponentIndex oldIndex = entityIndexes.getComponentIndex(entity, id);
+    entityIndexes.deRegisterComponent(entity, id);
+    EntityID toUpdate = componentTable.removeComponent<T>();
+    entityIndexes.updateComponentIndex(toUpdate, id, oldIndex);
   }
 };

@@ -27,14 +27,19 @@ void EntityTable::removeEntity(EntityID entity) {
 }
 
 void 
-EntityTable::registerComponent(EntityID entity, ComponentID componentID, ComponentID componentDirection) {
+EntityTable::registerComponent(EntityID entity, ComponentID componentID, ComponentIndex index) {
   componentMask[entity][componentID] = 1;
-  componentDirections[entity][componentID] = componentDirection;
+  componentDirections[entity][componentID] = index;
 }
 
 void 
 EntityTable::deRegisterComponent(EntityID entity, ComponentID componentID) {
   componentMask[entity][componentID] = 0;
+}
+
+void 
+EntityTable::updateComponentIndex(EntityID entity, ComponentID componentID) {
+
 }
 
 bool 
@@ -47,10 +52,9 @@ EntityTable::getComponentIndex(EntityID entity, ComponentID componentID) const {
   return componentDirections[entity][componentID];
 }
 
-
-std::vector<std::pair<ComponentID, unsigned int>> 
+std::vector<std::pair<ComponentID, ComponentIndex>> 
 EntityTable::getAllComponentIndexes(EntityID entity) {
-  std::vector<std::pair<ComponentID, unsigned int>> list;
+  std::vector<std::pair<ComponentID, ComponentIndex>> list;
 
   for(ComponentID id = 0; id < MAX_COMPONENTS; ++id) {
     if(componentMask[entity][id]) continue;

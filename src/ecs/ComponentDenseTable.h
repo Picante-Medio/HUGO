@@ -1,21 +1,45 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 #include <array>
 
-#include "Component.h"
 #include "Ecs.h"
-
-using ComponentIndex = unsigned long int;
+#include "DenseList.h"
 
 class ComponentDenseTable {
-  std::array<std::vector<Component>, MAX_COMPONENTS> components; // Components packed and alligned in memory
-  std::array<ComponentIndex, MAX_COMPONENTS> lastAlive; // Index of the last component alive of a certain type
+  std::array<std::unique_ptr<IDenseList>, MAX_COMPONENTS> componentLists; // Components packed and alligned in memory
+  std::array<ComponentIndex, MAX_COMPONENTS> activeSize; // Size of the vector of alive components
+
+  template<typename T>
+  std::unique_ptr<DenseList<T>> getComponentList() {
+    ComponentID cmpID = getComponentIndex<T>();
+    std::unique_ptr<DenseList<T>> list = static_cast<std::unique_ptr<DenseList<T>>>(componentLists[cmpID]);
+  }
 
 public:
   ComponentDenseTable();
 
-  Component& getComponent(ComponentID componentID, unsigned int direction);
-  void removeComponent(ComponentID componentID, unsigned int direction);
-  ComponentIndex addComponent(ComponentID componentID, Component component);
+  EntityID removeComponent(ComponentID id, ComponentIndex index);
+  ComponentIndex getCount(ComponentID id) const;
+
+  template<typename T>
+  T& getComponent(ComponentIndex index) {
+    return getComponentList<T>()->getComponent(index);
+  }
+
+  template<typename T>
+  ComponentIndex addComponent(const T& component, EntityID entity) {
+    return getComponentList<T>()->addComponent(component, entity);
+  }
+
+  template<typename T>
+  EntityID removeComponent(ComponentIndex direction) {
+    removeComponent(getComponentIndex<T>(), direction);
+  };
+
+  template<typename T>
+  T& getCount() const {
+    return getCount(getComponentIndex<T>());
+  }
 };
