@@ -1,6 +1,5 @@
 #include "EntityTable.h"
 #include "Ecs.h"
-#include <utility>
 #include <vector>
 
 EntityTable::EntityTable() 
@@ -13,7 +12,7 @@ EntityID EntityTable::createEntity() {
     availableEntitySpaces.pop();
   }
   else {
-    componentDirections.push_back(std::array<int, MAX_COMPONENTS>());
+    componentDirections.push_back(std::array<DenseListIndex, MAX_COMPONENTS>());
     componentMask.push_back(std::bitset<MAX_COMPONENTS>());
     newID = componentMask.size() - 1;
   }
@@ -27,7 +26,7 @@ void EntityTable::removeEntity(EntityID entity) {
 }
 
 void 
-EntityTable::registerComponent(EntityID entity, ComponentID componentID, ComponentIndex index) {
+EntityTable::registerComponent(EntityID entity, ComponentID componentID, DenseListIndex index) {
   componentMask[entity][componentID] = 1;
   componentDirections[entity][componentID] = index;
 }
@@ -38,7 +37,7 @@ EntityTable::deRegisterComponent(EntityID entity, ComponentID componentID) {
 }
 
 void 
-EntityTable::updateComponentIndex(EntityID entity, ComponentID componentID, ComponentIndex index) {
+EntityTable::updateDenseListIndex(EntityID entity, ComponentID componentID, DenseListIndex index) {
   componentDirections[entity][componentID] = index;
 }
 
@@ -48,13 +47,13 @@ EntityTable::hasComponent(EntityID entity, ComponentID componentID) const {
 }
 
 unsigned int 
-EntityTable::getComponentIndex(EntityID entity, ComponentID componentID) const {
+EntityTable::getDenseListIndex(EntityID entity, ComponentID componentID) const {
   return componentDirections[entity][componentID];
 }
 
-std::vector<std::pair<ComponentID, ComponentIndex>> 
-EntityTable::getAllComponentIndexes(EntityID entity) {
-  std::vector<std::pair<ComponentID, ComponentIndex>> list;
+std::vector<std::pair<ComponentID, DenseListIndex>> 
+EntityTable::getAllDenseListIndexes(EntityID entity) {
+  std::vector<std::pair<ComponentID, DenseListIndex>> list;
 
   for(ComponentID id = 0; id < MAX_COMPONENTS; ++id) {
     if(componentMask[entity][id]) continue;

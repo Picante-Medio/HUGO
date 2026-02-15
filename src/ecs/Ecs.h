@@ -3,18 +3,26 @@
 // Entities are just numbers
 using EntityID = unsigned long int;
 
-// Types and values
+// Identifier assigned dynamically to every component
 using ComponentID = unsigned int;
+
+// Component ID limit
 constexpr ComponentID MAX_COMPONENTS = 256;
 
-using ComponentIndex = unsigned long int;
+// Index on the component dense list
+using DenseListIndex = unsigned long int;
 
-// ID casting
+
+// Static methods to create the IDs dinamically
 static ComponentID getNextID() {
   static ComponentID index = 0;
-  return index++;
+  index += 1;
+
+  if(index >= MAX_COMPONENTS) throw "Too many components";
+  return index;
 }
 
+// Returns the same ID on everry call with a certain type. It is only meant to be used with component types
 template<typename T>
 static ComponentID getComponentId() {
   static ComponentID index = getNextID();

@@ -9,7 +9,6 @@
 
 class ComponentDenseTable {
   std::array<std::unique_ptr<IDenseList>, MAX_COMPONENTS> componentLists; // Components packed and alligned in memory
-  std::array<ComponentIndex, MAX_COMPONENTS> activeSize; // Size of the vector of alive components
 
   template<typename T>
   std::unique_ptr<DenseList<T>> getComponentList() {
@@ -17,29 +16,41 @@ class ComponentDenseTable {
     std::unique_ptr<DenseList<T>> list = static_cast<std::unique_ptr<DenseList<T>>>(componentLists[cmpID]);
   }
 
-public:
-  ComponentDenseTable();
+  template<typename T>
+  void ensureListExists() {
+    ComponentID componentID = getComponentId<T>();
+    if(componentLists[componentID] != nullptr) return;
 
-  EntityID removeComponent(ComponentID id, ComponentIndex index);
-  ComponentIndex getCount(ComponentID id) const;
+    componentLists[componentID] = std::make_unique<DenseList<T>>();
+  }
+
+public:
+  ComponentDenseTable(); 
+
+  EntityID removeComponent(ComponentID id, DenseListIndex index);
+  DenseListIndex getCount(ComponentID id) const;
 
   template<typename T>
-  T& getComponent(ComponentIndex index) {
+  T& getComponent(DenseListIndex index) {
+    ensureListExists<T>();
     return getComponentList<T>()->getComponent(index);
   }
 
   template<typename T>
-  ComponentIndex addComponent(const T& component, EntityID entity) {
+  DenseListIndex addComponent(const T& component, EntityID entity) {
+    ensureListExists<T>();
     return getComponentList<T>()->addComponent(component, entity);
   }
 
   template<typename T>
-  EntityID removeComponent(ComponentIndex direction) {
+  EntityID removeComponent(DenseListIndex direction) {
+    ensureListExists<T>();
     removeComponent(getComponentId<T>(), direction);
   };
 
   template<typename T>
   T& getCount() const {
+    ensureListExists<T>();
     return getCount(getComponentId<T>());
   }
 };

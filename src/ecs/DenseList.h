@@ -1,12 +1,17 @@
+#pragma once
+
 #include <vector>
 
 #include "Ecs.h"
 #include "Component.h"
 
+/**
+  * @brief Middleground interface for the generic dense list
+*/
 class IDenseList {
 public:
-  virtual ComponentIndex getCount() const = 0;
-  virtual EntityID remove(ComponentIndex index) = 0;
+  virtual DenseListIndex getCount() const = 0;
+  virtual EntityID remove(DenseListIndex index) = 0;
   virtual void removeAllComponents() = 0;
 };
 
@@ -14,13 +19,13 @@ template<typename T>
 class DenseList : public IDenseList {
   std::vector<T> components;
   std::vector<EntityID> idList;
-  ComponentIndex activeComponentCount;
+  DenseListIndex activeComponentCount;
 
 public:
   DenseList() : components(), activeComponentCount(0u)
   {}
 
-  ComponentIndex addComponent(const T& component, EntityID entity) {
+  DenseListIndex addComponent(const T& component, EntityID entity) {
     if(activeComponentCount == components.size()) 
       components.push_back(component);
 
@@ -32,11 +37,11 @@ public:
     return activeComponentCount - 1;
   }
 
-  ComponentIndex getCount() const override {
+  DenseListIndex getCount() const override {
     return activeComponentCount;
   }
 
-  EntityID remove(ComponentIndex index) override {
+  EntityID remove(DenseListIndex index) override {
     activeComponentCount--;
     components[index] = std::move(components[activeComponentCount]);
     idList[index] = idList[activeComponentCount];
@@ -44,7 +49,7 @@ public:
     return idList[index];
   }
 
-  T& getComponent(ComponentIndex index) {
+  T& getComponent(DenseListIndex index) {
     if(index >= activeComponentCount) throw "Out of range";
 
     return components[index];

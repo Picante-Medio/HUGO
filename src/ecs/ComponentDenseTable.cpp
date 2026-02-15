@@ -1,13 +1,16 @@
 #include "ComponentDenseTable.h"
 
-ComponentDenseTable::ComponentDenseTable() {}
-
-EntityID 
-ComponentDenseTable::removeComponent(ComponentID id, ComponentIndex index) {
-  return componentLists[id]->remove(index);
+ComponentDenseTable::ComponentDenseTable() {
+    componentLists.fill(nullptr);
+    activeSize.fill(0u);
 }
 
-ComponentIndex 
-ComponentDenseTable::getCount(ComponentID id) const {
-  return componentLists[id]->getCount();
+EntityID
+ComponentDenseTable::removeComponent(ComponentID componentID, DenseListIndex index) {
+  return componentLists[componentID]->remove(index);
+}
+
+DenseListIndex 
+ComponentDenseTable::getCount(ComponentID componentID) const {
+  return componentLists[componentID]->getCount();
 }

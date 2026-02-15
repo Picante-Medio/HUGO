@@ -31,14 +31,16 @@ public:
   void addComponent(EntityID entity, Ts &&... args) {
     T component(entity, std::forward<Ts>(args)...);
     ComponentID id = getComponentId<T>();
+
+    entityIndexes.registerComponent(entity, id, componentTable.addComponent(component, entity));
   }
 
   template<typename T>
   void removeComponent(EntityID entity) {
     ComponentID id = getComponentId<T>();
-    ComponentIndex oldIndex = entityIndexes.getComponentIndex(entity, id);
+    DenseListIndex oldIndex = entityIndexes.getDenseListIndex(entity, id);
     entityIndexes.deRegisterComponent(entity, id);
     EntityID toUpdate = componentTable.removeComponent<T>();
-    entityIndexes.updateComponentIndex(toUpdate, id, oldIndex);
+    entityIndexes.updateDenseListIndex(toUpdate, id, oldIndex);
   }
 };
