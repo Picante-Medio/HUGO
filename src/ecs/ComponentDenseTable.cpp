@@ -1,8 +1,6 @@
 #include "ComponentDenseTable.h"
 
-ComponentDenseTable::ComponentDenseTable() {
-
-}
+ComponentDenseTable::ComponentDenseTable() {}
 
 EntityID 
 ComponentDenseTable::removeComponent(ComponentID id, ComponentIndex index) {

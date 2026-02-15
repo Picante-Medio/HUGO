@@ -29,7 +29,7 @@ Scene::removeEntity(EntityID entity) {
   std::vector<std::pair<ComponentID, ComponentIndex>> componentsToDelete = entityIndexes.getAllComponentIndexes(entity);
 
   for(auto [componentID, direction] : componentsToDelete)
-    components.removeComponent(componentID, direction);
+    componentTable.removeComponent(componentID, direction);
 
   entityIndexes.removeEntity(entity);
 }

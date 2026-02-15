@@ -50,7 +50,3 @@ public:
     return components[index];
   }
 };
-
-template<typename T>
-DenseList<T>& getComponentList() {
-}

@@ -13,7 +13,7 @@ class ComponentDenseTable {
 
   template<typename T>
   std::unique_ptr<DenseList<T>> getComponentList() {
-    ComponentID cmpID = getComponentIndex<T>();
+    ComponentID cmpID = getComponentId<T>();
     std::unique_ptr<DenseList<T>> list = static_cast<std::unique_ptr<DenseList<T>>>(componentLists[cmpID]);
   }
 
@@ -35,11 +35,11 @@ public:
 
   template<typename T>
   EntityID removeComponent(ComponentIndex direction) {
-    removeComponent(getComponentIndex<T>(), direction);
+    removeComponent(getComponentId<T>(), direction);
   };
 
   template<typename T>
   T& getCount() const {
-    return getCount(getComponentIndex<T>());
+    return getCount(getComponentId<T>());
   }
 };

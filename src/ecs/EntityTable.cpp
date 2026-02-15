@@ -38,8 +38,8 @@ EntityTable::deRegisterComponent(EntityID entity, ComponentID componentID) {
 }
 
 void 
-EntityTable::updateComponentIndex(EntityID entity, ComponentID componentID) {
-
+EntityTable::updateComponentIndex(EntityID entity, ComponentID componentID, ComponentIndex index) {
+  componentDirections[entity][componentID] = index;
 }
 
 bool 
