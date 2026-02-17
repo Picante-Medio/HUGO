@@ -38,6 +38,7 @@ ExternalProject_Add(freetype_external
     CMAKE_CACHE_ARGS
         -DCMAKE_INSTALL_PREFIX:PATH=${COMMON_INSTALL_PREFIX}
         -DCMAKE_BUILD_TYPE:STRING=${MY_BUILD_TYPE}
+        -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
 )
 
 list(APPEND DEPENDENCIES_LIST freetype_external)
@@ -157,6 +158,8 @@ ExternalProject_Add(ogre_external
 
 list(APPEND DEPENDENCIES_LIST ogre_external)
 
+set(HUGO_LINKER_FLAGS "-lpng -lbz2 -lbrotlidec")
+
 ExternalProject_Add(hugo_external
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src
     BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/hugo-build
@@ -169,6 +172,8 @@ ExternalProject_Add(hugo_external
         -DCMAKE_CXX_FLAGS_DEBUG:STRING=${CMAKE_CXX_FLAGS_DEBUG}
         -DCMAKE_CXX_FLAGS_RELEASE:STRING=${CMAKE_CXX_FLAGS_RELEASE}
         -DENGINE_BIN_DIR:PATH=${CMAKE_SOURCE_DIR}/bin
+    CMAKE_ARGS
+        -DCMAKE_EXE_LINKER_FLAGS=${HUGO_LINKER_FLAGS}
 
     INSTALL_COMMAND ""
 )
