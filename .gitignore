@@ -16,6 +16,9 @@
 *.o
 *.pdb
 
+#Outs en linux
+bin/HUGO*
+
 # Runfiles y demás
 **/project.godot
 **/run
