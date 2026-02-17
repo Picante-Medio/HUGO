@@ -10,6 +10,7 @@ protected:
   std::shared_ptr<Scene> scene = nullptr;
 
 public:
+  explicit System() {}
   virtual void update(double dt) {}
   virtual void fixedUpdate(double dt) {}
 };
