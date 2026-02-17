@@ -20,22 +20,32 @@
             }
         },
         {
-            "name": "LINUX_GCC_x64",
-            "displayName": "Linux GCC x64",
-            "description": "Using GCC for Linux x64 architecture",
+            "name": "Linux",
             "generator": "Unix Makefiles",
-            "architecture": "x64",
-            "binaryDir": "${sourceDir}/build/${presetName}",
+            "binaryDir": "${sourceDir}/build/linux",
             "cacheVariables": {
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/install/${presetName}",
-                "CMAKE_C_COMPILER": "gcc",
-                "CMAKE_CXX_COMPILER": "g++",
                 "CMAKE_CXX_FLAGS_DEBUG": "-O0 -g",
-                "CMAKE_CXX_FLAGS_RELEASE": "-O3",
-                "OGRE_BUILD_MSVC_MP": "OFF",
-                "OGRE_BUILD_MSVC_ZM": "OFF"
+                "CMAKE_CXX_FLAGS_RELEASE": "-O3"
+            }
+        },
+        {
+            "name": "Linux-Debug",
+            "inherits": "Linux",
+            "binaryDir": "${sourceDir}/build/linux-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "Linux-Release",
+            "inherits": "Linux",
+            "binaryDir": "${sourceDir}/build/linux-release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
             }
         }
+
     ],
     "buildPresets": [
         {
@@ -53,18 +63,17 @@
             "jobs": 8
         },
         {
-            "name": "DEBUG_LINUX_GCC_x64",
+            "name": "DEBUG_LINUX",
             "displayName": "DEBUG Linux GCC x64",
-            "configurePreset": "LINUX_GCC_x64",
-            "configuration": "Debug",
+            "configurePreset": "Linux-Debug",
             "jobs": 8
         },
         {
-            "name": "RELEASE_LINUX_GCC_x64",
+            "name": "RELEASE_LINUX",
             "displayName": "RELEASE Linux GCC x64",
-            "configurePreset": "LINUX_GCC_x64",
-            "configuration": "Release",
+            "configurePreset": "Linux-Release",
             "jobs": 8
         }
     ]
+
 }
