@@ -12,6 +12,8 @@ else()
     set(MY_BUILD_TYPE ${CMAKE_BUILD_TYPE})
 endif()
 
+set(DEPENDENCIES_LIST "")
+
 set(COMMON_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/Dependencies/${CMAKE_SYSTEM_PROCESSOR})
 
 set(JOBS 8)
@@ -26,6 +28,8 @@ ExternalProject_Add(pugixml_external
         -DCMAKE_BUILD_TYPE:STRING=${MY_BUILD_TYPE}
 )
 
+list(APPEND DEPENDENCIES_LIST pugixml_external)
+
 ExternalProject_Add(freetype_external
     GIT_REPOSITORY "https://gitlab.freedesktop.org/freetype/freetype.git"
     GIT_TAG "VER-2-14-1"
@@ -35,6 +39,8 @@ ExternalProject_Add(freetype_external
         -DCMAKE_INSTALL_PREFIX:PATH=${COMMON_INSTALL_PREFIX}
         -DCMAKE_BUILD_TYPE:STRING=${MY_BUILD_TYPE}
 )
+
+list(APPEND DEPENDENCIES_LIST freetype_external)
 
 if(MSVC OR MINGW OR SKBUILD)
 
@@ -48,6 +54,8 @@ if(MSVC OR MINGW OR SKBUILD)
             -DCMAKE_BUILD_TYPE:STRING=${MY_BUILD_TYPE}
             -DBUILD_SHARED_LIBS:BOOL=ON
     )
+
+    list(APPEND DEPENDENCIES_LIST sdl2_external)
 
 endif()
 
@@ -138,7 +146,7 @@ ExternalProject_Add(ogre_external
     GIT_TAG "v14.5.2"
     GIT_SHALLOW TRUE
 
-    DEPENDS sdl2_external pugixml_external freetype_external
+    DEPENDS ${DEPENDENCIES_LIST}
 
     CMAKE_CACHE_ARGS
         -DOGRE_DEPENDENCIES_DIR:PATH=${COMMON_INSTALL_PREFIX}
@@ -147,11 +155,13 @@ ExternalProject_Add(ogre_external
         ${OGRE_OPTIONS}
 )
 
+list(APPEND DEPENDENCIES_LIST ogre_external)
+
 ExternalProject_Add(hugo_external
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src
     BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/hugo-build
     
-    DEPENDS sdl2_external pugixml_external freetype_external ogre_external
+    DEPENDS ${DEPENDENCIES_LIST}
     
     CMAKE_CACHE_ARGS
         -DCMAKE_PREFIX_PATH:PATH=${COMMON_INSTALL_PREFIX}
@@ -162,3 +172,5 @@ ExternalProject_Add(hugo_external
 
     INSTALL_COMMAND ""
 )
+
+message(status "${DEPENDENCIES_LIST}")
