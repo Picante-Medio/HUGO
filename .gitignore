@@ -1,9 +1,9 @@
 # Directories
 [Bb]uild/*
-[Bb]in/*
-.vscode/*
-.obsidian/*
-.git/*
+#[Bb]in/*
+**/.vscode/*
+**/.obsidian/*
+**/.git/*
 
 # Ficheros
 *.dll
@@ -17,5 +17,5 @@
 *.pdb
 
 # Runfiles y demás
-./project.godot
-./run.sh
+**/project.godot
+**/run.sh
