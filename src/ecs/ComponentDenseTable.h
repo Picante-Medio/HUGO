@@ -34,7 +34,7 @@ class ComponentDenseTable {
   std::unique_ptr<DenseList<T>> getComponentList() {
     ensureListExists<T>();
     ComponentID cmpID = getComponentId<T>();
-    std::unique_ptr<DenseList<T>> list = static_cast<std::unique_ptr<DenseList<T>>>(componentLists[cmpID]);
+    return static_cast<std::unique_ptr<DenseList<T>>>(componentLists[cmpID]);
   }
 
 public:
@@ -81,7 +81,7 @@ public:
   */
   template<typename T>
   EntityID removeComponent(DenseListIndex index) {
-    removeComponent(getComponentId<T>(), index);
+    return removeComponent(getComponentId<T>(), index);
   };
 
 
