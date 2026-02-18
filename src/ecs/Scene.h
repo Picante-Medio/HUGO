@@ -23,6 +23,8 @@ class Scene {
 public:
   Scene();
 
+  inline void addSystem(System system) { systems.push_back(system); }
+
   // Logic update
   void update(double dt);
 
@@ -36,18 +38,25 @@ public:
   // Component handling
   template <typename T, typename... Ts>
   void addComponent(EntityID entity, Ts &&...args) {
+    // Creating the component
     T component(entity, std::forward<Ts>(args)...);
     ComponentID id = getComponentId<T>();
 
+    // Adding the component
     entityTable.registerComponent(
         entity, id, componentTable.addComponent(component, entity));
   }
 
   template <typename T> void removeComponent(EntityID entity) {
+    // Obtaining the index of the component to delete
     ComponentID id = getComponentId<T>();
     DenseListIndex oldIndex = entityTable.getDenseListIndex(entity, id);
+
+    // Deleting the component
     entityTable.deRegisterComponent(entity, id);
     EntityID toUpdate = componentTable.removeComponent<T>();
+
+    // Updating the index of the moved component upon deletion
     entityTable.updateDenseListIndex(toUpdate, id, oldIndex);
   }
 
