@@ -14,7 +14,7 @@ endif()
 
 set(DEPENDENCIES_LIST "")
 
-set(COMMON_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/Dependencies/${CMAKE_SYSTEM_PROCESSOR})
+set(COMMON_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/deps-install/${CMAKE_SYSTEM_PROCESSOR})
 
 set(JOBS 8)
 
@@ -156,8 +156,6 @@ ExternalProject_Add(ogre_external
         ${OGRE_OPTIONS}
 )
 
-list(APPEND DEPENDENCIES_LIST ogre_external)
-
 set(HUGO_LINKER_FLAGS "-lpng -lbz2 -lbrotlidec")
 
 ExternalProject_Add(hugo_external
@@ -177,5 +175,3 @@ ExternalProject_Add(hugo_external
 
     INSTALL_COMMAND ""
 )
-
-message(status "${DEPENDENCIES_LIST}")

@@ -16,6 +16,8 @@ add_executable(${PROJECT_NAME} main.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     OgreMain
     OgreOverlay
+    RenderSystem_GL3Plus
+    RenderSystem_GL
     SDL2::SDL2
     SDL2::SDL2main)
 
