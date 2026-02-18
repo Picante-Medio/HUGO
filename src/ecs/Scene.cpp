@@ -26,7 +26,7 @@ Scene::createEntity() {
 
 void
 Scene::removeEntity(EntityID entity) {
-  std::vector<std::pair<ComponentID, ComponentIndex>> componentsToDelete = entityIndexes.getAllComponentIndexes(entity);
+  std::vector<std::pair<ComponentID, DenseListIndex>> componentsToDelete = entityIndexes.getAllDenseListIndexes(entity);
 
   for(auto [componentID, direction] : componentsToDelete)
     componentTable.removeComponent(componentID, direction);
