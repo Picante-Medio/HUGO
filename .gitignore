@@ -16,6 +16,7 @@
 *.o
 *.pdb
 *.clangd
+*.log
 
 #Outs en linux
 bin/HUGO*
