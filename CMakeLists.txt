@@ -158,6 +158,21 @@ ExternalProject_Add(ogre_external
 
 list(APPEND DEPENDENCIES_LIST ogre_external)
 
+
+ExternalProject_Add(miniaudio_external
+    GIT_REPOSITORY "https://github.com/mackron/miniaudio.git"
+    GIT_TAG "0.11.24"
+    GIT_SHALLOW TRUE
+
+    CMAKE_CACHE_ARGS
+        -DCMAKE_INSTALL_PREFIX:PATH=${COMMON_INSTALL_PREFIX}
+        -DCMAKE_BUILD_TYPE:STRING=${MY_BUILD_TYPE}
+)
+
+list(APPEND DEPENDENCIES_LIST miniaudio_external)
+
+# Flags que se le pasan al linker para que busque las librerías del mismo 
+# nombre como paquete del sistema si no las ve como archivo
 set(HUGO_LINKER_FLAGS "-lpng -lbz2 -lbrotlidec")
 
 ExternalProject_Add(hugo_external
