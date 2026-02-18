@@ -8,11 +8,21 @@ find_package(SDL2 CONFIG REQUIRED)
 find_package(OGRE CONFIG REQUIRED COMPONENTS
     Overlay)
 
-# Tu ejecutable
-add_executable(${PROJECT_NAME} main.cpp)
+file(GLOB_RECURSE SRC_DIRS CONFIGURE_DEPENDS  LIST_DIRECTORIES true ${CMAKE_SOURCE_DIR}/*)
 
-# Enlazar con SDL2 usando los targets modernos de CMake
-# SDL2::SDL2 es el target creado por SDL2Config.cmake [citation:1]
+set(INCLUDE_DIRS "${CMAKE_SOURCE_DIR}")
+foreach(path ${SRC_DIRS})
+    if(IS_DIRECTORY "${path}")
+        list(APPEND INCLUDE_DIRS "${path}")
+    endif()
+endforeach()
+
+file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/*.cpp)
+
+add_executable(${PROJECT_NAME} ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
+
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     OgreMain
     OgreOverlay
