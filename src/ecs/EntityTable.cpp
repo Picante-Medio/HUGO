@@ -46,6 +46,12 @@ EntityTable::hasComponent(EntityID entity, ComponentID componentID) const {
   return componentMask[entity][componentID];
 }
 
+
+bool 
+EntityTable::isInQuery(EntityID entity, std::bitset<MAX_COMPONENTS> queryMask) {
+  return (componentMask[entity] & queryMask) == queryMask;
+}
+
 DenseListIndex 
 EntityTable::getDenseListIndex(EntityID entity, ComponentID componentID) const {
   return componentDirections[entity][componentID];

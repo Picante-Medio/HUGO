@@ -13,7 +13,6 @@
  */
 class EntityTable {
   // Mask used to check if a component is in an entity
-
   std::vector<std::bitset<MAX_COMPONENTS>> componentMask;
 
   // Component directions in the dense table 
@@ -67,6 +66,14 @@ public:
   * @return true if entity has the component, false otherwise
   */
   bool hasComponent(EntityID entity, ComponentID componentID) const;
+
+  /**
+   * @brief checks if an entity has a group of components specified by a mask
+   * @param entity the entity that might be affected by the query
+   * @param queryMask the bitmask that specifies which components the entity must have to be part of the query
+   * @return true if the entity is affected by the query, false otherwise
+   */
+  bool isInQuery(EntityID entity, std::bitset<MAX_COMPONENTS> queryMask);
 
   /** 
   * @param entity the entity that the component is attached to
