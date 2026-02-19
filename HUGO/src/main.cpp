@@ -10,6 +10,11 @@
 #include "systems/render/RenderSystem.h"
 
 
+// prueba para ver que reconoce miniaudio
+#include "miniaudio.h"
+
+#include <iostream>
+
 int main(int argc, char* argv[]) {
 
     // std::pair<std::shared_ptr<Ogre::Root>, Ogre::RenderWindow*> ogreIni = HUGO::initializeOgre();
@@ -32,6 +37,8 @@ int main(int argc, char* argv[]) {
 	// 	double frameTime = vt.getDeltaTime() - starTime;
 	// 	if (frameTime < 10) SDL_Delay(10- frameTime);
 	// }
+
+    std::cout << "Prueba de funcionamiento\n";
 
     return 0;
 }

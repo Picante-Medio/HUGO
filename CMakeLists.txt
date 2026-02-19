@@ -12,11 +12,17 @@ else()
     set(MY_BUILD_TYPE ${CMAKE_BUILD_TYPE})
 endif()
 
+set(COMMON_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/HUGO/dependencies/${CMAKE_SYSTEM_PROCESSOR})
+set(DEPENDENCIES_PREFIX_PATHS "")
 set(DEPENDENCIES_LIST "")
 
-set(COMMON_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/Dependencies/${CMAKE_SYSTEM_PROCESSOR})
-
 set(JOBS 8)
+
+execute_process(
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_SOURCE_DIR}/CMakePresets.json
+        ${CMAKE_SOURCE_DIR}/HUGO/CMakePresets.json
+)
 
 ExternalProject_Add(pugixml_external
     GIT_REPOSITORY "https://github.com/zeux/pugixml.git"
@@ -24,10 +30,10 @@ ExternalProject_Add(pugixml_external
     GIT_SHALLOW TRUE
     
     CMAKE_CACHE_ARGS
-        -DCMAKE_INSTALL_PREFIX:PATH=${COMMON_INSTALL_PREFIX}
-        -DCMAKE_BUILD_TYPE:STRING=${MY_BUILD_TYPE}
-)
+        -DCMAKE_INSTALL_PREFIX:PATH=${COMMON_INSTALL_PREFIX}/pugixml
+        -DCMAKE_BUILD_TYPE:STRING=${MY_BUILD_TYPE})
 
+list(APPEND DEPENDENCIES_PREFIX_PATHS ${COMMON_INSTALL_PREFIX}/pugixml)
 list(APPEND DEPENDENCIES_LIST pugixml_external)
 
 ExternalProject_Add(freetype_external
@@ -36,11 +42,12 @@ ExternalProject_Add(freetype_external
     GIT_SHALLOW TRUE
     
     CMAKE_CACHE_ARGS
-        -DCMAKE_INSTALL_PREFIX:PATH=${COMMON_INSTALL_PREFIX}
+        -DCMAKE_INSTALL_PREFIX:PATH=${COMMON_INSTALL_PREFIX}/freetype
         -DCMAKE_BUILD_TYPE:STRING=${MY_BUILD_TYPE}
         -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
 )
 
+list(APPEND DEPENDENCIES_PREFIX_PATHS ${COMMON_INSTALL_PREFIX}/freetype)
 list(APPEND DEPENDENCIES_LIST freetype_external)
 
 if(MSVC OR MINGW OR SKBUILD)
@@ -51,11 +58,12 @@ if(MSVC OR MINGW OR SKBUILD)
         GIT_SHALLOW TRUE
         
         CMAKE_CACHE_ARGS
-            -DCMAKE_INSTALL_PREFIX:PATH=${COMMON_INSTALL_PREFIX}
+            -DCMAKE_INSTALL_PREFIX:PATH=${COMMON_INSTALL_PREFIX}/sdl2
             -DCMAKE_BUILD_TYPE:STRING=${MY_BUILD_TYPE}
             -DBUILD_SHARED_LIBS:BOOL=ON
     )
 
+    list(APPEND DEPENDENCIES_PREFIX_PATHS ${COMMON_INSTALL_PREFIX}/sdl2)
     list(APPEND DEPENDENCIES_LIST sdl2_external)
 
 endif()
@@ -150,43 +158,44 @@ ExternalProject_Add(ogre_external
     DEPENDS ${DEPENDENCIES_LIST}
 
     CMAKE_CACHE_ARGS
-        -DOGRE_DEPENDENCIES_DIR:PATH=${COMMON_INSTALL_PREFIX}
-        -DCMAKE_INSTALL_PREFIX:PATH=${COMMON_INSTALL_PREFIX}
+        -DCMAKE_PREFIX_PATH:PATH=${DEPENDENCIES_PREFIX_PATHS}
+        -DCMAKE_INSTALL_PREFIX:PATH=${COMMON_INSTALL_PREFIX}/ogre
         -DCMAKE_BUILD_TYPE:STRING=${MY_BUILD_TYPE}
         ${OGRE_OPTIONS}
 )
 
+list(APPEND DEPENDENCIES_PREFIX_PATHS ${COMMON_INSTALL_PREFIX}/ogre)
 list(APPEND DEPENDENCIES_LIST ogre_external)
 
 
-ExternalProject_Add(miniaudio_external
-    GIT_REPOSITORY "https://github.com/mackron/miniaudio.git"
-    GIT_TAG "0.11.24"
-    GIT_SHALLOW TRUE
+#ExternalProject_Add(miniaudio_external
+#    GIT_REPOSITORY "https://github.com/mackron/miniaudio.git"
+#    GIT_TAG "0.11.24"
+#    GIT_SHALLOW TRUE
+#
+#    CMAKE_CACHE_ARGS
+#        -DCMAKE_INSTALL_PREFIX:PATH=${COMMON_INSTALL_PREFIX}/miniaudio
+#        -DCMAKE_BUILD_TYPE:STRING=${MY_BUILD_TYPE}
+#)
 
-    CMAKE_CACHE_ARGS
-        -DCMAKE_INSTALL_PREFIX:PATH=${COMMON_INSTALL_PREFIX}
-        -DCMAKE_BUILD_TYPE:STRING=${MY_BUILD_TYPE}
-)
+#list(APPEND CMAKE_PREFIX_PATH ${COMMON_INSTALL_PREFIX}/miniaudio)
+#list(APPEND DEPENDENCIES_LIST miniaudio_external)
 
-list(APPEND DEPENDENCIES_LIST miniaudio_external)
-
-# Flags que se le pasan al linker para que busque las librerías del mismo 
-# nombre como paquete del sistema si no las ve como archivo
-set(HUGO_LINKER_FLAGS "-lpng -lbz2 -lbrotlidec")
+if (LINUX) 
+    # Flags que se le pasan al linker para que busque las librerías del mismo 
+    # nombre como paquete del sistema si no las ve como archivo
+    set(HUGO_LINKER_FLAGS "-lpng -lbz2 -lbrotlidec")
+endif()
 
 ExternalProject_Add(hugo_external
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src
-    BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/hugo-build
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/HUGO
     
     DEPENDS ${DEPENDENCIES_LIST}
     
     CMAKE_CACHE_ARGS
-        -DCMAKE_PREFIX_PATH:PATH=${COMMON_INSTALL_PREFIX}
         -DCMAKE_BUILD_TYPE:STRING=${MY_BUILD_TYPE}
         -DCMAKE_CXX_FLAGS_DEBUG:STRING=${CMAKE_CXX_FLAGS_DEBUG}
         -DCMAKE_CXX_FLAGS_RELEASE:STRING=${CMAKE_CXX_FLAGS_RELEASE}
-        -DENGINE_BIN_DIR:PATH=${CMAKE_SOURCE_DIR}/bin
     CMAKE_ARGS
         -DCMAKE_EXE_LINKER_FLAGS=${HUGO_LINKER_FLAGS}
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON

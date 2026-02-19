@@ -1,9 +1,16 @@
 # Directories
 [Bb]uild/*
+HUGO/[Bb]uild/*
 #[Bb]in/*
 **/.vscode/*
 **/.obsidian/*
 **/.git/*
+
+#Dependencias compiladas
+HUGO/[Dd]ependencies/*
+
+#Presets duplicados
+HUGO/CMakePresets.json
 
 # Ficheros
 *.dll
@@ -19,7 +26,7 @@
 *.log
 
 #Outs en linux
-bin/HUGO*
+HUGO/bin/HUGO*
 
 # Runfiles y demás
 **/project.godot
