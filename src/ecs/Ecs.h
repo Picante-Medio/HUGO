@@ -39,6 +39,6 @@ static ComponentID getComponentId() {
 }
 
 template<typename... Ts>
-std::vector<int> getAllComponentIds() {
+std::vector<ComponentID> getAllComponentIds() {
     return { getComponentId<Ts>()... };
 }

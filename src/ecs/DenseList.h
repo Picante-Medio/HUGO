@@ -2,7 +2,6 @@
 
 #include <vector>
 
-#include "Component.h"
 #include "Ecs.h"
 
 /**
@@ -78,5 +77,8 @@ public:
   }
 
 
-  std::vector<EntityID> getAffectedEntities() const override { return entityIdList; }
+  std::vector<EntityID> getAffectedEntities() const override {
+    //Slice of the vector with only the alive entities
+    return std::vector<EntityID>(entityIdList.begin(), entityIdList.begin() + activeComponentCount);
+  }
 };

@@ -34,7 +34,7 @@ class ComponentDenseTable {
   std::shared_ptr<DenseList<T>> getComponentList() {
     ensureListExists<T>();
     ComponentID cmpID = getComponentId<T>();
-    return static_cast<std::shared_ptr<DenseList<T>>>(componentLists[cmpID]);
+    return std::static_pointer_cast<DenseList<T>>(componentLists[cmpID]);
   }
 
 public:
@@ -91,7 +91,7 @@ public:
   * @return the number of valid components stored in the DenseList
   */
   template<typename T>
-  T& getCount() const {
+  DenseListIndex getCount() const {
     return getCount(getComponentId<T>());
   }
 
