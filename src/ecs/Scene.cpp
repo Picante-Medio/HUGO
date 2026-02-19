@@ -4,7 +4,7 @@
 #include <utility>
 #include <vector>
 
-#include "../components/menssage/CreateOgreObjectComponent.h"
+#include "../components/messages/CreateOgreObjectComponent.h"
 
 Scene::Scene()
 {}

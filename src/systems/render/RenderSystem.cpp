@@ -6,7 +6,7 @@
 #include "Scene.h"
 
 #include "../components/render/OgreObjectComponent.h"
-#include "../components/menssage/CreateOgreObjectComponent.h"
+#include "../components/messages/CreateOgreObjectComponent.h"
 
 RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> ogreRoot)
     :System(scene),ogreRoot(ogreRoot)
