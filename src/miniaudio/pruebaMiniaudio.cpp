@@ -62,7 +62,7 @@ void playSoundEngine(ma_engine& engine, const char* fileName)
     ma_sleep(10000);
     ma_sound_uninit(&sound);
 }
-int main() {
+int foo() {
     ma_engine engine;
     try {
         initEngine(engine);
