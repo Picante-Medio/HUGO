@@ -11,7 +11,30 @@
 RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> ogreRoot)
     :System(scene),ogreRoot(ogreRoot)
 {
-        sceneManager = ogreRoot.get()->createSceneManager();
+    sceneManager = ogreRoot.get()->createSceneManager();
+    renderWindow = ogreRoot.get()->getAutoCreatedWindow();
+
+    // Camera
+    Ogre::Camera* mCam = sceneManager->createCamera("camera");
+
+    mCam->setNearClipDistance(1);
+	mCam->setNearClipDistance(1);
+	mCam->setFarClipDistance(10000);
+	mCam->setAutoAspectRatio(true);
+
+    defaultCameraNode = sceneManager->getRootSceneNode()->createChildSceneNode("cameraNode");
+	defaultCameraNode->attachObject(mCam);
+	defaultCameraNode->setPosition(0, 0, 200);
+
+    // Viewport
+    viewport = ogreRoot.get()->getAutoCreatedWindow()->addViewport(mCam);
+    viewport->setBackgroundColour(Ogre::ColourValue(0.3f, 0.3f, 0.5f));
+
+    mCam->setAspectRatio(float(viewport->getActualWidth()) / float(viewport->getActualHeight()));   
+
+    viewport->setCamera(mCam);
+    // Basic light
+    sceneManager->setAmbientLight(Ogre::ColourValue(0.5f, 0.5f, 0.5f));
 }
 
 void RenderSystem::handleTag()

@@ -5,17 +5,15 @@
 
 namespace HUGO{
 
-    void initializeOgre(){
-
-        /*
+    std::shared_ptr<Ogre::Root> initializeOgre(){
         std::shared_ptr<Ogre::Root> mRoot = std::make_shared<Ogre::Root>("bin/plugins.cfg", "bin/ogre.cfg");
 
         mRoot->showConfigDialog(NULL);
 
         Ogre::RenderWindow* mRenderWindow = mRoot->initialise(true, "Prueba Ogre");
 
-        mRoot->startRendering();
-        */
+        // mRoot->startRendering();
+        return mRoot;
     }
 }
 

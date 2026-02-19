@@ -1,6 +1,7 @@
 #pragma once
 
+class Ogre::Root;
 namespace HUGO
 {
-    void initializeOgre();
+    std::shared_ptr<Ogre::Root> initializeOgre();
 }

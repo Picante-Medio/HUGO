@@ -27,7 +27,7 @@ public:
         }
     }
 
-    inline double getDeltaTime() const {
+    inline Uint32 getDeltaTime() const {
         return deltaTime;
     }
    
@@ -59,4 +59,4 @@ public:
     }
 };
 
-}  // namespace HUGO
+}
