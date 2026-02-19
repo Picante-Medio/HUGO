@@ -1,5 +1,5 @@
 #include "../ecs/Component.h"
-#include "../math/HugoMath.h"
+#include "../utils/HugoMath.h"
 
 struct TransformComponent: public Component
 {
