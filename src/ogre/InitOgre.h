@@ -1,7 +1,12 @@
 #pragma once
+#include <OgreRoot.h>
 
-class Ogre::Root;
 namespace HUGO
 {
-    std::shared_ptr<Ogre::Root> initializeOgre();
+    struct OgreContext {
+        std::shared_ptr<Ogre::Root> root;
+        Ogre::RenderWindow* window;
+    };
+
+    std::pair<std::shared_ptr<Ogre::Root>, Ogre::RenderWindow*> initializeOgre();
 }

@@ -8,11 +8,10 @@
 #include "../components/render/OgreObjectComponent.h"
 #include "../components/messages/CreateOgreObjectComponent.h"
 
-RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> ogreRoot)
-    :System(scene),ogreRoot(ogreRoot)
+RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> ogreRoot, Ogre::RenderWindow* window)
+    :System(scene),ogreRoot(ogreRoot), renderWindow(window)
 {
     sceneManager = ogreRoot.get()->createSceneManager();
-    renderWindow = ogreRoot.get()->getAutoCreatedWindow();
 
     // Camera
     Ogre::Camera* mCam = sceneManager->createCamera("camera");
@@ -27,7 +26,7 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
 	defaultCameraNode->setPosition(0, 0, 200);
 
     // Viewport
-    viewport = ogreRoot.get()->getAutoCreatedWindow()->addViewport(mCam);
+    viewport = renderWindow->addViewport(mCam);
     viewport->setBackgroundColour(Ogre::ColourValue(0.3f, 0.3f, 0.5f));
 
     mCam->setAspectRatio(float(viewport->getActualWidth()) / float(viewport->getActualHeight()));   

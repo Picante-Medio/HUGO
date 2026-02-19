@@ -13,7 +13,7 @@ private:
     void handleTag();
 
 public:
-    RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> root);
+    RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> root, Ogre::RenderWindow* window);
     void update(double dt) override;
     void fixedUpdate(double dt) override;
 };

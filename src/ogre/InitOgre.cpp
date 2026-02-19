@@ -5,7 +5,7 @@
 
 namespace HUGO{
 
-    std::shared_ptr<Ogre::Root> initializeOgre(){
+    std::pair<std::shared_ptr<Ogre::Root>, Ogre::RenderWindow*> initializeOgre(){
         std::shared_ptr<Ogre::Root> mRoot = std::make_shared<Ogre::Root>("bin/plugins.cfg", "bin/ogre.cfg");
 
         mRoot->showConfigDialog(NULL);
@@ -13,7 +13,7 @@ namespace HUGO{
         Ogre::RenderWindow* mRenderWindow = mRoot->initialise(true, "Prueba Ogre");
 
         // mRoot->startRendering();
-        return mRoot;
+        return std::make_pair(mRoot, mRenderWindow);
     }
 }
 
