@@ -12,7 +12,7 @@
   * @brief a list of DenseList objects, each DenseList of a different type of component
   */
 class ComponentDenseTable {
-  std::array<std::unique_ptr<IDenseList>, MAX_COMPONENTS> componentLists; // Components packed and alligned in memory
+  std::array<std::shared_ptr<IDenseList>, MAX_COMPONENTS> componentLists; // Components packed and alligned in memory
 
   /**
   * @brief auxiliar function that creates a DenseList of the specified type if it does not exist yet
@@ -31,10 +31,10 @@ class ComponentDenseTable {
   * @return a pointer to the specified type of dense list
   */
   template<typename T>
-  std::unique_ptr<DenseList<T>> getComponentList() {
+  std::shared_ptr<DenseList<T>> getComponentList() {
     ensureListExists<T>();
     ComponentID cmpID = getComponentId<T>();
-    return static_cast<std::unique_ptr<DenseList<T>>>(componentLists[cmpID]);
+    return static_cast<std::shared_ptr<DenseList<T>>>(componentLists[cmpID]);
   }
 
 public:

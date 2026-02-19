@@ -1,6 +1,7 @@
 #include "ComponentDenseTable.h"
 
 ComponentDenseTable::ComponentDenseTable() {
+  componentLists.fill(nullptr);
 }
 
 EntityID
