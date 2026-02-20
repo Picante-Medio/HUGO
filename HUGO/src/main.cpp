@@ -8,15 +8,14 @@
 #include "utils/HugoVirtualTimer.h"
 #include "ecs/Scene.h"
 #include "systems/render/RenderSystem.h"
-
-
-// prueba para ver que reconoce miniaudio
+#define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"
+#include "systems/audio/AudioSystem.h"
+
 
 #include <iostream>
 
 int main(int argc, char* argv[]) {
-
     // std::pair<std::shared_ptr<Ogre::Root>, Ogre::RenderWindow*> ogreIni = HUGO::initializeOgre();
     // auto scenePtr = std::make_shared<Scene>();
     // RenderSystem renderSystem(scenePtr, ogreIni.first, ogreIni.second);
@@ -43,8 +42,5 @@ int main(int argc, char* argv[]) {
     core.init();
     core.run();
     core.destroy();
-
-    std::cout << "Prueba de funcionamiento\n";
-
     return 0;
 }
