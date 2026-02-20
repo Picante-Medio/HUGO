@@ -77,9 +77,19 @@ void RenderSystem::fixedUpdate(double dt)
 {
 }
 
-void RenderSystem::fullScreen()
+void RenderSystem::setfullScreen()
 {
     auto desc = ogreRoot->getRenderSystem()->getRenderWindowDescription();
     
     renderWindow->setFullscreen(true, desc.width, desc.height);
+
+
+    viewport->_updateDimensions();
+}
+
+void RenderSystem::resizeScreen(unsigned int widthPt, unsigned int heightPt)
+{
+    renderWindow->resize(widthPt, heightPt);
+
+    viewport->_updateDimensions();
 }

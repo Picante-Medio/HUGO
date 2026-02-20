@@ -17,6 +17,6 @@ public:
     void update(double dt) override;
     void fixedUpdate(double dt) override;
 
-    void fullScreen();
+    void setfullScreen();
     void resizeScreen(unsigned int widthPt, unsigned int heightPt);
 };
