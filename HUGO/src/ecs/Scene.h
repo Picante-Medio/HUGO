@@ -88,6 +88,4 @@ public:
 
     return returnedQuery;
   }
-
-  void addRenderEntity(EntityID entity, const std::string& meshName, const std::string& materialName="");
 };

@@ -36,8 +36,3 @@ Scene::removeEntity(EntityID entity) {
   // Deleting the entity
   entityTable.removeEntity(entity);
 }
-
-void Scene::addRenderEntity(EntityID entity, const std::string& meshName, const std::string& materialName)
-{
-  //addComponent<CreateOgreObjectComponent>(entity, meshName, materialName);
-}
