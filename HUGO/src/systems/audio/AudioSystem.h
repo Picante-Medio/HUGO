@@ -1,5 +1,6 @@
 #pragma once
 #include "System.h"
+
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"
 #include "HugoTypes.h"
