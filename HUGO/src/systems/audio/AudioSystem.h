@@ -5,6 +5,7 @@
 #include "miniaudio.h"
 #include "HugoTypes.h"
 #include <unordered_map>
+#include <vector>
 
 class AudioSystem : public System{
 private:
