@@ -1,5 +1,5 @@
 #pragma once
-#include "../ecs/Component.h"
+#include "Component.h"
 
 // 3D SFX component
 struct Sound3DComponent: public Component

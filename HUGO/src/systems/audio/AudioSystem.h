@@ -2,13 +2,14 @@
 #include "System.h"
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"
-#include "../utils/HugoTypes.h"
+#include "HugoTypes.h"
 #include <unordered_map>
 
 class AudioSystem : public System{
 private:
     std::shared_ptr<ma_engine> engine;
-    std::unordered_map<HUGO::MusicID, ma_sound> sound;
+    std::vector<ma_sound> sounds;
+    std::vector<ma_sound> musics; 
 
     //functions
     void playAudio(HUGO::MusicID id);

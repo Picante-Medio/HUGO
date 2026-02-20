@@ -2,8 +2,8 @@
 #include <stdexcept>
 #include <iostream>
 
-AudioSystem::AudioSystem(std::shared_ptr<Scene> scene): System(scene), 
-    engine(std::make_shared<ma_engine>())
+AudioSystem::AudioSystem(std::shared_ptr<Scene> scene) : System(scene),
+                                                         engine(std::make_shared<ma_engine>())
 {
     ma_result result = ma_engine_init(nullptr, engine.get());
     if (result != MA_SUCCESS) {
@@ -14,15 +14,24 @@ AudioSystem::AudioSystem(std::shared_ptr<Scene> scene): System(scene),
 
 AudioSystem::~AudioSystem(){
     //release all loaded audios
-    /*for (auto a : audios) {
-        ma_sound_uninit(a);
-    } something like that*/
+    for (auto s : sounds) {
+        ma_sound_uninit(&s);
+    }
+    for (auto m : musics) {
+        ma_sound_uninit(&m);
+    }
     ma_engine_uninit(engine.get());
 }
+
 void AudioSystem::update(double dt){
     /*
     get all the entities with an audio message to process and call handleTag()
     in the message it includes which type of sound we need to play
         handleTag();
     */
+}
+
+void AudioSystem::playAudio(HUGO::MusicID id)
+{
+    
 }
