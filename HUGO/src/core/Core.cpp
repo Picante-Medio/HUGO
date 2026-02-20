@@ -5,7 +5,7 @@ using namespace HUGO;
 
 
 Core::Core(){
-    init();
+    
 }
 
 //Inicialización de los módulos de HUGO y carga de la .dll del juego
@@ -15,7 +15,7 @@ void Core::init(){
 
 //Destrucción de los módulos del motor. Final de HUGO
 void Core::destroy(){
-
+    destroyOgre();
 }
 
 //Bucle principal de HUGO

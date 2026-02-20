@@ -39,7 +39,10 @@ int main(int argc, char* argv[]) {
 	// 	if (frameTime < 10) SDL_Delay(10- frameTime);
 	// }
 
-    HUGO::Core();
+    HUGO::Core core = HUGO::Core();
+    core.init();
+    core.run();
+    core.destroy();
 
     std::cout << "Prueba de funcionamiento\n";
 
