@@ -20,7 +20,7 @@ public:
 
   template<typename T>
   const T& get() const {
-    return std::get<T>(pack);
+    return std::get<T&>(pack);
   }
 };
 
