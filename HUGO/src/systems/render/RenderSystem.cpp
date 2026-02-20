@@ -5,8 +5,8 @@
 #include "RenderSystem.h"
 #include "Scene.h"
 
-#include "../components/render/OgreObjectComponent.h"
-#include "../components/messages/CreateOgreObjectComponent.h"
+#include "OgreObjectComponent.h"
+#include "CreateOgreObjectComponent.h"
 
 RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> ogreRoot, Ogre::RenderWindow* window)
     :System(scene),ogreRoot(ogreRoot), renderWindow(window)
@@ -75,4 +75,11 @@ void RenderSystem::update(double dt)
 
 void RenderSystem::fixedUpdate(double dt)
 {
+}
+
+void RenderSystem::fullScreen()
+{
+    auto desc = ogreRoot->getRenderSystem()->getRenderWindowDescription();
+    
+    renderWindow->setFullscreen(true, desc.width, desc.height);
 }
