@@ -4,7 +4,7 @@
 #include <OgreOverlayManager.h>
 #include <OgreTextAreaOverlayElement.h>
 
-#include "ogre/InitOgre.h"
+#include "core/Core.h"
 #include "utils/HugoVirtualTimer.h"
 #include "ecs/Scene.h"
 #include "systems/render/RenderSystem.h"
@@ -38,6 +38,8 @@ int main(int argc, char* argv[]) {
 	// 	double frameTime = vt.getDeltaTime() - starTime;
 	// 	if (frameTime < 10) SDL_Delay(10- frameTime);
 	// }
+
+    HUGO::Core();
 
     std::cout << "Prueba de funcionamiento\n";
 
