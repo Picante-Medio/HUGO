@@ -1,10 +1,7 @@
 #pragma once
 #include <memory>
-
-namespace Ogre{
-    class Root;
-    class RenderWindow;
-};
+#include "OgreRenderWindow.h"
+#include "OgreRoot.h"
 
 namespace HUGO{
     class Core{

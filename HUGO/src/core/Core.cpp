@@ -26,7 +26,7 @@ void Core::run(){
 //--------------------------- INICIALIZACIÓN MÓDULOS --------------------
 
 void Core::initOgre(){
-    m_ogreRoot = std::make_shared<Ogre::Root>("HUGO/bin/plugins.cfg", "HUGO/bin/ogre.cfg");
+    m_ogreRoot = std::make_shared<Ogre::Root>("plugins.cfg", "ogre.cfg");
 
         
     for(Ogre::RenderSystem* renderSys: m_ogreRoot->getAvailableRenderers()){
