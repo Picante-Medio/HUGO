@@ -2,6 +2,10 @@
 #include <memory>
 #include "OgreRenderWindow.h"
 #include "OgreRoot.h"
+#include "HugoVirtualTimer.h"
+
+class Scene;
+class VirtualTimer;
 
 namespace HUGO{
     class Core{
@@ -21,6 +25,10 @@ namespace HUGO{
     
         std::shared_ptr<Ogre::Root> m_ogreRoot;
         Ogre::RenderWindow* m_renderWindow;
+
+        VirtualTimer vt;
+
+        std::shared_ptr<Scene> scenePtr;
     };
 
 }

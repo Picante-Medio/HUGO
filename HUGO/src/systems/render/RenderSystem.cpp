@@ -1,12 +1,16 @@
 #include "Ogre.h"
+
+#include <iostream>
+
 #include "OgreSceneManager.h"
 #include "OgreRenderWindow.h"
 
 #include "RenderSystem.h"
 #include "Scene.h"
-
 #include "OgreObjectComponent.h"
 #include "CreateOgreObjectComponent.h"
+
+
 
 RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> ogreRoot, Ogre::RenderWindow* window)
     :System(scene),ogreRoot(ogreRoot), renderWindow(window)
@@ -32,8 +36,28 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
     mCam->setAspectRatio(float(viewport->getActualWidth()) / float(viewport->getActualHeight()));   
 
     viewport->setCamera(mCam);
+
     // Basic light
     sceneManager->setAmbientLight(Ogre::ColourValue(0.5f, 0.5f, 0.5f));
+
+
+    const auto& options = ogreRoot->getRenderSystem()->getConfigOptions();
+
+    auto it = options.find("Video Mode");
+
+    if (it != options.end()) {
+        for (const auto& value : it->second.possibleValues) {
+
+            int width = 0;
+            int height = 0;
+
+            sscanf(value.c_str(), "%d x %d", &width, &height);
+
+            if (width > 0 && height > 0)
+                resolutions.emplace_back(width, height);
+        }
+    }
+   
 }
 
 void RenderSystem::handleTag()
@@ -79,12 +103,45 @@ void RenderSystem::fixedUpdate(double dt)
 
 void RenderSystem::setfullScreen()
 {
-    auto desc = ogreRoot->getRenderSystem()->getRenderWindowDescription();
+     if (!renderWindow) return;
+    auto [w, h] = resolutions[resolutions.size() - 1];
+    renderWindow->setFullscreen(true, w, h);
     
-    renderWindow->setFullscreen(true, desc.width, desc.height);
 
-
+    // Cosa rara para poner fullscreen en Windows
+    // SDL_DisplayMode dm;
+    // SDL_GetDesktopDisplayMode(0, &dm);
+    
+    // renderWindow->reposition(0, 0);
+    // renderWindow->resize(dm.w, dm.h);
+    
+    // #ifdef _WIN32
+    //     HWND hwnd = nullptr;
+    //     renderWindow->getCustomAttribute("WINDOW", &hwnd);
+    //     if (hwnd) {
+    //         SetWindowLongPtr(hwnd, GWL_STYLE, WS_POPUP | WS_VISIBLE);
+    //         SetWindowPos(hwnd, HWND_TOP, 0, 0, dm.w, dm.h, SWP_FRAMECHANGED);
+    //     }
+    // #endif
+    
+    // renderWindow->windowMovedOrResized();
+    
+    // if (viewport) {
+    //     viewport->_updateDimensions();
+    //     Ogre::Camera* cam = viewport->getCamera();
+    //     if (cam) {
+    //         cam->setAspectRatio(float(dm.w) / float(dm.h));
+    //     }
+    // }
+    
     viewport->_updateDimensions();
+
+}
+
+void RenderSystem::setWindowed()
+{
+    if (!renderWindow) return;
+    
 }
 
 void RenderSystem::resizeScreen(unsigned int widthPt, unsigned int heightPt)

@@ -10,6 +10,8 @@ private:
 
     Ogre::SceneNode* defaultCameraNode;
 
+    std::vector<std::pair<int, int>> resolutions;
+
     void handleTag();
 
 public:
@@ -18,5 +20,6 @@ public:
     void fixedUpdate(double dt) override;
 
     void setfullScreen();
+    void setWindowed();
     void resizeScreen(unsigned int widthPt, unsigned int heightPt);
 };
