@@ -4,19 +4,13 @@
 #include <iostream>
 #include <cassert>
 
-AudioSystem::AudioSystem(std::shared_ptr<Scene> scene)
-    : System(scene), sounds(), musics()
+AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, std::shared_ptr<ma_engine> maEngine)
+    : System(scene), engine(maEngine),sounds(), musics()
 {
-    engine = std::make_shared<ma_engine>();
-    ma_result result = ma_engine_init(nullptr, engine.get());
-    if (result != MA_SUCCESS) {
-        throw std::runtime_error("Failed to initialize ma_engine");
-    }
-    else std::cout << "ma_engine initialized correctly\n";
-
+   
     sounds.emplace_back();
 
-    result = ma_sound_init_from_file(
+    ma_result result = ma_sound_init_from_file(
         this->engine.get(),
         "lucky.mp3",
         MA_SOUND_FLAG_NO_SPATIALIZATION,
@@ -33,19 +27,9 @@ AudioSystem::AudioSystem(std::shared_ptr<Scene> scene)
 
 AudioSystem::~AudioSystem()
 {
-    // Liberar sonidos correctamente (POR REFERENCIA)
-    for (auto& s : sounds)
-    {
-        ma_sound_uninit(&s);
-    }
+    for (auto& s : sounds)  ma_sound_uninit(&s);
 
-    for (auto& m : musics)
-    {
-        ma_sound_uninit(&m);
-    }
-
-    // ❌ NO desinicializar el engine aquí
-    // El engine se destruye donde se creó (main)
+    for (auto& m : musics) ma_sound_uninit(&m); 
 }
 
 void AudioSystem::update(double dt)
@@ -53,18 +37,115 @@ void AudioSystem::update(double dt)
     // Aquí podrías gestionar timers si quieres parar sonidos tras X segundos
 }
 
-void AudioSystem::playAudio(HUGO::MusicID id, bool sfx)
+void AudioSystem::playAudio(HUGO::MusicID id, AudioTypes type)
 {
-    if (id >= sounds.size())
-        return;
+    //its a sound effect
+    if (type < MUSIC){
+       if (id <0 || id >= sounds.size())
+            return;
 
-    ma_sound_start(&sounds[id]);
+        ma_sound_start(&sounds[id]);
+    }
+    else{
+        if (id <0 || id >= musics.size())
+            return;
+
+        ma_sound_start(&musics[id]);
+    }
 }
 
-void AudioSystem::stopAudio(HUGO::MusicID id, bool sfx)
+void AudioSystem::stopAudio(HUGO::MusicID id, AudioTypes type)
 {
     if (id >= sounds.size())
         return;
 
     ma_sound_stop(&sounds[id]);
+}
+
+void AudioSystem::addAudio(const char* name, AudioTypes type)
+{
+    ma_result result;
+    switch (type)
+    {
+        case SOUND2D:
+            sounds.emplace_back();
+            result = ma_sound_init_from_file(
+                this->engine.get(),
+                name,
+                MA_SOUND_FLAG_NO_SPATIALIZATION,
+                nullptr,
+                nullptr,
+                &sounds.back()
+            );
+            break;
+        case SOUND3D:
+            sounds.emplace_back();
+            result = ma_sound_init_from_file(
+                this->engine.get(),
+                name,
+                MA_SOUND_FLAG_DECODE, //a default miniaudio sound is a 3d sound
+                nullptr,
+                nullptr,
+                &sounds.back()
+            );
+            break;
+        case MUSIC:
+            musics.emplace_back();
+            result = ma_sound_init_from_file(
+                this->engine.get(),
+                name,
+                MA_SOUND_FLAG_NO_SPATIALIZATION | MA_SOUND_FLAG_STREAM,
+                nullptr,
+                nullptr,
+                &musics.back()
+            );
+            break;
+        default:
+            break;
+    }
+}
+
+void AudioSystem::playAudio(HUGO::AudioID id, AudioTypes type)
+{
+}
+
+void AudioSystem::stopAudio(HUGO::AudioID id, AudioTypes type)
+{
+}
+
+void AudioSystem::pauseAudio(HUGO::AudioID id, AudioTypes type)
+{
+}
+
+void AudioSystem::resumeAudio(HUGO::AudioID id, AudioTypes type)
+{
+}
+
+void AudioSystem::setAudioPosition(HUGO::AudioID id, AudioTypes type, double seconds)
+{
+}
+
+double AudioSystem::getAudioPosition(HUGO::AudioID id, AudioTypes type)
+{
+    return 0.0;
+}
+
+void AudioSystem::setLooping(HUGO::AudioID id, AudioTypes type, bool loop)
+{
+}
+
+void AudioSystem::setVolume(HUGO::AudioID id, AudioTypes type, float vol)
+{
+}
+
+void AudioSystem::setPosition(HUGO::AudioID id, float x, float y, float z)
+{
+}
+
+void AudioSystem::setVelocity(HUGO::AudioID id, float vx, float vy, float vz)
+{
+}
+
+void AudioSystem::setDirection(HUGO::AudioID id, float dx, float dy, float dz)
+{
 }

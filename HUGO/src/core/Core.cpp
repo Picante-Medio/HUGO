@@ -1,4 +1,5 @@
 #include "Core.h"
+#include "Core.h"
 #include "Ogre.h"
 #include "RenderSystem.h"
 #include "Scene.h"
@@ -26,7 +27,7 @@ void Core::init(){
 //Destrucción de los módulos del motor. Final de HUGO
 void Core::destroy(){
     destroyOgre();
-    ma_engine_uninit(maEngine.get());
+    destroyMiniaudio();
 }
 
 //--------------------------- INICIALIZACIÓN MÓDULOS --------------------
@@ -96,4 +97,9 @@ void HUGO::Core::initMiniaudio()
         throw std::runtime_error("Failed to initialize ma_engine");
     }
     else std::cout << "ma_engine initialized correctly\n";
+}
+
+void HUGO::Core::destroyMiniaudio()
+{
+    ma_engine_uninit(maEngine.get());
 }
