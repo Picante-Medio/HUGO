@@ -26,6 +26,7 @@ void Core::init(){
 //Destrucción de los módulos del motor. Final de HUGO
 void Core::destroy(){
     destroyOgre();
+    ma_engine_uninit(maEngine.get());
 }
 
 //--------------------------- INICIALIZACIÓN MÓDULOS --------------------
@@ -68,18 +69,18 @@ void Core::initOgre()
 
 //Bucle principal de HUGO
 void Core::run(){
-    // bool exit = false;
-	// while (!exit) {
-    //     vt.update();
-	// 	double starTime = vt.getDeltaTime();
+    bool exit = false;
+	while (!exit) {
+        vt.update();
+		double starTime = vt.getDeltaTime();
 
-    //     scenePtr->fixedUpdate(starTime);
-    //     scenePtr->update(starTime);
+        scenePtr->fixedUpdate(starTime);
+        scenePtr->update(starTime);
 
-    //     m_ogreRoot->renderOneFrame();
-	// 	double frameTime = vt.getDeltaTime() - starTime;
-	// 	if (frameTime < 10) SDL_Delay(10- frameTime);
-	// }
+        m_ogreRoot->renderOneFrame();
+		double frameTime = vt.getDeltaTime() - starTime;
+		if (frameTime < 10) SDL_Delay(10- frameTime);
+	}
 }
 
 

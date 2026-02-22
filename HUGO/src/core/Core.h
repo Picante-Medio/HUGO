@@ -30,7 +30,7 @@ namespace HUGO{
 
         //Miniaudio
         void initMiniaudio();
-        std::shared_ptr<ma_engine> engine;
+        std::shared_ptr<ma_engine> maEngine;
 
         VirtualTimer vt;
 
