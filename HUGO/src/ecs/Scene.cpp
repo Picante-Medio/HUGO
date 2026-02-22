@@ -1,6 +1,7 @@
 #include "Scene.h"
 
 #include "Ecs.h"
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -11,14 +12,14 @@ Scene::Scene()
 
 void 
 Scene::update(double dt) {
-  for(System system : systems) 
-    system.update(dt);
+  for(std::shared_ptr<System> system : systems) 
+    system->update(dt);
 }
 
 void 
 Scene::fixedUpdate(double dt) {
-  for(System system : systems) 
-    system.fixedUpdate(dt);
+  for(std::shared_ptr<System> system : systems) 
+    system->fixedUpdate(dt);
 }
 
 EntityID 

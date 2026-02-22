@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -12,7 +13,7 @@
 class Scene {
   EntityTable entityTable;
   ComponentDenseTable componentTable;
-  std::vector<System> systems;
+  std::vector<std::shared_ptr<System>> systems;
 
   template <typename T> T &getComponent(EntityID entity) {
     ComponentID componentID = getComponentId<T>();
@@ -23,7 +24,7 @@ class Scene {
 public:
   Scene();
 
-  inline void addSystem(System system) { systems.push_back(system); }
+  inline void addSystem(std::shared_ptr<System> system) { systems.push_back(system); }
 
   // Logic update
   void update(double dt);

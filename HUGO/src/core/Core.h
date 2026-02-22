@@ -10,21 +10,12 @@ class VirtualTimer;
 
 namespace HUGO{
     class Core{
-    public:
-        Core();
-        void init();
-        void destroy();
-    
-        void run();
-    
-    private:
-    
         void initModules();
-    
+
         //Ogre
         void initOgre();
         void destroyOgre();
-    
+
         std::shared_ptr<Ogre::Root> m_ogreRoot;
         Ogre::RenderWindow* m_renderWindow;
 
@@ -35,6 +26,12 @@ namespace HUGO{
         VirtualTimer vt;
 
         std::shared_ptr<Scene> scenePtr;
+    public:
+        Core();
+        void init();
+        void destroy();
+
+        void run();
     };
 
 }
