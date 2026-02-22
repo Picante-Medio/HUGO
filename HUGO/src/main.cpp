@@ -4,6 +4,9 @@
 #include <OgreOverlayManager.h>
 #include <OgreTextAreaOverlayElement.h>
 
+#define MINIAUDIO_IMPLEMENTATION
+#include "miniaudio.h"
+
 #include "Core.h"
 #include "Scene.h"
 

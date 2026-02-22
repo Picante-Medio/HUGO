@@ -3,7 +3,6 @@
 #include "OgreRenderWindow.h"
 #include "OgreRoot.h"
 #include "HugoVirtualTimer.h"
-#define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"
 
 class Scene;
