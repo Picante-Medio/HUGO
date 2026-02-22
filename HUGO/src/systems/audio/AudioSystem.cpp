@@ -37,7 +37,7 @@ void AudioSystem::update(double dt)
     // Aquí podrías gestionar timers si quieres parar sonidos tras X segundos
 }
 
-void AudioSystem::playAudio(HUGO::MusicID id, AudioTypes type)
+void AudioSystem::playAudio(HUGO::AudioID id, AudioTypes type)
 {
     //its a sound effect
     if (type < MUSIC){
@@ -54,7 +54,7 @@ void AudioSystem::playAudio(HUGO::MusicID id, AudioTypes type)
     }
 }
 
-void AudioSystem::stopAudio(HUGO::MusicID id, AudioTypes type)
+void AudioSystem::stopAudio(HUGO::AudioID id, AudioTypes type)
 {
     if (id >= sounds.size())
         return;
@@ -103,14 +103,6 @@ void AudioSystem::addAudio(const char* name, AudioTypes type)
         default:
             break;
     }
-}
-
-void AudioSystem::playAudio(HUGO::AudioID id, AudioTypes type)
-{
-}
-
-void AudioSystem::stopAudio(HUGO::AudioID id, AudioTypes type)
-{
 }
 
 void AudioSystem::pauseAudio(HUGO::AudioID id, AudioTypes type)

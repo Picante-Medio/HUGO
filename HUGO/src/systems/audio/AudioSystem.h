@@ -36,10 +36,12 @@ public:
     void setLooping(HUGO::AudioID id, AudioTypes type, bool loop); // enable or disable looping for the audio
     void setVolume(HUGO::AudioID id, AudioTypes type, float vol); // set playback volume (0.0 = silent, 1.0 = full)
     
+    void setGroupVolume(AudioTypes type, float volume); // set the same volume to the whole group
+    
     // 3d audio functions
     void setPosition(HUGO::AudioID id, float x, float y, float z);
     void setVelocity(HUGO::AudioID id, float vx, float vy, float vz);
     void setDirection(HUGO::AudioID id, float dx, float dy, float dz);
 
-    
+    //
 };
