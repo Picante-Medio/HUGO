@@ -3,6 +3,8 @@
 #include "OgreRenderWindow.h"
 #include "OgreRoot.h"
 #include "HugoVirtualTimer.h"
+#define MINIAUDIO_IMPLEMENTATION
+#include "miniaudio.h"
 
 class Scene;
 class VirtualTimer;
@@ -20,11 +22,16 @@ namespace HUGO{
     
         void initModules();
     
+        //Ogre
         void initOgre();
         void destroyOgre();
     
         std::shared_ptr<Ogre::Root> m_ogreRoot;
         Ogre::RenderWindow* m_renderWindow;
+
+        //Miniaudio
+        void initMiniaudio();
+        std::shared_ptr<ma_engine> engine;
 
         VirtualTimer vt;
 

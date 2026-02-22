@@ -15,8 +15,7 @@ Core::Core(){
 //Inicialización de los módulos de HUGO y carga de la .dll del juego
 void Core::init(){
     vt.reset();
-    initOgre();
-
+    initModules();
     // scenePtr = std::make_shared<Scene>();
     // RenderSystem renderSystem(scenePtr, m_ogreRoot, m_renderWindow);
     // scenePtr->addSystem(renderSystem);
@@ -31,7 +30,14 @@ void Core::destroy(){
 
 //--------------------------- INICIALIZACIÓN MÓDULOS --------------------
 
-void Core::initOgre(){
+void HUGO::Core::initModules()
+{
+    initOgre();
+    initMiniaudio();
+}
+
+void Core::initOgre()
+{
     m_ogreRoot = std::make_shared<Ogre::Root>("plugins.cfg", "ogre.cfg");
 
     if (!m_ogreRoot->restoreConfig()) {
@@ -79,4 +85,14 @@ void Core::run(){
 
 void Core::destroyOgre(){
 
+}
+
+void HUGO::Core::initMiniaudio()
+{
+    maEngine = std::make_shared<ma_engine>();
+    ma_result result = ma_engine_init(nullptr, maEngine.get());
+    if (result != MA_SUCCESS) {
+        throw std::runtime_error("Failed to initialize ma_engine");
+    }
+    else std::cout << "ma_engine initialized correctly\n";
 }

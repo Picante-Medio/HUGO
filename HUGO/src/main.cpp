@@ -7,13 +7,6 @@
 #include "Core.h"
 #include "Scene.h"
 
-#define MINIAUDIO_IMPLEMENTATION
-#include "miniaudio.h"
-#include "systems/audio/AudioSystem.h"
-
-
-#include <iostream>
-
 int main(int argc, char* argv[]) {
 
     HUGO::Core core = HUGO::Core();
