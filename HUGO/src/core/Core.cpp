@@ -7,21 +7,19 @@
 #include <iostream>
 
 using namespace HUGO;
-
-
-Core::Core(){
-    
+Core::Core()
+{
 }
 
 //Initialization of HUGO modules and loading of games dynamic lib
 void Core::init(){
     vt.reset();
     initModules();
-    // scenePtr = std::make_shared<Scene>();
-    // RenderSystem renderSystem(scenePtr, m_ogreRoot, m_renderWindow);
-    // scenePtr->addSystem(renderSystem);
+    scenePtr = std::make_shared<Scene>();
+     std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(RenderSystem(scenePtr, m_ogreRoot, m_renderWindow));
+    scenePtr->addSystem(renderSystem);
     // renderSystem.setfullScreen();
-
+    renderSystem->createTestEntity();
 }
 
 //Destruction of HUGO modules. End of HUGO
@@ -41,7 +39,7 @@ void HUGO::Core::initModules()
 
 void Core::initOgre()
 {
-    m_ogreRoot = std::make_shared<Ogre::Root>("HUGO/bin/plugins.cfg", "HUGO/bin/ogre.cfg");
+    m_ogreRoot = std::make_shared<Ogre::Root>("plugins.cfg", "ogre.cfg");
 
     if (!m_ogreRoot->restoreConfig()) {
         Ogre::LogManager::getSingleton().logMessage("Initialize::configure_ogre => " +
@@ -57,6 +55,8 @@ void Core::initOgre()
 
     m_ogreRoot->getRenderSystem()->setConfigOption("Full Screen", "No");
 
+    locateResources();
+
     m_ogreRoot->initialise(false);
 
     // creation of the render window, with the size 1000x800 and not full screen
@@ -69,21 +69,43 @@ void Core::initOgre()
         &params
     );
 }
+void HUGO::Core::locateResources()
+{
+    auto& rgm = Ogre::ResourceGroupManager::getSingleton();
+    Ogre::ConfigFile cf;
+    cf.load("resources.cfg");
 
+    Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
+    Ogre::String sec, type, arch;
+    for(auto& s : cf.getSettingsBySection()) {
+        sec = s.first;
+        for (auto& t : s.second)
+        {
+            type = t.first;
+            arch = t.second;
+            rgm.addResourceLocation(arch,type,sec);
+        }
+    }
+}
+void HUGO::Core::loadResources()
+{
+    Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+}
 //HUGO main loop
 void Core::run(){
-    // bool exit = false;
-	// while (!exit) {
-    //     vt.update();
-	// 	double starTime = vt.getDeltaTime();
+    bool exit = false;
 
-    //     scenePtr->fixedUpdate(starTime);
-    //     scenePtr->update(starTime);
+	while (!exit) {
+        vt.update();
+		double starTime = vt.getDeltaTime();
 
-    //     m_ogreRoot->renderOneFrame();
-	// 	double frameTime = vt.getDeltaTime() - starTime;
-	// 	if (frameTime < 10) SDL_Delay(10- frameTime);
-	// }
+        scenePtr->fixedUpdate(starTime);
+        scenePtr->update(starTime);
+
+        m_ogreRoot->renderOneFrame();
+		double frameTime = vt.getDeltaTime() - starTime;
+		if (frameTime < 10) SDL_Delay(10- frameTime);
+	}
 }
 
 

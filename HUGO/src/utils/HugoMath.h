@@ -12,7 +12,12 @@ namespace HUGO{
         Vector3 operator+ (const Vector3& other) const{
             return { x + other.x, y + other.y, z + other.z};
         }
-
+        void operator+=(const Vector3& other)
+        {
+            x += other.x;
+            y += other.y;
+            z += other.z;
+        }
         Vector3 operator- (const Vector3& other) const{
             return { x - other.x, y - other.y, z - other.z};
         }
@@ -30,6 +35,10 @@ namespace HUGO{
             float cy = z * other.x - x * other.z;
             float cz = x * other.y - y * other.x;
             return {cx, cy, cz};
+        }
+
+        Ogre::Vector3 toOgre() {
+            return Ogre::Vector3(x, y, z);
         }
     };
 
@@ -92,6 +101,10 @@ namespace HUGO{
 
         Quaternion() : w(0), x(0), y(0), z(0) {}
         Quaternion(float w, float x, float y, float z) : w(w), x(x), y(y), z(z) {}
+
+        Ogre::Quaternion toOgre() {
+            return Ogre::Quaternion(w, x, y, z);
+        }
     };
     
 }

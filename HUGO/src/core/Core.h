@@ -24,8 +24,11 @@ namespace HUGO {
 
 
         VirtualTimer vt;
-
         std::shared_ptr<Scene> scenePtr;
+
+        
+        void locateResources();
+        void loadResources();
     public:
         Core();
         void init();

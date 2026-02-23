@@ -5,8 +5,6 @@
 #include <utility>
 #include <vector>
 
-#include "../components/messages/CreateOgreObjectComponent.h"
-
 Scene::Scene()
 {}
 

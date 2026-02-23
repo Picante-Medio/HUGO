@@ -2,11 +2,12 @@
 
 #include "OgreSceneManager.h"
 #include "OgreRenderWindow.h"
+#include "OgreLight.h"
 
 #include "RenderSystem.h"
 #include "Scene.h"
-#include "OgreObjectComponent.h"
-#include "CreateOgreObjectComponent.h"
+#include "RenderComponent.h"
+#include "TransformComponent.h"
 
 
 
@@ -14,6 +15,9 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
     :System(scene), ogreRoot(ogreRoot), renderWindow(window)
 {
     sceneManager = ogreRoot.get()->createSceneManager();
+    
+    //para ver las ejes
+    sceneManager->setDisplaySceneNodes(true);
 
     // Camera
     Ogre::Camera* mCam = sceneManager->createCamera("camera");
@@ -30,14 +34,20 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
     // Viewport
     viewport = renderWindow->addViewport(mCam);
     viewport->setBackgroundColour(Ogre::ColourValue(0.3f, 0.3f, 0.5f));
-
-    mCam->setAspectRatio(float(viewport->getActualWidth()) / float(viewport->getActualHeight()));   
-
     viewport->setCamera(mCam);
+
+    mCam->setAspectRatio(Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()));   
 
     // Basic light
     sceneManager->setAmbientLight(Ogre::ColourValue(0.5f, 0.5f, 0.5f));
 
+    Ogre::Light* light = sceneManager->createLight();
+    light->setType(Ogre::Light::LT_DIRECTIONAL);
+    light->setDiffuseColour(1.0, 1.0, 1.0);
+    Ogre::SceneNode* nodeDir = sceneManager->getRootSceneNode()->createChildSceneNode();
+    nodeDir->setDirection(Ogre::Vector3(-1, -1, -1));
+    nodeDir->attachObject(light);
+    
 
     const auto& options = ogreRoot->getRenderSystem()->getConfigOptions();
 
@@ -60,43 +70,66 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
 
 void RenderSystem::handleTag()
 {
-    // std::vector<EntityID> toRemove;
+    for(auto pack : scene->query<TransformComponent,RenderComponent>()) {
+        RenderComponent& rc = pack.get<RenderComponent&>();
+        EntityID entity = rc.entity;
 
-    // Query pack = scene.get()->query<CreateOgreObjectComponent>();
-    // for (auto& c : pack) {
-       
-    //     CreateOgreObjectComponent& msg = c.get<CreateOgreObjectComponent>();
-        
-    //     // //create ogre entity with menssage data
-    //     // std::unique_ptr<Ogre::Entity> ent= std::unique_ptr<Ogre::Entity>(sceneManager->createEntity(msg.meshName));
-    //     // if(!msg.meshName.empty()) 
-    //     //     ent->setMaterialName(msg.materialName);
-       
-    //     // //create scene node
-    //     // std::unique_ptr<Ogre::SceneNode> node= std::unique_ptr<Ogre::SceneNode>(sceneManager->getRootSceneNode()->createChildSceneNode());
-    //     // node->attachObject(ent.get());
+        //if do not have create ogre entity
+        if(!rc.ogreEntity){
+            OgreObject obj = createOgreObject(entity,rc.meshName,rc.materialName);
+            rc.ogreEntity = obj.ogreEntity;
+            rc.ogreSceneNode=obj.sceneNode;
+        }
 
-    //     // //add component with ogre data to entity
-    //     // scene.get()->addComponent<OgreObjectComponent>(msg.entity, std::move(ent), std::move(node));
-        
-    //     // //store need remove menssageComponent entityId
-    //     // toRemove.push_back(msg.entity);
-    // }
+        //update render transform
+        TransformComponent& tr=pack.get<TransformComponent&>();
+        rc.ogreSceneNode->setPosition(tr.position.toOgre());
+        rc.ogreSceneNode->setOrientation(tr.rotation.toOgre());
+        rc.ogreSceneNode->setScale(tr.scale.toOgre());
+    }
+}
 
-    // //remove messageComponent
-    // for(EntityID e: toRemove){
-    //     //scene.get()->removeComponent<CreateOgreObjectComponent>(e);
-    // }
+OgreObject RenderSystem::createOgreObject(EntityID entity, const std::string &meshName, const std::string &materialName)
+{
+    //create ogre entity
+    Ogre::Entity* ent=sceneManager->createEntity(meshName);  
+    if(!materialName.empty()) 
+        ent->setMaterialName(materialName);
 
+    //create scene node
+    Ogre::SceneNode* node= sceneManager->getRootSceneNode()->createChildSceneNode();
+    node->attachObject(ent);
+
+    return {ent, node};
 }
 
 void RenderSystem::update(double dt)
 {
    handleTag();
+
+    ////test
+    float vel = 0.01;
+    for(auto pack : scene->query<TransformComponent,RenderComponent>()) {
+        TransformComponent& tr=pack.get<TransformComponent&>();
+        tr.position.x += vel*dt;
+    }
+    ////
 }
 
 void RenderSystem::fixedUpdate(double dt)
 {
+}
+
+void RenderSystem::createTestEntity()
+{
+    EntityID e = scene->createEntity();
+    scene->addComponent<TransformComponent>(e, HUGO::Vector3(-30,10,10), HUGO::Quaternion(1,0,0,0), HUGO::Vector3(0.2,0.2,0.2));
+    scene->addComponent<RenderComponent>(e, "cube.mesh");
+
+
+    EntityID e2 = scene->createEntity();
+    scene->addComponent<TransformComponent>(e2, HUGO::Vector3(30,10,10), HUGO::Quaternion(1,0,0,0), HUGO::Vector3(0.2,0.2,0.2));
+    scene->addComponent<RenderComponent>(e2, "sphere.mesh");
 }
 
 void RenderSystem::setfullScreen()
