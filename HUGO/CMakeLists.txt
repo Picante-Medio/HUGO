@@ -11,8 +11,23 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/mackron/miniaudio.git
     GIT_TAG 0.11.24
 )
-FetchContent_MakeAvailable(miniaudio)
 
+FetchContent_Declare(
+    bullet3
+    GIT_REPOSITORY https://github.com/bulletphysics/bullet3.git
+    GIT_TAG 3.25
+)
+
+set(BUILD_BULLET2_DEMOS OFF CACHE BOOL "" FORCE)
+set(BUILD_CPU_DEMOS OFF CACHE BOOL "" FORCE)
+set(BUILD_OPENGL3_DEMOS OFF CACHE BOOL "" FORCE)
+set(BUILD_PYBULLET OFF CACHE BOOL "" FORCE)
+set(BUILD_EXTRAS OFF CACHE BOOL "" FORCE)
+set(BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+set(INSTALL_LIBS OFF CACHE BOOL "" FORCE)
+set(INSTALL_CMAKE_FILES OFF CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(miniaudio bullet3)
 
 #find_package(PNG REQUIRED)
 #find_package(BZip2 REQUIRED)
@@ -62,13 +77,14 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${miniaudio_SOURCE_DIR})
 
 set(HUGO_LINKED_LIBRARIES 
+    Bullet3Common
+    Bullet3Collision
     OgreMain
     OgreOverlay
     RenderSystem_GL3Plus
     RenderSystem_GL
     SDL2::SDL2
     SDL2::SDL2main)
-
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${HUGO_LINKED_LIBRARIES})
 
