@@ -1,5 +1,7 @@
 #pragma once
+#include <vector>
 #include "System.h"
+#include "Ogre.h"
 
 class RenderSystem : public System{
     std::shared_ptr<Ogre::Root> ogreRoot;

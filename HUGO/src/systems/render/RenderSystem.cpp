@@ -1,5 +1,3 @@
-#include "Ogre.h"
-
 #include <iostream>
 
 #include "OgreSceneManager.h"
