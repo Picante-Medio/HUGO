@@ -13,7 +13,7 @@
 
 
 RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> ogreRoot, Ogre::RenderWindow* window)
-    :System(scene),ogreRoot(ogreRoot), renderWindow(window)
+    :System(scene), ogreRoot(ogreRoot), renderWindow(window)
 {
     sceneManager = ogreRoot.get()->createSceneManager();
 
@@ -21,13 +21,13 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
     Ogre::Camera* mCam = sceneManager->createCamera("camera");
 
     mCam->setNearClipDistance(1);
-	mCam->setNearClipDistance(1);
-	mCam->setFarClipDistance(10000);
-	mCam->setAutoAspectRatio(true);
+    mCam->setNearClipDistance(1);
+    mCam->setFarClipDistance(10000);
+    mCam->setAutoAspectRatio(true);
 
     defaultCameraNode = sceneManager->getRootSceneNode()->createChildSceneNode("cameraNode");
-	defaultCameraNode->attachObject(mCam);
-	defaultCameraNode->setPosition(0, 0, 200);
+    defaultCameraNode->attachObject(mCam);
+    defaultCameraNode->setPosition(0, 0, 200);
 
     // Viewport
     viewport = renderWindow->addViewport(mCam);

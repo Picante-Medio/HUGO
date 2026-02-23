@@ -2,7 +2,6 @@
 #include "System.h"
 
 class RenderSystem : public System{
-private:
     std::shared_ptr<Ogre::Root> ogreRoot;
     Ogre::SceneManager* sceneManager;
     Ogre::RenderWindow* renderWindow; 
