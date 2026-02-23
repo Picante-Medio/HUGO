@@ -13,6 +13,17 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(miniaudio)
 
+
+#find_package(PNG REQUIRED)
+#find_package(BZip2 REQUIRED)
+#find_package(Brotli REQUIRED)
+
+#if(LINUX)
+#    set(CMAKE_EXE_LINKER_FLAGS "-lpng -lbz2 -lbrotlidec -lpthread -lm")
+#endif()
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS BOOL ON)
+
 set(BASE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/dependencies/${CMAKE_SYSTEM_PROCESSOR})
 
 if (WIN32)
@@ -20,11 +31,13 @@ if (WIN32)
         ${BASE_PREFIX_PATH}/sdl2
         ${BASE_PREFIX_PATH}/ogre
         ${BASE_PREFIX_PATH}/miniaudio
+        CACHE PATH "prefix path"
     )
 else()
     set(CMAKE_PREFIX_PATH 
         ${BASE_PREFIX_PATH}/ogre
         ${BASE_PREFIX_PATH}/miniaudio
+        CACHE PATH "prefix path"
     )
 endif()
 
@@ -48,13 +61,16 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${INCLUDE_DIRS}
     ${miniaudio_SOURCE_DIR})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE 
+set(HUGO_LINKED_LIBRARIES 
     OgreMain
     OgreOverlay
     RenderSystem_GL3Plus
     RenderSystem_GL
     SDL2::SDL2
     SDL2::SDL2main)
+
+
+target_link_libraries(${PROJECT_NAME} PRIVATE ${HUGO_LINKED_LIBRARIES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     DEBUG_POSTFIX "d"

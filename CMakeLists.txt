@@ -61,6 +61,7 @@ if(MSVC OR MINGW OR SKBUILD)
             -DCMAKE_INSTALL_PREFIX:PATH=${COMMON_INSTALL_PREFIX}/sdl2
             -DCMAKE_BUILD_TYPE:STRING=${MY_BUILD_TYPE}
             -DBUILD_SHARED_LIBS:BOOL=ON
+            -DCMAKE_INSTALL_LIBDIR=lib
     )
 
     list(APPEND DEPENDENCIES_PREFIX_PATHS ${COMMON_INSTALL_PREFIX}/sdl2)
@@ -167,26 +168,6 @@ ExternalProject_Add(ogre_external
 list(APPEND DEPENDENCIES_PREFIX_PATHS ${COMMON_INSTALL_PREFIX}/ogre)
 list(APPEND DEPENDENCIES_LIST ogre_external)
 
-
-#ExternalProject_Add(miniaudio_external
-#    GIT_REPOSITORY "https://github.com/mackron/miniaudio.git"
-#    GIT_TAG "0.11.24"
-#    GIT_SHALLOW TRUE
-#
-#    CMAKE_CACHE_ARGS
-#        -DCMAKE_INSTALL_PREFIX:PATH=${COMMON_INSTALL_PREFIX}/miniaudio
-#        -DCMAKE_BUILD_TYPE:STRING=${MY_BUILD_TYPE}
-#)
-
-#list(APPEND CMAKE_PREFIX_PATH ${COMMON_INSTALL_PREFIX}/miniaudio)
-#list(APPEND DEPENDENCIES_LIST miniaudio_external)
-
-if (LINUX) 
-    # Flags que se le pasan al linker para que busque las librerías del mismo 
-    # nombre como paquete del sistema si no las ve como archivo
-    set(HUGO_LINKER_FLAGS "-lpng -lbz2 -lbrotlidec")
-endif()
-
 ExternalProject_Add(hugo_external
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/HUGO
     
@@ -196,9 +177,6 @@ ExternalProject_Add(hugo_external
         -DCMAKE_BUILD_TYPE:STRING=${MY_BUILD_TYPE}
         -DCMAKE_CXX_FLAGS_DEBUG:STRING=${CMAKE_CXX_FLAGS_DEBUG}
         -DCMAKE_CXX_FLAGS_RELEASE:STRING=${CMAKE_CXX_FLAGS_RELEASE}
-    CMAKE_ARGS
-        -DCMAKE_EXE_LINKER_FLAGS=${HUGO_LINKER_FLAGS}
-        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
     INSTALL_COMMAND ""
 )
