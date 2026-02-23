@@ -22,7 +22,7 @@ if(LINUX)
     set(CMAKE_EXE_LINKER_FLAGS "-lpng -lbz2 -lbrotlidec -lpthread -lm")
 endif()
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS BOOL ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(BASE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/dependencies/${CMAKE_SYSTEM_PROCESSOR})
 
