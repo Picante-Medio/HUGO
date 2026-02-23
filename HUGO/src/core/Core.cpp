@@ -127,8 +127,6 @@ void HUGO::Core::initMiniaudio()
         throw std::runtime_error("Failed to initialize ma_engine");
     }
     else std::cout << "ma_engine initialized correctly\n";
-    AudioSystem aud(nullptr, maEngine);
-    
 }
 
 void HUGO::Core::destroyMiniaudio()

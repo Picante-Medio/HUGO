@@ -1,10 +1,11 @@
 #pragma once
 #include "Component.h"
+#include "HugoTypes.h"
 
 // 2D SFX component
 struct MusicComponent: public Component
 {
-    int soundId;
+    HUGO::AudioID soundId;
     float volume;
     bool loop;
     bool playOnStart;

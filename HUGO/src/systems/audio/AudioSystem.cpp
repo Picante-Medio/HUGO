@@ -4,11 +4,6 @@
 AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, std::shared_ptr<ma_engine> maEngine)
     : System(scene), engine(maEngine), audios(), nextID(0)
 {
-    std::cout << "AudioSystem created\n";
-    addAudio("lucky.mp3", MUSIC);
-    playAudio(0);
-    setVolume(0, 0.1f);
-
 }
 
 void AudioSystem::update(double dt)

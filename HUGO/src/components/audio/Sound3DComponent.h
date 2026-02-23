@@ -1,10 +1,11 @@
 #pragma once
 #include "Component.h"
+#include "HugoTypes.h"
 
 // 3D SFX component
 struct Sound3DComponent: public Component
 {
-    int soundId;
+    HUGO::AudioID soundId;
     float volume;
     bool loop;
     bool playOnStart;
