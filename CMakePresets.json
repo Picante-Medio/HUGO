@@ -16,7 +16,8 @@
                 "CMAKE_CXX_FLAGS_DEBUG": "/Od /Zi",
                 "CMAKE_CXX_FLAGS_RELEASE": "/O2",
                 "OGRE_BUILD_MSVC_MP": "ON",
-                "OGRE_BUILD_MSVC_ZM": "ON"
+                "OGRE_BUILD_MSVC_ZM": "ON",
+                "HUGO_BUILD_ENGINE": "OFF"
             }
         },
         {
@@ -26,7 +27,8 @@
             "cacheVariables": {
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/install/${presetName}",
                 "CMAKE_CXX_FLAGS_DEBUG": "-O0 -g",
-                "CMAKE_CXX_FLAGS_RELEASE": "-O3"
+                "CMAKE_CXX_FLAGS_RELEASE": "-O3",
+                "HUGO_BUILD_ENGINE": "OFF"
             }
         },
         {
