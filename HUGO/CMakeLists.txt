@@ -18,9 +18,9 @@ FetchContent_MakeAvailable(miniaudio)
 #find_package(BZip2 REQUIRED)
 #find_package(Brotli REQUIRED)
 
-#if(LINUX)
-#    set(CMAKE_EXE_LINKER_FLAGS "-lpng -lbz2 -lbrotlidec -lpthread -lm")
-#endif()
+if(LINUX)
+    set(CMAKE_EXE_LINKER_FLAGS "-lpng -lbz2 -lbrotlidec -lpthread -lm")
+endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS BOOL ON)
 
