@@ -23,10 +23,10 @@ AudioInfo AudioSystem::createAudio(const char* filename, AudioTypes type)
     //choose the flags depending on what type of audio it is
     switch (type) {
         case SOUND2D: 
-            flags = MA_SOUND_FLAG_NO_SPATIALIZATION; 
+            flags = MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION; 
             break;
         case SOUND3D: 
-            flags = 0; 
+            flags = MA_SOUND_FLAG_DECODE; 
             break;
         case MUSIC:
             flags = MA_SOUND_FLAG_NO_SPATIALIZATION | MA_SOUND_FLAG_STREAM; 

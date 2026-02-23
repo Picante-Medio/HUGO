@@ -20,10 +20,24 @@ void Core::init(){
     scenePtr = std::make_shared<Scene>();
     std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr, m_ogreRoot, m_renderWindow);
     scenePtr->addSystem(renderSystem);
-
+    
+    std::shared_ptr<AudioSystem> audioSystem = std::make_shared<AudioSystem>(scenePtr, maEngine);
+    scenePtr->addSystem(audioSystem);
     //m_resourceManager = std::make_shared<HUGO::ResourceManager>(maEngine, m_ogreRoot);
 
     renderSystem->createTestEntity();
+    //BGM
+    audioSystem->addAudio("lucky.mp3", MUSIC);
+    // WE WONT USE OGG IN OUR PROJECT
+    //SFX
+    audioSystem->addAudio("risa.wav", SOUND3D);
+    audioSystem->playAudio(0);
+    audioSystem->setVolume(0, 0.01f);
+    audioSystem->setAudioPosition(0, 160.0);
+    audioSystem->playAudio(1);
+    audioSystem->setLooping(1, true);
+    audioSystem->set3DPosition(1, 0, 10, 0);
+    audioSystem->setGroupVolume(SOUND2D, 0.5f);
 }
 
 //Destruction of HUGO modules. End of HUGO
