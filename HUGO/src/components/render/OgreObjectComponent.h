@@ -1,4 +1,4 @@
-#include "../../ecs/Component.h"
+#include "Component.h"
 #include <memory>
 
 namespace Ogre {

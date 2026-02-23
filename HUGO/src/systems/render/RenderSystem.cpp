@@ -138,10 +138,11 @@ void RenderSystem::setfullScreen()
 
 }
 
-void RenderSystem::setWindowed()
+void RenderSystem::setWindowed(bool fullScreen)
 {
     if (!renderWindow) return;
-    
+    auto desc = ogreRoot->getRenderSystem()->getRenderWindowDescription();
+    renderWindow->setFullscreen(fullScreen, desc.width, desc.height);
 }
 
 void RenderSystem::resizeScreen(unsigned int widthPt, unsigned int heightPt)
@@ -149,4 +150,19 @@ void RenderSystem::resizeScreen(unsigned int widthPt, unsigned int heightPt)
     renderWindow->resize(widthPt, heightPt);
 
     viewport->_updateDimensions();
+}
+
+void RenderSystem::setBackgroundColor(float r, float g, float b)
+{
+    viewport->setBackgroundColour(Ogre::ColourValue(r, g, b));
+}
+
+void RenderSystem::setCameraPosition(float x, float y, float z)
+{
+    defaultCameraNode->setPosition(x, y, z);
+}
+
+void RenderSystem::setAmbientLight(float r, float g, float b)
+{
+    sceneManager->setAmbientLight(Ogre::ColourValue(r, g, b));
 }

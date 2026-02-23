@@ -20,6 +20,10 @@ public:
     void fixedUpdate(double dt) override;
 
     void setfullScreen();
-    void setWindowed();
+    void setWindowed(bool fullScreen);
     void resizeScreen(unsigned int widthPt, unsigned int heightPt);
+
+    void setBackgroundColor(float r, float g, float b);
+    void setCameraPosition(float x, float y, float z);
+    void setAmbientLight(float r, float g, float b);
 };
