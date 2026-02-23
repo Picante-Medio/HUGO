@@ -48,7 +48,8 @@ public:
         entity, id, componentTable.addComponent(component, entity));
   }
 
-  template <typename T> void removeComponent(EntityID entity) {
+  template <typename T> 
+  void removeComponent(EntityID entity) {
     // Obtaining the index of the component to delete
     ComponentID id = getComponentId<T>();
     DenseListIndex oldIndex = entityTable.getDenseListIndex(entity, id);
@@ -61,7 +62,8 @@ public:
     entityTable.updateDenseListIndex(toUpdate, id, oldIndex);
   }
 
-  template <typename... Ts> Query<Ts...> query() {
+  template <typename... Ts> 
+  Query<Ts...> query() {
     Query<Ts...> returnedQuery;
 
     // Expand the parameter pack to get the affected components by ID

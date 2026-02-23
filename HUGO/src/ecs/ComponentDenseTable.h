@@ -95,7 +95,5 @@ public:
     return getCount(getComponentId<T>());
   }
 
-  std::vector<EntityID> affectedEntities(ComponentID componentID) {
-    return componentLists[componentID]->getAffectedEntities();
-  }
+  std::vector<EntityID> affectedEntities(ComponentID componentID); 
 };
