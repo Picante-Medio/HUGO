@@ -2,6 +2,7 @@
 #include "Core.h"
 #include "Ogre.h"
 #include "RenderSystem.h"
+#include "AudioSystem.h"
 #include "Scene.h"
 #include <SDL2/SDL.h>
 #include <iostream>
@@ -36,6 +37,7 @@ void HUGO::Core::initModules()
 {
     initOgre();
     initMiniaudio();
+
 }
 
 void Core::initOgre()
@@ -97,6 +99,8 @@ void HUGO::Core::initMiniaudio()
         throw std::runtime_error("Failed to initialize ma_engine");
     }
     else std::cout << "ma_engine initialized correctly\n";
+    AudioSystem aud(nullptr, maEngine);
+    
 }
 
 void HUGO::Core::destroyMiniaudio()
