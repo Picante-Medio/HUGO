@@ -1,5 +1,4 @@
 #include "Core.h"
-#include "Core.h"
 #include "Ogre.h"
 #include "RenderSystem.h"
 #include "AudioSystem.h"
@@ -14,7 +13,7 @@ Core::Core(){
     
 }
 
-//Inicialización de los módulos de HUGO y carga de la .dll del juego
+//Initialization of HUGO modules and loading of games dynamic lib
 void Core::init(){
     vt.reset();
     initModules();
@@ -25,13 +24,13 @@ void Core::init(){
 
 }
 
-//Destrucción de los módulos del motor. Final de HUGO
+//Destruction of HUGO modules. End of HUGO
 void Core::destroy(){
     destroyOgre();
     destroyMiniaudio();
 }
 
-//--------------------------- INICIALIZACIÓN MÓDULOS --------------------
+//--------------------------- IMODULES INITIALIZATION --------------------
 
 void HUGO::Core::initModules()
 {
@@ -42,12 +41,13 @@ void HUGO::Core::initModules()
 
 void Core::initOgre()
 {
-    m_ogreRoot = std::make_shared<Ogre::Root>("plugins.cfg", "ogre.cfg");
+    m_ogreRoot = std::make_shared<Ogre::Root>("HUGO/bin/plugins.cfg", "HUGO/bin/ogre.cfg");
 
     if (!m_ogreRoot->restoreConfig()) {
         Ogre::LogManager::getSingleton().logMessage("Initialize::configure_ogre => " +
         std::string("ERROR: unable to configure Ogre"));
     }
+    //If there is another rendering system available, we could choose between one or another
     for(Ogre::RenderSystem* renderSys: m_ogreRoot->getAvailableRenderers()){
         if(renderSys->getName() == "OpenGL Rendering Subsystem"){
             m_ogreRoot->setRenderSystem(renderSys);
@@ -70,7 +70,7 @@ void Core::initOgre()
     );
 }
 
-//Bucle principal de HUGO
+//HUGO main loop
 void Core::run(){
     // bool exit = false;
 	// while (!exit) {
@@ -88,7 +88,9 @@ void Core::run(){
 
 
 void Core::destroyOgre(){
+    m_renderWindow->destroy();
 
+    m_ogreRoot->shutdown();
 }
 
 void HUGO::Core::initMiniaudio()
