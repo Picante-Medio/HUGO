@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include <SDL2/SDL.h>
 #include <iostream>
+#include "ResourceManager.h"
 
 using namespace HUGO;
 Core::Core()
@@ -15,10 +16,13 @@ Core::Core()
 void Core::init(){
     vt.reset();
     initModules();
+    
     scenePtr = std::make_shared<Scene>();
      std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(RenderSystem(scenePtr, m_ogreRoot, m_renderWindow));
     scenePtr->addSystem(renderSystem);
-    // renderSystem.setfullScreen();
+
+    m_resourceManager = std::make_shared<HUGO::ResourceManager>(maEngine, m_ogreRoot);
+
     renderSystem->createTestEntity();
 }
 

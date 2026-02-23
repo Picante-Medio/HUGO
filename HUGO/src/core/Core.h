@@ -6,7 +6,10 @@
 #include "miniaudio.h"
 class Scene;
 class VirtualTimer;
+
 namespace HUGO {
+    class ResourceManager;
+
     class Core {
         void initModules();
 
@@ -29,6 +32,8 @@ namespace HUGO {
         
         void locateResources();
         void loadResources();
+        //Resource Manager
+        std::shared_ptr<ResourceManager> m_resourceManager;
     public:
         Core();
         void init();
