@@ -143,7 +143,7 @@ void AudioSystem::setGroupVolume(AudioTypes type, float volume)
         musicsGroupVolume = volume;  // O(1)
 }
 
-void AudioSystem::setPosition(HUGO::AudioID id, float x, float y, float z)
+void AudioSystem::set3DPosition(HUGO::AudioID id, float x, float y, float z)
 {
     ma_sound* s = get3DSound(id);
     ma_sound_set_position(s, x, y, z);

@@ -61,7 +61,7 @@ public:
                       float volume); // set the same volume to the whole group
 
   // 3d audio functions
-  void setPosition(HUGO::AudioID id, float x, float y, float z);
+  void set3DPosition(HUGO::AudioID id, float x, float y, float z);
   void setVelocity(HUGO::AudioID id, float vx, float vy, float vz);
   void setDirection(HUGO::AudioID id, float dx, float dy, float dz);
   void setDopplerFactor(HUGO::AudioID id, float factor);
