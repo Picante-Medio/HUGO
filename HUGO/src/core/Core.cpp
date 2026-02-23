@@ -5,7 +5,7 @@
 #include "Scene.h"
 #include <SDL2/SDL.h>
 #include <iostream>
-#include "ResourceManager.h"
+//#include "ResourceManager.h"
 
 using namespace HUGO;
 Core::Core()
@@ -18,10 +18,10 @@ void Core::init(){
     initModules();
     
     scenePtr = std::make_shared<Scene>();
-     std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(RenderSystem(scenePtr, m_ogreRoot, m_renderWindow));
+    std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr, m_ogreRoot, m_renderWindow);
     scenePtr->addSystem(renderSystem);
 
-    m_resourceManager = std::make_shared<HUGO::ResourceManager>(maEngine, m_ogreRoot);
+    //m_resourceManager = std::make_shared<HUGO::ResourceManager>(maEngine, m_ogreRoot);
 
     renderSystem->createTestEntity();
 }
@@ -36,9 +36,8 @@ void Core::destroy(){
 
 void HUGO::Core::initModules()
 {
-    initOgre();
     initMiniaudio();
-
+    initOgre();
 }
 
 void Core::initOgre()
