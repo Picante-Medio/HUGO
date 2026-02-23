@@ -6,8 +6,8 @@
 #include "miniaudio.h"
 class Scene;
 class VirtualTimer;
-namespace HUGO{
-    class Core{
+namespace HUGO {
+    class Core {
         void initModules();
 
         //Ogre

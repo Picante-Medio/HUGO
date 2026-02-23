@@ -4,6 +4,9 @@
 
 
 class Audio {
+private:
+    ma_sound audio;
+
 public:
     Audio() = default;
 
@@ -25,7 +28,4 @@ public:
         );
         return result == MA_SUCCESS;
     }
-
-private:
-    ma_sound audio;
 };
