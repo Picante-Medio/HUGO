@@ -233,7 +233,6 @@ void RenderSystem::registerCameraEntity(EntityID entity)
         return;
     }
     
-    std::cout << "camera de ogre siendo creada\n";
     createOgreCamera(entity);
 }
 
@@ -243,7 +242,6 @@ void RenderSystem::registerViewportEntity(EntityID entity)
     if (viewportMap.find(entity) != viewportMap.end()) {
         return;
     }
-    std::cout << "viewport de ogre siendo creada\n";
     
     createOgreViewport(entity);
 }
@@ -334,7 +332,6 @@ void RenderSystem::createOgreViewport(EntityID entity)
     ViewportResources res;
     
     const ViewportComponent* viewportComp = nullptr;
-    std::cout << "Pillar el component ViewPort" << std::endl;
     for(auto pack : scene->query<ViewportComponent>()) {
         const ViewportComponent& vp = pack.get<ViewportComponent&>();
         if (vp.entity == entity) {
@@ -345,7 +342,6 @@ void RenderSystem::createOgreViewport(EntityID entity)
     
     Ogre::Camera* cam = nullptr;
     
-    std::cout << "Buscando camera\n";    
     if (viewportComp->cameraEntity != 0) {
         auto camIt = cameraMap.find(viewportComp->cameraEntity);
         if (camIt != cameraMap.end()) {
@@ -356,7 +352,6 @@ void RenderSystem::createOgreViewport(EntityID entity)
     
     // if it has no camera asigned, use the main one
     if (!cam && mainCameraEntity != 0) {
-        std::cout << "No tiene camera naun\n";    
         
         auto camIt = cameraMap.find(mainCameraEntity);
         if (camIt != cameraMap.end()) {
@@ -366,8 +361,6 @@ void RenderSystem::createOgreViewport(EntityID entity)
 
     // if the viewport doesnt have a camera, asign the firts avaible
     if (!cam && !cameraMap.empty()) {
-        std::cout << "sigue sin cameraaaa\n";    
-        
         cam = cameraMap.begin()->second.ogreCamera;
     }
 
