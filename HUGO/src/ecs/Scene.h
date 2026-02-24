@@ -56,7 +56,7 @@ public:
 
     // Deleting the component
     entityTable.deRegisterComponent(entity, id);
-    EntityID toUpdate = componentTable.removeComponent<T>();
+    EntityID toUpdate = componentTable.removeComponent<T>(id);
 
     // Updating the index of the moved component upon deletion
     entityTable.updateDenseListIndex(toUpdate, id, oldIndex);

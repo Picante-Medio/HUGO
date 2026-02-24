@@ -5,6 +5,8 @@
 #include "System.h"
 
 #include <vector>
+#include <string>
+#include <unordered_map>
 
 typedef struct {
   HUGO::AudioTypes type;
@@ -17,11 +19,17 @@ Audios will be loaded from a lua script (hopefully)
 class AudioSystem : public System {
   std::shared_ptr<ma_engine> engine;
   std::vector<AudioInfo> audios;
+    // format: path -> id
+  // unordered map if we want to know its id using a string
+  std::unordered_map<std::string, HUGO::AudioID> audioMap;
+  
   HUGO::AudioID nextID;
 
   float soundsGroupVolume = 1.0f; // global volume controller for 2D and 3D sfx
   float musicsGroupVolume = 1.0f; // global volume controller for musics
 
+  //path where all the audio files are located 
+  std::string path = "test_media/";
   // private functions as helpers
 
   // private function to create a ma_sound using an audio file
@@ -36,7 +44,9 @@ class AudioSystem : public System {
 
   void handleMessages();
 
-public:
+  void loadFromFile(const char* path);
+
+  public:
   AudioSystem(std::shared_ptr<Scene> scene,
               std::shared_ptr<ma_engine> maEngine);
   virtual ~AudioSystem() = default;
@@ -70,4 +80,6 @@ public:
   void setVelocity(HUGO::AudioID id, float vx, float vy, float vz);
   void setDirection(HUGO::AudioID id, float dx, float dy, float dz);
   void setDopplerFactor(HUGO::AudioID id, float factor);
+
+  void createTestEntity();
 };

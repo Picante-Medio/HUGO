@@ -4,19 +4,26 @@
 #include "AudioComponent.h"
 #include "Sound3DInfoComponent.h"
 
-#include "ReproduceAudioComponent.h"
+#include "AudioTags.h"
 
+#include <fstream>
 #include <iostream>
+#include <list>
 #include <stdexcept>
+#include <sstream>
+
 AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, std::shared_ptr<ma_engine> maEngine)
     : System(scene), engine(maEngine), audios(), nextID(0)
 {
+    std::string completePath = path + "AudioList.txt";
+    loadFromFile(completePath.c_str());
 }
 
 void AudioSystem::update(double dt)
 {
     // if we want to change some value of the sound
     handleMessages();
+    
 }
 
 void AudioSystem::fixedUpdate(double dt)
@@ -66,10 +73,53 @@ ma_sound *AudioSystem::get3DSound(HUGO::AudioID id)
 
 void AudioSystem::handleMessages()
 {
-    for (auto pack : scene->query<ReproduceAudioComponent, AudioComponent>()) {
+    std::list<EntityID> garbageMessages;
+
+    for (auto pack : scene->query<AudioComponent, ReproduceAudioTag>()) {
         AudioComponent& sc = pack.get<AudioComponent&>();
+        ReproduceAudioTag& rc = pack.get<ReproduceAudioTag&>();
         playAudio(sc.soundId);
+        garbageMessages.push_back(rc.entity);
+    } 
+    for (auto m: garbageMessages){
+        scene->removeComponent<ReproduceAudioTag>(m);
     }
+    
+}
+
+void AudioSystem::loadFromFile(const char *path)
+{
+    std::ifstream file(path);
+    if (!file.is_open())
+        throw std::runtime_error("Could not open audio file list");
+
+    std::string line;
+    while (std::getline(file, line))
+    {
+        // skip empty lines or lines that start with #
+        if (line.empty() || line[0] == '#') continue;
+
+        std::stringstream ss(line);
+        std::string id, filename, typeStr;
+
+        std::getline(ss, id, ';');
+        std::getline(ss, filename, ';');
+        std::getline(ss, typeStr, ';');
+
+        HUGO::AudioTypes type = static_cast<HUGO::AudioTypes>(std::stoi(typeStr));
+
+        audios.emplace_back(createAudio(filename.c_str(), type));
+        audioMap[id] = nextID;
+        nextID++;
+    }
+}
+
+void AudioSystem::createTestEntity()
+{
+    EntityID ent = scene->createEntity();
+    scene->addComponent<AudioComponent>(ent, HUGO::MUSIC, audioMap["bgm"]);
+    auto t = scene->query<AudioComponent>();
+    scene->addComponent<ReproduceAudioTag>(ent);
 }
 
 void AudioSystem::addAudio(const char* name, HUGO::AudioTypes type)
@@ -182,3 +232,4 @@ void AudioSystem::setDopplerFactor(HUGO::AudioID id, float factor)
     ma_sound* s = get3DSound(id);
     ma_sound_set_doppler_factor(s, factor);
 }
+
