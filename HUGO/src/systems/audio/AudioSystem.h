@@ -5,9 +5,9 @@
 #include "System.h"
 
 #include <vector>
-typedef enum { SOUND2D, SOUND3D, MUSIC, LAST_TYPE } AudioTypes;
+
 typedef struct {
-  AudioTypes type;
+  HUGO::AudioTypes type;
   std::unique_ptr<Audio> ptr;
 } AudioInfo;
 
@@ -25,11 +25,16 @@ class AudioSystem : public System {
   // private functions as helpers
 
   // private function to create a ma_sound using an audio file
-  AudioInfo createAudio(const char *filename, AudioTypes type);
+  AudioInfo createAudio(const char *filename, HUGO::AudioTypes type);
   // private function to get a ma_sound pointer of the vector to do operations
   ma_sound *getSound(HUGO::AudioID id);
   // auxiliar method to check if audios[id] exists and its a 3d sound
   ma_sound *get3DSound(HUGO::AudioID id);
+
+
+  //(TODO) sound queue
+
+  void handleMessages();
 
 public:
   AudioSystem(std::shared_ptr<Scene> scene,
@@ -40,7 +45,7 @@ public:
   void fixedUpdate(double dt) override;
   // add an audio to the system
   // type determines if it's 2D, 3D or music
-  void addAudio(const char *name, AudioTypes type);
+  void addAudio(const char *name, HUGO::AudioTypes type);
 
   // playback control functions
   void playAudio(HUGO::AudioID id);
@@ -57,7 +62,7 @@ public:
   void setVolume(HUGO::AudioID id,
                  float vol); // set playback volume (0.0 = silent, 1.0 = full)
 
-  void setGroupVolume(AudioTypes type,
+  void setGroupVolume(HUGO::AudioTypes type,
                       float volume); // set the same volume to the whole group
 
   // 3d audio functions

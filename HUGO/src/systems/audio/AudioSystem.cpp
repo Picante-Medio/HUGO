@@ -1,4 +1,11 @@
 #include "AudioSystem.h"
+#include "Scene.h"
+
+#include "AudioComponent.h"
+#include "Sound3DInfoComponent.h"
+
+#include "ReproduceAudioComponent.h"
+
 #include <iostream>
 #include <stdexcept>
 AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, std::shared_ptr<ma_engine> maEngine)
@@ -8,13 +15,15 @@ AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, std::shared_ptr<ma_engine
 
 void AudioSystem::update(double dt)
 {
+    // if we want to change some value of the sound
+    handleMessages();
 }
 
 void AudioSystem::fixedUpdate(double dt)
 {
 }
 
-AudioInfo AudioSystem::createAudio(const char* filename, AudioTypes type)
+AudioInfo AudioSystem::createAudio(const char* filename, HUGO::AudioTypes type)
 {
     AudioInfo audio;
     audio.ptr = std::make_unique<Audio>();
@@ -22,13 +31,13 @@ AudioInfo AudioSystem::createAudio(const char* filename, AudioTypes type)
 
     //choose the flags depending on what type of audio it is
     switch (type) {
-        case SOUND2D: 
+        case HUGO::SOUND2D: 
             flags = MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION; 
             break;
-        case SOUND3D: 
+        case HUGO::SOUND3D: 
             flags = MA_SOUND_FLAG_DECODE; 
             break;
-        case MUSIC:
+        case HUGO::MUSIC:
             flags = MA_SOUND_FLAG_NO_SPATIALIZATION | MA_SOUND_FLAG_STREAM; 
             break;
         default: 
@@ -51,12 +60,19 @@ ma_sound* AudioSystem::getSound(HUGO::AudioID id)
 ma_sound *AudioSystem::get3DSound(HUGO::AudioID id)
 {
     ma_sound* s = getSound(id);
-    if (!s || audios[id].type != SOUND3D) return nullptr;
+    if (!s || audios[id].type != HUGO::SOUND3D) return nullptr;
     else return s;
 }
 
+void AudioSystem::handleMessages()
+{
+    for (auto pack : scene->query<ReproduceAudioComponent, AudioComponent>()) {
+        AudioComponent& sc = pack.get<AudioComponent&>();
+        playAudio(sc.soundId);
+    }
+}
 
-void AudioSystem::addAudio(const char* name, AudioTypes type)
+void AudioSystem::addAudio(const char* name, HUGO::AudioTypes type)
 {
     audios.emplace_back(createAudio(name, type));
     ++nextID;
@@ -127,7 +143,7 @@ void AudioSystem::setVolume(HUGO::AudioID id, float vol)
     if (!sound) return;
 
     //multiply factor according to its type
-    if(audios[id].type < MUSIC)
+    if(audios[id].type < HUGO::MUSIC)
         vol *= soundsGroupVolume;
     else
         vol *= musicsGroupVolume;
@@ -135,9 +151,9 @@ void AudioSystem::setVolume(HUGO::AudioID id, float vol)
     ma_sound_set_volume(sound, vol);
 }
 
-void AudioSystem::setGroupVolume(AudioTypes type, float volume)
+void AudioSystem::setGroupVolume(HUGO::AudioTypes type, float volume)
 {
-    if (type < MUSIC)
+    if (type < HUGO::MUSIC)
         soundsGroupVolume = volume; // O(1)
     else
         musicsGroupVolume = volume;  // O(1)

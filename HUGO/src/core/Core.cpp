@@ -30,14 +30,16 @@ void Core::init(){
     audioSystem->addAudio("lucky.mp3", MUSIC);
     // WE WONT USE OGG IN OUR PROJECT
     //SFX
-    audioSystem->addAudio("risa.wav", SOUND3D);
+    audioSystem->setAudioPosition(0, 0.0);
     audioSystem->playAudio(0);
-    audioSystem->setVolume(0, 0.01f);
+    audioSystem->addAudio("risa.wav", SOUND3D);
     audioSystem->setAudioPosition(0, 160.0);
-    audioSystem->playAudio(1);
+    audioSystem->setVolume(0, 0.5f);
+    audioSystem->playAudio(0);
+    //audioSystem->playAudio(1);
     audioSystem->setLooping(1, true);
     audioSystem->set3DPosition(1, 0, 10, 0);
-    audioSystem->setGroupVolume(SOUND2D, 0.5f);
+    //audioSystem->setGroupVolume(SOUND2D, 0.5f);
 }
 
 //Destruction of HUGO modules. End of HUGO

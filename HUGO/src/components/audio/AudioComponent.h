@@ -2,9 +2,9 @@
 #include "Component.h"
 #include "HugoTypes.h"
 
-// 2D SFX component
-struct MusicComponent: public Component
+struct AudioComponent: public Component
 {
+    HUGO::AudioTypes type;
     HUGO::AudioID soundId;
     float volume;
     bool loop;
@@ -12,7 +12,7 @@ struct MusicComponent: public Component
     float pitch;
     // flag to know if this sound is playing or not
     bool isPlaying;
-    MusicComponent(EntityID entity, int soundId, float volume = 1.0f, bool loop = false, 
+    AudioComponent(EntityID entity, HUGO::AudioTypes type, HUGO::AudioID soundId, float volume = 1.0f, bool loop = false, 
         bool playOnStart = false, float pitch = 1.0f)
         :Component(entity), soundId(soundId), volume(volume), loop(loop), 
         playOnStart(playOnStart), pitch(pitch), isPlaying(false){}
