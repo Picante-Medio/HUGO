@@ -21,12 +21,12 @@ struct CameraComponent: public Component
  
   // Perspective parameters
   float fovY; // Field of view in the Y direction, in degrees
-  float nearClip;
-  float farClip;
+  float nearClip = 1.0f;
+  float farClip = 10000.0f;
 
   // Orthographic parameters
   float orthoWidth = 10.f;
-  float orthoHeightf = 10.f;
+  float orthoHeight = 10.f;
 
   //Aspect ratio
   float aspectRatio = 16.0f / 9.0f;

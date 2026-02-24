@@ -13,7 +13,7 @@ struct ViewportComponent: public Component
     int zOrder = 0;
     
     // Background color and clear options
-    HUGO::Vector4 clearColor = HUGO::Vector4(0.0f, 0.0f, 0.0f, 1.0f);
+    HUGO::Vector4 clearColor = HUGO::Vector4(0.3f, 0.3f, 0.5f, 1.0f);
     bool clearDepth = true;
     bool clearStencil = true;
     

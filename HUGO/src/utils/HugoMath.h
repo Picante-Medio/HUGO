@@ -1,5 +1,6 @@
 #pragma once
 #include <cmath>
+#include "Ogre.h"
  
 namespace HUGO{
 
@@ -37,7 +38,7 @@ namespace HUGO{
             return {cx, cy, cz};
         }
 
-        Ogre::Vector3 toOgre() {
+        Ogre::Vector3 toOgre() const {
             return Ogre::Vector3(x, y, z);
         }
     };
@@ -102,7 +103,7 @@ namespace HUGO{
         Quaternion() : w(0), x(0), y(0), z(0) {}
         Quaternion(float w, float x, float y, float z) : w(w), x(x), y(y), z(z) {}
 
-        Ogre::Quaternion toOgre() {
+        Ogre::Quaternion toOgre() const{
             return Ogre::Quaternion(w, x, y, z);
         }
     };
