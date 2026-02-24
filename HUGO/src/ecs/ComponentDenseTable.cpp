@@ -8,7 +8,6 @@ ComponentDenseTable::ComponentDenseTable() {
 EntityID
 ComponentDenseTable::removeComponent(ComponentID componentID, DenseListIndex index) {
   if(componentLists[componentID] == nullptr) return 0u;
-
   return componentLists[componentID]->remove(index);
 }
 

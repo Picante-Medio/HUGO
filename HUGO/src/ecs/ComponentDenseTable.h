@@ -81,7 +81,7 @@ public:
   */
   template<typename T>
   EntityID removeComponent(DenseListIndex index) {
-    return removeComponent(getComponentId<T>(), index);
+    return getComponentList<T>()->remove(index);
   };
 
 
