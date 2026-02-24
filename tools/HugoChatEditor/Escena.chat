@@ -1,0 +1,15 @@
+SYSTEM : MOVEMENT_SYSTEM
+SYSTEM : CHAT_SYSTEM
+
+ENTITY : Entity3D | 0
+	COMPONENT : TRANSFORM
+		global_position : (0.043837, 0.0, 0.0)
+		scale : (1.0, 1.0, 1.0)
+		rotation : (0.0, 0.0, 0.0)
+	COMPONENT : MESH_RENDERER
+		mesh : res://sphere.tres
+
+ENTITY : Entity | 1
+	COMPONENT : PARENT
+		value : 0
+

@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://dq2fl1vp76r7r"]
+
+[ext_resource type="Script" uid="uid://cft1fgdpqn2vu" path="res://SceneScripts/scene_tracker.gd" id="1_865ah"]
+[ext_resource type="Script" uid="uid://doqyo02100nfx" path="res://Components/jump_handler.gd" id="3_sks45"]
+[ext_resource type="Script" uid="uid://dcc6b5sxl6c7u" path="res://Entities/entity.gd" id="5_d4yc1"]
+
+[node name="Escena" type="Node" unique_id=94047689 groups=["SCENE_TRACKER"]]
+script = ExtResource("1_865ah")
+entities = Dictionary[String, Dictionary]({
+"Entity": {},
+"Rodilla": {}
+})
+systems = Array[int]([0, 1, 0])
+
+[node name="Rodilla" type="Node3D" parent="." unique_id=1605836219]
+script = ExtResource("5_d4yc1")
+metadata/_custom_type_script = "uid://dcc6b5sxl6c7u"
+
+[node name="Entity" type="Node3D" parent="." unique_id=1913746766]
+script = ExtResource("5_d4yc1")
+metadata/_custom_type_script = "uid://dcc6b5sxl6c7u"
+
+[node name="JumpHandler" type="Node" parent="Entity" unique_id=1235435571]
+script = ExtResource("3_sks45")
+metadata/_custom_type_script = "uid://doqyo02100nfx"

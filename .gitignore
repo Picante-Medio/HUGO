@@ -31,3 +31,10 @@ HUGO/bin/HUGO*
 # Runfiles y demás
 **/project.godot
 **/run
+
+#Ignores de Godot
+.godot/
+/android/
+*.editorconfig
+*.import
+*.uid
