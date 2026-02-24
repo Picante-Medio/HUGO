@@ -1,21 +1,14 @@
 @tool
 extends EditorScript
 
-func generate_entity_map(entities:Dictionary[String, Dictionary]) -> Dictionary[String, int]:
-	var entity_map: Dictionary[String, int]
-	var i:int = 0
-	for entity_key in entities.keys():
-		entity_map.get_or_add(entity_key, i)
-		i += 1
-	return entity_map
-
 func _run() -> void:
 	var root: SCENE_TRACKER = EditorInterface.get_edited_scene_root()
 	if root == null:
 		push_error("No edited scene root found.")
 		return
 	
-	var entity_map:Dictionary[String, int] = generate_entity_map(root.entities)
+	root.create_entities()
+	var entity_map:Dictionary[String, int] = root.entities_map
 	
 	var scene_name := root.name
 	var file_path := "res://%s.chat" % scene_name

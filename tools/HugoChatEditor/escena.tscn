@@ -1,25 +1,54 @@
 [gd_scene format=3 uid="uid://dq2fl1vp76r7r"]
 
 [ext_resource type="Script" uid="uid://cft1fgdpqn2vu" path="res://SceneScripts/scene_tracker.gd" id="1_865ah"]
-[ext_resource type="Script" uid="uid://doqyo02100nfx" path="res://Components/jump_handler.gd" id="3_sks45"]
+[ext_resource type="Script" uid="uid://dimuk3ggoam44" path="res://Entities/entity3d.gd" id="3_sks45"]
+[ext_resource type="SphereMesh" uid="uid://citadnjn16yba" path="res://sphere.tres" id="4_d4yc1"]
+[ext_resource type="Script" uid="uid://bnjt3w18hk2gs" path="res://Components/mesh_renderer.gd" id="4_fanfj"]
 [ext_resource type="Script" uid="uid://dcc6b5sxl6c7u" path="res://Entities/entity.gd" id="5_d4yc1"]
+[ext_resource type="Script" uid="uid://doqyo02100nfx" path="res://Components/jump_handler.gd" id="6_ssasw"]
 
 [node name="Escena" type="Node" unique_id=94047689 groups=["SCENE_TRACKER"]]
 script = ExtResource("1_865ah")
 entities = Dictionary[String, Dictionary]({
 "Entity": {},
-"Rodilla": {}
+"Entity3D": {
+"MeshInstance3D": Dictionary[String, Variant]({
+"mesh": "res://sphere.tres"
+}),
+"Node": Dictionary[String, Variant]({
+"jump_force": 0.0
+}),
+"Transform": Dictionary[String, Variant]({
+"position": Vector3(0, 0, 0),
+"rotation": Vector3(0, 0, 0),
+"scale": Vector3(1, 1, 1)
+})
+},
+"Entity_O": {
+"Parent": {
+"value": 0
+}
+}
 })
 systems = Array[int]([0, 1, 0])
 
-[node name="Rodilla" type="Node3D" parent="." unique_id=1605836219]
+[node name="Entity" type="Node3D" parent="." unique_id=490908630]
 script = ExtResource("5_d4yc1")
 metadata/_custom_type_script = "uid://dcc6b5sxl6c7u"
 
-[node name="Entity" type="Node3D" parent="." unique_id=1913746766]
+[node name="Entity_O" type="Node3D" parent="Entity" unique_id=1187685454]
 script = ExtResource("5_d4yc1")
 metadata/_custom_type_script = "uid://dcc6b5sxl6c7u"
 
-[node name="JumpHandler" type="Node" parent="Entity" unique_id=1235435571]
+[node name="Entity3D" type="Node3D" parent="." unique_id=550912060]
 script = ExtResource("3_sks45")
+metadata/_custom_type_script = "uid://dimuk3ggoam44"
+
+[node name="MeshRenderer" type="MeshInstance3D" parent="Entity3D" unique_id=1799140428]
+mesh = ExtResource("4_d4yc1")
+script = ExtResource("4_fanfj")
+metadata/_custom_type_script = "uid://bnjt3w18hk2gs"
+
+[node name="JumpHandler" type="Node" parent="Entity3D" unique_id=1898419599]
+script = ExtResource("6_ssasw")
 metadata/_custom_type_script = "uid://doqyo02100nfx"
