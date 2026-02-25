@@ -9,7 +9,7 @@
 #include "CameraTags.h"
 
 RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> ogreRoot, Ogre::RenderWindow* window)
-    :System(scene), ogreRoot(ogreRoot), renderWindow(window)
+    :System(scene), ogreRoot(ogreRoot), renderWindow(window), idToIndex(), freeOgreObjectId()
 {
     sceneManager = ogreRoot.get()->createSceneManager();
     
@@ -54,7 +54,7 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
             int width = 0;
             int height = 0;
 
-            sscanf(value.c_str(), "%d x %d", &width, &height);
+            sscanf_s(value.c_str(), "%d x %d", &width, &height);
 
             if (width > 0 && height > 0)
                 resolutions.emplace_back(width, height);
@@ -69,29 +69,27 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
     setMainViewport(defaultViewport);
 }
 
+#pragma region Tags
 void RenderSystem::handleTag()
 {
-    for (auto pack : scene->query<TransformComponent,RenderComponent>()) {
+    for(auto& pack : scene->query<TransformComponent,RenderComponent>()) {
         RenderComponent& rc = pack.get<RenderComponent&>();
-        EntityID entity = rc.entity;
+        TransformComponent& tr=pack.get<TransformComponent&>();
 
-        //if do not have create ogre entity
-        if(!rc.ogreEntity){
-            OgreObject obj = createOgreObject(entity,rc.meshName,rc.materialName);
-            rc.ogreEntity = obj.ogreEntity;
-            rc.ogreSceneNode=obj.sceneNode;
-        }
+        if (rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) {
+            //create a new ogreObject
+            rc.objectID = createOgreObject(rc.meshName,rc.materialName);
+        } 
+        OgreObject& obj = getOgreObject(rc.objectID);
 
         //update render transform
-        TransformComponent& tr=pack.get<TransformComponent&>();
-        rc.ogreSceneNode->setPosition(tr.position.toOgre());
-        rc.ogreSceneNode->setOrientation(tr.rotation.toOgre());
-        rc.ogreSceneNode->setScale(tr.scale.toOgre());
+        obj.ogreSceneNode->setPosition(tr.position.toOgre());
+        obj.ogreSceneNode->setOrientation(tr.rotation.toOgre());
+        obj.ogreSceneNode->setScale(tr.scale.toOgre());
     }
 
-
     // Camera update
-    for(auto pack : scene->query<CameraDirtyTag, TransformComponent, CameraComponent>()) {
+    for(auto& pack : scene->query<CameraDirtyTag, TransformComponent, CameraComponent>()) {
         CameraDirtyTag& tag = pack.get<CameraDirtyTag&>();
         TransformComponent& tr = pack.get<TransformComponent&>();
         CameraComponent& camera = pack.get<CameraComponent&>();
@@ -115,7 +113,7 @@ void RenderSystem::handleTag()
     }
 
     // Viewport update
-    for(auto pack : scene->query<ViewportDirtyTag, ViewportComponent>()) {
+    for(auto& pack : scene->query<ViewportDirtyTag, ViewportComponent>()) {
         ViewportDirtyTag& tag = pack.get<ViewportDirtyTag&>();
         ViewportComponent& viewport = pack.get<ViewportComponent&>();
         EntityID entity = tag.entity;
@@ -145,7 +143,10 @@ void RenderSystem::handleTag()
     }
 }
 
-OgreObject RenderSystem::createOgreObject(EntityID entity, const std::string &meshName, const std::string &materialName)
+#pragma endregion
+
+#pragma region OgreObject
+HUGO::OgreObjectID RenderSystem::createOgreObject(const std::string &meshName, const std::string &materialName)
 {
     //create ogre entity
     Ogre::Entity* ent=sceneManager->createEntity(meshName);  
@@ -155,38 +156,98 @@ OgreObject RenderSystem::createOgreObject(EntityID entity, const std::string &me
     //create scene node
     Ogre::SceneNode* node= sceneManager->getRootSceneNode()->createChildSceneNode();
     node->attachObject(ent);
+    
+    HUGO::OgreObjectID id;
+    //reuse id
+    if(!freeOgreObjectId.empty()){ 
+        id= freeOgreObjectId.back();
+        freeOgreObjectId.pop_back();
+    }
+    else{
+        //generate new ID
+        id = static_cast<HUGO::OgreObjectID>(idToIndex.size());
+        idToIndex.push_back(0);
+    }
+    
+    //create OgreObject
+    OgreObject obj = {id, ent, node};
 
-    return {ent, node};
+    //store object
+    std::size_t index = ogreObjects.push_back(std::move(obj));
+    idToIndex[id] = index;
+
+    return id;
 }
+
+OgreObject &RenderSystem::getOgreObject(HUGO::OgreObjectID id)
+{
+    return ogreObjects[idToIndex[id]];
+}
+
+void RenderSystem::removeOgreObject(HUGO::OgreObjectID& id)
+{
+    if (id != HUGO::INVALID_OGRE_OBJECT_ID){
+        
+        std::size_t index = idToIndex[id];
+        std::size_t lastIndex = ogreObjects.size() - 1;
+
+        destroyOgreObject(ogreObjects[index]);
+
+        if (index != lastIndex) {
+            // mover último objeto al hueco
+            ogreObjects[index] = std::move(ogreObjects[lastIndex]);
+            HUGO::OgreObjectID movedID = ogreObjects[index].id;
+            idToIndex[movedID] = index;
+        }
+
+        ogreObjects.remove(lastIndex);
+        freeOgreObjectId.push_back(id);
+        id = HUGO::INVALID_OGRE_OBJECT_ID;
+    }
+}
+
+void RenderSystem::destroyOgreObject(OgreObject &obj)
+{
+    if(obj.ogreSceneNode){
+        sceneManager->destroySceneNode(obj.ogreSceneNode);
+        obj.ogreSceneNode = nullptr;
+    }
+    if(obj.ogreEntity){
+        sceneManager->destroyEntity(obj.ogreEntity);
+        obj.ogreEntity = nullptr;
+    }
+}
+#pragma endregion
 
 void RenderSystem::update(double dt)
 {
     handleTag();
 
-    ////test
-    float vel = 0.01;
+    //test
+    float vel = 0.05f;
     for(auto pack : scene->query<TransformComponent,RenderComponent>()) {
         TransformComponent& tr=pack.get<TransformComponent&>();
-        tr.position.x += vel*dt;
+        tr.position.z += vel*dt;
     }
-    ////
+    //
 }
 
 void RenderSystem::fixedUpdate(double dt)
 {
 }
 
+#pragma region Testing
 void RenderSystem::createTestEntity()
 {
     EntityID e = scene->createEntity();
-    scene->addComponent<TransformComponent>(e, HUGO::Vector3(-30,10,10), HUGO::Quaternion(1,0,0,0), HUGO::Vector3(0.2,0.2,0.2));
+    scene->addComponent<TransformComponent>(e, HUGO::Vector3(-30,10,10), HUGO::Quaternion(1,0,0,0), HUGO::Vector3(0.2f,0.2f,0.2f));
     scene->addComponent<RenderComponent>(e, "cube.mesh");
 
-
     EntityID e2 = scene->createEntity();
-    scene->addComponent<TransformComponent>(e2, HUGO::Vector3(30,10,10), HUGO::Quaternion(1,0,0,0), HUGO::Vector3(0.2,0.2,0.2));
+    scene->addComponent<TransformComponent>(e2, HUGO::Vector3(30,10,10), HUGO::Quaternion(1,0,0,0), HUGO::Vector3(0.2f,0.2f,0.2f));
     scene->addComponent<RenderComponent>(e2, "sphere.mesh");
 }
+#pragma endregion
 
 // Helper function for Camera creation
 // EntityID RenderSystem::createCameraEntity()
@@ -225,7 +286,7 @@ EntityID RenderSystem::createViewportEntity()
 }
 
 // ==================== Registering ====================
-
+#pragma region Registering
 void RenderSystem::registerCameraEntity(EntityID entity)
 {
     // check if its already registered
@@ -265,16 +326,17 @@ void RenderSystem::unregisterViewportEntity(EntityID entity)
         mainViewportEntity = 0;
     }
 }
+#pragma endregion
 
 // ==================== Ogre Camera and ViewPort Creation ====================
-
+#pragma region  OgreCamera and ViewPort Creation 
 void RenderSystem::createOgreCamera(EntityID entity)
 {
     CameraResources res;
     
     // Get the transform component of the camera to set the initial position
     const TransformComponent* transformComp = nullptr;
-    for(auto pack : scene->query<TransformComponent>()) {
+    for(auto& pack : scene->query<TransformComponent>()) {
         const TransformComponent& tr = pack.get<TransformComponent&>();
         if (tr.entity == entity) {
             transformComp = &tr;
@@ -284,7 +346,7 @@ void RenderSystem::createOgreCamera(EntityID entity)
 
     // Get CameraComponent
     const CameraComponent* cameraComp = nullptr;
-    for(auto pack : scene->query<CameraComponent>()) {
+    for(auto& pack : scene->query<CameraComponent>()) {
         const CameraComponent& cam = pack.get<CameraComponent&>();
         if (cam.entity == entity) {
             cameraComp = &cam;
@@ -332,7 +394,7 @@ void RenderSystem::createOgreViewport(EntityID entity)
     ViewportResources res;
     
     const ViewportComponent* viewportComp = nullptr;
-    for(auto pack : scene->query<ViewportComponent>()) {
+    for(auto& pack : scene->query<ViewportComponent>()) {
         const ViewportComponent& vp = pack.get<ViewportComponent&>();
         if (vp.entity == entity) {
             viewportComp = &vp;
@@ -388,6 +450,7 @@ void RenderSystem::createOgreViewport(EntityID entity)
 
     scene->addComponent<ViewportDirtyTag>(entity);
 }
+#pragma endregion
 
 void RenderSystem::updateViewportDimensions()
 {

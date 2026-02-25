@@ -1,14 +1,20 @@
 #pragma once
 #include <vector>
 #include <unordered_map>
+
 #include "System.h"
-#include "HugoMath.h"
-#include "Ogre.h"
 #include "Ecs.h"
+#include "Ogre.h"
+#include "PagedArray.h"
+#include "HugoTypes.h"
+#include "HugoMath.h"
+
+struct RenderComponent;
 
 struct OgreObject{
-    Ogre::Entity* ogreEntity;
-    Ogre::SceneNode* sceneNode;
+    HUGO::OgreObjectID id;
+    Ogre::Entity* ogreEntity = nullptr;
+    Ogre::SceneNode* ogreSceneNode = nullptr;
 };
 
 // For multiple cameras and viewports
@@ -33,6 +39,10 @@ class RenderSystem : public System{
     std::unordered_map<EntityID, CameraResources> cameraMap; // Provisional
     std::unordered_map<EntityID, ViewportResources> viewportMap;
 
+    std::vector<HUGO::OgreObjectID> freeOgreObjectId;
+    std::vector<std::size_t> idToIndex;
+    PagedArray<OgreObject, 128> ogreObjects;
+
     EntityID mainCameraEntity = 0;
     EntityID mainViewportEntity = 0;
 
@@ -45,12 +55,16 @@ class RenderSystem : public System{
     // void destroyOgreCamera(EntityID entity);
     // void destroyOgreViewport(EntityID entity);
 
-
     void handleTag();
-    OgreObject createOgreObject(EntityID entity, const std::string& meshName, const std::string& materialName="");
 
+    //OgreObjects
+    HUGO::OgreObjectID createOgreObject(const std::string& meshName, const std::string& materialName="");
+    OgreObject& RenderSystem::getOgreObject(HUGO::OgreObjectID id);
+    void removeOgreObject(HUGO::OgreObjectID& id);
+    void destroyOgreObject(OgreObject& obj);
 public:
     RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> root, Ogre::RenderWindow* window);
+
     void update(double dt) override;
     void fixedUpdate(double dt) override;
 
