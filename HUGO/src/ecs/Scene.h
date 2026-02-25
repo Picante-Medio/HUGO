@@ -77,9 +77,13 @@ public:
     // Get the smallest list of possible entities
     int smallestListIndex = 0;
     DenseListIndex smallestSize = componentTable.getCount(ids[0]);
-    for (int i = 1; i < ids.size(); ++i)
-      if (componentTable.getCount(ids[i]) < smallestSize)
-        smallestListIndex = i;
+    for (int i = 1; i < ids.size(); ++i){
+      DenseListIndex size = componentTable.getCount(ids[i]);
+      if (size < smallestSize) {
+          smallestSize = size;
+          smallestListIndex = i;
+      }
+    }
 
     ComponentID componentID = ids[smallestListIndex];
     std::vector<EntityID> potentialEntities = componentTable.affectedEntities(componentID);

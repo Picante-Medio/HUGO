@@ -2,7 +2,7 @@
 #include "Scene.h"
 
 #include "AudioComponent.h"
-#include "Sound3DInfoComponent.h"
+//#include "Sound3DInfoComponent.h"
 
 #include "AudioTags.h"
 
@@ -78,12 +78,13 @@ void AudioSystem::handleMessages()
     for (auto pack : scene->query<AudioComponent, ReproduceAudioTag>()) {
         AudioComponent& sc = pack.get<AudioComponent&>();
         ReproduceAudioTag& rc = pack.get<ReproduceAudioTag&>();
+        if (sc.isPlaying) continue;
         playAudio(sc.soundId);
         garbageMessages.push_back(rc.entity);
     } 
-    for (auto m: garbageMessages){
-        scene->removeComponent<ReproduceAudioTag>(m);
-    }
+    // for (auto m: garbageMessages){
+    //     scene->removeComponent<ReproduceAudioTag>(m);
+    // }
     
 }
 
@@ -112,13 +113,13 @@ void AudioSystem::loadFromFile(const char *path)
         audioMap[id] = nextID;
         nextID++;
     }
+    file.close();
 }
 
 void AudioSystem::createTestEntity()
 {
     EntityID ent = scene->createEntity();
-    scene->addComponent<AudioComponent>(ent, HUGO::MUSIC, audioMap["bgm"]);
-    auto t = scene->query<AudioComponent>();
+    scene->addComponent<AudioComponent>(ent, HUGO::MUSIC, audioMap["bgm"], 0.1f);
     scene->addComponent<ReproduceAudioTag>(ent);
 }
 

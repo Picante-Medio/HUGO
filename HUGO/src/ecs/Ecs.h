@@ -19,10 +19,9 @@ using DenseListIndex = unsigned long int;
   * @brief auxiliar function that generates IDs dinamically every time it is called
   * @return a unique ID
 */
-static ComponentID getNextID() {
+inline ComponentID getNextID() {
   static ComponentID index = 0;
   index += 1;
-
   if(index >= MAX_COMPONENTS) throw "Too many components";
   return index;
 }
@@ -33,7 +32,7 @@ static ComponentID getNextID() {
   * @return a unique ID
 */
 template<typename T>
-static ComponentID getComponentId() {
+inline ComponentID getComponentId() {
   static ComponentID index = getNextID();
   return index;
 }

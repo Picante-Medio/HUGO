@@ -14,6 +14,6 @@ struct AudioComponent: public Component
     bool isPlaying;
     AudioComponent(EntityID entity, HUGO::AudioTypes type, HUGO::AudioID soundId, float volume = 1.0f, bool loop = false, 
         bool playOnStart = false, float pitch = 1.0f)
-        :Component(entity), soundId(soundId), volume(volume), loop(loop), 
+        :Component(entity), type(type),soundId(soundId), volume(volume), loop(loop), 
         playOnStart(playOnStart), pitch(pitch), isPlaying(false){}
 };

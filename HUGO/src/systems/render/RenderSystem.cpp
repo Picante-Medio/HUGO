@@ -71,7 +71,7 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
 
 void RenderSystem::handleTag()
 {
-    for(auto pack : scene->query<TransformComponent,RenderComponent>()) {
+    for (auto pack : scene->query<TransformComponent,RenderComponent>()) {
         RenderComponent& rc = pack.get<RenderComponent&>();
         EntityID entity = rc.entity;
 
