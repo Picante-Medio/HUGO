@@ -18,5 +18,7 @@ namespace HUGO{
         ResourceManager(std::shared_ptr<ma_engine> ma_eng, std::shared_ptr<Ogre::Root> ogreRoot);
         void unloadSceneResources(HUGO::SceneID id);
         void loadSceneResources(HUGO::SceneID id);
+
+        void createResourceSceneGroups(/*The game's map*/);
     };
 }
