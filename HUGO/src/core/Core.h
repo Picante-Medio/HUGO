@@ -25,15 +25,15 @@ namespace HUGO {
         void destroyMiniaudio();
         std::shared_ptr<ma_engine> maEngine;
 
-
         VirtualTimer vt;
         std::shared_ptr<Scene> scenePtr;
-
         
         void locateResources();
         void loadResources();
+
         //Resource Manager
         std::shared_ptr<ResourceManager> m_resourceManager;
+    
     public:
         Core();
         void init();

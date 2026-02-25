@@ -1,6 +1,7 @@
 #pragma once
 #include <cmath>
 #include "Ogre.h"
+#include "../bullet3-src/src/btBulletDynamicsCommon.h"
  
 namespace HUGO{
 
@@ -40,6 +41,10 @@ namespace HUGO{
 
         Ogre::Vector3 toOgre() const {
             return Ogre::Vector3(x, y, z);
+        }
+
+        btVector3 toBullet() const {
+            return btVector3(x, y, z);
         }
     };
 
@@ -105,6 +110,10 @@ namespace HUGO{
 
         Ogre::Quaternion toOgre() const{
             return Ogre::Quaternion(w, x, y, z);
+        }
+
+        btQuaternion toBullet() const{
+            return btQuaternion(x, y, z, w);
         }
     };
     
