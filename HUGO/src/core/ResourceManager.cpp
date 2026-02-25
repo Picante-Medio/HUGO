@@ -8,9 +8,14 @@ ResourceManager::ResourceManager(std::shared_ptr<ma_engine> ma_eng, std::shared_
 }
 
 void ResourceManager::unloadSceneResources(HUGO::SceneID id){
-
+    //Unload all the resources from Miniaudio and Ogre
 }
 
 void ResourceManager::loadSceneResources(HUGO::SceneID id){
+    //It should search in the map for the assets that are used, such as meshes, textures, audio... and call Ogre and MiniAudio to load them in memory.
 
+}
+
+void ResourceManager::createResourceSceneGroups(/*The game's map*/){
+    
 }
