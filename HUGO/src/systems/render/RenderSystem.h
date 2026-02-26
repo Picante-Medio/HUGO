@@ -59,7 +59,7 @@ class RenderSystem : public System{
 
     //OgreObjects
     HUGO::OgreObjectID createOgreObject(const std::string& meshName, const std::string& materialName="");
-    OgreObject& RenderSystem::getOgreObject(HUGO::OgreObjectID id);
+    OgreObject& getOgreObject(HUGO::OgreObjectID id);
     void removeOgreObject(HUGO::OgreObjectID& id);
     void destroyOgreObject(OgreObject& obj);
 public:
