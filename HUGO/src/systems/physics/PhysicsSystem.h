@@ -3,7 +3,7 @@
 #include "Ecs.h"
 #include "System.h"
 #include "TransformComponent.h"
-#include "../bullet3-src/src/btBulletDynamicsCommon.h"
+#include "btBulletDynamicsCommon.h"
 
 class HUGOMotionState : public btMotionState{
 

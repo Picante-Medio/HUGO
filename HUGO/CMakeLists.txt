@@ -46,13 +46,11 @@ if (WIN32)
     set(CMAKE_PREFIX_PATH 
         ${BASE_PREFIX_PATH}/sdl2
         ${BASE_PREFIX_PATH}/ogre
-        ${BASE_PREFIX_PATH}/miniaudio
         CACHE PATH "prefix path"
     )
 else()
     set(CMAKE_PREFIX_PATH 
         ${BASE_PREFIX_PATH}/ogre
-        ${BASE_PREFIX_PATH}/miniaudio
         CACHE PATH "prefix path"
     )
 endif()
@@ -75,10 +73,15 @@ add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
     ${INCLUDE_DIRS}
-    ${miniaudio_SOURCE_DIR})
+    ${miniaudio_SOURCE_DIR}
+    ${bullet3_SOURCE_DIR}/src)
 
-set(HUGO_LINKED_LIBRARIES 
+set(HUGO_LINKED_LIBRARIES
+    LinearMath
+    BulletDynamics
+    BulletCollision
     Bullet3Common
+    Bullet3Dynamics
     Bullet3Collision
     OgreMain
     OgreOverlay
