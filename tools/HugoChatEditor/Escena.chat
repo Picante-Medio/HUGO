@@ -3,18 +3,15 @@ SYSTEM : CHAT_SYSTEM
 SYSTEM : MOVEMENT_SYSTEM
 
 ENTITY : Entity | 0
-
-ENTITY : Entity_O | 1
-	COMPONENT : Parent
-		value : 0
-
-ENTITY : Entity3D | 2
 	COMPONENT : MeshInstance3D
-		mesh : res://sphere.tres
-	COMPONENT : Node
-		jump_force : 0.0
+
+ENTITY : Entity3D | 1
 	COMPONENT : Transform
-		position : (0.0, 0.0, 0.0)
+		position : (0.564753, 0.0, 0.0)
 		rotation : (0.0, 0.0, 0.0)
 		scale : (1.0, 1.0, 1.0)
+
+ENTITY : Entity_O | 2
+	COMPONENT : Parent
+		value : 1
 
