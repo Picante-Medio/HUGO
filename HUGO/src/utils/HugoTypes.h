@@ -10,17 +10,6 @@ namespace HUGO{
     using SceneID = int;
 
     using String = std::string;
-    
-    typedef enum { SOUND2D, SOUND3D, MUSIC, LAST_TYPE } AudioTypes;
-    typedef enum {
-    NONE   = 0,
-    LOOP   = 1 << 0,
-    VOLUME = 1 << 1,
-    PITCH  = 1 << 2,
-    STARTTIME  = 1 << 3,
-    START = 1 << 4,
-    STOP = 1 << 5
-    } AudioDirtyFlags;
 
     enum AudioTypes { 
         SOUND2D, 
