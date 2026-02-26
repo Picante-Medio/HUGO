@@ -38,3 +38,6 @@ HUGO/bin/HUGO*
 *.editorconfig
 *.import
 *.uid
+
+#Ignores internos
+HUGO/.gitignore
