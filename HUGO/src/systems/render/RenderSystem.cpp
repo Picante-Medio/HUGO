@@ -54,7 +54,10 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
             int width = 0;
             int height = 0;
 
-            sscanf_s(value.c_str(), "%d x %d", &width, &height);
+            char temp = 0;
+
+            std::stringstream sStream(value);
+            sStream >> width >> temp >> height;
 
             if (width > 0 && height > 0)
                 resolutions.emplace_back(width, height);
