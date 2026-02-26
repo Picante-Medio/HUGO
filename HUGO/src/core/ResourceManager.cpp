@@ -16,6 +16,6 @@ void ResourceManager::loadSceneResources(HUGO::SceneID id){
 
 }
 
-void ResourceManager::createResourceSceneGroups(/*The game's map*/){
+void ResourceManager::setupResources(HUGO::String path){
     
 }

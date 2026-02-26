@@ -19,6 +19,7 @@ namespace HUGO{
         void unloadSceneResources(HUGO::SceneID id);
         void loadSceneResources(HUGO::SceneID id);
 
-        void createResourceSceneGroups(/*The game's map*/);
+        //Setup resources from all scenes and prefabs of game
+        void setupResources(HUGO::String path);
     };
 }
