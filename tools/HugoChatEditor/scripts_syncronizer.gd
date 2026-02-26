@@ -3,6 +3,7 @@ extends EditorScript
 
 const COMPONENTS_PATH = "../../HUGO/src/components"
 const OUTPUT_COMPONENTS_PATH = "Components"
+const OUTPUT_CHAT_PARSER_PATH = "../../HUGO/src/ecs/ChatParser.h"
 const HUGO_TYPES_PATH = "../../HUGO/src/utils/HugoTypes.h"
 
 const OUTPUT_ENUMS_PATH = "Enums.gd"
@@ -20,52 +21,84 @@ func _run() -> void:
 	list_and_print_files_recursive(COMPONENTS_PATH)
 	write_components()
 	EditorInterface.get_resource_filesystem().scan_sources()
+	create_chat_parser()
+
+func create_chat_parser() -> void:
+	var file := FileAccess.open(OUTPUT_CHAT_PARSER_PATH, FileAccess.WRITE)
+
+	file.store_line('#include "Scene.h"')
+	for component in components_dictionary.keys():
+		file.store_line('#include "' + component + '.h"')
+	file.store_line("")
+
+	file.store_line("class SceneParser {")
+	file.store_line("\tpublic:")
+	file.store_line("\t\tvoid ReadComponent(Scene& scene, string& componentName, EnitityID entity, std::vector<std::any> args) {")
+
+	var i:int = 0
+	for component in components_dictionary.keys():
+		if i == 0: file.store_string("\t\t\tif")
+		else: file.store_string("\t\t\telse")
+		file.store_string('("' + component + '" == componentName' + ") ")
+
+		var args:String = ""
+		var arg_index := 0
+		for parameter in components_dictionary[component]:
+			args = args + "args[" + str(arg_index) + "],"
+			arg_index += 1
+
+		args = args.substr(0, args.length() - 1)
+		file.store_line("scene.addComponent<" + component + ">(entity, " + args + ");")
+		i += 1
+	file.store_line("\t\t}")
+
+	file.store_line("}")
 
 func ensure_folder(path: String) -> void:
 	var abs_path := ProjectSettings.globalize_path(path)
 	if DirAccess.dir_exists_absolute(abs_path): return
-	
+
 	var err := DirAccess.make_dir_recursive_absolute(abs_path)
 	if err != OK:
 		push_error("Error creando carpeta: " + abs_path)
 
 func write_components():
 	ensure_folder(OUTPUT_COMPONENTS_PATH)
-	
+
 	for key in components_dictionary.keys():
 		var value = components_dictionary[key]
 		print("\nCOMPONENT : " + key)
 		for v in value:
 			print(v[0] + " " + v[1])
-			
+
 	for component_name:String in components_dictionary.keys():
 		var file := FileAccess.open(OUTPUT_COMPONENTS_PATH.path_join(component_name + ".gd"), FileAccess.WRITE)
-		
+
 		file.store_line("extends Component")
 		file.store_line("class_name " + component_name)
 		file.store_line("")
-		
+
 		var component_parameters = components_dictionary[component_name]
 		for parameter:Array in component_parameters:
 			var new_parameter:String = "@export var " + parameter[1] + ":" + parameter[0]
 			file.store_line(new_parameter)
-		
+
 		file.store_line("")
 		file.store_line("func get_component() -> Dictionary[String, Variant]:")
 		file.store_line("\treturn {")
-		
+
 		for parameter:Array in component_parameters:
 			var new_parameter:String = '\t\t"' + parameter[1] + '"' + " : " + parameter[1] + ","
 			file.store_line(new_parameter)
-			
+
 		file.store_line("\t}")
-			
+
 		file.close()
-	
+
 func write_enums():
 	var file := FileAccess.open(OUTPUT_ENUMS_PATH, FileAccess.WRITE)
 	file.store_line("class_name ENUMS")
-	
+
 	for enum_key in enums_dictionary.keys():
 		var enum_value = enums_dictionary[enum_key]
 		var text_to_write:String = "enum " + enum_key + "{"
@@ -73,7 +106,7 @@ func write_enums():
 			text_to_write = text_to_write + value + ","
 		text_to_write = text_to_write + "}"
 		file.store_line(text_to_write)
-		
+
 	file.close()
 
 func hugo_check_line(line: String) -> void:
@@ -81,78 +114,78 @@ func hugo_check_line(line: String) -> void:
 		var alias_name:String = line.split("using")[1].split("=")[0].strip_edges()
 		var variant_name:String = line.split("=")[1].split(";")[0].strip_edges()
 		types_dictionary.get_or_add(alias_name, variant_name)
-	
+
 	if line.begins_with("typedef enum"):
 		var enum_values:PackedStringArray = line.split("{")[1].split("}")[0].split(",")
 		var enum_name:String = line.split("}")[1].split(";")[0].strip_edges()
 		enums_dictionary.get_or_add(enum_name, enum_values)
-	
+
 func parse_hugo_types() -> void:
 	var file := FileAccess.open(HUGO_TYPES_PATH, FileAccess.READ)
-	
+
 	while not file.eof_reached():
 		var line := file.get_line().strip_edges()
 		hugo_check_line(line)
-	
+
 	file.close()
 
 func list_and_print_files_recursive(path: String) -> void:
 	var dir := DirAccess.open(path)
 
 	dir.list_dir_begin()
-	
+
 	var name := dir.get_next()
-	
+
 	while name != "":
 		if name != "." and name != "..":
 			var full_path := path.path_join(name)
-			
+
 			if dir.current_is_dir():
 				list_and_print_files_recursive(full_path)
 			else:
 				hugo_parse_component(full_path)
-		
+
 		name = dir.get_next()
-	
+
 	dir.list_dir_end()
 
 func hugo_parse_component(path: String) -> void:
 	var file := FileAccess.open(path, FileAccess.READ)
 	var line := file.get_line().strip_edges()
-	
+
 	while not line.contains(":") and not file.eof_reached():
 		line = file.get_line().strip_edges()
-	
+
 	if line.split(":")[1].strip_edges() != "public Component": return
 	var component_name := line.split("struct")[1].split(":")[0].strip_edges()
 	if BLACK_LIST.has(component_name): return
-	
+
 	components_dictionary.get_or_add(component_name, [])
-	
+
 	var complete_whitelist:Array[String]
 	complete_whitelist.append_array(enums_dictionary.keys())
 	complete_whitelist.append_array(WHITE_LIST)
 	complete_whitelist.append_array(types_dictionary.keys())
-	
+
 	while not file.eof_reached():
 		line = file.get_line().strip_edges()
 		if not line.contains(";"): continue
-		
-		var cleaned_parameter:String = line.split("::")[1] if line.split("::").size() > 1 else line.split("::")[0] 
+
+		var cleaned_parameter:String = line.split("::")[1] if line.split("::").size() > 1 else line.split("::")[0]
 		cleaned_parameter = cleaned_parameter.split("=")[0]
 		cleaned_parameter = cleaned_parameter.split(";")[0]
 		cleaned_parameter = cleaned_parameter.strip_edges()
-		
+
 		var parameter:PackedStringArray = cleaned_parameter.split(" ")
 		if parameter.size() != 2: continue
 		var parameter_type := parameter[0].strip_edges()
 		var parameter_name := parameter[1].strip_edges()
 		if parameter_name.contains("(") or not complete_whitelist.has(parameter_type): continue
-		
+
 		if parameter_type == "string": parameter_type = "String"
 		elif types_dictionary.has(parameter_type): parameter_type = types_dictionary[parameter_type]
 		elif enums_dictionary.has(parameter_type): parameter_type = "ENUMS." + parameter_type
-		
+
 		components_dictionary[component_name].push_back([parameter_type, parameter_name])
-		
+
 	file.close()
