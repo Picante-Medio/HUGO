@@ -14,6 +14,7 @@ namespace HUGO {
 		Vector3 operator+ (const Vector3& other) const;
 		void operator+=(const Vector3& other);
 		Vector3 operator- (const Vector3& other) const;
+		//Vector3 operator-= (const Vector3& other);
 
 		float operator* (const Vector3& other) const;
 		Vector3 operator* (float scalar) const;
@@ -59,5 +60,41 @@ namespace HUGO {
 		Ogre::Quaternion toOgre() const;
 		btQuaternion toBullet() const;
 	};
+	
+
+	// struct Degree {
+	// 	float deg;
+
+	// 	Degree(float d = 0);
+	// 	Degree(const Radian& r );
+	// 	Degree(const HUGO::Degree& rhs);
+
+	// 	Degree& operator = ( const float& f );
+    //     Degree& operator = ( const Degree& d );
+    //     Degree& operator = ( const Radian& r );
+
+    //     float valueDegrees() const;
+    //     float valueRadians() const;
+
+    //     const Degree& operator + () const;
+    //     Degree operator + ( const Degree& d ) const;
+    //     Degree operator + ( const Radian& r ) const;
+    //     Degree operator - () const;
+    //     Degree operator - ( const Degree& d ) const;
+    //     Degree operator - ( const Radian& r ) const;
+    //     Degree operator * ( float f ) const;
+    //     Degree operator * ( const Degree& f ) const;
+    //     Degree& operator *= ( float f );
+    //     Degree operator / ( float f ) const;
+    //     Degree& operator /= ( float f );
+
+    //     bool operator <  ( const Degree& d ) const;
+    //     bool operator <= ( const Degree& d ) const;
+    //     bool operator == ( const Degree& d ) const;
+    //     bool operator != ( const Degree& d ) const;
+    //     bool operator >= ( const Degree& d ) const;
+    //     bool operator >  ( const Degree& d ) const;
+	// };
+
 
 }

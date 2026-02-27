@@ -7,6 +7,7 @@
 #include "CameraComponent.h"
 #include "ViewportComponent.h"
 #include "CameraTags.h"
+#include "HugoTypes.h"
 
 RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> ogreRoot, Ogre::RenderWindow* window)
     :System(scene), ogreRoot(ogreRoot), renderWindow(window), idToIndex(), freeOgreObjectId()
@@ -105,7 +106,7 @@ void RenderSystem::handleTag()
             it->second.node->setOrientation(tr.rotation.toOgre());
             
             // update projection parameters
-            if (camera.projectionType == ProjectionType::Perspective) {
+            if (camera.projectionType == HUGO::ProjectionType::Perspective) {
                 it->second.ogreCamera->setFOVy(Ogre::Degree(camera.fovY));
             }
             it->second.ogreCamera->setNearClipDistance(camera.nearClip);
@@ -372,7 +373,7 @@ void RenderSystem::createOgreCamera(EntityID entity)
     res.ogreCamera->setFarClipDistance(cameraComp->farClip);
     res.ogreCamera->setAutoAspectRatio(cameraComp->autoAspectRatio);
     
-    if (cameraComp->projectionType == ProjectionType::Perspective) {
+    if (cameraComp->projectionType == HUGO::ProjectionType::Perspective) {
         res.ogreCamera->setProjectionType(Ogre::PT_PERSPECTIVE);
         res.ogreCamera->setFOVy(Ogre::Degree(cameraComp->fovY));
     } else {

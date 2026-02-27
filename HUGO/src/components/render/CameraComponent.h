@@ -1,23 +1,11 @@
 #include "Component.h"
 #include "HugoMath.h"
-
-// Projection types for the camera
-enum class ProjectionType {
-    Perspective,
-    Orthographic
-};
-
-// Polygon rendering modes
-enum class PolygonMode {
-    Solid,
-    Wireframe,
-    Points
-};
+#include "HugoTypes.h"
 
 // Camera component that holds all necessary information for rendering a camera in the scene
 struct CameraComponent: public Component
 {
-  ProjectionType projectionType = ProjectionType::Perspective;
+  HUGO::ProjectionType projectionType = HUGO::ProjectionType::Perspective;
  
   // Perspective parameters
   float fovY; // Field of view in the Y direction, in degrees
@@ -36,7 +24,7 @@ struct CameraComponent: public Component
   int priority = 0; // for multiple cameras, lower priority renders first
   
   // Modos
-  PolygonMode polygonMode = PolygonMode::Solid;
+  HUGO::PolygonMode polygonMode = HUGO::PolygonMode::SOLID;
   
   CameraComponent(EntityID entity,
                    float fov = 60.0f, float nearP = 0.1f, float farP = 1000.0f,

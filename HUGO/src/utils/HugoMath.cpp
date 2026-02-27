@@ -20,7 +20,14 @@ namespace HUGO {
 		return { x - other.x, y - other.y, z - other.z };
 	}
 
-	float Vector3::operator* (const Vector3& other) const {
+    // Vector3 Vector3::operator-=(const Vector3 &other)
+    // {
+    //     x -= other.x;
+	// 	y -= other.y;
+	// 	z -= other.z;
+    // }
+
+    float Vector3::operator* (const Vector3& other) const {
 		return x * other.x + y * other.y + z * other.z;
 	}
 
@@ -121,4 +128,109 @@ namespace HUGO {
 	btQuaternion Quaternion::toBullet() const {
 		return btQuaternion(x, y, z, w);
 	}
+
+	// --------------------- DEGREES ---------------------
+// 	Degree::Degree(float d) : deg(d){
+// 		deg = d;
+// 	}
+	
+// 	Degree::Degree(const Radian& r ) 
+// 		: deg(r.valueDegrees()) 
+// 	{}
+	
+// 	Degree::Degree (const HUGO::Degree& rhs) 
+// 		: deg(rhs.deg) 
+// 	{}
+	
+
+// 	Degree& Degree::operator = ( const float& f ) { 
+// 		deg = f; 
+// 		return *this; 
+// 	}
+	
+// 	Degree& Degree::operator = ( const Degree& d ) { 
+// 		deg = d.deg; 
+// 		return *this; 
+// 	}
+
+// 	Degree& Degree::operator = (const Radian& r ) { 
+// 		deg = r.valueDegrees(); 
+// 		return *this; 
+// 	}
+
+// 	float Degree::valueDegrees() const {
+
+// 	}
+	
+// 	float Degree::valueRadians() const {
+
+// 	}
+
+// 	const Degree&  Degree::operator + () const 
+// 	{ 
+// 		return *this; 
+// 	}
+
+// 	Degree  Degree::operator + ( const Degree& d ) const { 
+// 		return Degree ( deg + d.deg ); 
+// 	}
+
+// 	Degree  Degree::operator + ( const Radian& r ) const 
+// 	{ 
+// 		return Degree ( deg + r.valueDegrees() ); 
+// 	}
+
+// 	Degree  Degree::operator - () const { 
+// 		return Degree(-deg); 
+// 	}
+
+// 	Degree  Degree::operator - ( const Degree& d ) const { 
+// 		return Degree ( deg - d.deg ); 
+// 	}
+
+// 	Degree  Degree::operator - ( const Radian& r ) const { 
+// 		return Degree ( deg - r.valueDegrees() ); 
+// 	}
+
+
+
+// 	Degree  Degree::operator * ( float f ) const { 
+// 		return Degree ( deg * f ); 
+// 	}
+
+// 	Degree  Degree::operator * ( const Degree& f ) const { 
+// 		return Degree ( deg * f.deg ); 
+// 	}
+
+// 	Degree&  Degree::operator *= ( float f ) { 
+// 		deg *= f; return *this; 
+// 	}
+
+// 	Degree  Degree::operator / ( float f ) const { 
+// 		return Degree ( deg / f ); 
+// 	}
+
+// 	Degree&  Degree::operator /= ( float f ) { 
+// 		deg /= f; 
+// 		return *this; 
+// 	}
+
+// 	bool  Degree::operator <  ( const Degree& d ) const { 
+// 		return deg <  d.deg; 
+// 	}
+// 	bool  Degree::operator <= ( const Degree& d ) const { 
+// 		return deg <= d.deg; 
+// 	}
+// 	bool  Degree::operator == ( const Degree& d ) const { 
+// 		return deg == d.deg; 
+// 	}
+// 	bool  Degree::operator != ( const Degree& d ) const { 
+// 		return deg != d.deg; 
+// 	}
+// 	bool  Degree::operator >= ( const Degree& d ) const { 
+// 		return deg >= d.deg; 
+// 	}
+// 	bool  Degree::operator >  ( const Degree& d ) const { 
+// 		return deg >  d.deg; 
+// 	}
 }

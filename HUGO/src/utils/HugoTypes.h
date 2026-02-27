@@ -16,14 +16,16 @@ namespace HUGO{
 
     using String = std::string;
 
-    enum AudioTypes { 
-        SOUND2D, 
-        SOUND3D, 
-        MUSIC, 
-        LAST_TYPE 
+    enum AudioTypes
+    {
+        SOUND2D,
+        SOUND3D,
+        MUSIC,
+        LAST_TYPE
     };
 
-    enum AudioDirtyFlags {
+    enum AudioDirtyFlags
+    {
         NONE = 0,
         LOOP = 1 << 0,
         VOLUME = 1 << 1,
@@ -33,7 +35,8 @@ namespace HUGO{
         STOP = 1 << 5
     };
 
-    enum Audio3DDirtyFlags {
+    enum Audio3DDirtyFlags
+    {
         NONE_3D = 0,
         MINDISTANCE = 1 << 0,
         MAXDISTANCE = 1 << 1,
@@ -47,6 +50,36 @@ namespace HUGO{
 
     using AudioEndCallback = std::function<void(HUGO::AudioID)>;
 
+    // Render Types
+
+    // -------- Camera Types --------
+
+    // Polygon rendering modes
+    enum PolygonMode
+    {
+        SOLID,
+        WIREFRAME,
+        POINTS
+    };
+
+    // Projection types for the camera
+    enum ProjectionType
+    {
+        Perspective,
+        Orthographic
+    };
+
+    // -------- Light Types --------
+
+    enum LightType
+    {
+        LT_POINT,
+        LT_DIRECTIONAL,
+        LT_SPOTLIGHT,
+        LT_RECTLIGHT
+    };
+
+    
     // #ifndef BULLET_PHYSICS
     // #define BULLET_PHYSICS
     using Simulation = BulletSimulation;
