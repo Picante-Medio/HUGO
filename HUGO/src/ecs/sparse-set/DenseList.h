@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <vector>
 
 #include "Ecs.h"
@@ -43,7 +44,6 @@ public:
     }
 
     activeComponentCount++;
-
     return activeComponentCount - 1;
   }
 
@@ -58,11 +58,22 @@ public:
   * @return the id of the entity which component has moved to preserve order. The new index of said component is the value of the index parameter
   */
   EntityID remove(DenseListIndex index) override {
-    activeComponentCount--;
-    components[index] = std::move(components[activeComponentCount]);
-    entityIdList[index] = entityIdList[activeComponentCount];
+      if (activeComponentCount == 0)
+          throw std::runtime_error("Remove from empty DenseList");
 
-    return entityIdList[index];
+      if (index >= activeComponentCount)
+          throw std::out_of_range("DenseList::remove index out of range");
+
+      activeComponentCount--;
+
+      EntityID movedEntity = entityIdList[activeComponentCount];
+
+      if (index != activeComponentCount) {
+          components[index] = std::move(components[activeComponentCount]);
+          entityIdList[index] = movedEntity;
+      }
+
+      return movedEntity;
   }
 
   /**
