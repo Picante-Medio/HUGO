@@ -110,8 +110,7 @@ namespace HUGO {
 			w /= len;
 		}
 	}
-	float w, x, y, z;
-
+	
 	Quaternion::Quaternion() : w(0), x(0), y(0), z(0) {}
 	Quaternion::Quaternion(float w, float x, float y, float z) : w(w), x(x), y(y), z(z) {}
 
