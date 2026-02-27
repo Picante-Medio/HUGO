@@ -10,7 +10,7 @@ class HUGOMotionState : public btMotionState{
     std::shared_ptr<TransformComponent> hugoTransform;
     btTransform btTransformRegister;
 
-    // The center offset multiplies the bulletTransform to adjust the center of mass. By default its the Identity
+    // The center offset multiplies the bulletTransform to adjust the center of mass. By default it's the Identity
     // * This is a test. If the behaviour isn't the expected can be removed
     btTransform centerOfMassOffset;
 
@@ -26,15 +26,11 @@ public:
 };
 
 class PhysicsSystem : public System {
-
-    std::shared_ptr<btDiscreteDynamicsWorld> btWorld;
-    std::shared_ptr<btDefaultCollisionConfiguration> collisionConfig;
-    std::shared_ptr<btCollisionDispatcher> dispatcher;
-    std::shared_ptr<btDbvtBroadphase> overlappingPairCache;
-    std::shared_ptr<btSequentialImpulseConstraintSolver> solver;
+    
 
 public:
     PhysicsSystem(std::shared_ptr<Scene> scene);
+    ~PhysicsSystem();
 
     void update(double dt) override;
     void fixedUpdate(double dt) override;
