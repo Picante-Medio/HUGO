@@ -8,6 +8,9 @@ namespace HUGO{
     using OgreObjectID = int;
     constexpr OgreObjectID INVALID_OGRE_OBJECT_ID = std::numeric_limits<int>::max();
 
+    using BulletObjectID = int;
+    constexpr BulletObjectID INVALID_BULLET_OBJECT_ID = std::numeric_limits<int>::max();
+
     using AudioID = int;
     using SceneID = int;
 

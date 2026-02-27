@@ -13,6 +13,8 @@ enum class RBShapes{
 
 struct RigidBodyComponent: public Component
 {
+    float restitution;
+    float friction;
     float mass;
     float damping;
     HUGO::Vector3 positionOffset;
