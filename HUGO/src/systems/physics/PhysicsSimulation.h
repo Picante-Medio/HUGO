@@ -1,6 +1,13 @@
 #include "btBulletDynamicsCommon.h"
 
-class BulletSimulation {
+class PhysicsSimulation {
+    
+    public:
+    virtual void* getSimulation() = 0;
+    virtual void stepSimulation(double dt) = 0;
+};
+
+class BulletSimulation : public PhysicsSimulation {
 
     btDefaultCollisionConfiguration* collisionConfig;
     btCollisionDispatcher* dispatcher;
@@ -9,11 +16,11 @@ class BulletSimulation {
 
     btDynamicsWorld* btWorld;
 
+    public:
+    
     BulletSimulation();
     ~BulletSimulation();
 
-public:
-
-    btDynamicsWorld* getSimulation();
+    void* getSimulation() override;
     void stepSimulation(double dt);
 };

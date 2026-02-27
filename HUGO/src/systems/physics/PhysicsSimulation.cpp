@@ -1,4 +1,4 @@
-#include "BulletSimulation.h"
+#include "PhysicsSimulation.h"
 
 BulletSimulation::BulletSimulation() {
     // We are using bullet's default collision configuration. Custom configuration is recommended for more complexity
@@ -42,8 +42,8 @@ BulletSimulation::~BulletSimulation() {
     // delete collisionShapes
 }
 
-btDynamicsWorld* BulletSimulation::getSimulation() {
-    return btWorld;
+void* BulletSimulation::getSimulation() {
+    return static_cast<void*>(btWorld);
 }
 
 void BulletSimulation::stepSimulation(double dt) {

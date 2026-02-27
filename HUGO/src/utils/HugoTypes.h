@@ -2,6 +2,8 @@
 #include <functional>
 #include <limits>
 #include <string>
+#include "PhysicsSimulation.h"
+
 namespace HUGO{
     using OgreObjectID = int;
     constexpr OgreObjectID INVALID_OGRE_OBJECT_ID = std::numeric_limits<int>::max();
@@ -41,4 +43,9 @@ namespace HUGO{
     };
 
     using AudioEndCallback = std::function<void(HUGO::AudioID)>;
+
+    // #ifndef BULLET_PHYSICS
+    // #define BULLET_PHYSICS
+    using Simulation = BulletSimulation;
+    // #endif
 }

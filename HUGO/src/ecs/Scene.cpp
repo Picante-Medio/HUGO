@@ -6,7 +6,9 @@
 #include <vector>
 
 Scene::Scene()
-{}
+{
+  simulation = std::make_unique<HUGO::Simulation>();
+}
 
 void 
 Scene::update(double dt) {

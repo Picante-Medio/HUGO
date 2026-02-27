@@ -10,7 +10,6 @@
 #include "Query.h"
 #include "System.h"
 #include "HugoTypes.h"
-#include "BulletSimulation.h"
 
 class Scene {
   EntityTable entityTable;
@@ -23,7 +22,7 @@ class Scene {
         entityTable.getDenseListIndex(entity, componentID));
   }
 
-  BulletSimulation* simulation;
+  std::unique_ptr<HUGO::Simulation> simulation;
 
   template <typename T>
   T* getSimulation() {
