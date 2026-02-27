@@ -15,6 +15,7 @@ HUGO/CMakePresets.json
 # Ficheros
 *.dll
 *.so
+*.so*
 *.obj
 *.a
 *.lib

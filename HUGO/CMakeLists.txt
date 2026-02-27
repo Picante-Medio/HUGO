@@ -53,6 +53,16 @@ else()
         ${BASE_PREFIX_PATH}/ogre
         CACHE PATH "prefix path"
     )
+    
+    file(GLOB OGRE_PLUGINS
+        ${BASE_PREFIX_PATH}/ogre/lib/OGRE/*.so*)
+
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${OGRE_PLUGINS}
+            $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        COMMAND_EXPAND_LISTS
+    )
 endif()
 
 find_package(SDL2 CONFIG REQUIRED)
@@ -90,7 +100,8 @@ set(HUGO_LINKED_LIBRARIES
     SDL2::SDL2
     SDL2::SDL2main)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ${HUGO_LINKED_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE 
+    ${HUGO_LINKED_LIBRARIES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     DEBUG_POSTFIX "d"
