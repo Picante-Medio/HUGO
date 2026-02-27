@@ -9,6 +9,7 @@
 #include <iostream>
 //#include "ResourceManager.h"
 
+// se podría hacer clase singleton¿? -Marco
 using namespace HUGO;
 Core::Core()
 {
