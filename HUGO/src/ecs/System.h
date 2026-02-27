@@ -11,6 +11,7 @@ protected:
 
 public:
   explicit System(std::shared_ptr<Scene> scene): scene(scene) {}
+  virtual ~System() {}
   virtual void update(double dt) = 0;
   virtual void fixedUpdate(double dt) = 0;
 };

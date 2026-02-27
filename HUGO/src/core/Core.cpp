@@ -109,13 +109,14 @@ void Core::run(){
 
 	while (!exit) {
         vt.update();
-		double starTime = vt.getDeltaTime();
+		double startTime = vt.getDeltaTime();
 
-        scenePtr->fixedUpdate(starTime);
-        scenePtr->update(starTime);
+        scenePtr->fixedUpdate(startTime);
+        scenePtr->stepPhysics(startTime);
+        scenePtr->update(startTime);
 
         m_ogreRoot->renderOneFrame();
-		double frameTime = vt.getDeltaTime() - starTime;
+		double frameTime = vt.getDeltaTime() - startTime;
 		if (frameTime < 10) SDL_Delay(10- frameTime);
 	}
 }

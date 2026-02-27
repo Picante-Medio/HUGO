@@ -20,6 +20,11 @@ Scene::fixedUpdate(double dt) {
     system->fixedUpdate(dt);
 }
 
+void
+Scene::stepPhysics(double dt) {
+  simulation->stepSimulation(dt);
+}
+
 EntityID 
 Scene::createEntity() {
   return entityTable.createEntity();

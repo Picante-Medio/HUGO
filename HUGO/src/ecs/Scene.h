@@ -9,6 +9,8 @@
 #include "EntityTable.h"
 #include "Query.h"
 #include "System.h"
+#include "HugoTypes.h"
+#include "BulletSimulation.h"
 
 class Scene {
   EntityTable entityTable;
@@ -21,6 +23,13 @@ class Scene {
         entityTable.getDenseListIndex(entity, componentID));
   }
 
+  BulletSimulation* simulation;
+
+  template <typename T>
+  T* getSimulation() {
+    return static_cast<T>(simulation->getSimulation());
+  }
+
 public:
   Scene();
 
@@ -31,6 +40,9 @@ public:
 
   // Physics update
   void fixedUpdate(double dt);
+
+  // Physics step
+  void stepPhysics(double dt);
 
   // Entity handling
   EntityID createEntity();
