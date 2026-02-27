@@ -4,6 +4,7 @@
 #include "AudioSystem.h"
 #include "PhysicsSystem.h"
 #include "Scene.h"
+#include <OgreConfigFile.h>
 #include <SDL2/SDL.h>
 #include <iostream>
 //#include "ResourceManager.h"
@@ -86,7 +87,7 @@ void HUGO::Core::locateResources()
     Ogre::ConfigFile cf;
     cf.load("resources.cfg");
 
-    Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
+  Ogre::ConfigFile::SettingsBySection_ seci = cf.getSettingsBySection();
     Ogre::String sec, type, arch;
     for(auto& s : cf.getSettingsBySection()) {
         sec = s.first;

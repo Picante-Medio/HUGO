@@ -1,4 +1,5 @@
 #pragma once
+
 #include <memory>
 #include "OgreRenderWindow.h"
 #include "OgreRoot.h"
