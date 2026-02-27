@@ -17,13 +17,13 @@ namespace HUGO {
       void pause();
 
       // Resume the timer
-      inline void resume();
+      void resume();
 
       // Reset the timer
-      inline void reset();
+      void reset();
 
       // Getters
-      inline bool getIsPaused() const;
-      inline Uint32 getDeltaTime() const;
+      bool getIsPaused() const;
+      Uint32 getDeltaTime() const;
   };
 }
