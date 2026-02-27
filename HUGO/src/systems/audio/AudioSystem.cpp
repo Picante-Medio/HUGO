@@ -11,8 +11,8 @@
 #include <stdexcept>
 #include <sstream>
 
-AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, std::shared_ptr<ma_engine> maEngine)
-    : System(scene), engine(maEngine), audios(), nextID(0)
+AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, std::shared_ptr<ma_engine> maEngine, const std::string& path)
+    : System(scene), engine(maEngine), path(path), audios(), nextID(0)
 {
     std::string completePath = path + "AudioList.txt";
     loadFromFile(completePath.c_str());

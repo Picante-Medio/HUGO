@@ -9,11 +9,12 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <queue>
 
-typedef struct {
+struct AudioInfo{
   HUGO::AudioTypes type;
   std::unique_ptr<Audio> ptr;
-} AudioInfo;
+};
 
 /*
 Audios will be loaded from a lua script (hopefully)
@@ -26,18 +27,19 @@ struct TransformComponent;
 
 class AudioSystem : public System {
   std::shared_ptr<ma_engine> engine;
+  //path where all the audio files are located 
+  std::string path;
+
   std::vector<AudioInfo> audios;
     // format: path -> id
   // unordered map if we want to know its id using a string
   std::unordered_map<std::string, HUGO::AudioID> audioMap;
-
+  std::unordered_map<std::string, std::queue<Audio>> audioMaps;
   HUGO::AudioID nextID;
 
   float soundsGroupVolume = 1.0f; // global volume controller for 2D and 3D sfx
   float musicsGroupVolume = 1.0f; // global volume controller for musics
 
-  //path where all the audio files are located 
-  std::string path = "test_media/";
   // private functions as helpers
 
   // private function to load and store all the audio files we are going to include
@@ -93,7 +95,8 @@ class AudioSystem : public System {
   bool startTriggered=false;
   public:
   AudioSystem(std::shared_ptr<Scene> scene,
-              std::shared_ptr<ma_engine> maEngine);
+              std::shared_ptr<ma_engine> maEngine,
+              const std::string& path = "test_media/");
   virtual ~AudioSystem() = default;
 
   void update(double dt) override;
