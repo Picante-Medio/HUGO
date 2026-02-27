@@ -3,16 +3,40 @@
 #include "HugoTypes.h"
 #include "HugoMath.h"
 
-enum class RBShapes{
-    Box,
-    Sphere,
-    Capsule,
-    Cylinder,
-    Cone
+struct BoxColliderInfo {
+    HUGO::Vector3 halfExtents;
+};
+
+struct SphereColliderInfo {
+    float r;
+};
+
+struct CapsuleColliderInfo {
+    float r;
+    float height;
+};
+
+struct CylinderColliderInfo {
+    HUGO::Vector3 halfExtents;
+};
+
+struct ConeColliderInfo {
+    float r;
+    float height;
 };
 
 struct RigidBodyComponent: public Component
 {
+    enum Collider {
+        BOX,
+        SPHERE,
+        CAPSULE,
+        CYLINDER,
+        CONE
+    };
+
+
+
     float restitution;
     float friction;
     float mass;
