@@ -27,18 +27,20 @@ func create_chat_parser() -> void:
 	var file := FileAccess.open(OUTPUT_CHAT_PARSER_PATH, FileAccess.WRITE)
 
 	file.store_line('#include "Scene.h"')
+	file.store_line('#include "Ecs.h"')
+	file.store_line('#include <any>')
 	for component in components_dictionary.keys():
 		file.store_line('#include "' + component + '.h"')
 	file.store_line("")
 
 	file.store_line("class SceneParser {")
 	file.store_line("\tpublic:")
-	file.store_line("\t\tvoid ReadComponent(Scene& scene, string& componentName, EnitityID entity, std::vector<std::any> args) {")
+	file.store_line("\t\tvoid ReadComponent(Scene& scene, std::string& componentName, EntityID entity, std::vector<std::any> args) {")
 
 	var i:int = 0
 	for component in components_dictionary.keys():
 		if i == 0: file.store_string("\t\t\tif")
-		else: file.store_string("\t\t\telse")
+		else: file.store_string("\t\t\telse if")
 		file.store_string('("' + component + '" == componentName' + ") ")
 
 		var args:String = ""
@@ -48,11 +50,11 @@ func create_chat_parser() -> void:
 			arg_index += 1
 
 		args = args.substr(0, args.length() - 1)
-		file.store_line("scene.addComponent<" + component + ">(entity, " + args + ");")
+		file.store_line("\n\t\t\t\tscene.addComponent<" + component + ">(entity, " + args + ");")
 		i += 1
 	file.store_line("\t\t}")
 
-	file.store_line("}")
+	file.store_line("};")
 
 func ensure_folder(path: String) -> void:
 	var abs_path := ProjectSettings.globalize_path(path)
