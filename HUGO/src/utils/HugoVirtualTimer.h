@@ -3,60 +3,27 @@
 #include "SDL.h"
 
 namespace HUGO {
+  class VirtualTimer {
+  private:
+      Uint32 lastTime;
+      Uint32 deltaTime;
+      bool isPaused;
 
-class VirtualTimer {
-private:
-    Uint32 lastTime;
-    Uint32 deltaTime;
-    bool isPaused;
+  public:
+      VirtualTimer();
+      void update();
 
-public:
-    VirtualTimer() 
-        : lastTime(SDL_GetTicks()),
-          deltaTime(0), isPaused(false) {}
+      // Stop the timer
+      void pause();
 
-    
-    inline void update() {
-        if (!isPaused) {
-            Uint32 currentTime = SDL_GetTicks();
-            deltaTime = currentTime - lastTime;
-            lastTime = currentTime;
-        }
-        else {
-            deltaTime = 0;
-        }
-    }
+      // Resume the timer
+      inline void resume();
 
-    inline Uint32 getDeltaTime() const {
-        return deltaTime;
-    }
-   
-    // Stop the timer
-    void pause() {
-        if (!isPaused) {
-            isPaused = true;
-            lastTime = SDL_GetTicks();
-        }
-    }
+      // Reset the timer
+      inline void reset();
 
-    // Resume the timer
-    inline void resume() {
-        if (isPaused) {
-            isPaused = false;
-            lastTime = SDL_GetTicks();
-        }
-    }
-
-    inline bool getIsPaused() const {
-        return isPaused;
-    }
-
-    // Reset the timer
-    inline void reset() {
-        lastTime = SDL_GetTicks();
-        deltaTime = 0;
-        isPaused = false;
-    }
-};
-
+      // Getters
+      inline bool getIsPaused() const;
+      inline Uint32 getDeltaTime() const;
+  };
 }
