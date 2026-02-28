@@ -126,11 +126,14 @@ void PhysicsSystem::fixedUpdate(double dt)
 HUGO::BulletObjectID PhysicsSystem::createRigidBodyObject(const RigidBodyComponent hgRb)
 {
     // Create a RigidBodyObject and assign an id. Must have a way to determine if it's static, kinematic or dynamic
+    return NULL;
 }
     
 RigidBodyObject& PhysicsSystem::getRigidBodyObject(const HUGO::BulletObjectID)
 {
     // Return RigidBodyObject of the given id
+    RigidBodyObject temp = {0, nullptr};
+    return temp;
 }
     
 void PhysicsSystem::removeRigidBodyObject(const HUGO::BulletObjectID)
