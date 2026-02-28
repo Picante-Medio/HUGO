@@ -13,7 +13,7 @@
 
 AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, std::shared_ptr<ma_engine> maEngine, 
     const std::string& path, int queueSize)
-    : System(scene), engine(maEngine), path(path), audiosName(), audiosMap(), nextID(0), queueSize(queueSize)
+    : System(scene), engine(maEngine), path(path), audios(), nameToID(), pools(), nextID(0), queueSize(queueSize)
 {
     std::string completePath = path + "AudioList.txt";
     loadFromFile(completePath.c_str());
@@ -21,59 +21,44 @@ AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, std::shared_ptr<ma_engine
 }
 
 // HELPERS
-void AudioSystem::loadFromFile(const char *path)
+void AudioSystem::loadFromFile(const char* path)
 {
     std::ifstream file(path);
     if (!file.is_open())
         throw std::runtime_error("Could not open audio file list");
 
     std::string line;
+
     while (std::getline(file, line))
     {
-        // skip empty lines or lines that start with #
         if (line.empty() || line[0] == '#') continue;
 
         std::stringstream ss(line);
-        std::string id, filename, typeStr;
 
-        std::getline(ss, id, ';');
-        std::getline(ss, filename, ';');
-        std::getline(ss, typeStr, ';');
+        std::string name, filename, typeStr;
 
-        HUGO::AudioTypes type = static_cast<HUGO::AudioTypes>(std::stoi(typeStr));
-        
-        audiosName.emplace_back(filename);
-        nextID++;
+        std::getline(ss, name, ';'); // name of the audio
+        std::getline(ss, filename, ';'); // file root
+        std::getline(ss, typeStr, ';'); // type of audio
+
+        HUGO::AudioTypes type =
+            static_cast<HUGO::AudioTypes>(std::stoi(typeStr));
+
+        HUGO::AudioID id = nextID++;
+
+        audios.push_back({name, filename, type});
+        nameToID[name] = id;
+
+        pools.emplace_back(); // pool aligned with id
     }
-    file.close();
 }
 
-AudioInfo AudioSystem::createAudio(const std::string& name, HUGO::AudioTypes type)
+AudioInfo AudioSystem::createVoice(HUGO::AudioID id)
 {
     AudioInfo info;
-    info.type = type;
-
-    info.audio = std::make_unique<Audio>(
-        engine,
-        path + name
-    );
-
-    ma_sound_set_end_callback(
-        info.audio->get(),
-        AudioSystem::endCallback,
-        &info
-    );
-
-    return info;
-}
-
-AudioInfo AudioSystem::createVoice(const std::string& name, HUGO::AudioTypes type)
-{
-    AudioInfo info;
-
     info.ptr = std::make_unique<Audio>();
 
-    std::string fullPath = path + name;
+    std::string fullPath = audios[id].filename;
 
     if (!info.ptr->init(engine.get(), fullPath.c_str(), 0))
         throw std::runtime_error("Failed loading audio");
@@ -81,16 +66,12 @@ AudioInfo AudioSystem::createVoice(const std::string& name, HUGO::AudioTypes typ
     return info;
 }
 
-ma_sound* AudioSystem::getSound(const std::string& name)
+ma_sound* AudioSystem::getSound(HUGO::AudioID id)
 {
-    // first, find the value associated to the key
-    auto it = audiosMap.find(name);
-    if (it == audiosMap.end())
-        throw std::runtime_error("Audio not registered");
+    AudioPool& pool = pools[id];
 
-    AudioPool& pool = it->second;
-
-    // find a free voice to be used
+    // reuse free voice
+    // O(N) but N is a small number
     for (auto& voice : pool.voices)
     {
         if (!voice.inUse)
@@ -100,10 +81,10 @@ ma_sound* AudioSystem::getSound(const std::string& name)
         }
     }
 
-    // if there are not free voice anymore, insert one
+    // create new if it is allowed
     if (pool.voices.size() < queueSize)
     {
-        pool.voices.emplace_back(createVoice(name, pool.type));
+        pool.voices.emplace_back(createVoice(id));
 
         AudioInfo& v = pool.voices.back();
         v.inUse = true;
@@ -111,70 +92,98 @@ ma_sound* AudioSystem::getSound(const std::string& name)
         ma_sound_set_end_callback(
             v.ptr->get(),
             AudioSystem::endCallback,
-            &v
+            nullptr
         );
 
         return v.ptr->get();
     }
 
-    // 3️⃣ voice stealing (round robin)
-    AudioInfo& stolen =
-        pool.voices[pool.stealIndex];
-
+    // else, we need to steal a position (round robin)
+    AudioInfo& stolen = pool.voices[pool.stealIndex];
     pool.stealIndex =
         (pool.stealIndex + 1) % pool.voices.size();
 
     ma_sound_stop(stolen.ptr->get());
+    ma_sound_seek_to_pcm_frame(stolen.ptr->get(), 0);
+
     stolen.inUse = true;
 
     return stolen.ptr->get();
 }
 
-ma_sound *AudioSystem::get3DSound(HUGO::AudioID id)
+ma_sound *AudioSystem::getExistingSound(AudioComponent &c)
 {
-    ma_sound* s = getSound(id);
-    if (audios[id].type != HUGO::SOUND3D)
-        throw std::runtime_error("Error get3DSound: This is not a 3D sound");
-    else return s;
+    return c.activePtr; 
 }
 
-const AudioInfo &AudioSystem::getAudio(const std::string &name)
+ma_sound *AudioSystem::acquireVoice(AudioComponent &c)
 {
-    //if we dont have any audio
-    if (audiosMap.find("name") == audiosMap.end()){
-        //return error or type
+    if (!c.activePtr)
+    {
+        c.activePtr = getSound(c.audioId);
+
+        if (c.onEnd)
+        {
+            ma_sound_set_end_callback(
+                c.activePtr,
+                &AudioSystem::endCallback,
+                &c
+            );
+        }
     }
-    std::queue<AudioInfo>& q = audiosMap["name"];
-    
-    return q.front();
+
+    return c.activePtr;
 }
 
-void AudioSystem::processChanges(AudioComponent &c)
+void AudioSystem::processChanges(AudioComponent& c)
 {
-    if (c.dirtyFlags == HUGO::AudioDirtyFlags::NONE) return;
+    // if nothing changed in this component, return
+    if (c.dirtyFlags == HUGO::NONE)
+        return;
 
-    HUGO::AudioID id = c.audioId;
-    ma_sound* s = getSound(id);
+    // get the pointer to the currently active voice (if it has)
+    ma_sound* s = c.activePtr;
 
-    if (c.dirtyFlags & HUGO::AudioDirtyFlags::LOOP)
+    // acquire a voice ONLY when playback is requested
+    // this avoids creating EXTRA sounds for simple parameter updates
+    if (!s && (c.dirtyFlags & HUGO::START))
+    {
+        s = getSound(c.audioId);
+        c.activePtr = s;
+    }
+
+    // if we still don't have a valid voice,
+    // there is nothing we can apply changes to
+    if (!s)
+    {
+        c.dirtyFlags = HUGO::NONE;
+        return;
+    }
+
+    if (c.dirtyFlags & HUGO::LOOP)
         setLooping(s, c.loop);
 
-    if (c.dirtyFlags & HUGO::AudioDirtyFlags::VOLUME)
-        setVolume(id, c.volume);
+    
+    if (c.dirtyFlags & HUGO::VOLUME)
+        setVolume(c.audioId, c.volume);
 
-    if (c.dirtyFlags & HUGO::AudioDirtyFlags::PITCH)
+    if (c.dirtyFlags & HUGO::PITCH)
         setPitch(s, c.pitch);
 
-    if (c.dirtyFlags & HUGO::AudioDirtyFlags::STARTTIME)
+    if (c.dirtyFlags & HUGO::STARTTIME)
         setAudioPosition(s, c.startTime);
 
-    if (c.dirtyFlags & HUGO::AudioDirtyFlags::START)
+    if (c.dirtyFlags & HUGO::START)
         playAudio(s);
 
-    if (c.dirtyFlags & HUGO::AudioDirtyFlags::STOP)
+    if (c.dirtyFlags & HUGO::STOP)
+    {
+        // stop playback and release the active voice reference
         stopAudio(s);
+    }
 
-    c.dirtyFlags = HUGO::AudioDirtyFlags::NONE; // clean the flags after finishing
+    // clear flags
+    c.dirtyFlags = HUGO::NONE;
 }
 
 void AudioSystem::process3DChanges(Audio3DInfoComponet &c, const TransformComponent& t)
@@ -210,6 +219,7 @@ void AudioSystem::process3DChanges(Audio3DInfoComponet &c, const TransformCompon
     }
     c.dirtyFlags = HUGO::Audio3DDirtyFlags::NONE_3D; // clean the flags after finishing
 }
+
 
 void AudioSystem::playAudio(ma_sound* s)
 {
@@ -271,16 +281,23 @@ void AudioSystem::setLooping(ma_sound* s, bool loop)
 
 void AudioSystem::setVolume(HUGO::AudioID id, float vol)
 {
-    ma_sound* sound = getSound(id);
-    if (!sound) return;
+    if (id < 0 || id >= pools.size()) return;
 
-    //multiply factor according to its type
-    if(audios[id].type < HUGO::MUSIC)
+    AudioPool& pool = pools[id];
+
+    // apply group volume
+    if (audios[id].type < HUGO::MUSIC)
         vol *= soundsGroupVolume;
     else
         vol *= musicsGroupVolume;
 
-    ma_sound_set_volume(sound, vol);
+    // apply volume to all active voices
+    // O(N)
+    for (auto& voice : pool.voices)
+    {
+        if (voice.inUse)
+            ma_sound_set_volume(voice.ptr->get(), vol);
+    }
 }
 
 void AudioSystem::setPitch(ma_sound* s, float pitch)
@@ -288,12 +305,12 @@ void AudioSystem::setPitch(ma_sound* s, float pitch)
     ma_sound_set_pitch(s, pitch);
 }
 
-void AudioSystem::setGroupVolume(HUGO::AudioTypes type, float volume)
+void AudioSystem::setGroupVolume(HUGO::AudioTypes type, float vol)
 {
     if (type < HUGO::MUSIC)
-        soundsGroupVolume = volume; // O(1)
+        soundsGroupVolume = vol; // O(1)
     else
-        musicsGroupVolume = volume;  // O(1)
+        musicsGroupVolume = vol;  // O(1)
 }
 
 void AudioSystem::set3DPosition(ma_sound* s, const HUGO::Vector3& p)
@@ -360,10 +377,13 @@ void AudioSystem::update(double dt)
         process3DChanges(sc, tr);
     }
 
-
+    int i =0;
     for (auto& pack : scene->query<AudioComponent>()) {
         AudioComponent& sc = pack.get<AudioComponent&>();
-
+        if (i>0){
+            processChanges(sc);
+            continue;
+        }
         // state 1
         if (!stopTriggered && elapsedTime >= x)
         {
@@ -388,7 +408,21 @@ void AudioSystem::update(double dt)
         // apply changes
         if (sc.dirtyFlags != HUGO::NONE)
             processChanges(sc);
+        
+        ++i;
     }
+
+    //the correct version of the update loop 
+    // for (auto& pack : scene->query<Audio3DInfoComponet, TransformComponent>()) {
+    //     Audio3DInfoComponet& sc = pack.get<Audio3DInfoComponet&>();
+    //     TransformComponent& tr = pack.get<TransformComponent&>();
+    //     process3DChanges(sc, tr);
+    // }
+
+    // for (auto& pack : scene->query<AudioComponent>()) {
+    //     AudioComponent& sc = pack.get<AudioComponent&>();
+    //     processChanges(sc);
+    // }
 }
 
 void AudioSystem::fixedUpdate(double dt)
@@ -397,26 +431,49 @@ void AudioSystem::fixedUpdate(double dt)
 
 void AudioSystem::addAudio(const char* name, HUGO::AudioTypes type)
 {
-    audios.emplace_back(createAudio(name, type));
-    ++nextID;
+    std::string audioName = name;
+
+    auto it = nameToID.find(audioName);
+    if (it == nameToID.end())
+        throw std::runtime_error("Audio already registered");
+
+    HUGO::AudioID id = nextID++;
+
+    audios.push_back({audioName, audioName, type});
+    nameToID[audioName] = id;
+
+    pools.emplace_back();
 }
 
 void AudioSystem::createTestEntity()
 {
     EntityID ent = scene->createEntity();
-    scene->addComponent<AudioComponent>(ent, HUGO::MUSIC, audioMap["bgm"]);
+    EntityID ent2 = scene->createEntity();
+    scene->addComponent<AudioComponent>(ent, HUGO::MUSIC, nameToID["bgm"]);
+    scene->addComponent<AudioComponent>(ent2, HUGO::MUSIC, nameToID["bgm"]);
+    int i = 0;
     for (auto& pack : scene->query<AudioComponent>()) {
         AudioComponent& sc = pack.get<AudioComponent&>();
-        sc.isPlaying = true;
-        sc.loop = true;
-        sc.pitch = 2.0f;
-        sc.startTime = 30.0;
-        sc.volume = 0.1f;
-        sc.dirtyFlags = static_cast<HUGO::AudioDirtyFlags>(
-                        HUGO::AudioDirtyFlags::LOOP |
-                        HUGO::AudioDirtyFlags::PITCH |
-                        HUGO::AudioDirtyFlags::STARTTIME |
-                        HUGO::AudioDirtyFlags::START |
-                        HUGO::AudioDirtyFlags::VOLUME);
+        if (i == 0){
+            sc.isPlaying = true;
+            sc.loop = true;
+            sc.pitch = 2.0f;
+            sc.startTime = 30.0;
+            sc.volume = 0.1f;
+            sc.dirtyFlags = static_cast<HUGO::AudioDirtyFlags>(
+                            HUGO::AudioDirtyFlags::LOOP |
+                            HUGO::AudioDirtyFlags::PITCH |
+                            HUGO::AudioDirtyFlags::STARTTIME |
+                            HUGO::AudioDirtyFlags::START |
+                            HUGO::AudioDirtyFlags::VOLUME);   
+        }
+        else if (i == 1){
+            sc.isPlaying = true;
+            sc.volume = 0.05f;
+            sc.dirtyFlags = static_cast<HUGO::AudioDirtyFlags>(
+                            HUGO::AudioDirtyFlags::START |
+                            HUGO::AudioDirtyFlags::VOLUME);
+        }
+        ++i;
     }
 }
