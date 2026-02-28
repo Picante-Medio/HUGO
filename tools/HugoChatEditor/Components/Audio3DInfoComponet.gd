@@ -14,14 +14,14 @@ class_name Audio3DInfoComponet
 
 func get_component() -> Dictionary[String, Variant]:
 	return {
-		"audioId" : audioId,
-		"minDistance" : minDistance,
-		"maxDistance" : maxDistance,
-		"velocity" : velocity,
-		"direction" : direction,
-		"dopplerFactor" : dopplerFactor,
-		"rolloff" : rolloff,
-		"coneInnerAngle" : coneInnerAngle,
-		"coneOuterAngle" : coneOuterAngle,
-		"coneOuterGain" : coneOuterGain,
+		"audioId" : FormatWriter.format(audioId),
+		"minDistance" : FormatWriter.format(minDistance),
+		"maxDistance" : FormatWriter.format(maxDistance),
+		"velocity" : FormatWriter.format(velocity),
+		"direction" : FormatWriter.format(direction),
+		"dopplerFactor" : FormatWriter.format(dopplerFactor),
+		"rolloff" : FormatWriter.format(rolloff),
+		"coneInnerAngle" : FormatWriter.format(coneInnerAngle),
+		"coneOuterAngle" : FormatWriter.format(coneOuterAngle),
+		"coneOuterGain" : FormatWriter.format(coneOuterGain),
 	}

@@ -3,7 +3,7 @@ extends EditorScript
 
 const COMPONENTS_PATH = "../../HUGO/src/components"
 const OUTPUT_COMPONENTS_PATH = "Components"
-const OUTPUT_CHAT_PARSER_PATH = "../../HUGO/src/ecs/ChatParser.h"
+const OUTPUT_CHAT_PARSER_PATH = "../../HUGO/src/ecs/ChatParser.cpp"
 const HUGO_TYPES_PATH = "../../HUGO/src/utils/HugoTypes.h"
 
 const OUTPUT_ENUMS_PATH = "Enums.gd"
@@ -90,7 +90,7 @@ func write_components():
 		file.store_line("\treturn {")
 
 		for parameter:Array in component_parameters:
-			var new_parameter:String = '\t\t"' + parameter[1] + '"' + " : " + parameter[1] + ","
+			var new_parameter:String = '\t\t"' + parameter[1] + '"' + " : FormatWriter.format(" + parameter[1] + "),"
 			file.store_line(new_parameter)
 
 		file.store_line("\t}")

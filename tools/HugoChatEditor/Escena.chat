@@ -1,17 +1,18 @@
-SYSTEM : MOVEMENT_SYSTEM
-SYSTEM : CHAT_SYSTEM
-SYSTEM : MOVEMENT_SYSTEM
+SYSTEM MOVEMENT_SYSTEM
+SYSTEM CHAT_SYSTEM
+SYSTEM MOVEMENT_SYSTEM
 
-ENTITY : Entity | 0
-	COMPONENT : MeshInstance3D
+ENTITY Entity 0
+	COMPONENT MeshInstance3D
+		mesh res://sphere.tres
 
-ENTITY : Entity3D | 1
-	COMPONENT : Transform
-		position : (0.564753, 0.0, 0.0)
-		rotation : (0.0, 0.0, 0.0)
-		scale : (1.0, 1.0, 1.0)
+ENTITY Entity3D 1
+	COMPONENT Transform
+		position (0.564753, 0.0, 0.0)
+		rotation (0.0, 0.0, 0.0)
+		scale (1.0, 1.0, 1.0)
 
-ENTITY : Entity_O | 2
-	COMPONENT : Parent
-		value : 1
+ENTITY Entity_O 2
+	COMPONENT Parent
+		value 1
 

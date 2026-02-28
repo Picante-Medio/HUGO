@@ -10,10 +10,10 @@ class_name ViewportComponent
 
 func get_component() -> Dictionary[String, Variant]:
 	return {
-		"left" : left,
-		"top" : top,
-		"width" : width,
-		"height" : height,
-		"zOrder" : zOrder,
-		"clearColor" : clearColor,
+		"left" : FormatWriter.format(left),
+		"top" : FormatWriter.format(top),
+		"width" : FormatWriter.format(width),
+		"height" : FormatWriter.format(height),
+		"zOrder" : FormatWriter.format(zOrder),
+		"clearColor" : FormatWriter.format(clearColor),
 	}

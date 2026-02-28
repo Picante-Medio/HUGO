@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cft1fgdpqn2vu" path="res://SceneScripts/scene_tracker.gd" id="1_865ah"]
 [ext_resource type="Script" uid="uid://dimuk3ggoam44" path="res://Entities/entity3d.gd" id="3_sks45"]
+[ext_resource type="SphereMesh" uid="uid://citadnjn16yba" path="res://sphere.tres" id="4_d4yc1"]
 [ext_resource type="Script" uid="uid://bnjt3w18hk2gs" path="res://NativeComponents/mesh_renderer.gd" id="4_fanfj"]
 [ext_resource type="Script" uid="uid://dcc6b5sxl6c7u" path="res://Entities/entity.gd" id="5_d4yc1"]
 
@@ -9,7 +10,9 @@
 script = ExtResource("1_865ah")
 entities = Dictionary[String, Dictionary]({
 "Entity": {
-"MeshInstance3D": Dictionary[String, Variant]({})
+"MeshInstance3D": Dictionary[String, Variant]({
+"mesh": "res://sphere.tres"
+})
 },
 "Entity3D": {
 "Transform": Dictionary[String, Variant]({
@@ -17,6 +20,11 @@ entities = Dictionary[String, Dictionary]({
 "rotation": Vector3(0, 0, 0),
 "scale": Vector3(1, 1, 1)
 })
+},
+"Entity_O": {
+"Parent": {
+"value": 1
+}
 }
 })
 systems = Array[int]([0, 1, 0])
@@ -26,6 +34,7 @@ script = ExtResource("5_d4yc1")
 metadata/_custom_type_script = "uid://dcc6b5sxl6c7u"
 
 [node name="MeshRenderer" type="MeshInstance3D" parent="Entity" unique_id=1285119260]
+mesh = ExtResource("4_d4yc1")
 script = ExtResource("4_fanfj")
 metadata/_custom_type_script = "uid://bnjt3w18hk2gs"
 
@@ -34,6 +43,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5647534, 0, 0)
 script = ExtResource("3_sks45")
 metadata/_custom_type_script = "uid://dimuk3ggoam44"
 
-[node name="Entity" type="Node3D" parent="Entity3D" unique_id=761297550]
+[node name="Entity_O" type="Node3D" parent="Entity3D" unique_id=761297550]
 script = ExtResource("5_d4yc1")
 metadata/_custom_type_script = "uid://dcc6b5sxl6c7u"

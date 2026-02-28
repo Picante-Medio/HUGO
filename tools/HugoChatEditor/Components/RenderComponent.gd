@@ -7,7 +7,7 @@ class_name RenderComponent
 
 func get_component() -> Dictionary[String, Variant]:
 	return {
-		"meshName" : meshName,
-		"materialName" : materialName,
-		"objectID" : objectID,
+		"meshName" : FormatWriter.format(meshName),
+		"materialName" : FormatWriter.format(materialName),
+		"objectID" : FormatWriter.format(objectID),
 	}
