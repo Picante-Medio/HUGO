@@ -27,16 +27,6 @@ struct ConeColliderInfo {
 
 struct RigidBodyComponent: public Component
 {
-    enum Collider {
-        BOX,
-        SPHERE,
-        CAPSULE,
-        CYLINDER,
-        CONE
-    };
-
-
-
     float restitution;
     float friction;
     float mass;
@@ -56,6 +46,9 @@ struct RigidBodyComponent: public Component
 
     HUGO::Vector3 impulseToApplyThisFrame;
     HUGO::Vector3 impulseTorqueToApplyThisFrame;
+
+    // pointer to bullet's RB for sync purposes. RBComponent is NOT the owner of the RB
+    HUGO::simulationRB* rigidBody = nullptr;
 
     RigidBodyComponent(EntityID entity) 
         : Component(entity){};

@@ -5,8 +5,12 @@
 #include <utility>
 #include <vector>
 
-Scene::Scene()
-{
+Scene::Scene() {
+  initSimulation();
+}
+
+void 
+Scene::initSimulation() {
   simulation = std::make_unique<HUGO::Simulation>();
 }
 

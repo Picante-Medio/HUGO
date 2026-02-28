@@ -70,7 +70,7 @@ namespace HUGO{
     };
 
     // -------- Light Types --------
-
+    
     enum LightType
     {
         LT_POINT,
@@ -78,10 +78,27 @@ namespace HUGO{
         LT_SPOTLIGHT,
         LT_RECTLIGHT
     };
-
     
-    // #ifndef BULLET_PHYSICS
-    // #define BULLET_PHYSICS
+
+    // -------- PHYSICS TYPES --------
+    
+    // #ifdef BULLET_PHYSICS
     using Simulation = BulletSimulation;
+    using simulationRB = btRigidBody;
+    // #else
+    // ...
     // #endif
+
+
+    // -------- Collider Types --------
+    enum class ColliderType 
+    {
+        BOX,
+        SPHERE,
+        CAPSULE,
+        CYLINDER,
+        CONE
+    };
+
+
 }

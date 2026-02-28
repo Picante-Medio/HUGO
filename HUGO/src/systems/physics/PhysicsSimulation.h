@@ -16,6 +16,8 @@ class BulletSimulation : public PhysicsSimulation {
 
     btDynamicsWorld* btWorld;
 
+    btAlignedObjectArray<btCollisionShape*> collisionShapes;
+
     public:
     
     BulletSimulation();

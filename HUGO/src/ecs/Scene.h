@@ -22,12 +22,15 @@ class Scene {
         entityTable.getDenseListIndex(entity, componentID));
   }
 
-  std::unique_ptr<HUGO::Simulation> simulation;
-
+  // Physics simulation
+  void initSimulation();
+  
   template <typename T>
   T* getSimulation() {
     return static_cast<T>(simulation->getSimulation());
   }
+
+  std::unique_ptr<HUGO::Simulation> simulation;
 
 public:
   Scene();

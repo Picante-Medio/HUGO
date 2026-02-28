@@ -31,7 +31,27 @@ BulletSimulation::BulletSimulation() {
 }
 
 BulletSimulation::~BulletSimulation() {
-    // delete rigidbdies
+    // remove and delete rigidbodies
+    for (int i = btWorld->getNumCollisionObjects() - 1; i >= 0; i--)
+	{
+		btCollisionObject* obj = btWorld->getCollisionObjectArray()[i];
+		btRigidBody* body = btRigidBody::upcast(obj);
+        
+		if (body && body->getMotionState())
+		{
+			delete body->getMotionState();
+		}
+		btWorld->removeCollisionObject(obj);
+		delete obj;
+	}
+
+	//delete collision shapes
+	for (int j = 0; j < collisionShapes.size(); j++)
+	{
+		btCollisionShape* shape = collisionShapes[j];
+		collisionShapes[j] = 0;
+		delete shape;
+	}
 
     delete btWorld;
     delete solver;
@@ -39,7 +59,6 @@ BulletSimulation::~BulletSimulation() {
     delete dispatcher;
     delete collisionConfig;
 
-    // delete collisionShapes
 }
 
 void* BulletSimulation::getSimulation() {
