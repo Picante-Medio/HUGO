@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <utility>
 #include <vector>
 
 #include "Ecs.h"
@@ -11,7 +12,7 @@
 class IDenseList {
 public:
   virtual DenseListIndex getCount() const = 0;
-  virtual EntityID remove(DenseListIndex index) = 0;
+  virtual std::pair<bool, EntityID> remove(DenseListIndex index) = 0;
   virtual std::vector<EntityID> getAffectedEntities() const = 0;
 };
 
@@ -57,7 +58,7 @@ public:
   * @param index index of the component to remove
   * @return the id of the entity which component has moved to preserve order. The new index of said component is the value of the index parameter
   */
-  EntityID remove(DenseListIndex index) override {
+  std::pair<bool, EntityID> remove(DenseListIndex index) override {
       if (activeComponentCount == 0)
           throw std::runtime_error("Remove from empty DenseList");
 
@@ -66,14 +67,15 @@ public:
 
       activeComponentCount--;
 
+      bool needUpdate = index != activeComponentCount;
       EntityID movedEntity = entityIdList[activeComponentCount];
-
-      if (index != activeComponentCount) {
+      if (needUpdate) {
           components[index] = std::move(components[activeComponentCount]);
           entityIdList[index] = movedEntity;
+          return {needUpdate, movedEntity};
       }
 
-      return movedEntity;
+      else return {false, 0u};
   }
 
   /**

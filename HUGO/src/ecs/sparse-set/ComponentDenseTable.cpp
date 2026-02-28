@@ -1,13 +1,14 @@
 #include "ComponentDenseTable.h"
+#include "Ecs.h"
 #include <vector>
 
 ComponentDenseTable::ComponentDenseTable() {
   componentLists.fill(nullptr);
 }
 
-EntityID
+std::pair<bool, EntityID>
 ComponentDenseTable::removeComponent(ComponentID componentID, DenseListIndex index) {
-  if(componentLists[componentID] == nullptr) return 0u;
+  if(componentLists[componentID] == nullptr) return {false, 0u};
   return componentLists[componentID]->remove(index);
 }
 

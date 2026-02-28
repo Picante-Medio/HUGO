@@ -46,7 +46,7 @@ public:
   * @param index index in the denselist of the component to be removed
   * @return the id of the entity which component has moved to preserve order. The new index of said component is the value of the index parameter
   */
-  EntityID removeComponent(ComponentID componentID, DenseListIndex index);
+  std::pair<bool, EntityID> removeComponent(ComponentID componentID, DenseListIndex index);
   DenseListIndex getCount(ComponentID componentID) const;
 
   /**
@@ -80,7 +80,7 @@ public:
   * @return the id of the entity which component has moved to preserve order. The new index of said component is the value of the index parameter
   */
   template<typename T>
-  EntityID removeComponent(DenseListIndex index) {
+  std::pair<bool, EntityID> removeComponent(DenseListIndex index) {
     return getComponentList<T>()->remove(index);
   };
 

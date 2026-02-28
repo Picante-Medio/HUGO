@@ -70,10 +70,10 @@ public:
 
     // Deleting the component
     entityTable.deRegisterComponent(entity, id);
-    EntityID toUpdate = componentTable.removeComponent<T>(id);
+    auto [needsUpdate, toUpdate] = componentTable.removeComponent<T>(id);
 
     // Updating the index of the moved component upon deletion
-    entityTable.updateDenseListIndex(toUpdate, id, oldIndex);
+    if(needsUpdate) entityTable.updateDenseListIndex(toUpdate, id, oldIndex);
   }
 
   template <typename... Ts> 
