@@ -22,7 +22,7 @@ void ChatParser::readChatFolder(const HUGO::String& chatFolder){
 
     for(const auto& entry : std::filesystem::directory_iterator(chatFolder)) {
         //! Doesn't compile: no suitable user-defined conversion from "std::filesystem::path" to "HUGO::String" (aka "std::string") exists
-        //HUGO::String chatPath = chatFolder + static_cast<HUGO::String>(entry.path().filename());
+        HUGO::String chatPath = chatFolder + static_cast<HUGO::String>(entry.path().filename().generic_string());
 
         //readChat(chatPath);
     }
