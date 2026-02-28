@@ -27,13 +27,13 @@ void EntityTable::removeEntity(EntityID entity) {
 
 void 
 EntityTable::registerComponent(EntityID entity, ComponentID componentID, DenseListIndex index) {
-  componentMask[entity][componentID] = 1;
+  componentMask[entity].set(componentID, true);
   componentDirections[entity][componentID] = index;
 }
 
 void 
 EntityTable::deRegisterComponent(EntityID entity, ComponentID componentID) {
-  componentMask[entity][componentID] = 0;
+  componentMask[entity].set(componentID, false);
 }
 
 void 
@@ -43,7 +43,7 @@ EntityTable::updateDenseListIndex(EntityID entity, ComponentID componentID, Dens
 
 bool 
 EntityTable::hasComponent(EntityID entity, ComponentID componentID) const {
-  return componentMask[entity][componentID];
+  return componentMask[entity].test(componentID);
 }
 
 
@@ -62,11 +62,9 @@ std::vector<std::pair<ComponentID, DenseListIndex>>
 EntityTable::getAllDenseListIndexes(EntityID entity) {
   std::vector<std::pair<ComponentID, DenseListIndex>> list;
 
-  for(ComponentID id = 0; id < MAX_COMPONENTS; ++id) {
-    if(componentMask[entity][id]) continue;
-
-    list.push_back({id, componentDirections[entity][id]});
-  }
+  for(ComponentID id = 0; id < MAX_COMPONENTS; ++id)
+    if(componentMask[entity].test(id))
+      list.push_back({id, componentDirections[entity][id]});
 
   return list;
 }
