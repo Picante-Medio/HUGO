@@ -21,9 +21,10 @@ ChatParser::ChatParser(): m_scene_data(), m_prefab_data(){
 void ChatParser::readChatFolder(const HUGO::String& chatFolder){
 
     for(const auto& entry : std::filesystem::directory_iterator(chatFolder)) {
-        HUGO::String chatPath = chatFolder + static_cast<HUGO::String>(entry.path().filename());
+        //! Doesn't compile: no suitable user-defined conversion from "std::filesystem::path" to "HUGO::String" (aka "std::string") exists
+        //HUGO::String chatPath = chatFolder + static_cast<HUGO::String>(entry.path().filename());
 
-        readChat(chatPath);
+        //readChat(chatPath);
     }
 }
 

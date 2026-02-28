@@ -7,6 +7,7 @@
 #include "PhysicsTags.h"
 #include "Scene.h"
 
+#pragma region HUGOMotionState
 // ----------------------HUGOMotionState----------------------
 
 HUGOMotionState::HUGOMotionState(const btTransform initialPos, std::shared_ptr<TransformComponent> transform, btTransform offset)
@@ -48,7 +49,9 @@ void HUGOMotionState::setWorldTransform(const btTransform& worldTrans)
     btVector3 pos = btTransformRegister.getOrigin();
     hugoTransform->position = HUGO::Vector3(pos.x(), pos.y(), pos.z());
 }
+#pragma endregion
 
+#pragma region PhysicsSystem
 // ----------------------PhysicsSystem----------------------
 
 PhysicsSystem::PhysicsSystem(std::shared_ptr<Scene> scene)
@@ -57,43 +60,60 @@ PhysicsSystem::PhysicsSystem(std::shared_ptr<Scene> scene)
 
 }
 
-PhysicsSystem::~PhysicsSystem() {
+PhysicsSystem::~PhysicsSystem() 
+{
 
 }
 
-void PhysicsSystem::update(double dt) {
+void PhysicsSystem::update(double dt) 
+{
+
 }
 
-void PhysicsSystem::fixedUpdate(double dt) {
-    // Add rigidBodies to simulation
+void PhysicsSystem::fixedUpdate(double dt) 
+{
+    // Add rigidBodies to simulation and Update if neccessary
     // Static rigidBodies 
-    for(auto& pack: scene->query<NewRBTag, StaticRBTag, RigidBodyComponent, TransformComponent>()) {
+    for(auto& pack: scene->query<StaticRBTag, RigidBodyComponent, TransformComponent>()) {
         RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
         TransformComponent& transform = pack.get<TransformComponent&>();
-        
-        scene->removeComponent<NewRBTag>(rb.entity);
+
+        if (rb.objectID == HUGO::INVALID_BULLET_OBJECT_ID) {
+            //create a new RigidBodyObject
+            rb.objectID = createRigidBodyObject(rb);
+        }
         
     }
-
+    
     // Kinematic rigidBodies
     for(auto& pack: scene->query<NewRBTag, KinematicRBTag, RigidBodyComponent, TransformComponent>()) {
         RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
         TransformComponent& transform = pack.get<TransformComponent&>();
         
-        scene->removeComponent<NewRBTag>(rb.entity);
+        if (rb.objectID == HUGO::INVALID_BULLET_OBJECT_ID) {
+            //create a new RigidBodyObject
+            rb.objectID = createRigidBodyObject(rb);
+        }
+
+        // Update BtRB from HugoRB
         
     }
-
+    
     // Dynamic rigidBodies
     for(auto& pack: scene->query<NewRBTag, RigidBodyComponent, TransformComponent>()) {
         RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
         TransformComponent& transform = pack.get<TransformComponent&>();
         
-        scene->removeComponent<NewRBTag>(rb.entity);
+        if (rb.objectID == HUGO::INVALID_BULLET_OBJECT_ID) {
+            //create a new RigidBodyObject
+            rb.objectID = createRigidBodyObject(rb);
+        }
+
+        // Update BtRB from HugoRB
         
     }
 
-    // update kinematic bodies in the simulation
+    // update kinematic bodies in the Motion State
     for(auto& pack: scene->query<KinematicRBTag, RigidBodyComponent, TransformComponent>()) {
         RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
         TransformComponent& transform = pack.get<TransformComponent&>();
@@ -102,3 +122,24 @@ void PhysicsSystem::fixedUpdate(double dt) {
         motionState->updateBulletTransform(transform);
     }
 }
+
+HUGO::BulletObjectID PhysicsSystem::createRigidBodyObject(const RigidBodyComponent hgRb)
+{
+    // Create a RigidBodyObject and assign an id. Must have a way to determine if it's static, kinematic or dynamic
+}
+    
+RigidBodyObject& PhysicsSystem::getRigidBodyObject(const HUGO::BulletObjectID)
+{
+    // Return RigidBodyObject of the given id
+}
+    
+void PhysicsSystem::removeRigidBodyObject(const HUGO::BulletObjectID)
+{
+    // Remove RigidBodyObject from the list of registered ids
+}
+    
+void PhysicsSystem::destroyRigidBodyObject(RigidBodyObject& RbObj)
+{
+    // Destroy contents of the RigidBodyObjects
+}
+#pragma endregion

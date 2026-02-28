@@ -4,6 +4,15 @@
 #include "System.h"
 #include "TransformComponent.h"
 #include "btBulletDynamicsCommon.h"
+#include "PagedArray.h"
+#include "HugoTypes.h"
+
+class RigidBodyComponent;
+
+struct RigidBodyObject{
+    HUGO::BulletObjectID id;
+    btRigidBody* bulletRB = nullptr;
+};
 
 class HUGOMotionState : public btMotionState{
 
@@ -27,6 +36,14 @@ public:
 
 class PhysicsSystem : public System {
     
+    PagedArray<RigidBodyObject, 128> rigidBodies;
+    std::vector<HUGO::BulletObjectID> freeOgreObjectId;
+    std::vector<std::size_t> idToIndex;
+
+    HUGO::BulletObjectID createRigidBodyObject(const RigidBodyComponent hgRb);
+    RigidBodyObject& getRigidBodyObject(const HUGO::BulletObjectID);
+    void removeRigidBodyObject(const HUGO::BulletObjectID);
+    void destroyRigidBodyObject(RigidBodyObject& RbObj);
 
 public:
     PhysicsSystem(std::shared_ptr<Scene> scene);

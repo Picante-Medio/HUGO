@@ -16,18 +16,6 @@ BulletSimulation::BulletSimulation() {
     // Finally we create the world and set its gravity
     btWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfig);
     btWorld->setGravity(btVector3(0, -9.8, 0));
-
-    // btBoxShape* testshape = new btBoxShape({1, 1, 1});
-    // btMotionState* testmstate = new btDefaultMotionState();
-
-    //TODO Descomentar y comprobar si los cuerpos se mantienen al destruir el mundo o no (para saber si destruirlos a mano)
-    //testrb = new btRigidBody(1.0, testmstate, testshape);
-    //btWorld->addRigidBody(testrb);
-
-    //delete btWorld;
-
-    //testrb->activate();
-    //std::cout << "Se ha accedido al rigidbody sin que exista el mundo";
 }
 
 BulletSimulation::~BulletSimulation() {

@@ -11,6 +11,9 @@ namespace HUGO{
     using BulletObjectID = int;
     constexpr BulletObjectID INVALID_BULLET_OBJECT_ID = std::numeric_limits<int>::max();
 
+    using BulletShapeID = int;
+    constexpr BulletShapeID INVALID_BULLET_SHAPE_ID = std::numeric_limits<int>::max();
+
     using AudioID = int;
     using SceneID = int;
 

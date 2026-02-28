@@ -5,24 +5,60 @@
 #include "HugoTypes.h"
 #include "HugoMath.h"
 
-struct BoxColliderInfo {
+enum ShapeType{
+    BOX,
+    SPHERE,
+    CAPSULE,
+    CYLINDER,
+    CONE
+};
+
+struct _Shape{
+private:
+    HUGO::BulletShapeID id;
+    ShapeType type;
+};
+
+// We declare private before public so we can use a pointer to any struct as a pointer to the Shape struct
+
+struct BoxShapeInfo {
+private:
+    _Shape shape;
+
+public:
     HUGO::Vector3 halfExtents;
 };
 
 struct SphereColliderInfo {
+private:
+    _Shape shape;
+
+public:
     float r;
 };
 
 struct CapsuleColliderInfo {
+private:
+    _Shape shape;
+
+public:
     float r;
     float height;
 };
 
 struct CylinderColliderInfo {
+private:
+    _Shape shape;
+
+public:
     HUGO::Vector3 halfExtents;
 };
 
 struct ConeColliderInfo {
+private:
+    _Shape shape;
+
+public:
     float r;
     float height;
 };
@@ -52,10 +88,10 @@ struct RigidBodyComponent: public Component
     // pointer to bullet's RB for sync purposes. RBComponent is NOT the owner of the RB
     HUGO::simulationRB* simulationRigidBody = nullptr;
 
-    RigidBodyComponent(EntityID entity) 
+    RigidBodyComponent(EntityID entity, _Shape& shape) 
         : Component(entity){};
     
     friend class PhysicsSystem;
 private:
-    HUGO::OgreObjectID objectID = HUGO::INVALID_OGRE_OBJECT_ID;
+    HUGO::BulletObjectID objectID = HUGO::INVALID_BULLET_OBJECT_ID;
 };
