@@ -23,7 +23,7 @@ inline ComponentID getNextID() {
   static ComponentID index = 0;
   index += 1;
   if(index >= MAX_COMPONENTS) throw "Too many components";
-  return index;
+  return index - 1;
 }
 
 /**
