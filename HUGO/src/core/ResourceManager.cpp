@@ -1,5 +1,4 @@
 #include "ResourceManager.h"
-#include "OgreRoot.h"
 
 using namespace HUGO;
 

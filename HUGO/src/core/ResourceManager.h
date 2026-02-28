@@ -2,10 +2,7 @@
 #include "HugoTypes.h"
 #include <memory>
 #include "miniaudio.h"
-
-namespace Ogre{
-    class Root;
-}
+#include "OgreRoot.h"
 
 namespace HUGO{
     //When changing to a Scene, ResourceManager must be called to unload previously allocated memory and load assets required for the new Scene
