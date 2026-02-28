@@ -90,6 +90,7 @@ func write_components():
 	for component_name:String in components_dictionary.keys():
 		var file := FileAccess.open(OUTPUT_COMPONENTS_PATH.path_join(component_name + ".gd"), FileAccess.WRITE)
 
+		file.store_line("@tool")
 		file.store_line("extends Component")
 		file.store_line("class_name " + component_name)
 		file.store_line("")

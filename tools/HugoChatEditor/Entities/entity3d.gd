@@ -4,7 +4,7 @@ class_name Entity3D
 
 func get_component() -> Dictionary[String, Variant]:
 	return {
-		"position" : position,
-		"rotation" : rotation,
-		"scale" : scale
+		"position" : FormatWriter.format(position),
+		"rotation" : FormatWriter.format(rotation),
+		"scale" : FormatWriter.format(scale)
 	}

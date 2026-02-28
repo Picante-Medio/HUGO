@@ -1,3 +1,4 @@
+@tool
 extends Component
 class_name RenderComponent
 

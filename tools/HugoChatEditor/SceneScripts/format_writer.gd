@@ -1,11 +1,11 @@
 class_name FormatWriter
 
-static func format(variant):
+static func format(variant:Variant):
 	if variant is Vector2:
-		return variant.x + " " + variant.y
+		return "VECTOR_2 " + str(variant.x) + " " + str(variant.y)
 	elif variant is Vector3:
-		return variant.x + " " + variant.y + " " + variant.z
+		return "VECTOR_3 " + str(variant.x) + " " + str(variant.y) + " " + str(variant.z)
 	elif variant is Vector4:
-		return variant.x + " " + variant.y + " " + variant.z + " " + variant.w
-		
-	return variant
+		return "VECTOR_4 " + str(variant.x) + " " + str(variant.y) + " " + str(variant.z) + " " + str(variant.w)
+	
+	return str(variant)
