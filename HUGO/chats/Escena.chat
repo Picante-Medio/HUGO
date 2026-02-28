@@ -1,0 +1,25 @@
+PREFAB alfonso.chat
+
+
+ENTITY Juan 0
+	COMPONENT Transform
+		[position] VECTOR_3 0.56475341320038 0.0 0.0
+		[rotation] VECTOR_3 0.0 0.0 0.0
+		[scale] VECTOR_3 1.0 1.0 1.0
+
+ENTITY Guille 1
+	COMPONENT Parent
+		[value int] 0
+
+ENTITY Entity 2
+
+ENTITY Alfonso 3
+	COMPONENT Parent
+		[value int] 2
+	COMPONENT MeshInstance3D
+		[mesh] String res://sphere.tres
+
+ENTITY David 4
+	COMPONENT Parent
+		[value int] 3
+

@@ -1,4 +1,4 @@
 @tool
 @icon("res://Icons/entity_icon.png")
-extends Node3D
+extends SCENE_TRACKER
 class_name Entity

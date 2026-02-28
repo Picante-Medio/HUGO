@@ -1,10 +1,14 @@
 @tool
 extends EditorScript
+class_name ScriptsSyncronizer
 
 const COMPONENTS_PATH = "../../HUGO/src/components"
 const OUTPUT_COMPONENTS_PATH = "Components"
 const OUTPUT_CHAT_PARSER_PATH = "../../HUGO/src/ecs/ChatParser.cpp"
 const HUGO_TYPES_PATH = "../../HUGO/src/utils/HugoTypes.h"
+
+const CHATS_PATH = "../../HUGO/chats/"
+const PREFABS_PATH = "res://Prefabs/"
 
 const OUTPUT_ENUMS_PATH = "Enums.gd"
 
@@ -18,10 +22,33 @@ const BLACK_LIST:Array[String] = ["TransformComponent", "CameraComponent"]
 func _run() -> void:
 	parse_hugo_types()
 	write_enums()
-	list_and_print_files_recursive(COMPONENTS_PATH)
 	write_components()
-	EditorInterface.get_resource_filesystem().scan_sources()
 	create_chat_parser()
+	parse_components(COMPONENTS_PATH)
+	create_prefabs(PREFABS_PATH)
+	EditorInterface.get_resource_filesystem().scan_sources()
+
+func create_prefabs(path:String):
+	var dir := DirAccess.open(path)
+
+	dir.list_dir_begin()
+
+	var name := dir.get_next()
+
+	while name != "":
+		if name != "." and name != "..":
+			var full_path := PREFABS_PATH.path_join(name)
+
+			if dir.current_is_dir():
+				create_prefabs(full_path)
+			else:
+				EditorInterface.open_scene_from_path(full_path)
+				SceneWriter.write()
+				EditorInterface.close_scene()
+
+		name = dir.get_next()
+
+	dir.list_dir_end()
 
 func create_chat_parser() -> void:
 	var file := FileAccess.open(OUTPUT_CHAT_PARSER_PATH, FileAccess.READ_WRITE)
@@ -146,7 +173,7 @@ func parse_hugo_types() -> void:
 
 	file.close()
 
-func list_and_print_files_recursive(path: String) -> void:
+func parse_components(path: String) -> void:
 	var dir := DirAccess.open(path)
 
 	dir.list_dir_begin()
@@ -158,7 +185,7 @@ func list_and_print_files_recursive(path: String) -> void:
 			var full_path := path.path_join(name)
 
 			if dir.current_is_dir():
-				list_and_print_files_recursive(full_path)
+				parse_components(full_path)
 			else:
 				hugo_parse_component(full_path)
 

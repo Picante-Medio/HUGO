@@ -1,0 +1,9 @@
+
+ENTITY Alfonso 0
+	COMPONENT MeshInstance3D
+		[mesh] String res://sphere.tres
+
+ENTITY David 1
+	COMPONENT Parent
+		[value int] 0
+
