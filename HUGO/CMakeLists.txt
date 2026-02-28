@@ -55,13 +55,8 @@ else()
     )
     
     file(GLOB OGRE_PLUGINS
-        ${BASE_PREFIX_PATH}/ogre/lib/OGRE/*.so*)
-
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${OGRE_PLUGINS}
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>
-        COMMAND_EXPAND_LISTS
+        "${BASE_PREFIX_PATH}/ogre/lib/OGRE/*.so"
+        "${BASE_PREFIX_PATH}/ogre/lib/OGRE/*.so.*"
     )
 endif()
 
@@ -87,12 +82,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${bullet3_SOURCE_DIR}/src)
 
 set(HUGO_LINKED_LIBRARIES
-    LinearMath
     BulletDynamics
     BulletCollision
     Bullet3Common
     Bullet3Dynamics
     Bullet3Collision
+    LinearMath
     OgreMain
     OgreOverlay
     RenderSystem_GL3Plus
