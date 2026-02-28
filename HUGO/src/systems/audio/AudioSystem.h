@@ -11,13 +11,18 @@
 #include <unordered_map>
 #include <queue>
 
-struct AudioInfo{
-  HUGO::AudioTypes type;
-  std::unique_ptr<Audio> ptr;
+struct AudioInfo {
+    std::unique_ptr<Audio> ptr;
+    bool inUse = false;
 };
 
+struct AudioPool {
+    HUGO::AudioTypes type;
+    std::vector<AudioInfo> voices;
+    size_t stealIndex = 0;
+};
 /*
-Audios will be loaded from a lua script (hopefully)
+Audios we want to include wille be define in a txt file
 */
 
 //forward declarations
@@ -30,27 +35,26 @@ class AudioSystem : public System {
   //path where all the audio files are located 
   std::string path;
 
-  std::vector<AudioInfo> audios;
-    // format: path -> id
+  // format: path -> id
   // unordered map if we want to know its id using a string
-  std::unordered_map<std::string, HUGO::AudioID> audioMap;
-  std::unordered_map<std::string, std::queue<Audio>> audioMaps;
+  std::vector<std::string> audiosName;
+  std::unordered_map<std::string, AudioPool> audiosMap;
   HUGO::AudioID nextID;
-
+  int queueSize;
   float soundsGroupVolume = 1.0f; // global volume controller for 2D and 3D sfx
   float musicsGroupVolume = 1.0f; // global volume controller for musics
 
   // private functions as helpers
-
   // private function to load and store all the audio files we are going to include
   void loadFromFile(const char* path);
   // private function to create a ma_sound using an audio file
-  AudioInfo createAudio(const char *filename, HUGO::AudioTypes type);
+  const AudioInfo& createAudio(HUGO::AudioID id, HUGO::AudioTypes type);
+  AudioInfo createVoice(const std::string& name, HUGO::AudioTypes type);
   // private function to get a ma_sound pointer of the vector to do operations
   ma_sound *getSound(HUGO::AudioID id);
   // auxiliar method to check if audios[id] exists and its a 3d sound
   ma_sound *get3DSound(HUGO::AudioID id);
-
+  const AudioInfo& getAudio(const std::string& name);
   //(TODO) sound queue
   // functions to process changes of one audio
   void processChanges(AudioComponent& c);
@@ -96,7 +100,8 @@ class AudioSystem : public System {
   public:
   AudioSystem(std::shared_ptr<Scene> scene,
               std::shared_ptr<ma_engine> maEngine,
-              const std::string& path = "test_media/");
+              const std::string& path = "test_media/",
+              int queueSize = 10); //maximum number of parallel reproduction of an audio
   virtual ~AudioSystem() = default;
 
   void update(double dt) override;

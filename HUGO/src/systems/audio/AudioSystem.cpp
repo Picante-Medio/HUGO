@@ -11,11 +11,13 @@
 #include <stdexcept>
 #include <sstream>
 
-AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, std::shared_ptr<ma_engine> maEngine, const std::string& path)
-    : System(scene), engine(maEngine), path(path), audios(), nextID(0)
+AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, std::shared_ptr<ma_engine> maEngine, 
+    const std::string& path, int queueSize)
+    : System(scene), engine(maEngine), path(path), audiosName(), audiosMap(), nextID(0), queueSize(queueSize)
 {
     std::string completePath = path + "AudioList.txt";
     loadFromFile(completePath.c_str());
+    
 }
 
 // HELPERS
@@ -39,52 +41,93 @@ void AudioSystem::loadFromFile(const char *path)
         std::getline(ss, typeStr, ';');
 
         HUGO::AudioTypes type = static_cast<HUGO::AudioTypes>(std::stoi(typeStr));
-
-        audios.emplace_back(createAudio(filename.c_str(), type));
-        audioMap[id] = nextID;
+        
+        audiosName.emplace_back(filename);
         nextID++;
     }
     file.close();
 }
 
-AudioInfo AudioSystem::createAudio(const char* filename, HUGO::AudioTypes type)
+AudioInfo AudioSystem::createAudio(const std::string& name, HUGO::AudioTypes type)
 {
-    AudioInfo audio;
-    audio.ptr = std::make_unique<Audio>();
-    ma_uint32 flags = 0;
+    AudioInfo info;
+    info.type = type;
 
-    //choose the flags depending on what type of audio it is
-    switch (type) {
-        case HUGO::SOUND2D: 
-            flags = MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION; 
-            break;
-        case HUGO::SOUND3D: 
-            flags = MA_SOUND_FLAG_DECODE; 
-            break;
-        case HUGO::MUSIC:
-            flags = MA_SOUND_FLAG_NO_SPATIALIZATION | MA_SOUND_FLAG_STREAM; 
-            break;
-        default: 
-            throw std::runtime_error("Error createAudio: unknown AudioType");
-            break;
-    }
-    if (!audio.ptr->init(engine.get(), filename, flags))
-        throw std::runtime_error(std::string("Failed to load ") + filename);
-    audio.type = type;
-    return audio;
+    info.audio = std::make_unique<Audio>(
+        engine,
+        path + name
+    );
+
+    ma_sound_set_end_callback(
+        info.audio->get(),
+        AudioSystem::endCallback,
+        &info
+    );
+
+    return info;
 }
 
-ma_sound* AudioSystem::getSound(HUGO::AudioID id)
+AudioInfo AudioSystem::createVoice(const std::string& name, HUGO::AudioTypes type)
 {
-    if (id < 0 || id >= static_cast<HUGO::AudioID>(audios.size()))
-        throw std::range_error("Error getSound: invalid index");
+    AudioInfo info;
 
-    ma_sound* sound = audios[id].ptr ? audios[id].ptr->get() : nullptr;
+    info.ptr = std::make_unique<Audio>();
 
-    if (sound == nullptr) 
-        throw std::runtime_error("Error getSound: Could not find the audio");
+    std::string fullPath = path + name;
 
-    return sound;
+    if (!info.ptr->init(engine.get(), fullPath.c_str(), 0))
+        throw std::runtime_error("Failed loading audio");
+
+    return info;
+}
+
+ma_sound* AudioSystem::getSound(const std::string& name)
+{
+    // first, find the value associated to the key
+    auto it = audiosMap.find(name);
+    if (it == audiosMap.end())
+        throw std::runtime_error("Audio not registered");
+
+    AudioPool& pool = it->second;
+
+    // find a free voice to be used
+    for (auto& voice : pool.voices)
+    {
+        if (!voice.inUse)
+        {
+            voice.inUse = true;
+            return voice.ptr->get();
+        }
+    }
+
+    // if there are not free voice anymore, insert one
+    if (pool.voices.size() < queueSize)
+    {
+        pool.voices.emplace_back(createVoice(name, pool.type));
+
+        AudioInfo& v = pool.voices.back();
+        v.inUse = true;
+
+        ma_sound_set_end_callback(
+            v.ptr->get(),
+            AudioSystem::endCallback,
+            &v
+        );
+
+        return v.ptr->get();
+    }
+
+    // 3️⃣ voice stealing (round robin)
+    AudioInfo& stolen =
+        pool.voices[pool.stealIndex];
+
+    pool.stealIndex =
+        (pool.stealIndex + 1) % pool.voices.size();
+
+    ma_sound_stop(stolen.ptr->get());
+    stolen.inUse = true;
+
+    return stolen.ptr->get();
 }
 
 ma_sound *AudioSystem::get3DSound(HUGO::AudioID id)
@@ -93,6 +136,17 @@ ma_sound *AudioSystem::get3DSound(HUGO::AudioID id)
     if (audios[id].type != HUGO::SOUND3D)
         throw std::runtime_error("Error get3DSound: This is not a 3D sound");
     else return s;
+}
+
+const AudioInfo &AudioSystem::getAudio(const std::string &name)
+{
+    //if we dont have any audio
+    if (audiosMap.find("name") == audiosMap.end()){
+        //return error or type
+    }
+    std::queue<AudioInfo>& q = audiosMap["name"];
+    
+    return q.front();
 }
 
 void AudioSystem::processChanges(AudioComponent &c)

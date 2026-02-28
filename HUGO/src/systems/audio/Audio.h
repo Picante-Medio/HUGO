@@ -1,31 +1,27 @@
-// wrapper for audios
 #pragma once
 #include "miniaudio.h"
 
-
 class Audio {
 private:
-    ma_sound audio;
+    ma_sound audio{};
+    bool initialized = false;
 
 public:
     Audio() = default;
 
-    ~Audio() {
-        ma_sound_uninit(&audio);
-    }
+    // it CANT be copied
+    Audio(const Audio&) = delete;
+    Audio& operator=(const Audio&) = delete;
 
-    ma_sound* get() { return &audio; }
+    // but it can be moved
+    Audio(Audio&& other) noexcept;
+    Audio& operator=(Audio&& other) noexcept;
 
-    // Initialize from file with given flags
-    inline bool init(ma_engine* engine, const char* filename, ma_uint32 flags) {
-        ma_result result = ma_sound_init_from_file(
-            engine,
-            filename,
-            flags,
-            nullptr,
-            nullptr,
-            &audio
-        );
-        return result == MA_SUCCESS;
-    }
+    virtual ~Audio();
+
+    ma_sound* get();
+
+    bool init(ma_engine* engine, const char* filename, ma_uint32 flags = 0);
+
+    void rewind();
 };
