@@ -9,3 +9,7 @@ struct StaticRBTag : public Component {
 struct KinematicRBTag : public Component {
     KinematicRBTag(EntityID entity) : Component(entity) {}
 };
+
+struct NewRBTag : public Component {
+    NewRBTag(EntityID entity) : Component(entity) {}
+};
