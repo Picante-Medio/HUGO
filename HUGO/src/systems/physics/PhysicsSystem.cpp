@@ -4,6 +4,7 @@
 #include "HugoMath.h"
 #include "RigidBodyComponent.h"
 #include "TransformComponent.h"
+#include "PhysicsTags.h"
 #include "Scene.h"
 
 // ----------------------HUGOMotionState----------------------
@@ -21,7 +22,7 @@ void HUGOMotionState::setHugoTransform(std::shared_ptr<TransformComponent> trans
     hugoTransform = transform;
 }
     
-void HUGOMotionState::updateBulletTransform(TransformComponent newPos)
+void HUGOMotionState::updateBulletTransform(const TransformComponent& newPos)
 {
     btTransform auxTransform = btTransform(
                                newPos.rotation.toBullet(), 
@@ -32,7 +33,6 @@ void HUGOMotionState::updateBulletTransform(TransformComponent newPos)
 
 void HUGOMotionState::getWorldTransform(btTransform& worldTrans) const
 {
-    // updateBulletTransform(hugoTransform);
     worldTrans = btTransformRegister * centerOfMassOffset;
 }
     
@@ -62,12 +62,17 @@ PhysicsSystem::~PhysicsSystem() {
 }
 
 void PhysicsSystem::update(double dt) {
-
 }
 
 void PhysicsSystem::fixedUpdate(double dt) {
     // add rigidBodies to simulation
 
-    // update kinematic bodies
-    // must update the motion state transform!
+    // update kinematic bodies in the simulation
+    for(auto& pack: scene->query<KinematicRBTag, RigidBodyComponent, TransformComponent>()) {
+        RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
+        TransformComponent& transform = pack.get<TransformComponent&>();
+        
+        HUGOMotionState* motionState = static_cast<HUGOMotionState*>(rb.simulationRigidBody->getMotionState());
+        motionState->updateBulletTransform(transform);
+    }
 }

@@ -19,7 +19,7 @@ public:
     HUGOMotionState(const btTransform initialPos, std::shared_ptr<TransformComponent> transform, btTransform offset = btTransform::getIdentity());
 
     void setHugoTransform(std::shared_ptr<TransformComponent> transform);
-    void updateBulletTransform(TransformComponent newPos);
+    void updateBulletTransform(const TransformComponent& newPos);
 
     void getWorldTransform(btTransform& worldTrans) const override;
     void setWorldTransform(const btTransform& worldTrans) override;
