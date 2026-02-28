@@ -1,5 +1,7 @@
-#include "Component.h"
+#pragma once
+
 #include <string>
+#include "Component.h"
 #include "HugoTypes.h"
 #include "HugoMath.h"
 
@@ -48,7 +50,7 @@ struct RigidBodyComponent: public Component
     HUGO::Vector3 impulseTorqueToApplyThisFrame;
 
     // pointer to bullet's RB for sync purposes. RBComponent is NOT the owner of the RB
-    HUGO::simulationRB* rigidBody = nullptr;
+    HUGO::simulationRB* simulationRigidBody = nullptr;
 
     RigidBodyComponent(EntityID entity) 
         : Component(entity){};

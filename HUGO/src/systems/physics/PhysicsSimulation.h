@@ -1,3 +1,5 @@
+#pragma once
+
 #include "btBulletDynamicsCommon.h"
 
 class PhysicsSimulation {
@@ -25,4 +27,6 @@ class BulletSimulation : public PhysicsSimulation {
 
     void* getSimulation() override;
     void stepSimulation(double dt);
+
+    void addShape(btCollisionShape* collisionShape);
 };

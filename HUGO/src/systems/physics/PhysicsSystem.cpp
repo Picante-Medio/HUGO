@@ -1,6 +1,10 @@
+#include <iostream>
+
 #include "PhysicsSystem.h"
 #include "HugoMath.h"
-#include <iostream>
+#include "RigidBodyComponent.h"
+#include "TransformComponent.h"
+#include "Scene.h"
 
 // ----------------------HUGOMotionState----------------------
 
@@ -28,6 +32,7 @@ void HUGOMotionState::updateBulletTransform(TransformComponent newPos)
 
 void HUGOMotionState::getWorldTransform(btTransform& worldTrans) const
 {
+    // updateBulletTransform(hugoTransform);
     worldTrans = btTransformRegister * centerOfMassOffset;
 }
     
@@ -57,9 +62,12 @@ PhysicsSystem::~PhysicsSystem() {
 }
 
 void PhysicsSystem::update(double dt) {
-    
+
 }
 
 void PhysicsSystem::fixedUpdate(double dt) {
-    
+    // add rigidBodies to simulation
+
+    // update kinematic bodies
+    // must update the motion state transform!
 }

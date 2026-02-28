@@ -30,6 +30,11 @@ class Scene {
     return static_cast<T>(simulation->getSimulation());
   }
 
+  template <typename T>
+  void addShapeToSimulation(T* collisionShape) {
+    simulation->addShape(collisionShape);
+  }
+
   std::unique_ptr<HUGO::Simulation> simulation;
 
 public:

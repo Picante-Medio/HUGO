@@ -68,3 +68,7 @@ void* BulletSimulation::getSimulation() {
 void BulletSimulation::stepSimulation(double dt) {
     btWorld->stepSimulation(dt);
 }
+
+void BulletSimulation::addShape(btCollisionShape* collisionShape) {
+    collisionShapes.push_back(collisionShape);
+}
