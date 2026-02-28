@@ -58,8 +58,8 @@ public:
     ComponentID id = getComponentId<T>();
 
     // Adding the component
-    entityTable.registerComponent(
-        entity, id, componentTable.addComponent(component, entity));
+    DenseListIndex index = componentTable.addComponent(component, entity);
+    entityTable.registerComponent(entity, id, index);
   }
 
   template <typename T> 

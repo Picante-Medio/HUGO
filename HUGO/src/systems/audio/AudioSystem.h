@@ -72,7 +72,7 @@ private:
     AudioInfo createVoice(HUGO::AudioID id);
 
     // function to synchronize the audio when we want to play it for another time
-    void AudioSystem::applyComponentState(AudioComponent& c, ma_sound* s);
+    void applyComponentState(AudioComponent& c, ma_sound* s);
 
     // acquire reusable voice (reuse/create/steal)
     ma_sound* getSound(HUGO::AudioID id);
