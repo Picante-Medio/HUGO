@@ -113,7 +113,7 @@ void RenderSystem::handleTag()
             it->second.ogreCamera->setFarClipDistance(camera.farClip);
         }
         // eliminate the tag
-        //scene->removeComponent<CameraDirtyTag>(entity);
+        scene->removeComponent<CameraDirtyTag>(entity);
     }
 
     // Viewport update
