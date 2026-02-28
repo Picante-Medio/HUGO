@@ -24,24 +24,37 @@ func _run() -> void:
 	create_chat_parser()
 
 func create_chat_parser() -> void:
-	var file := FileAccess.open(OUTPUT_CHAT_PARSER_PATH, FileAccess.WRITE)
+	var file := FileAccess.open(OUTPUT_CHAT_PARSER_PATH, FileAccess.READ_WRITE)
+	
+	var file_text = file.get_as_text()
+	
+	var includes_gap = file_text.split("//COMPONENTS_INCLUDE")
+	var includes:String = "//COMPONENTS_INCLUDE\n"
+	
+	assert(includes_gap.size() != 1)
 
-	file.store_line('#include "Scene.h"')
-	file.store_line('#include "Ecs.h"')
-	file.store_line('#include <any>')
 	for component in components_dictionary.keys():
-		file.store_line('#include "' + component + '.h"')
-	file.store_line("")
-
-	file.store_line("class SceneParser {")
-	file.store_line("\tpublic:")
-	file.store_line("\t\tvoid ReadComponent(Scene& scene, std::string& componentName, EntityID entity, std::vector<std::any> args) {")
+		includes += '#include "' + component + '.h"\n'
+	includes += "//COMPONENTS_INCLUDE\n"
+	
+	var includes_pointer:int = 2
+	if includes_gap.size() == 2: includes_pointer = 1
+	
+	file_text = includes_gap[0] + includes + includes_gap[includes_pointer]
+	
+	var construction_gap = file_text.split("//COMPONENTS_CONSTRUCTION")
+	var construction:String = "//COMPONENTS_CONSTRUCTION\n"
+	
+	assert(construction_gap.size() != 1)
+	
+	var construction_pointer:int = 2
+	if construction_gap.size() == 2: construction_pointer = 1
 
 	var i:int = 0
 	for component in components_dictionary.keys():
-		if i == 0: file.store_string("\t\t\tif")
-		else: file.store_string("\t\t\telse if")
-		file.store_string('("' + component + '" == componentName' + ") ")
+		if i == 0: construction += "\t\t\tif"
+		else: construction += "\t\t\telse if"
+		construction += '("' + component + '" == componentName' + ")\n"
 
 		var args:String = ""
 		var arg_index := 0
@@ -50,11 +63,12 @@ func create_chat_parser() -> void:
 			arg_index += 1
 
 		args = args.substr(0, args.length() - 1)
-		file.store_line("\n\t\t\t\tscene.addComponent<" + component + ">(entity, " + args + ");")
+		construction += "\t\t\t\tscene.addComponent<" + component + ">(entity, " + args + ");\n"
 		i += 1
-	file.store_line("\t\t}")
-
-	file.store_line("};")
+	construction += "//COMPONENTS_CONSTRUCTION\n"
+	
+	file_text = construction_gap[0] + construction + construction_gap[construction_pointer]
+	file.store_string(file_text)
 
 func ensure_folder(path: String) -> void:
 	var abs_path := ProjectSettings.globalize_path(path)
