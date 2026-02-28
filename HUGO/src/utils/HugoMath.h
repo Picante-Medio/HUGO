@@ -1,9 +1,10 @@
 #pragma once
-#include <cmath>
 #include "Ogre.h"
 #include "../bullet3-src/src/btBulletDynamicsCommon.h"
 
 namespace HUGO {
+	struct Degree;
+    struct Radian;
 
 	struct Vector3
 	{
@@ -61,40 +62,67 @@ namespace HUGO {
 		btQuaternion toBullet() const;
 	};
 	
+	 struct Radian {
+        float rad;
 
-	// struct Degree {
-	// 	float deg;
+        Radian(float r = 0);
+        Radian(const Degree& d);
+        Radian(const HUGO::Radian& rhs);
+        
+        float valueDegrees() const;
+        float valueRadians() const;
 
-	// 	Degree(float d = 0);
-	// 	Degree(const Radian& r );
-	// 	Degree(const HUGO::Degree& rhs);
+        const Radian& operator + () const;
+        Radian operator+(const Radian& r) const;
+        Radian operator+(const Degree& d) const;
+        Radian operator-() const;
+        Radian operator-(const Radian& r) const;
+        Radian operator-(const Degree& d) const;
+        Radian operator*(float f) const;
+        Radian operator*(const Radian& r) const;
+        Radian operator/(float f) const;
+        
+        bool operator <  ( const Radian& d ) const;
+        bool operator <= ( const Radian& d ) const;
+        bool operator == ( const Radian& d ) const;
+        bool operator != ( const Radian& d ) const;
+        bool operator >= ( const Radian& d ) const;
+        bool operator >  ( const Radian& d ) const;
+    };
 
-	// 	Degree& operator = ( const float& f );
-    //     Degree& operator = ( const Degree& d );
-    //     Degree& operator = ( const Radian& r );
+	struct Degree {
+		float deg;
 
-    //     float valueDegrees() const;
-    //     float valueRadians() const;
+		Degree(float d = 0);
+		Degree(const Radian& r );
+		Degree(const HUGO::Degree& rhs);
 
-    //     const Degree& operator + () const;
-    //     Degree operator + ( const Degree& d ) const;
-    //     Degree operator + ( const Radian& r ) const;
-    //     Degree operator - () const;
-    //     Degree operator - ( const Degree& d ) const;
-    //     Degree operator - ( const Radian& r ) const;
-    //     Degree operator * ( float f ) const;
-    //     Degree operator * ( const Degree& f ) const;
-    //     Degree& operator *= ( float f );
-    //     Degree operator / ( float f ) const;
-    //     Degree& operator /= ( float f );
+		Degree& operator = ( const float& f );
+        Degree& operator = ( const Degree& d );
+        Degree& operator = ( const Radian& r );
 
-    //     bool operator <  ( const Degree& d ) const;
-    //     bool operator <= ( const Degree& d ) const;
-    //     bool operator == ( const Degree& d ) const;
-    //     bool operator != ( const Degree& d ) const;
-    //     bool operator >= ( const Degree& d ) const;
-    //     bool operator >  ( const Degree& d ) const;
-	// };
+        float valueDegrees() const;
+        float valueRadians() const;
+
+        const Degree& operator + () const;
+        Degree operator + ( const Degree& d ) const;
+        Degree operator + ( const Radian& r ) const;
+        Degree operator - () const;
+        Degree operator - ( const Degree& d ) const;
+        Degree operator - ( const Radian& r ) const;
+        Degree operator * ( float f ) const;
+        Degree operator * ( const Degree& f ) const;
+        Degree& operator *= ( float f );
+        Degree operator / ( float f ) const;
+        Degree& operator /= ( float f );
+
+        bool operator <  ( const Degree& d ) const;
+        bool operator <= ( const Degree& d ) const;
+        bool operator == ( const Degree& d ) const;
+        bool operator != ( const Degree& d ) const;
+        bool operator >= ( const Degree& d ) const;
+        bool operator >  ( const Degree& d ) const;
+	};
 
 
 }
