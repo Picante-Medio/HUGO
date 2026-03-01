@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Audio.h"
+#include "AudioTags.h"
+#include "HugoError.h"
 #include "HugoMath.h"
 #include "HugoTypes.h"
 #include "System.h"
@@ -71,9 +73,6 @@ private:
     // create a ma_sound ptr
     AudioInfo createVoice(HUGO::AudioID id);
 
-    // function to synchronize the audio when we want to play it for another time
-    void applyComponentState(AudioComponent& c, ma_sound* s);
-
     // acquire reusable voice (reuse/create/steal)
     ma_sound* getSound(HUGO::AudioID id);
 
@@ -91,9 +90,10 @@ private:
        and update them with the audios
        ============================================== */
 
-    void processChanges(AudioComponent& c);
-    void process3DChanges(Audio3DInfoComponet& c,
-                          const TransformComponent& t);
+    void processChanges(AudioComponent& c, const AudioDirtyTag& t);
+    void process3DChanges(const Audio3DInfoComponet& c,
+                          const TransformComponent& tr,
+                          const Audio3DDirtyTag& t);
 
     /* ================
        playback control

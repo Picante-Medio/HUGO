@@ -29,7 +29,6 @@ struct Audio3DInfoComponet: public Component
     float coneOuterAngle; // outer cone angle in degrees
     float coneOuterGain; // gain outside the cone
 
-    HUGO::Audio3DDirtyFlags dirtyFlags;
     // Default constructor
     Audio3DInfoComponet(EntityID entity, HUGO::AudioID id, float minDistance= 1.0f, float maxDistance = 100.0f, 
         const HUGO::Vector3& velocity = HUGO::Vector3(0.0f, 0.0f, 0.0f), 
@@ -38,7 +37,6 @@ struct Audio3DInfoComponet: public Component
         float coneInnerAngle = 360.0f, float coneOuterAngle = 360.0f, float coneOuterGain=0.0f): Component(entity), audioId(id),
           minDistance(minDistance), maxDistance(maxDistance), velocity(velocity), direction(direction), // default facing +Z
           dopplerFactor(dooplerFactor), rolloff(roolof),
-          coneInnerAngle(coneInnerAngle), coneOuterAngle(coneOuterAngle), coneOuterGain(coneOuterGain),
-          dirtyFlags(HUGO::Audio3DDirtyFlags::NONE_3D){}
+          coneInnerAngle(coneInnerAngle), coneOuterAngle(coneOuterAngle), coneOuterGain(coneOuterGain){}
 };
 

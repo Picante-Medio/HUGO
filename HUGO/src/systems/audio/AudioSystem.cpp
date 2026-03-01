@@ -2,6 +2,7 @@
 
 #include "AudioComponent.h"
 #include "Audio3DInfoComponet.h"
+
 #include "Scene.h"
 #include "TransformComponent.h"
 
@@ -135,10 +136,10 @@ ma_sound *AudioSystem::acquireVoice(AudioComponent &c)
     return c.activePtr;
 }
 
-void AudioSystem::processChanges(AudioComponent& c)
+void AudioSystem::processChanges(AudioComponent& c, const AudioDirtyTag& t)
 {
     // if nothing changed in this component, return
-    if (c.dirtyFlags == HUGO::NONE)
+    if (t.flags == HUGO::NONE)
         return;
 
     // get the pointer to the currently active voice (if it has)
@@ -146,7 +147,7 @@ void AudioSystem::processChanges(AudioComponent& c)
 
     // acquire a voice ONLY when playback is requested
     // this avoids creating EXTRA sounds for simple parameter updates
-    if (!s && (c.dirtyFlags & HUGO::START))
+    if (!s && (t.flags & HUGO::START))
     {
         s = getSound(c.audioId);
         c.activePtr = s;
@@ -156,68 +157,63 @@ void AudioSystem::processChanges(AudioComponent& c)
     // there is nothing we can apply changes to
     if (!s)
     {
-        c.dirtyFlags = HUGO::NONE;
         return;
     }
 
-    if (c.dirtyFlags & HUGO::LOOP)
+    if (t.flags  & HUGO::LOOP)
         setLooping(s, c.loop);
 
     
-    if (c.dirtyFlags & HUGO::VOLUME)
+    if (t.flags & HUGO::VOLUME)
         setVolume(c.audioId, c.volume);
 
-    if (c.dirtyFlags & HUGO::PITCH)
+    if (t.flags & HUGO::PITCH)
         setPitch(s, c.pitch);
 
-    if (c.dirtyFlags & HUGO::STARTTIME)
+    if (t.flags & HUGO::STARTTIME)
         setAudioPosition(s, c.startTime);
 
-    if (c.dirtyFlags & HUGO::START)
+    if (t.flags & HUGO::START)
         playAudio(s);
 
-    if (c.dirtyFlags & HUGO::STOP)
+    if (t.flags & HUGO::STOP)
     {
         // stop playback and release the active voice reference
         stopAudio(s);
     }
-
-    // clear flags
-    c.dirtyFlags = HUGO::NONE;
 }
 
-void AudioSystem::process3DChanges(Audio3DInfoComponet &c, const TransformComponent& t)
+void AudioSystem::process3DChanges(const Audio3DInfoComponet &c, const TransformComponent& tr, const Audio3DDirtyTag& t)
 {
-    if (c.dirtyFlags == HUGO::Audio3DDirtyFlags::NONE_3D) return;
+    if (t.flags == HUGO::Audio3DDirtyFlags::NONE_3D) return;
 
     HUGO::AudioID id = c.audioId;
     ma_sound* s = getSound(id);
 
-    if (c.dirtyFlags & HUGO::Audio3DDirtyFlags::MINDISTANCE)
+    if (t.flags & HUGO::Audio3DDirtyFlags::MINDISTANCE)
         set3DMinDistance(s, c.minDistance);
 
-    if (c.dirtyFlags & HUGO::Audio3DDirtyFlags::MAXDISTANCE)
+    if (t.flags & HUGO::Audio3DDirtyFlags::MAXDISTANCE)
         set3DMaxDistance(s, c.maxDistance);
 
-    if (c.dirtyFlags & HUGO::Audio3DDirtyFlags::VELOCITY)
+    if (t.flags & HUGO::Audio3DDirtyFlags::VELOCITY)
         setVelocity(s, c.velocity);
 
-    if (c.dirtyFlags & HUGO::Audio3DDirtyFlags::DIRECTION)
+    if (t.flags & HUGO::Audio3DDirtyFlags::DIRECTION)
         setDirection(s, c.direction);
 
-    if (c.dirtyFlags & HUGO::Audio3DDirtyFlags::DOPPLER)
+    if (t.flags & HUGO::Audio3DDirtyFlags::DOPPLER)
         setDopplerFactor(s, c.dopplerFactor);
 
-    if (c.dirtyFlags & HUGO::Audio3DDirtyFlags::ROLLOF)
+    if (t.flags & HUGO::Audio3DDirtyFlags::ROLLOF)
         set3DRollof(s, c.rolloff);
 
-    if (c.dirtyFlags & HUGO::Audio3DDirtyFlags::CONE)
+    if (t.flags & HUGO::Audio3DDirtyFlags::CONE)
         set3DCone(s, c.coneInnerAngle, c.coneOuterAngle, c.coneOuterGain);
 
-    if (c.dirtyFlags & HUGO::Audio3DDirtyFlags::MOVED){
-        set3DPosition(s, t.position);
+    if (t.flags & HUGO::Audio3DDirtyFlags::MOVED){
+        set3DPosition(s, tr.position);
     }
-    c.dirtyFlags = HUGO::Audio3DDirtyFlags::NONE_3D; // clean the flags after finishing
 }
 
 
@@ -359,7 +355,6 @@ void AudioSystem::endCallback(void* data, ma_sound* pSound)
     if (!c) return;
 
     c->isPlaying = false;
-    c->dirtyFlags = HUGO::STOP;
 
     if (c->onEnd){
         c->onEnd(c->audioId);  // call lambda expression
@@ -371,58 +366,61 @@ void AudioSystem::update(double dt)
 {
     elapsedTime += dt;
 
-    for (auto& pack : scene->query<Audio3DInfoComponet, TransformComponent>()) {
-        Audio3DInfoComponet& sc = pack.get<Audio3DInfoComponet&>();
-        TransformComponent& tr = pack.get<TransformComponent&>();
-        process3DChanges(sc, tr);
+    // 3D changes
+    for (auto& pack :
+         scene->query<Audio3DInfoComponet,
+                      TransformComponent,
+                      Audio3DDirtyTag>())
+    {
+        Audio3DInfoComponet& info = pack.get<Audio3DInfoComponet&>();
+        TransformComponent& tr   = pack.get<TransformComponent&>();
+        Audio3DDirtyTag& tag  = pack.get<Audio3DDirtyTag&>();
+
+        process3DChanges(info, tr, tag);
+
+        scene->removeComponent<Audio3DDirtyTag>(info.entity);
     }
 
-    int i =0;
-    for (auto& pack : scene->query<AudioComponent>()) {
-        AudioComponent& sc = pack.get<AudioComponent&>();
-        if (i>0){
-            processChanges(sc);
-            continue;
-        }
-        // state 1
-        if (!stopTriggered && elapsedTime >= x)
-        {
-            sc.isPlaying = false;
-            sc.dirtyFlags = HUGO::STOP;
+    // general changes
+    for (auto& pack :
+         scene->query<AudioComponent, AudioDirtyTag>())
+    {
+        AudioComponent& c   = pack.get<AudioComponent&>();
+        AudioDirtyTag& tag = pack.get<AudioDirtyTag&>();
 
-            stopTriggered = true;
-        }
+        processChanges(c, tag);
 
-        // state 2
-        if (!startTriggered && elapsedTime >= 2.0 * x)
-        {
-            sc.isPlaying = true;
-            sc.pitch = 0.75f;
-            sc.startTime = 10.0;
-
-            sc.dirtyFlags = static_cast<HUGO::AudioDirtyFlags>(HUGO::PITCH | HUGO::STARTTIME | HUGO::START);
-
-            startTriggered = true;
-        }
-
-        // apply changes
-        if (sc.dirtyFlags != HUGO::NONE)
-            processChanges(sc);
-        
-        ++i;
+        scene->removeComponent<AudioDirtyTag>(c.entity);
     }
 
-    //the correct version of the update loop 
-    // for (auto& pack : scene->query<Audio3DInfoComponet, TransformComponent>()) {
-    //     Audio3DInfoComponet& sc = pack.get<Audio3DInfoComponet&>();
-    //     TransformComponent& tr = pack.get<TransformComponent&>();
-    //     process3DChanges(sc, tr);
-    // }
+    // play events
+    for (auto& pack :
+         scene->query<AudioComponent, AudioPlayTag>())
+    {
+        AudioComponent& c = pack.get<AudioComponent&>();
 
-    // for (auto& pack : scene->query<AudioComponent>()) {
-    //     AudioComponent& sc = pack.get<AudioComponent&>();
-    //     processChanges(sc);
-    // }
+        ma_sound* s = acquireVoice(c);
+        playAudio(s);
+
+        c.isPlaying = true;
+
+        scene->removeComponent<AudioPlayTag>(c.entity);
+    }
+
+    // stop events
+    for (auto& pack :
+         scene->query<AudioComponent, AudioStopTag>())
+    {
+        AudioComponent& c = pack.get<AudioComponent&>();
+
+        if (c.activePtr)
+            stopAudio(c.activePtr);
+
+        c.isPlaying = false;
+        c.activePtr = nullptr;
+
+        scene->removeComponent<AudioStopTag>(c.entity);
+    }
 }
 
 void AudioSystem::fixedUpdate(double dt)
@@ -450,7 +448,9 @@ void AudioSystem::createTestEntity()
     EntityID ent = scene->createEntity();
     EntityID ent2 = scene->createEntity();
     scene->addComponent<AudioComponent>(ent, HUGO::MUSIC, nameToID["bgm"]);
+    scene->addComponent<AudioPlayTag>(ent);
     scene->addComponent<AudioComponent>(ent2, HUGO::MUSIC, nameToID["bgm"]);
+    scene->addComponent<AudioPlayTag>(ent2);
     int i = 0;
     for (auto& pack : scene->query<AudioComponent>()) {
         AudioComponent& sc = pack.get<AudioComponent&>();
@@ -460,19 +460,19 @@ void AudioSystem::createTestEntity()
             sc.pitch = 2.0f;
             sc.startTime = 30.0;
             sc.volume = 0.1f;
-            sc.dirtyFlags = static_cast<HUGO::AudioDirtyFlags>(
+            scene->addComponent<AudioDirtyTag>(ent, static_cast<HUGO::AudioDirtyFlags>(
                             HUGO::AudioDirtyFlags::LOOP |
                             HUGO::AudioDirtyFlags::PITCH |
                             HUGO::AudioDirtyFlags::STARTTIME |
                             HUGO::AudioDirtyFlags::START |
-                            HUGO::AudioDirtyFlags::VOLUME);   
+                            HUGO::AudioDirtyFlags::VOLUME));   
         }
         else if (i == 1){
             sc.isPlaying = true;
             sc.volume = 0.05f;
-            sc.dirtyFlags = static_cast<HUGO::AudioDirtyFlags>(
+            scene->addComponent<AudioDirtyTag>(ent, static_cast<HUGO::AudioDirtyFlags>(
                             HUGO::AudioDirtyFlags::START |
-                            HUGO::AudioDirtyFlags::VOLUME);
+                            HUGO::AudioDirtyFlags::VOLUME));
         }
         ++i;
     }
