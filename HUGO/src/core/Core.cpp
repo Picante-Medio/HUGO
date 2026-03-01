@@ -94,7 +94,8 @@ void Core::initOgre()
 #elif _WIN32
     size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.win.window);
 #endif
-    params["externalWindowHandle"] = Ogre::StringConverter::toString(windowHandle);
+    params["externalWindowHandle"] = std::to_string(windowHandle);
+    params["parentWindowHandle"] = std::to_string(windowHandle);
     m_renderWindow = m_ogreRoot->createRenderWindow("Ogre Test Window", 1000, 800, false, &params);
 }
 
