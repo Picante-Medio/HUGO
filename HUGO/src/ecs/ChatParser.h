@@ -29,13 +29,13 @@ namespace HUGO{
 	private:
 		
 		//Data that can be queried
-		std::unordered_map<HUGO::String, SceneData> m_scene_data;
-		std::unordered_map<HUGO::String, EntityData> m_prefab_data;
+		std::unordered_map<HUGO::String, SceneData> m_sceneData;
+		std::unordered_map<HUGO::String, EntityData> m_prefabData;
 
 		void readChat(const HUGO::String& chatPath);
 
-		//Massive switch-case for the parser (omg)
-		void handleType(const HUGO::String& type);
+		void handleSceneType();
+		void handlePrefabType();
 
 		HUGO::Vector3 readVector3();
 		HUGO::Int readInt();
