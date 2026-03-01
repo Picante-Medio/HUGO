@@ -83,46 +83,35 @@ void PhysicsSystem::fixedUpdate(double dt)
 
         if (rb.objectID == HUGO::INVALID_BULLET_OBJECT_ID) {
             //create a new RigidBodyObject
-            rb.objectID = createRigidBodyObject(rb, transform);
+            rb.objectID = createRigidBodyObject(rb, transform, bodyType::STATIC);
         }
         
     }
     
-    // Kinematic rigidBodies
-    for(auto& pack: scene->query<NewRBTag, KinematicRBTag, RigidBodyComponent, TransformComponent>()) {
-        RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
-        TransformComponent& transform = pack.get<TransformComponent&>();
-        
-        if (rb.objectID == HUGO::INVALID_BULLET_OBJECT_ID) {
-            //create a new RigidBodyObject
-            rb.objectID = createRigidBodyObject(rb, transform);
-        }
-
-        // Update BtRB from HugoRB
-        
-    }
-    
-    // Dynamic rigidBodies
-    for(auto& pack: scene->query<NewRBTag, RigidBodyComponent, TransformComponent>()) {
-        RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
-        TransformComponent& transform = pack.get<TransformComponent&>();
-        
-        if (rb.objectID == HUGO::INVALID_BULLET_OBJECT_ID) {
-            //create a new RigidBodyObject
-            rb.objectID = createRigidBodyObject(rb, transform);
-        }
-
-        // Update BtRB from HugoRB
-        
-    }
-
-    // update kinematic bodies in the Motion State
+    // Kinematic rigidBodies (creation and update)
     for(auto& pack: scene->query<KinematicRBTag, RigidBodyComponent, TransformComponent>()) {
         RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
         TransformComponent& transform = pack.get<TransformComponent&>();
         
+        if (rb.objectID == HUGO::INVALID_BULLET_OBJECT_ID) {
+            //create a new RigidBodyObject
+            rb.objectID = createRigidBodyObject(rb, transform, bodyType::KINEMATIC);
+        }
+        
         HUGOMotionState* motionState = static_cast<HUGOMotionState*>(getRigidBodyObject(rb.objectID).bulletRB->getMotionState());
         motionState->updateBulletTransform();
+    }
+    
+    // Dynamic rigidBodies
+    for(auto& pack: scene->query<RigidBodyComponent, TransformComponent>()) {
+        RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
+        TransformComponent& transform = pack.get<TransformComponent&>();
+        
+        if (rb.objectID == HUGO::INVALID_BULLET_OBJECT_ID) {
+            //create a new RigidBodyObject
+            rb.objectID = createRigidBodyObject(rb, transform, bodyType::DYNAMIC);
+        }
+        
     }
 }
 
@@ -207,9 +196,10 @@ void PhysicsSystem::destroyShapeObject(ShapeObject& shObj)
     }
 }
 
-HUGO::BulletObjectID PhysicsSystem::createRigidBodyObject(RigidBodyComponent& hgRb, const TransformComponent& tf)
+HUGO::BulletObjectID PhysicsSystem::createRigidBodyObject(RigidBodyComponent& hgRb, const TransformComponent& tf, bodyType type)
 {
 
+    // Create/reuse shape object
     btCollisionShape* shape = nullptr;
     if(hgRb.rbShape.id != HUGO::INVALID_BULLET_SHAPE_ID){
         shape = getShapeObject(hgRb.rbShape.id).bulletShape;
@@ -218,10 +208,25 @@ HUGO::BulletObjectID PhysicsSystem::createRigidBodyObject(RigidBodyComponent& hg
         shape = getShapeObject(createShapeObject(hgRb.rbShape)).bulletShape;
     }
 
+    // Create state
     HUGOMotionState* state = new HUGOMotionState(btTransform(), std::make_shared<TransformComponent>(tf));
     state->updateBulletTransform();
 
+    // Create bullet rb
     btRigidBody* rb = new btRigidBody(hgRb.mass, state, shape);
+
+    // Set flags for static, dynamic or kinematic
+    switch(type){
+        case bodyType::STATIC:
+            rb->setFlags(btCollisionObject::CF_STATIC_OBJECT);
+            break;
+        case bodyType::KINEMATIC:
+            rb->setFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
+            break;
+        case bodyType::DYNAMIC:
+        default:
+            break;
+    }
 
     HUGO::BulletObjectID id;
     //reuse id

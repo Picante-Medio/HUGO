@@ -44,6 +44,12 @@ public:
 
 class PhysicsSystem : public System {
 
+    enum bodyType{
+        DYNAMIC,
+        STATIC,
+        KINEMATIC
+    };
+
     std::shared_ptr<PhysicsSimulation> simulation;
 
     // Same logic as in RenderSystem. Credits to them, they did a really good job.
@@ -61,7 +67,7 @@ class PhysicsSystem : public System {
     void removeShapeObject(HUGO::BulletShapeID& id);
     void destroyShapeObject(ShapeObject& shObj);
 
-    HUGO::BulletObjectID createRigidBodyObject(RigidBodyComponent& hgRb, const TransformComponent& tf);
+    HUGO::BulletObjectID createRigidBodyObject(RigidBodyComponent& hgRb, const TransformComponent& tf, bodyType type);
     RigidBodyObject& getRigidBodyObject(const HUGO::BulletObjectID id);
     void removeRigidBodyObject(HUGO::BulletObjectID& id);
     void destroyRigidBodyObject(RigidBodyObject& RbObj);
