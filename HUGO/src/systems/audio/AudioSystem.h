@@ -67,9 +67,6 @@ private:
        PRIVATE FUNCTIONS
        =================*/
 
-    // Load assets
-    void loadFromFile(const char* path);
-
     // create a ma_sound ptr
     AudioInfo createVoice(HUGO::AudioID id);
 
@@ -154,7 +151,9 @@ public:
                 int queueSize = 10);
 
     virtual ~AudioSystem() = default;
-
+    
+    // Load assets
+    void loadAudiosFromFile(const char* path);
     void update(double dt) override;
     void fixedUpdate(double dt) override;
 

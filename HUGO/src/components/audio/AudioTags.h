@@ -30,3 +30,8 @@ struct AudioStopTag: public Component{
     AudioStopTag(EntityID entity)
             : Component(entity){}
 };
+
+struct AudioResumeTag: public Component{
+    AudioResumeTag(EntityID entity)
+            : Component(entity){}
+};

@@ -32,16 +32,16 @@ void Core::init(){
     scenePtr = std::make_shared<Scene>();
 
     std::shared_ptr<AudioSystem> audioSystem = std::make_shared<AudioSystem>(scenePtr, maEngine);
+    audioSystem->loadAudiosFromFile("test_media/AudioList.txt");
     scenePtr->addSystem(audioSystem);
-    //audioSystem->createTestEntity();
+    audioSystem->createTestEntity();
     
     std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr, m_ogreRoot, m_renderWindow);
     scenePtr->addSystem(renderSystem);
-
+    renderSystem->createTestEntity();
     //std::shared_ptr<PhysicsSystem> physicsSystem = std::make_shared<PhysicsSystem>(scenePtr);
     
     //m_resourceManager = std::make_shared<HUGO::ResourceManager>(maEngine, m_ogreRoot);
-    renderSystem->createTestEntity();
 }
 
 //Destruction of HUGO modules. End of HUGO
@@ -112,6 +112,7 @@ void HUGO::Core::locateResources()
 void HUGO::Core::loadResources()
 {
     Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+    
 }
 //HUGO main loop
 void Core::run(){

@@ -15,43 +15,7 @@
 AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, std::shared_ptr<ma_engine> maEngine, 
     const std::string& path, int queueSize)
     : System(scene), engine(maEngine), path(path), audios(), nameToID(), pools(), nextID(0), queueSize(queueSize)
-{
-    std::string completePath = path + "AudioList.txt";
-    loadFromFile(completePath.c_str());
-    
-}
-
-// HELPERS
-void AudioSystem::loadFromFile(const char* path)
-{
-    std::ifstream file(path);
-    if (!file.is_open())
-        throw std::runtime_error("Could not open audio file list");
-
-    std::string line;
-
-    while (std::getline(file, line))
-    {
-        if (line.empty() || line[0] == '#') continue;
-
-        std::stringstream ss(line);
-
-        std::string name, filename, typeStr;
-
-        std::getline(ss, name, ';'); // name of the audio
-        std::getline(ss, filename, ';'); // file root
-        std::getline(ss, typeStr, ';'); // type of audio
-
-        HUGO::AudioTypes type =
-            static_cast<HUGO::AudioTypes>(std::stoi(typeStr));
-
-        HUGO::AudioID id = nextID++;
-
-        audios.push_back({name, filename, type});
-        nameToID[name] = id;
-
-        pools.emplace_back(); // pool aligned with id
-    }
+{   
 }
 
 AudioInfo AudioSystem::createVoice(HUGO::AudioID id)
@@ -361,7 +325,40 @@ void AudioSystem::endCallback(void* data, ma_sound* pSound)
     }
 }
 
-// PUBLIC METHODS
+// HELPERS
+void AudioSystem::loadAudiosFromFile(const char* path)
+{
+    std::ifstream file(path);
+    if (!file.is_open())
+        throw std::runtime_error("Could not open audio file list");
+
+    std::string line;
+
+    while (std::getline(file, line))
+    {
+        if (line.empty() || line[0] == '#') continue;
+
+        std::stringstream ss(line);
+
+        std::string name, filename, typeStr;
+
+        std::getline(ss, name, ';'); // name of the audio
+        std::getline(ss, filename, ';'); // file root
+        std::getline(ss, typeStr, ';'); // type of audio
+
+        HUGO::AudioTypes type =
+            static_cast<HUGO::AudioTypes>(std::stoi(typeStr));
+
+        HUGO::AudioID id = nextID++;
+
+        audios.push_back({name, filename, type});
+        nameToID[name] = id;
+
+        pools.emplace_back(); // pool aligned with id
+    }
+}
+
+
 void AudioSystem::update(double dt)
 {
     elapsedTime += dt;
@@ -385,8 +382,8 @@ void AudioSystem::update(double dt)
     for (auto& pack :
          scene->query<AudioComponent, AudioDirtyTag>())
     {
-        AudioComponent& c   = pack.get<AudioComponent&>();
-        AudioDirtyTag& tag = pack.get<AudioDirtyTag&>();
+        auto& c   = pack.get<AudioComponent&>();
+        auto& tag = pack.get<AudioDirtyTag&>();
 
         processChanges(c, tag);
 
@@ -397,7 +394,7 @@ void AudioSystem::update(double dt)
     for (auto& pack :
          scene->query<AudioComponent, AudioPlayTag>())
     {
-        AudioComponent& c = pack.get<AudioComponent&>();
+        auto& c = pack.get<AudioComponent&>();
 
         ma_sound* s = acquireVoice(c);
         playAudio(s);
@@ -411,15 +408,57 @@ void AudioSystem::update(double dt)
     for (auto& pack :
          scene->query<AudioComponent, AudioStopTag>())
     {
-        AudioComponent& c = pack.get<AudioComponent&>();
+        auto& c = pack.get<AudioComponent&>();
 
         if (c.activePtr)
             stopAudio(c.activePtr);
 
         c.isPlaying = false;
-        c.activePtr = nullptr;
 
         scene->removeComponent<AudioStopTag>(c.entity);
+    }
+
+    // TEST STATE MACHINE
+    int i = 0;
+
+    for (auto& pack : scene->query<AudioComponent>())
+    {
+        auto& sc = pack.get<AudioComponent&>();
+        EntityID id = sc.entity;
+
+        if (i > 0)
+        {
+            ++i;
+            continue;
+        }
+
+        // -------- STATE 1 : STOP --------
+        if (!stopTriggered && elapsedTime >= x)
+        {
+            sc.isPlaying = false;
+            scene->addComponent<AudioStopTag>(id);
+
+            stopTriggered = true;
+        }
+
+        // -------- STATE 2 : RESTART --------
+        if (!startTriggered && elapsedTime >= 2.0 * x)
+        {
+            sc.isPlaying = true;
+            sc.pitch = 0.75f;
+            sc.startTime = 10.0;
+
+            scene->addComponent<AudioDirtyTag>(
+                id,
+                static_cast<HUGO::AudioDirtyFlags>(
+                    HUGO::PITCH | HUGO::STARTTIME));
+
+            scene->addComponent<AudioPlayTag>(id);
+
+            startTriggered = true;
+        }
+
+        ++i;
     }
 }
 
@@ -465,14 +504,16 @@ void AudioSystem::createTestEntity()
                             HUGO::AudioDirtyFlags::PITCH |
                             HUGO::AudioDirtyFlags::STARTTIME |
                             HUGO::AudioDirtyFlags::START |
-                            HUGO::AudioDirtyFlags::VOLUME));   
+                            HUGO::AudioDirtyFlags::VOLUME));
+            scene->addComponent<AudioPlayTag>(ent);
         }
         else if (i == 1){
             sc.isPlaying = true;
             sc.volume = 0.05f;
-            scene->addComponent<AudioDirtyTag>(ent, static_cast<HUGO::AudioDirtyFlags>(
+            scene->addComponent<AudioDirtyTag>(ent2, static_cast<HUGO::AudioDirtyFlags>(
                             HUGO::AudioDirtyFlags::START |
                             HUGO::AudioDirtyFlags::VOLUME));
+            scene->addComponent<AudioPlayTag>(ent2);
         }
         ++i;
     }
