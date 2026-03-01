@@ -9,6 +9,7 @@
 namespace HUGO {
   class Input {
     std::unordered_map<SDL_Keycode, bool> keyPressed;
+    std::unordered_map<SDL_Keycode, bool> previousKeyPressed;
     std::unordered_map<std::string, std::vector<SDL_Keycode>> keysOfAction;
 
   public:

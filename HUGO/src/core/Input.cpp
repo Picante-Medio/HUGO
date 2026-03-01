@@ -2,7 +2,7 @@
 #include <SDL_events.h>
 
 namespace HUGO {
-Input::Input() : keysOfAction(), keyPressed() {}
+Input::Input() : keysOfAction(), keyPressed(), previousKeyPressed() {}
 
 Input &Input::Instance() {
   static Input instance;
@@ -11,6 +11,7 @@ Input &Input::Instance() {
 
 void Input::handleInput() {
   SDL_Event event;
+  previousKeyPressed = keyPressed;
 
   while (SDL_PollEvent(&event)) {
 
@@ -67,16 +68,28 @@ Input::isActionPressed(std::string action) {
 
 bool
 Input::wasKeyJustPressed(SDL_Keycode key) {
-
+  return previousKeyPressed[key];
 }
 
 bool 
-Input::wasActionJustPressed(std::string action) {}
+Input::wasActionJustPressed(std::string action) {
+  for(SDL_Keycode key : keysOfAction[action])
+    if(previousKeyPressed[key]) return true;
+
+  return false;
+}
 
 bool 
-Input::wasKeyJustReleased(SDL_Keycode key) {}
+Input::wasKeyJustReleased(SDL_Keycode key) {
+  return previousKeyPressed[key] && !keyPressed[key];
+}
 
 bool 
-Input::wasActionJustReleased(std::string action) {}
+Input::wasActionJustReleased(std::string action) {
+  for(SDL_Keycode key : keysOfAction[action])
+    if(wasKeyJustReleased(key)) return true;
+
+  return false;
+}
 
 } // namespace HUGO
