@@ -11,7 +11,7 @@ class Input {
   std::unordered_map<SDL_Keycode, bool> keyPressed;
   std::unordered_map<SDL_Keycode, bool> previousKeyPressed;
   std::unordered_map<std::string, std::vector<SDL_Keycode>> keysOfAction;
-
+  bool quit;
 public:
   Input();
 
@@ -32,6 +32,7 @@ public:
   // Accessors for input state
   bool isKeyPressed(SDL_Keycode key);
   bool isActionPressed(std::string action);
+  bool isQuitPressed();
 
   bool wasKeyJustPressed(SDL_Keycode key);
   bool wasActionJustPressed(std::string action);

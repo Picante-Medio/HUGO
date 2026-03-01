@@ -75,20 +75,36 @@ void Core::initOgre()
 
     m_ogreRoot->getRenderSystem()->setConfigOption("Full Screen", "No");
 
-    m_ogreRoot->initialise();
+    m_ogreRoot->initialise(false);
     locateResources();
     loadResources();
 
+    #ifdef __linux__
+        SDL_setenv("SDL_VIDEODRIVER", "x11", 1);
+    #endif
+
+    if (SDL_Init(SDL_INIT_EVENTS) != 0) {
+        throw std::runtime_error("SDL_Init failed");
+    }
+    
+    sdlWindow = SDL_CreateWindow("Ogre Test Window",SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                                    1000, 800, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE);
+    SDL_SysWMinfo wmInfo;
+    SDL_VERSION(&wmInfo.version);
+    if (!SDL_GetWindowWMInfo(sdlWindow, &wmInfo)) {
+        throw std::runtime_error("SDL_GetWindowWMInfo failed");
+    }
+    SDL_Log("Video driver: %s", SDL_GetCurrentVideoDriver());
+
     Ogre::NameValuePairList params;
-    params["SDL2Window"] = "true";
+    #ifdef __linux__
+    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.x11.window);
+    #elif _WIN32
+    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.win.window);
+    #endif
+    
+    params["externalWindowHandle"] = Ogre::StringConverter::toString(windowHandle);
     m_renderWindow = m_ogreRoot->createRenderWindow("Ogre Test Window", 1000, 800, false, &params);
-
-    unsigned long windowHandle = 0;
-    m_renderWindow->getCustomAttribute("WINDOW", &windowHandle);
-    SDL_Log("EGL window handle: %lu", windowHandle);
-
-    SDL_Init(SDL_INIT_EVENTS);
-    SDL_CreateWindowFrom((void*)windowHandle);
 }
 
 void HUGO::Core::locateResources()
@@ -121,14 +137,20 @@ void Core::run(){
 	while (!exit) {
         vt.update();
 		double startTime = vt.getDeltaTime();
+        SDL_Event event;
         Input::Instance().handleInput();
+        if(Input::Instance().isQuitPressed()) {
+            exit = true;
+        }
         scenePtr->fixedUpdate(startTime);
         scenePtr->stepPhysics(startTime);
         scenePtr->update(startTime);
 
         m_ogreRoot->renderOneFrame();
-		double frameTime = vt.getDeltaTime() - startTime;
-		if (frameTime < 10) SDL_Delay(10- frameTime);
+        double frameTime = vt.getDeltaTime() - startTime;
+        if (frameTime < 0.016) {
+            SDL_Delay(static_cast<Uint32>((0.016 - frameTime) * 1000.0));
+        }
 	}
 }
 

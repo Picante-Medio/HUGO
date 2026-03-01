@@ -2,7 +2,7 @@
 #include <SDL_events.h>
 
 namespace HUGO {
-Input::Input() : keysOfAction(), keyPressed(), previousKeyPressed() {}
+Input::Input() : keysOfAction(), keyPressed(), previousKeyPressed(), quit(false) {}
 
 Input &Input::Instance() {
   static Input instance;
@@ -17,16 +17,18 @@ void Input::handleInput() {
 
   while (SDL_PollEvent(&event)) {
     switch (event.type) {
-    case SDL_KEYDOWN:
-      keyPressed[event.key.keysym.sym] = true;
-      break;
+      case SDL_QUIT:
+        quit = true;
+        break;
+      case SDL_KEYDOWN:
+        keyPressed[event.key.keysym.sym] = true;
+        break;
+      case SDL_KEYUP:
+        keyPressed[event.key.keysym.sym] = false;
+        break;
 
-    case SDL_KEYUP:
-      keyPressed[event.key.keysym.sym] = false;
-      break;
-
-    default:
-      break;
+      default:
+        break;
     }
   }
 }
@@ -62,6 +64,11 @@ bool Input::isActionPressed(std::string action) {
       return true;
 
   return false;
+}
+
+bool HUGO::Input::isQuitPressed()
+{
+    return quit;
 }
 
 bool Input::wasKeyJustPressed(SDL_Keycode key) {
