@@ -28,13 +28,20 @@ struct ViewportResources {
     EntityID lastCameraEntity = 0;
 };
 
+struct LightResources {
+    Ogre::Light* ogreLight = nullptr;
+    EntityID lastCameraEntity = 0;
+    Ogre::SceneNode* node = nullptr;
+};
+
 class RenderSystem : public System{
     std::shared_ptr<Ogre::Root> ogreRoot;
     Ogre::SceneManager* sceneManager = nullptr;
     Ogre::RenderWindow* renderWindow = nullptr; 
 
     std::unordered_map<EntityID, CameraResources> cameraMap; // Provisional
-    std::unordered_map<EntityID, ViewportResources> viewportMap;
+    std::unordered_map<EntityID, ViewportResources> viewportMap; // Provisional
+    std::unordered_map<EntityID, LightResources> lightMap; // Provisional
 
     std::vector<HUGO::OgreObjectID> freeOgreObjectId;
     std::vector<std::size_t> idToIndex;
@@ -48,6 +55,7 @@ class RenderSystem : public System{
     void updateViewportDimensions();
 
     void createOgreCamera(EntityID entity);
+    void createOgreLight(EntityID entity);
     void createOgreViewport(EntityID entity);
     // void destroyOgreCamera(EntityID entity);
     // void destroyOgreViewport(EntityID entity);
@@ -74,13 +82,20 @@ public:
     // Creation of viewport and camera (helpers)
     EntityID createCameraEntity(const HUGO::Vector3& position = HUGO::Vector3(0, 0, 0));
     EntityID createViewportEntity();
+    EntityID createLightEntity(const HUGO::Vector3& position = HUGO::Vector3(0, 0, 0)
+                   , HUGO::Vector4 diff = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f), HUGO::Vector4 specular= HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f)
+                   , HUGO::LightType lType = HUGO::LightType::LT_POINT
+                   , const HUGO::Radian& outer = HUGO::Radian(0.0f), const HUGO::Radian& inner = HUGO::Radian(0.0f)
+                   , float falloff = 1.0f, float nearClip = 1.0f, float shadowNearClipDist = 1.0f, float shadowFarClipDist = 100.0f);
 
     // Register and unregister for cameras and viewports created outside the RenderSystem
     void registerCameraEntity(EntityID entity);
     void registerViewportEntity(EntityID entity);
+    void registerLightEntity(EntityID entity);
     
     void unregisterCameraEntity(EntityID entity);
     void unregisterViewportEntity(EntityID entity);
+    void unregisterLightEntity(EntityID entity);
 
     // Window configuration
     void setfullScreen();

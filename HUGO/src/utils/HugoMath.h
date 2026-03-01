@@ -88,6 +88,8 @@ namespace HUGO {
         bool operator != ( const Radian& d ) const;
         bool operator >= ( const Radian& d ) const;
         bool operator >  ( const Radian& d ) const;
+
+		Ogre::Radian toOgre() const;
     };
 
 	struct Degree {
@@ -122,6 +124,8 @@ namespace HUGO {
         bool operator != ( const Degree& d ) const;
         bool operator >= ( const Degree& d ) const;
         bool operator >  ( const Degree& d ) const;
+
+		Ogre::Degree toOgre() const;
 	};
 
 	//I dont know if this is necessary, but just in case

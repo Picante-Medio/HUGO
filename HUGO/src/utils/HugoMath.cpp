@@ -120,8 +120,10 @@ namespace HUGO {
 		}
 	}
 	
-	Quaternion::Quaternion() : w(0), x(0), y(0), z(0) {}
-	Quaternion::Quaternion(float w, float x, float y, float z) : w(w), x(x), y(y), z(z) {}
+	Quaternion::Quaternion() 
+		: w(0), x(0), y(0), z(0) {}
+	Quaternion::Quaternion(float w, float x, float y, float z) 
+		: w(w), x(x), y(y), z(z) {}
 
 	Ogre::Quaternion Quaternion::toOgre() const {
 		return Ogre::Quaternion(w, x, y, z);
@@ -210,8 +212,12 @@ namespace HUGO {
         return rad > r.rad;
     }
 
+    Ogre::Radian Radian::toOgre() const
+    {
+        return Ogre::Radian(rad);
+    }
 
-	// --------------------- DEGREES ---------------------
+    // --------------------- DEGREES ---------------------
 	Degree::Degree(float d) : deg(d){
 		deg = d;
 	}
@@ -316,4 +322,8 @@ namespace HUGO {
 	bool Degree::operator >  ( const Degree& d ) const { 
 		return deg >  d.deg; 
 	}
+    Ogre::Degree Degree::toOgre() const
+    {
+        return Ogre::Degree(deg);
+    }
 }
