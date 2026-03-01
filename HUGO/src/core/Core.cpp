@@ -61,7 +61,6 @@ void HUGO::Core::initModules()
 void Core::initOgre()
 {
     m_ogreRoot = std::make_shared<Ogre::Root>("plugins.cfg", "ogre.cfg");
-
     if (!m_ogreRoot->restoreConfig()) {
         Ogre::LogManager::getSingleton().logMessage("Initialize::configure_ogre => " +
         std::string("ERROR: unable to configure Ogre"));
@@ -75,38 +74,28 @@ void Core::initOgre()
     }
 
     m_ogreRoot->getRenderSystem()->setConfigOption("Full Screen", "No");
-
     locateResources();
+    m_ogreRoot->initialise(false); //To ensure ogre knows sdl is the window owner
 
-    m_ogreRoot->initialise(false);
 #ifdef __linux__
     SDL_setenv("SDL_VIDEODRIVER", "x11", 1);
 #endif
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
     SDL_Window* sdlWindow = SDL_CreateWindow("Ogre", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 800, SDL_WINDOW_OPENGL);
-
     SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version);
     SDL_GetWindowWMInfo(sdlWindow, &wmInfo);
     SDL_Log("Video driver: %s", SDL_GetCurrentVideoDriver());
-
     loadResources();
-    // creation of the render window, with the size 1000x800 and not full screen
-
+    
     Ogre::NameValuePairList params;
 #ifdef __linux__
-   size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.x11.window);
+    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.x11.window);
 #elif _WIN32
- size_t windowHandle = reinterpret_cast<size_t>(wminfo.info.win.window);
+    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.win.window);
 #endif
-   params["externalWindowHandle"] = Ogre::StringConverter::toString(windowHandle);
-    m_renderWindow = m_ogreRoot->createRenderWindow(
-        "Ogre Test Window",
-        1000, // width
-        800,  // height
-        false,
-        &params
-    );
+    params["externalWindowHandle"] = Ogre::StringConverter::toString(windowHandle);
+    m_renderWindow = m_ogreRoot->createRenderWindow("Ogre Test Window", 1000, 800, false, &params);
 }
 
 void HUGO::Core::locateResources()
