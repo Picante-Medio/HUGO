@@ -20,6 +20,13 @@ namespace HUGO {
     //Input handling, needs to be called every update tick
     void handleInput();
 
+    void registerAction(std::string actionName, std::vector<SDL_Keycode> keys);
+    void registerAction(std::string actionName, SDL_Keycode key);
+    void addKeyToAction(std::string actionName, SDL_Keycode key);
+
+    //!!Linear in the number of actions
+    void removeKeyFromAction(std::string actionName, SDL_Keycode key);
+
     bool isKeyPressed(SDL_Keycode key);
     bool isActionPressed(std::string action);
 
