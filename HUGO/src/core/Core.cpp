@@ -5,6 +5,7 @@
 #include "PhysicsSystem.h"
 #include "Scene.h"
 #include <OgreConfigFile.h>
+#include <OgreResourceGroupManager.h>
 #include <SDL2/SDL.h>
 #include <iostream>
 //#include "ResourceManager.h"
@@ -84,7 +85,7 @@ void Core::initOgre()
 }
 void HUGO::Core::locateResources()
 {
-    auto& rgm = Ogre::ResourceGroupManager::getSingleton();
+  Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
     Ogre::ConfigFile cf;
     cf.load("resources.cfg");
 

@@ -1,3 +1,5 @@
+#include <OgreCommon.h>
+#include <OgreConfigOptionMap.h>
 #include <iostream>
 
 #include "RenderSystem.h"
@@ -45,7 +47,7 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
     nodeDir->attachObject(light);
     
 
-    const auto& options = ogreRoot->getRenderSystem()->getConfigOptions();
+    const Ogre::ConfigOptionMap& options = ogreRoot->getRenderSystem()->getConfigOptions();
 
     auto it = options.find("Video Mode");
 
@@ -514,7 +516,7 @@ void RenderSystem::setfullScreen()
 void RenderSystem::setWindowed(bool fullScreen)
 {
     if (!renderWindow) return;
-    auto desc = ogreRoot->getRenderSystem()->getRenderWindowDescription();
+    Ogre::RenderWindowDescription desc = ogreRoot->getRenderSystem()->getRenderWindowDescription();
     renderWindow->setFullscreen(fullScreen, desc.width, desc.height);
 
     // Update all viewports
