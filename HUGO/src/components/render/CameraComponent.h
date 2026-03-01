@@ -32,9 +32,6 @@ struct CameraComponent: public Component
                    float fov = 60.0f, float nearP = 0.1f, float farP = 1000.0f,
                    int prio = 0, bool isActive = true)
         : Component(entity)
-        , fovY(fov)
-        , nearClip(nearP)
-        , farClip(farP)
-        , priority(prio)
-        , active(isActive) {}
+        , fovY(fov), nearClip(nearP), farClip(farP)
+        , priority(prio), active(isActive) {}
 };

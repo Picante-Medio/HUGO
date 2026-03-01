@@ -25,10 +25,7 @@ struct ViewportComponent: public Component
     bool active = true;
     
     ViewportComponent(EntityID entity,
-                    float l = 0.0f, float t = 0.0f,
-                    float w = 1.0f, float h = 1.0f,
-                    int z = 0)
+                    float l = 0.0f, float t = 0.0f, float w = 1.0f, float h = 1.0f, int z = 0)
       : Component(entity)
-      , left(l), top(t), width(w), height(h)
-      , zOrder(z) {}
+      , left(l), top(t), width(w), height(h), zOrder(z) {}
 };

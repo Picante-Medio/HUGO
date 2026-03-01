@@ -21,7 +21,6 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
         throw std::runtime_error("[RenderSystem] SceneManager creation failed: " + std::string(e.getDescription()));
     }
     
-    //para ver los ejes
     //sceneManager->setDisplaySceneNodes(true);
 
     // Basic light
@@ -487,6 +486,7 @@ void RenderSystem::createOgreViewport(EntityID entity)
 }
 #pragma endregion
 
+#pragma region  Screen Changes
 void RenderSystem::updateViewportDimensions()
 {
     for (auto& [entity, res] : viewportMap) {
@@ -510,33 +510,6 @@ void RenderSystem::setfullScreen()
     auto [w, h] = resolutions[resolutions.size() - 1];
     renderWindow->setFullscreen(true, w, h);
     
-
-    // Cosa rara para poner fullscreen en Windows
-    // SDL_DisplayMode dm;
-    // SDL_GetDesktopDisplayMode(0, &dm);
-    
-    // renderWindow->reposition(0, 0);
-    // renderWindow->resize(dm.w, dm.h);
-    
-    // #ifdef _WIN32
-    //     HWND hwnd = nullptr;
-    //     renderWindow->getCustomAttribute("WINDOW", &hwnd);
-    //     if (hwnd) {
-    //         SetWindowLongPtr(hwnd, GWL_STYLE, WS_POPUP | WS_VISIBLE);
-    //         SetWindowPos(hwnd, HWND_TOP, 0, 0, dm.w, dm.h, SWP_FRAMECHANGED);
-    //     }
-    // #endif
-    
-    // renderWindow->windowMovedOrResized();
-    
-    // if (viewport) {
-    //     viewport->_updateDimensions();
-    //     Ogre::Camera* cam = viewport->getCamera();
-    //     if (cam) {
-    //         cam->setAspectRatio(float(dm.w) / float(dm.h));
-    //     }
-    // }
-
     // Update all viewports
     updateViewportDimensions();
 
@@ -560,6 +533,7 @@ void RenderSystem::resizeScreen(unsigned int widthPt, unsigned int heightPt)
     // Update all viewports
     updateViewportDimensions();
 }
+#pragma endregion
 
 void RenderSystem::setAmbientLight(float r, float g, float b)
 {
@@ -579,16 +553,16 @@ void RenderSystem::setMainCamera(EntityID cameraEntity)
     }
 }
 
-EntityID RenderSystem::getMainCamera() const
-{
-    return mainCameraEntity;
-}
-
 void RenderSystem::setMainViewport(EntityID viewportEntity)
 {
     if (viewportMap.find(viewportEntity) != viewportMap.end()) {
         mainViewportEntity = viewportEntity;
     }
+}
+
+EntityID RenderSystem::getMainCamera() const
+{
+    return mainCameraEntity;
 }
 
 EntityID RenderSystem::getMainViewport() const
