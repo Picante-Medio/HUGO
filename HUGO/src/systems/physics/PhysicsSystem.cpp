@@ -114,7 +114,9 @@ void PhysicsSystem::fixedUpdate(double dt)
         
     }
 }
+#pragma endregion
 
+#pragma region ShapeObject
 HUGO::BulletShapeID PhysicsSystem::createShapeObject(Shape& shape)
 {
 
@@ -195,7 +197,9 @@ void PhysicsSystem::destroyShapeObject(ShapeObject& shObj)
         shObj.bulletShape = nullptr;
     }
 }
+#pragma endregion
 
+#pragma region BulletObject
 HUGO::BulletObjectID PhysicsSystem::createRigidBodyObject(RigidBodyComponent& hgRb, const TransformComponent& tf, bodyType type)
 {
 

@@ -40,6 +40,39 @@ private:
 
 struct RigidBodyComponent: public Component
 {
+    friend class PhysicsSystem;
+    
+    RigidBodyComponent(EntityID entity, Shape shape);
+
+    // Setters
+    void setRestitution(float nRestitution);
+    void setFriction(float nFriction);
+    void setMass(float nMass);
+    void setDamping(float nDamping);
+
+    void applyImpulse(HUGO::Vector3 nImpulse); // Modifies linear velocity
+    void applyTorqueImpulse(HUGO::Vector3 nImpulse); // Modifies angular velocity
+    void applyForce(HUGO::Vector3 nForce); // Modifies linear acceleration
+    void applyTorque(HUGO::Vector3 nTorque); // Modifies angular acceleration
+
+    void setPositionOffset(HUGO::Vector3 offset);
+    void setRotationOffset(HUGO::Quaternion offset);
+
+    // Getters
+    float getRestitution();
+    float getFriction();
+    float getMass();
+    float getDamping();
+
+    HUGO::Vector3 getLinearVelocity();
+    HUGO::Vector3 getAngularVelocity();
+    HUGO::Vector3 getLinearAcceleration();
+    HUGO::Vector3 getAngularAcceleration();
+
+    HUGO::Vector3 getPositionOffset();
+    HUGO::Quaternion getRotationOffset();
+
+private:
     float restitution;
     float friction;
     float mass;
@@ -49,22 +82,8 @@ struct RigidBodyComponent: public Component
 
     HUGO::Vector3 linearVelocity;
     HUGO::Vector3 angularVelocity;
-
-    // Forces can be applied throught rigidbody or external components to query which rigidbodies have force to be applied.
-    // For this we need to query every rigidbody and a way to filter if the entity attached has or not the force component.
-    // Since there's no way to do so at the moment, we choose the first option 
-
-    HUGO::Vector3 forceToApplyThisFrame;
-    HUGO::Vector3 torqueToApplyThisFrame;
-
-    HUGO::Vector3 impulseToApplyThisFrame;
-    HUGO::Vector3 impulseTorqueToApplyThisFrame;
-
-    RigidBodyComponent(EntityID entity, Shape shape) 
-        : Component(entity), rbShape(shape){};
-    
-    friend class PhysicsSystem;
-private:
+    HUGO::Vector3 linearAcceleration;
+    HUGO::Vector3 angularAcceleration;
 
     // Once created shape shouldn't be modified
     Shape rbShape;
