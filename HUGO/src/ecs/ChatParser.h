@@ -40,6 +40,7 @@ namespace HUGO{
 		HUGO::Vector3 readVector3();
 		HUGO::Int readInt();
 		HUGO::Float readFloat();
+		HUGO::String readString();
 	public:
 
 		//Initialize empty database. Function readChatFolder must be called to fill the database.

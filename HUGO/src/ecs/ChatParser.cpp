@@ -76,18 +76,27 @@ void ChatParser::handleSceneType(){
             Vector3 vec3 = readVector3();
 
             //Might be terrorism
+            //Adds it to the parameters of the last component added to the last entity of the scene
             m_sceneData[sceneName].entities.back().back().parameters.push_back(vec3);
         }
 
         if(input == "FLOAT"){
+            HUGO::Float f = readFloat();
 
+            m_sceneData[sceneName].entities.back().back().parameters.push_back(f);
         }
 
         if(input == "INT"){
+            HUGO::Int i = readInt();
 
+            m_sceneData[sceneName].entities.back().back().parameters.push_back(i);
         }
 
-        
+        if(input == "STRING"){
+            HUGO::String s = readString();
+            
+            m_sceneData[sceneName].entities.back().back().parameters.push_back(s);
+        }
 
         std::cin >> input;
     }
@@ -97,9 +106,41 @@ void ChatParser::handlePrefabType(){
     HUGO::String prefabName;
     std::cin >> prefabName;
 
+    m_prefabData[prefabName] = EntityData();
 
+    HUGO::String input;
+    std::cin >> input;
     while(std::cin){
+        if(input == "COMPONENT"){
+            ComponentData compData;
+            std::cin >> compData.componentName;
 
+            m_prefabData[prefabName].push_back(compData);
+        }
+
+        if(input == "VECTOR_3"){
+            Vector3 vec3 = readVector3();
+
+            m_prefabData[prefabName].back().parameters.push_back(vec3);
+        }
+
+        if(input == "FLOAT"){
+            HUGO::Float f = readFloat();
+
+            m_prefabData[prefabName].back().parameters.push_back(f);
+        }
+
+        if(input == "INT"){
+            HUGO::Int i = readInt();
+
+            m_prefabData[prefabName].back().parameters.push_back(i);
+        }
+
+        if(input == "STRING"){
+            HUGO::String s = readString();
+            
+            m_prefabData[prefabName].back().parameters.push_back(s);
+        }
     }
 }
 
@@ -124,6 +165,8 @@ SceneData ChatParser::getSceneData(const HUGO::String & sceneName){
     return res->second;
 }
 
+//------Read type methods---------
+
 HUGO::Vector3 ChatParser::readVector3(){
     Vector3 res;
     std::cin >> res.x >> res.y >> res.z;
@@ -141,6 +184,20 @@ HUGO::Int ChatParser::readInt(){
 HUGO::Float ChatParser::readFloat(){
     HUGO::Float res;
     std::cin >> res;
+
+    return res;
+}
+
+HUGO::String ChatParser::readString(){
+    HUGO::String res;
+
+    /*
+    ...
+    valueName STRING
+        Hola, que tal estas
+    ...
+    */
+    getline(std::cin, res);
 
     return res;
 }
