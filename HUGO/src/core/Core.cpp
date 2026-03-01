@@ -29,7 +29,7 @@ void Core::init(){
     std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr, m_ogreRoot, m_renderWindow);
     scenePtr->addSystem(renderSystem);
 
-    std::shared_ptr<PhysicsSystem> physicsSystem = std::make_shared<PhysicsSystem>(scenePtr);
+    //std::shared_ptr<PhysicsSystem> physicsSystem = std::make_shared<PhysicsSystem>(scenePtr);
     
     //m_resourceManager = std::make_shared<HUGO::ResourceManager>(maEngine, m_ogreRoot);
 

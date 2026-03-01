@@ -6,7 +6,7 @@
 #include "HugoTypes.h"
 #include "HugoMath.h"
 
-struct BoxShapeInfo {
+struct BoxColliderInfo {
     HUGO::Vector3 halfExtents;
 };
 
@@ -29,8 +29,10 @@ struct ConeColliderInfo {
 };
 
 struct Shape{
+
+    friend class PhysicsSystem;
     // Shape's geometry is determined by the variant. Which struct is held can be checked with std::holds_alternative
-    std::variant<BoxShapeInfo, SphereColliderInfo, CapsuleColliderInfo, CylinderColliderInfo, ConeColliderInfo> info;
+    std::variant<BoxColliderInfo, SphereColliderInfo, CapsuleColliderInfo, CylinderColliderInfo, ConeColliderInfo> info;
 
 private:
     HUGO::BulletShapeID id;
@@ -59,9 +61,12 @@ struct RigidBodyComponent: public Component
     HUGO::Vector3 impulseTorqueToApplyThisFrame;
 
     RigidBodyComponent(EntityID entity, Shape shape) 
-        : Component(entity){};
+        : Component(entity), rbShape(shape){};
     
     friend class PhysicsSystem;
 private:
+
+    // Once created shape shouldn't be modified
+    Shape rbShape;
     HUGO::BulletObjectID objectID = HUGO::INVALID_BULLET_OBJECT_ID;
 };

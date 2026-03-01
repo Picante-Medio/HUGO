@@ -2,10 +2,11 @@
 
 #include "PhysicsSystem.h"
 #include "HugoMath.h"
-#include "RigidBodyComponent.h"
 #include "TransformComponent.h"
 #include "PhysicsTags.h"
 #include "Scene.h"
+#include "RigidBodyComponent.h"
+#include "PhysicsSimulation.h"
 
 #pragma region HUGOMotionState
 // ----------------------HUGOMotionState----------------------
@@ -23,13 +24,14 @@ void HUGOMotionState::setHugoTransform(std::shared_ptr<TransformComponent> trans
     hugoTransform = transform;
 }
     
-void HUGOMotionState::updateBulletTransform(const TransformComponent& newPos)
+void HUGOMotionState::updateBulletTransform()
 {
+    // Uses associated HUGO::TransformComponent to update itself
     btTransform auxTransform = btTransform(
-                               newPos.rotation.toBullet(), 
-                               newPos.position.toBullet());
+                               hugoTransform->rotation.toBullet(), 
+                               hugoTransform->position.toBullet());
 
-    btTransformRegister = auxTransform;
+    btTransformRegister = auxTransform * centerOfMassOffset;
 }
 
 void HUGOMotionState::getWorldTransform(btTransform& worldTrans) const
@@ -54,8 +56,9 @@ void HUGOMotionState::setWorldTransform(const btTransform& worldTrans)
 #pragma region PhysicsSystem
 // ----------------------PhysicsSystem----------------------
 
-PhysicsSystem::PhysicsSystem(std::shared_ptr<Scene> scene)
+PhysicsSystem::PhysicsSystem(std::shared_ptr<Scene> scene, std::shared_ptr<PhysicsSimulation> sim)
 : System(scene)
+, simulation(sim)
 {
 
 }
@@ -80,7 +83,7 @@ void PhysicsSystem::fixedUpdate(double dt)
 
         if (rb.objectID == HUGO::INVALID_BULLET_OBJECT_ID) {
             //create a new RigidBodyObject
-            rb.objectID = createRigidBodyObject(rb);
+            rb.objectID = createRigidBodyObject(rb, transform);
         }
         
     }
@@ -92,7 +95,7 @@ void PhysicsSystem::fixedUpdate(double dt)
         
         if (rb.objectID == HUGO::INVALID_BULLET_OBJECT_ID) {
             //create a new RigidBodyObject
-            rb.objectID = createRigidBodyObject(rb);
+            rb.objectID = createRigidBodyObject(rb, transform);
         }
 
         // Update BtRB from HugoRB
@@ -106,7 +109,7 @@ void PhysicsSystem::fixedUpdate(double dt)
         
         if (rb.objectID == HUGO::INVALID_BULLET_OBJECT_ID) {
             //create a new RigidBodyObject
-            rb.objectID = createRigidBodyObject(rb);
+            rb.objectID = createRigidBodyObject(rb, transform);
         }
 
         // Update BtRB from HugoRB
@@ -119,30 +122,169 @@ void PhysicsSystem::fixedUpdate(double dt)
         TransformComponent& transform = pack.get<TransformComponent&>();
         
         HUGOMotionState* motionState = static_cast<HUGOMotionState*>(getRigidBodyObject(rb.objectID).bulletRB->getMotionState());
-        motionState->updateBulletTransform(transform);
+        motionState->updateBulletTransform();
     }
 }
 
-HUGO::BulletObjectID PhysicsSystem::createRigidBodyObject(const RigidBodyComponent hgRb)
+HUGO::BulletShapeID PhysicsSystem::createShapeObject(Shape& shape)
 {
-    // Create a RigidBodyObject and assign an id. Must have a way to determine if it's static, kinematic or dynamic
-    return NULL;
+
+    btCollisionShape* resShape = nullptr;
+    if(std::holds_alternative<BoxColliderInfo>(shape.info)){
+        resShape = new btBoxShape(std::get<BoxColliderInfo>(shape.info).halfExtents.toBullet());
+    }
+    else if(std::holds_alternative<SphereColliderInfo>(shape.info)){
+        resShape = new btSphereShape(std::get<SphereColliderInfo>(shape.info).r);
+    }
+    else if(std::holds_alternative<CapsuleColliderInfo>(shape.info)){
+        CapsuleColliderInfo aux = std::get<CapsuleColliderInfo>(shape.info);
+        resShape = new btCapsuleShape(aux.r, aux.height);
+    }
+    else if(std::holds_alternative<CylinderColliderInfo>(shape.info)){
+        resShape = new btCylinderShape(std::get<CylinderColliderInfo>(shape.info).halfExtents.toBullet());
+    }
+    else{ // Cone
+        ConeColliderInfo aux = std::get<ConeColliderInfo>(shape.info);
+        resShape = new btConeShape(aux.r, aux.height);
+    }
+
+    HUGO::BulletShapeID id;
+    //reuse id
+    if(!freeBulletShapeId.empty()){ 
+        id= freeBulletShapeId.back();
+        freeBulletShapeId.pop_back();
+    }
+    else{
+        //generate new ID
+        id = static_cast<HUGO::BulletShapeID>(shapeIdToIndex.size());
+        shapeIdToIndex.push_back(0);
+    }
+
+    //create Bullet Shape
+    ShapeObject obj = {id, resShape};
+    shape.id = id;
+
+    //store object
+    std::size_t index = shapes.push_back(std::move(obj));
+    shapeIdToIndex[id] = index;
+
+    return id;
+}
+
+ShapeObject& PhysicsSystem::getShapeObject(const HUGO::BulletShapeID id)
+{
+    return shapes[shapeIdToIndex[id]];
+}
+
+void PhysicsSystem::removeShapeObject(HUGO::BulletShapeID& id)
+{
+    if (id != HUGO::INVALID_BULLET_SHAPE_ID){
+        
+        std::size_t index = shapeIdToIndex[id];
+        std::size_t lastIndex = shapes.size() - 1;
+
+        destroyShapeObject(shapes[index]);
+
+        if (index != lastIndex) {
+            // mover último objeto al hueco
+            shapes[index] = std::move(shapes[lastIndex]);
+            HUGO::BulletShapeID movedID = shapes[index].id;
+            shapeIdToIndex[movedID] = index;
+        }
+
+        shapes.remove(lastIndex);
+        freeBulletShapeId.push_back(id);
+        id = HUGO::INVALID_BULLET_SHAPE_ID;
+    }
+}
+
+void PhysicsSystem::destroyShapeObject(ShapeObject& shObj)
+{
+    if(shObj.bulletShape){
+        delete shObj.bulletShape;
+        shObj.bulletShape = nullptr;
+    }
+}
+
+HUGO::BulletObjectID PhysicsSystem::createRigidBodyObject(RigidBodyComponent& hgRb, const TransformComponent& tf)
+{
+
+    btCollisionShape* shape = nullptr;
+    if(hgRb.rbShape.id != HUGO::INVALID_BULLET_SHAPE_ID){
+        shape = getShapeObject(hgRb.rbShape.id).bulletShape;
+    }
+    else{
+        shape = getShapeObject(createShapeObject(hgRb.rbShape)).bulletShape;
+    }
+
+    HUGOMotionState* state = new HUGOMotionState(btTransform(), std::make_shared<TransformComponent>(tf));
+    state->updateBulletTransform();
+
+    btRigidBody* rb = new btRigidBody(hgRb.mass, state, shape);
+
+    HUGO::BulletObjectID id;
+    //reuse id
+    if(!freeBulletObjectId.empty()){ 
+        id= freeBulletObjectId.back();
+        freeBulletObjectId.pop_back();
+    }
+    else{
+        //generate new ID
+        id = static_cast<HUGO::BulletObjectID>(objectIdToIndex.size());
+        objectIdToIndex.push_back(0);
+    }
+    
+    //create RigidBodyObject
+    RigidBodyObject obj = {id, rb};
+
+    //store object
+    std::size_t index = rigidBodies.push_back(std::move(obj));
+    objectIdToIndex[id] = index;
+
+    return id;
 }
     
-RigidBodyObject& PhysicsSystem::getRigidBodyObject(const HUGO::BulletObjectID)
+RigidBodyObject& PhysicsSystem::getRigidBodyObject(const HUGO::BulletObjectID id)
 {
-    // Return RigidBodyObject of the given id
-    RigidBodyObject temp = {0, nullptr};
-    return temp;
+    return rigidBodies[objectIdToIndex[id]];
 }
     
-void PhysicsSystem::removeRigidBodyObject(const HUGO::BulletObjectID)
+void PhysicsSystem::removeRigidBodyObject(HUGO::BulletObjectID& id)
 {
-    // Remove RigidBodyObject from the list of registered ids
+    if (id != HUGO::INVALID_BULLET_OBJECT_ID){
+        
+        std::size_t index = objectIdToIndex[id];
+        std::size_t lastIndex = rigidBodies.size() - 1;
+
+        destroyRigidBodyObject(rigidBodies[index]);
+
+        if (index != lastIndex) {
+            // mover último objeto al hueco
+            rigidBodies[index] = std::move(rigidBodies[lastIndex]);
+            HUGO::BulletObjectID movedID = rigidBodies[index].id;
+            objectIdToIndex[movedID] = index;
+        }
+
+        rigidBodies.remove(lastIndex);
+        freeBulletObjectId.push_back(id);
+        id = HUGO::INVALID_BULLET_OBJECT_ID;
+    }
 }
     
 void PhysicsSystem::destroyRigidBodyObject(RigidBodyObject& RbObj)
 {
-    // Destroy contents of the RigidBodyObjects
+    btRigidBody* body = RbObj.bulletRB;
+
+    if(body){
+        if (body->getMotionState())
+	    {
+		    delete body->getMotionState();
+	    }
+        btDynamicsWorld* btWorld = static_cast<btDynamicsWorld*>(simulation->getSimulation());
+
+	    btWorld->removeCollisionObject(body);
+	    delete body;
+        RbObj.bulletRB = nullptr;
+    }
 }
 #pragma endregion

@@ -7,11 +7,19 @@
 #include "PagedArray.h"
 #include "HugoTypes.h"
 
+class TransformComponent;
 class RigidBodyComponent;
+class Shape;
+class PhysicsSimulation;
 
 struct RigidBodyObject{
     HUGO::BulletObjectID id;
     btRigidBody* bulletRB = nullptr;
+};
+
+struct ShapeObject{
+    HUGO::BulletShapeID id;
+    btCollisionShape* bulletShape = nullptr;
 };
 
 class HUGOMotionState : public btMotionState{
@@ -28,25 +36,38 @@ public:
     HUGOMotionState(const btTransform initialPos, std::shared_ptr<TransformComponent> transform, btTransform offset = btTransform::getIdentity());
 
     void setHugoTransform(std::shared_ptr<TransformComponent> transform);
-    void updateBulletTransform(const TransformComponent& newPos);
+    void updateBulletTransform();
 
     void getWorldTransform(btTransform& worldTrans) const override;
     void setWorldTransform(const btTransform& worldTrans) override;
 };
 
 class PhysicsSystem : public System {
-    
-    PagedArray<RigidBodyObject, 128> rigidBodies;
-    std::vector<HUGO::BulletObjectID> freeOgreObjectId;
-    std::vector<std::size_t> idToIndex;
 
-    HUGO::BulletObjectID createRigidBodyObject(const RigidBodyComponent hgRb);
-    RigidBodyObject& getRigidBodyObject(const HUGO::BulletObjectID);
-    void removeRigidBodyObject(const HUGO::BulletObjectID);
+    std::shared_ptr<PhysicsSimulation> simulation;
+
+    // Same logic as in RenderSystem. Credits to them, they did a really good job.
+    PagedArray<RigidBodyObject, 128> rigidBodies;
+    std::vector<HUGO::BulletObjectID> freeBulletObjectId;
+    std::vector<std::size_t> objectIdToIndex;
+
+    // We use ids to shapes so various rb can use the same shape
+    PagedArray<ShapeObject, 128> shapes;
+    std::vector<HUGO::BulletShapeID> freeBulletShapeId;
+    std::vector<std::size_t> shapeIdToIndex;
+    
+    HUGO::BulletShapeID createShapeObject(Shape& shape);
+    ShapeObject& getShapeObject(const HUGO::BulletShapeID id);
+    void removeShapeObject(HUGO::BulletShapeID& id);
+    void destroyShapeObject(ShapeObject& shObj);
+
+    HUGO::BulletObjectID createRigidBodyObject(RigidBodyComponent& hgRb, const TransformComponent& tf);
+    RigidBodyObject& getRigidBodyObject(const HUGO::BulletObjectID id);
+    void removeRigidBodyObject(HUGO::BulletObjectID& id);
     void destroyRigidBodyObject(RigidBodyObject& RbObj);
 
 public:
-    PhysicsSystem(std::shared_ptr<Scene> scene);
+    PhysicsSystem(std::shared_ptr<Scene> scene, std::shared_ptr<PhysicsSimulation> sim);
     ~PhysicsSystem();
 
     void update(double dt) override;
