@@ -74,9 +74,13 @@ void Core::initOgre()
     }
 
     m_ogreRoot->getRenderSystem()->setConfigOption("Full Screen", "No");
+
+    m_ogreRoot->initialise();
     locateResources();
-    m_ogreRoot->initialise(false);
+    loadResources();
+
     Ogre::NameValuePairList params;
+    params["SDL2Window"] = "true";
     m_renderWindow = m_ogreRoot->createRenderWindow("Ogre Test Window", 1000, 800, false, &params);
 
     unsigned long windowHandle = 0;
