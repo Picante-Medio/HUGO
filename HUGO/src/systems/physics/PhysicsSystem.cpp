@@ -178,6 +178,7 @@ ShapeObject& PhysicsSystem::getShapeObject(const HUGO::BulletShapeID id)
 
 void PhysicsSystem::removeShapeObject(HUGO::BulletShapeID& id)
 {
+    // Must make sure any rigidbody that used the shape to be deleted doesn't exist anymore
     if (id != HUGO::INVALID_BULLET_SHAPE_ID){
         
         std::size_t index = shapeIdToIndex[id];
