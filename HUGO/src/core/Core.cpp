@@ -97,7 +97,7 @@ void Core::initOgre()
 #ifdef __linux__
    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.x11.window);
 #elif _WIN32
-    unsigned long windowHandle = reinterpret_cast<unsigned long>(wmInfo.info.win.window);
+ size_t windowHandle = reinterpret_cast<size_t>(wminfo.info.win.window);
 #endif
    params["externalWindowHandle"] = Ogre::StringConverter::toString(windowHandle);
     m_renderWindow = m_ogreRoot->createRenderWindow(
