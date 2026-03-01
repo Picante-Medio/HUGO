@@ -89,17 +89,17 @@ void Core::initOgre()
     SDL_VERSION(&wmInfo.version);
     SDL_GetWindowWMInfo(sdlWindow, &wmInfo);
     SDL_Log("Video driver: %s", SDL_GetCurrentVideoDriver());
-    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.x11.window);
 
     loadResources();
     // creation of the render window, with the size 1000x800 and not full screen
     Ogre::NameValuePairList params;
 
 #ifdef __linux__
-    params["externalWindowHandle"] = Ogre::StringConverter::toString(windowHandle);
+    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.x11.window);
 #elif _WIN32
-    windowHandle = (size_t)wmInfo.info.win.window;
+    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.win.window);
 #endif
+    params["externalWindowHandle"] = Ogre::StringConverter::toString(windowHandle);
     m_renderWindow = m_ogreRoot->createRenderWindow(
         "Ogre Test Window",
         1000, // width
