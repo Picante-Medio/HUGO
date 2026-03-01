@@ -62,6 +62,7 @@ class RenderSystem : public System{
     OgreObject& getOgreObject(HUGO::OgreObjectID id);
     void removeOgreObject(HUGO::OgreObjectID& id);
     void destroyOgreObject(OgreObject& obj);
+      
 public:
     RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> root, Ogre::RenderWindow* window);
 
@@ -69,6 +70,8 @@ public:
     void fixedUpdate(double dt) override;
 
     void createTestEntity();
+    // Materials
+    void setMaterial(EntityID entity,const std::string& materialName);
     
     // Creation of viewport and camera (helpers)
     EntityID createCameraEntity(const HUGO::Vector3& position = HUGO::Vector3(0, 0, 0));

@@ -17,3 +17,9 @@ struct RenderComponent: public Component
 private:
     HUGO::OgreObjectID objectID = HUGO::INVALID_OGRE_OBJECT_ID;
 };
+
+struct MaterialDirtyTag : public Component {
+    std::string materialName;
+    MaterialDirtyTag(EntityID entity, const std::string& materialName) 
+        : Component(entity), materialName(materialName) {}
+};

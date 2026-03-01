@@ -16,8 +16,8 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
 {
     sceneManager = ogreRoot.get()->createSceneManager();
     
-    //para ver las ejes
-    sceneManager->setDisplaySceneNodes(true);
+    //para ver los ejes
+    //sceneManager->setDisplaySceneNodes(true);
 
     // Camera
     // Ogre::Camera* mCam = sceneManager->createCamera("camera");
@@ -37,13 +37,13 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
     // mCam->setAspectRatio(Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()));   
 
     // Basic light
-    sceneManager->setAmbientLight(Ogre::ColourValue(0.5f, 0.5f, 0.5f));
+    sceneManager->setAmbientLight(Ogre::ColourValue(0.7f, 0.7f, 0.7f));
 
     Ogre::Light* light = sceneManager->createLight();
     light->setType(Ogre::Light::LT_DIRECTIONAL);
-    light->setDiffuseColour(1.0, 1.0, 1.0);
+    light->setDiffuseColour(0.7f, 0.7f, 0.7f);
     Ogre::SceneNode* nodeDir = sceneManager->getRootSceneNode()->createChildSceneNode();
-    nodeDir->setDirection(Ogre::Vector3(-1, -1, -1));
+    nodeDir->setDirection(Ogre::Vector3(-1, -1, 0));
     nodeDir->attachObject(light);
     
 
@@ -147,6 +147,18 @@ void RenderSystem::handleTag()
         // eliminate the tag
         //scene->removeComponent<ViewportDirtyTag>(entity);
     }
+
+    //Material Update
+    for(auto& pack : scene->query<MaterialDirtyTag, RenderComponent>()) {
+        MaterialDirtyTag& material = pack.get<MaterialDirtyTag&>();
+        RenderComponent& rc = pack.get<RenderComponent&>();
+
+        rc.materialName=material.materialName;
+        OgreObject& obj = getOgreObject(rc.objectID);
+        obj.ogreEntity->setMaterialName(rc.materialName);
+
+        scene->removeComponent<MaterialDirtyTag>(rc.entity);
+    }
 }
 
 #pragma endregion
@@ -200,7 +212,6 @@ void RenderSystem::removeOgreObject(HUGO::OgreObjectID& id)
         destroyOgreObject(ogreObjects[index]);
 
         if (index != lastIndex) {
-            // mover último objeto al hueco
             ogreObjects[index] = std::move(ogreObjects[lastIndex]);
             HUGO::OgreObjectID movedID = ogreObjects[index].id;
             idToIndex[movedID] = index;
@@ -230,10 +241,9 @@ void RenderSystem::update(double dt)
     handleTag();
 
     //test
-    float vel = 0.05f;
     for(auto pack : scene->query<TransformComponent,RenderComponent>()) {
         TransformComponent& tr=pack.get<TransformComponent&>();
-        tr.position.z += vel*dt;
+        //tr.position.z += vel*dt;
     }
     //
 }
@@ -245,13 +255,20 @@ void RenderSystem::fixedUpdate(double dt)
 #pragma region Testing
 void RenderSystem::createTestEntity()
 {
-    EntityID e = scene->createEntity();
-    scene->addComponent<TransformComponent>(e, HUGO::Vector3(-30,10,10), HUGO::Quaternion(1,0,0,0), HUGO::Vector3(0.2f,0.2f,0.2f));
-    scene->addComponent<RenderComponent>(e, "cube.mesh");
+    EntityID e1 = scene->createEntity();
+    scene->addComponent<TransformComponent>(e1, HUGO::Vector3(-30,10,10), HUGO::Quaternion(1,0,0,0), HUGO::Vector3(0.2f,0.2f,0.2f));
+    scene->addComponent<RenderComponent>(e1, "cube.mesh");
 
     EntityID e2 = scene->createEntity();
     scene->addComponent<TransformComponent>(e2, HUGO::Vector3(30,10,10), HUGO::Quaternion(1,0,0,0), HUGO::Vector3(0.2f,0.2f,0.2f));
-    scene->addComponent<RenderComponent>(e2, "sphere.mesh");
+    scene->addComponent<RenderComponent>(e2, "sphere.mesh","prueba/ColorRosa");
+
+    setMaterial(e1, "prueba/ColorVerde");
+}
+
+void RenderSystem::setMaterial(EntityID entity, const std::string &materialName)
+{
+    scene->addComponent<MaterialDirtyTag>(entity, materialName);
 }
 #pragma endregion
 

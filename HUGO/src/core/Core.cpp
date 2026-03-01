@@ -25,7 +25,7 @@ void Core::init(){
 
     std::shared_ptr<AudioSystem> audioSystem = std::make_shared<AudioSystem>(scenePtr, maEngine);
     scenePtr->addSystem(audioSystem);
-    audioSystem->createTestEntity();
+    //audioSystem->createTestEntity();
     
     std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr, m_ogreRoot, m_renderWindow);
     scenePtr->addSystem(renderSystem);
@@ -73,6 +73,7 @@ void Core::initOgre()
 
     m_ogreRoot->initialise(false);
 
+    loadResources();
     // creation of the render window, with the size 1000x800 and not full screen
     Ogre::NameValuePairList params;
     m_renderWindow = m_ogreRoot->createRenderWindow(
