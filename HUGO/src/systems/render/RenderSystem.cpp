@@ -14,27 +14,15 @@
 RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> ogreRoot, Ogre::RenderWindow* window)
     :System(scene), ogreRoot(ogreRoot), renderWindow(window), idToIndex(), freeOgreObjectId()
 {
-    sceneManager = ogreRoot.get()->createSceneManager();
+    try {
+        sceneManager = ogreRoot->createSceneManager();
+    }
+    catch (const Ogre::Exception& e) {
+        throw std::runtime_error("[RenderSystem] SceneManager creation failed: " + std::string(e.getDescription()));
+    }
     
     //para ver los ejes
     //sceneManager->setDisplaySceneNodes(true);
-
-    // Camera
-    // Ogre::Camera* mCam = sceneManager->createCamera("camera");
-    // mCam->setNearClipDistance(1);
-    // mCam->setFarClipDistance(10000);
-    // mCam->setAutoAspectRatio(true);
-
-    // defaultCameraNode = sceneManager->getRootSceneNode()->createChildSceneNode("cameraNode");
-    // defaultCameraNode->attachObject(mCam);
-    // defaultCameraNode->setPosition(0, 0, 200);
-
-    // // Viewport
-    // viewport = renderWindow->addViewport(mCam);
-    // viewport->setBackgroundColour(Ogre::ColourValue(0.3f, 0.3f, 0.5f));
-    // viewport->setCamera(mCam);
-
-    // mCam->setAspectRatio(Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()));   
 
     // Basic light
     sceneManager->setAmbientLight(Ogre::ColourValue(0.7f, 0.7f, 0.7f));
@@ -75,25 +63,14 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
     setMainViewport(defaultViewport);
 }
 
+RenderSystem::~RenderSystem()
+{
+   
+}
+
 #pragma region Tags
 void RenderSystem::handleTag()
 {
-    for(auto& pack : scene->query<TransformComponent,RenderComponent>()) {
-        RenderComponent& rc = pack.get<RenderComponent&>();
-        TransformComponent& tr=pack.get<TransformComponent&>();
-
-        if (rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) {
-            //create a new ogreObject
-            rc.objectID = createOgreObject(rc.meshName,rc.materialName);
-        } 
-        OgreObject& obj = getOgreObject(rc.objectID);
-
-        //update render transform
-        obj.ogreSceneNode->setPosition(tr.position.toOgre());
-        obj.ogreSceneNode->setOrientation(tr.rotation.toOgre());
-        obj.ogreSceneNode->setScale(tr.scale.toOgre());
-    }
-
     // Camera update
     for(auto& pack : scene->query<CameraDirtyTag, TransformComponent, CameraComponent>()) {
         CameraDirtyTag& tag = pack.get<CameraDirtyTag&>();
@@ -153,11 +130,13 @@ void RenderSystem::handleTag()
         MaterialDirtyTag& material = pack.get<MaterialDirtyTag&>();
         RenderComponent& rc = pack.get<RenderComponent&>();
 
-        rc.materialName=material.materialName;
-        OgreObject& obj = getOgreObject(rc.objectID);
-        obj.ogreEntity->setMaterialName(rc.materialName);
+        if (rc.objectID != HUGO::INVALID_OGRE_OBJECT_ID) {
+            rc.materialName=material.materialName;
+            OgreObject& obj = getOgreObject(rc.objectID);
+            obj.ogreEntity->setMaterialName(rc.materialName);
 
-        scene->removeComponent<MaterialDirtyTag>(rc.entity);
+            scene->removeComponent<MaterialDirtyTag>(rc.entity);
+        }  
     }
 }
 
@@ -166,14 +145,27 @@ void RenderSystem::handleTag()
 #pragma region OgreObject
 HUGO::OgreObjectID RenderSystem::createOgreObject(const std::string &meshName, const std::string &materialName)
 {
-    //create ogre entity
-    Ogre::Entity* ent=sceneManager->createEntity(meshName);  
-    if(!materialName.empty()) 
-        ent->setMaterialName(materialName);
+    Ogre::Entity* ent = nullptr;
+    Ogre::SceneNode* node = nullptr;
 
-    //create scene node
-    Ogre::SceneNode* node= sceneManager->getRootSceneNode()->createChildSceneNode();
-    node->attachObject(ent);
+     try {
+        //create ogre entity
+        ent = sceneManager->createEntity(meshName);
+        if (!materialName.empty()) {
+            ent->setMaterialName(materialName);
+        }
+
+        //create scene node
+        node = sceneManager->getRootSceneNode()->createChildSceneNode();
+        node->attachObject(ent);
+    }
+    catch (const Ogre::Exception& e){
+        std::cerr << "[RenderSystem] Failed to create OgreObject: "<< std::string(e.getDescription()) << '\n';
+        if (ent) sceneManager->destroyEntity(ent);
+        if (node) sceneManager->destroySceneNode(node);
+
+        return HUGO::INVALID_OGRE_OBJECT_ID;
+    }
     
     HUGO::OgreObjectID id;
     //reuse id
@@ -236,21 +228,40 @@ void RenderSystem::destroyOgreObject(OgreObject &obj)
 }
 #pragma endregion
 
+#pragma region Updates
 void RenderSystem::update(double dt)
-{
+{ 
     handleTag();
 
-    //test
-    for(auto pack : scene->query<TransformComponent,RenderComponent>()) {
+    //Update transform of entity with renderComponent
+    for(auto& pack : scene->query<TransformComponent,RenderComponent>()) {
+        RenderComponent& rc = pack.get<RenderComponent&>();
         TransformComponent& tr=pack.get<TransformComponent&>();
-        //tr.position.z += vel*dt;
+
+        if (rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) {
+            //create a new ogreObject
+            rc.objectID = createOgreObject(rc.meshName,rc.materialName);
+
+            if (rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) {
+                std::cerr << "[RenderSystem] RenderComponent could not create OgreObject"<<'\n';
+                continue;
+            }
+        } 
+        OgreObject& obj = getOgreObject(rc.objectID);
+
+        //update transform
+        obj.ogreSceneNode->setPosition(tr.position.toOgre());
+        obj.ogreSceneNode->setOrientation(tr.rotation.toOgre());
+        obj.ogreSceneNode->setScale(tr.scale.toOgre());
     }
-    //
+
 }
 
 void RenderSystem::fixedUpdate(double dt)
 {
 }
+
+#pragma endregion
 
 #pragma region Testing
 void RenderSystem::createTestEntity()
@@ -266,12 +277,12 @@ void RenderSystem::createTestEntity()
     setMaterial(e1, "prueba/ColorVerde");
 }
 
+#pragma endregion
+
 void RenderSystem::setMaterial(EntityID entity, const std::string &materialName)
 {
     scene->addComponent<MaterialDirtyTag>(entity, materialName);
 }
-#pragma endregion
-
 // Helper function for Camera creation
 // EntityID RenderSystem::createCameraEntity()
 // {
@@ -379,6 +390,7 @@ void RenderSystem::createOgreCamera(EntityID entity)
 
     if (!transformComp || !cameraComp) {
         // gestion de errores
+        std::cerr<<"[RenderSystem] Camera entity "<< std::to_string(entity) << "missing required components"<<"\n";
     }
 
     // Unique name for the camera

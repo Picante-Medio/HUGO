@@ -30,11 +30,8 @@ struct ViewportResources {
 
 class RenderSystem : public System{
     std::shared_ptr<Ogre::Root> ogreRoot;
-    Ogre::SceneManager* sceneManager;
-    Ogre::RenderWindow* renderWindow; 
-
-    // Ogre::Viewport* viewport;
-    // Ogre::SceneNode* defaultCameraNode;
+    Ogre::SceneManager* sceneManager = nullptr;
+    Ogre::RenderWindow* renderWindow = nullptr; 
 
     std::unordered_map<EntityID, CameraResources> cameraMap; // Provisional
     std::unordered_map<EntityID, ViewportResources> viewportMap;
@@ -65,7 +62,8 @@ class RenderSystem : public System{
       
 public:
     RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> root, Ogre::RenderWindow* window);
-
+    ~RenderSystem() override;
+    
     void update(double dt) override;
     void fixedUpdate(double dt) override;
 
