@@ -13,7 +13,7 @@ void Input::handleInput() {
   SDL_Event event;
 
   while (SDL_PollEvent(&event)) {
-
+  
     switch (event.type) {
     case SDL_KEYDOWN:
       keyPressed[event.key.keysym.sym] = true;
@@ -30,20 +30,20 @@ void Input::handleInput() {
 }
 
 bool 
-Input::isKeyPressed(SDL_KeyCode key) {
+Input::isKeyPressed(SDL_Keycode key) {
   return keyPressed[key];
 }
 
 bool 
 Input::isActionPressed(std::string action) {
-  for(SDL_KeyCode key : keysOfAction[action])
+  for(SDL_Keycode key : keysOfAction[action])
     if(keyPressed[key]) return true;
 
   return false;
 }
 
-bool 
-Input::wasKeyJustPressed(SDL_KeyCode key) {
+bool
+Input::wasKeyJustPressed(SDL_Keycode key) {
 
 }
 
@@ -51,7 +51,7 @@ bool
 Input::wasActionJustPressed(std::string action) {}
 
 bool 
-Input::wasKeyJustReleased(SDL_KeyCode key) {}
+Input::wasKeyJustReleased(SDL_Keycode key) {}
 
 bool 
 Input::wasActionJustReleased(std::string action) {}
