@@ -28,7 +28,7 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
     //sceneManager->setDisplaySceneNodes(true);
 
     // Basic light
-    sceneManager->setAmbientLight(Ogre::ColourValue(0.7f, 0.7f, 0.7f));
+    sceneManager->setAmbientLight(Ogre::ColourValue(0.15f, 0.15f, 0.15f));
 
     const Ogre::ConfigOptionMap& options = ogreRoot->getRenderSystem()->getConfigOptions();
 
@@ -64,12 +64,8 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
     // nodeDir->setDirection(Ogre::Vector3(-1, -1, 0));
     // nodeDir->attachObject(light);
 
-    createLightEntity(HUGO::Vector3(0,80,0), HUGO::Vector4(1,0,0,1), HUGO::Vector4(1,1,1,1)
-        , HUGO::LightType::LT_POINT, HUGO::Radian(0), HUGO::Radian(0), 0, 0.1f, 0.1f, 1000);
-    createLightEntity(HUGO::Vector3(0,80,80), HUGO::Vector4(1,1,1,1), HUGO::Vector4(1,1,1,1)
-        , HUGO::LightType::LT_DIRECTIONAL, HUGO::Radian(0), HUGO::Radian(0), 0, 0.1f, 0.1f, 1000);
-    createLightEntity(HUGO::Vector3(0,30,50), HUGO::Vector4(0,0,1,1), HUGO::Vector4(1,1,1,1)
-        , HUGO::LightType::LT_SPOTLIGHT, HUGO::Radian(45*M_PI/180), HUGO::Radian(30*M_PI/180), 1, 0.1f, 0.1f, 1000);
+    createLightEntity( HUGO::Vector3(-50, 300, 800), HUGO::Vector4(0.4f, 0.2f, 0.4f, 0.2f)
+        , HUGO::Vector4(0.0f, 0.0f, 0.0f, 0.0f), HUGO::LightType::LT_POINT, HUGO::Radian(0), HUGO::Radian(0), 0, 0.1f, 0.1f, 300);   
 }
 
 RenderSystem::~RenderSystem()
