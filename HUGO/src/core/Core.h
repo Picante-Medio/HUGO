@@ -1,12 +1,15 @@
 #pragma once
 
 #include <memory>
+
 #include "OgreRenderWindow.h"
 #include "OgreRoot.h"
 #include "HugoVirtualTimer.h"
 #include "miniaudio.h"
+
 class Scene;
 class VirtualTimer;
+class SDL_Window;
 
 namespace HUGO {
     class ResourceManager;
@@ -20,6 +23,7 @@ namespace HUGO {
 
         std::shared_ptr<Ogre::Root> m_ogreRoot;
         Ogre::RenderWindow* m_renderWindow;
+        SDL_Window* sdlWindow;
 
         //Miniaudio
         void initMiniaudio();

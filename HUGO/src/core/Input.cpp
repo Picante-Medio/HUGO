@@ -10,11 +10,12 @@ Input &Input::Instance() {
 }
 
 void Input::handleInput() {
-  SDL_Event event;
   previousKeyPressed = keyPressed;
 
-  while (SDL_PollEvent(&event)) {
+  SDL_PumpEvents();
+  SDL_Event event;
 
+  while (SDL_PollEvent(&event)) {
     switch (event.type) {
     case SDL_KEYDOWN:
       keyPressed[event.key.keysym.sym] = true;
@@ -30,12 +31,10 @@ void Input::handleInput() {
   }
 }
 
-
-void 
-Input::registerAction(std::string actionName, std::vector<SDL_Keycode> keys) {
-   keysOfAction[actionName] = keys;
+void Input::registerAction(std::string actionName,
+                           std::vector<SDL_Keycode> keys) {
+  keysOfAction[actionName] = keys;
 }
-
 
 void Input::registerAction(std::string actionName, SDL_Keycode key) {
   keysOfAction[actionName] = {key};
@@ -46,48 +45,45 @@ void Input::addKeyToAction(std::string actionName, SDL_Keycode key) {
 }
 
 void Input::removeKeyFromAction(std::string actionName, SDL_Keycode key) {
-  for(auto it = keysOfAction[actionName].begin(); it != keysOfAction[actionName].end();) {
-    if(*(it) == key) it = keysOfAction[actionName].erase(it);
-    else ++it;
+  for (auto it = keysOfAction[actionName].begin();
+       it != keysOfAction[actionName].end();) {
+    if (*(it) == key)
+      it = keysOfAction[actionName].erase(it);
+    else
+      ++it;
   }
 }
 
+bool Input::isKeyPressed(SDL_Keycode key) { return keyPressed[key]; }
 
-bool 
-Input::isKeyPressed(SDL_Keycode key) {
-  return keyPressed[key];
-}
-
-bool 
-Input::isActionPressed(std::string action) {
-  for(SDL_Keycode key : keysOfAction[action])
-    if(keyPressed[key]) return true;
+bool Input::isActionPressed(std::string action) {
+  for (SDL_Keycode key : keysOfAction[action])
+    if (keyPressed[key])
+      return true;
 
   return false;
 }
 
-bool
-Input::wasKeyJustPressed(SDL_Keycode key) {
+bool Input::wasKeyJustPressed(SDL_Keycode key) {
   return previousKeyPressed[key];
 }
 
-bool 
-Input::wasActionJustPressed(std::string action) {
-  for(SDL_Keycode key : keysOfAction[action])
-    if(previousKeyPressed[key]) return true;
+bool Input::wasActionJustPressed(std::string action) {
+  for (SDL_Keycode key : keysOfAction[action])
+    if (previousKeyPressed[key])
+      return true;
 
   return false;
 }
 
-bool 
-Input::wasKeyJustReleased(SDL_Keycode key) {
+bool Input::wasKeyJustReleased(SDL_Keycode key) {
   return previousKeyPressed[key] && !keyPressed[key];
 }
 
-bool 
-Input::wasActionJustReleased(std::string action) {
-  for(SDL_Keycode key : keysOfAction[action])
-    if(wasKeyJustReleased(key)) return true;
+bool Input::wasActionJustReleased(std::string action) {
+  for (SDL_Keycode key : keysOfAction[action])
+    if (wasKeyJustReleased(key))
+      return true;
 
   return false;
 }

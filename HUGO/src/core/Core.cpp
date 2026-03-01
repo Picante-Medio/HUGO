@@ -1,13 +1,21 @@
 #include "Core.h"
-#include "Ogre.h"
+
+#include <OgreCommon.h>
+#include <OgreConfigFile.h>
+#include <OgreResourceGroupManager.h>
+#include <SDL2/SDL.h>
+#include <SDL_video.h>
+#include <cstddef>
+#include <iostream>
+#include <Ogre.h>
+#include <memory>
+#include <SDL2/SDL_syswm.h>
+
+#include "Input.h"
 #include "RenderSystem.h"
 #include "AudioSystem.h"
 #include "PhysicsSystem.h"
 #include "Scene.h"
-#include <OgreConfigFile.h>
-#include <OgreResourceGroupManager.h>
-#include <SDL2/SDL.h>
-#include <iostream>
 //#include "ResourceManager.h"
 
 // se podría hacer clase singleton¿? -Marco
@@ -33,7 +41,6 @@ void Core::init(){
     //std::shared_ptr<PhysicsSystem> physicsSystem = std::make_shared<PhysicsSystem>(scenePtr);
     
     //m_resourceManager = std::make_shared<HUGO::ResourceManager>(maEngine, m_ogreRoot);
-
     renderSystem->createTestEntity();
 }
 
@@ -72,10 +79,27 @@ void Core::initOgre()
     locateResources();
 
     m_ogreRoot->initialise(false);
+#ifdef __linux__
+    SDL_setenv("SDL_VIDEODRIVER", "x11", 1);
+#endif
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
+    SDL_Window* sdlWindow = SDL_CreateWindow("Ogre", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 800, SDL_WINDOW_OPENGL);
+
+    SDL_SysWMinfo wmInfo;
+    SDL_VERSION(&wmInfo.version);
+    SDL_GetWindowWMInfo(sdlWindow, &wmInfo);
+    SDL_Log("Video driver: %s", SDL_GetCurrentVideoDriver());
+    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.x11.window);
 
     loadResources();
     // creation of the render window, with the size 1000x800 and not full screen
     Ogre::NameValuePairList params;
+
+#ifdef __linux__
+    params["externalWindowHandle"] = Ogre::StringConverter::toString(windowHandle);
+#elif _WIN32
+    windowHandle = (size_t)wmInfo.info.win.window;
+#endif
     m_renderWindow = m_ogreRoot->createRenderWindow(
         "Ogre Test Window",
         1000, // width
@@ -84,6 +108,7 @@ void Core::initOgre()
         &params
     );
 }
+
 void HUGO::Core::locateResources()
 {
   Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
@@ -113,7 +138,7 @@ void Core::run(){
 	while (!exit) {
         vt.update();
 		double startTime = vt.getDeltaTime();
-
+        Input::Instance().handleInput();
         scenePtr->fixedUpdate(startTime);
         scenePtr->stepPhysics(startTime);
         scenePtr->update(startTime);
@@ -129,6 +154,9 @@ void Core::destroyOgre(){
     m_renderWindow->destroy();
 
     m_ogreRoot->shutdown();
+
+    SDL_DestroyWindow(sdlWindow);
+    SDL_Quit();
 }
 
 void HUGO::Core::initMiniaudio()
