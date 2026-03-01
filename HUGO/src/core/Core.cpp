@@ -84,7 +84,7 @@ void Core::initOgre()
     m_renderWindow = m_ogreRoot->createRenderWindow("Ogre Test Window", 1000, 800, false, &params);
 
     unsigned long windowHandle = 0;
-    m_renderWindow->getCustomAttribute("EGLWINDOW", &windowHandle);
+    m_renderWindow->getCustomAttribute("WINDOW", &windowHandle);
     SDL_Log("EGL window handle: %lu", windowHandle);
 
     SDL_Init(SDL_INIT_EVENTS);
