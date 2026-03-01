@@ -92,14 +92,14 @@ void Core::initOgre()
 
     loadResources();
     // creation of the render window, with the size 1000x800 and not full screen
-    Ogre::NameValuePairList params;
 
+    Ogre::NameValuePairList params;
 #ifdef __linux__
-    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.x11.window);
+   size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.x11.window);
 #elif _WIN32
-    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.win.window);
+    unsigned long windowHandle = reinterpret_cast<unsigned long>(wmInfo.info.win.window);
 #endif
-    params["externalWindowHandle"] = Ogre::StringConverter::toString(windowHandle);
+   params["externalWindowHandle"] = Ogre::StringConverter::toString(windowHandle);
     m_renderWindow = m_ogreRoot->createRenderWindow(
         "Ogre Test Window",
         1000, // width
