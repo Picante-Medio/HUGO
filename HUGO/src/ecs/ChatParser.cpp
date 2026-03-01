@@ -1,15 +1,10 @@
 #include "ChatParser.h"
-#include "ResourceManager.h"
-#include "Scene.h"
-#include "Ecs.h"
 #include <any>
-#include "Audio3DInfoComponet.h"
-#include "AudioComponent.h"
-#include "RenderComponent.h"
-#include "ViewportComponent.h"
 
 #include <iostream>
+#include <fstream>
 #include <filesystem>
+#include <memory>
 
 using namespace HUGO;
 
@@ -24,12 +19,42 @@ void ChatParser::readChatFolder(const HUGO::String& chatFolder){
         //! Doesn't compile: no suitable user-defined conversion from "std::filesystem::path" to "HUGO::String" (aka "std::string") exists
         HUGO::String chatPath = chatFolder + static_cast<HUGO::String>(entry.path().filename().generic_string());
 
-        //readChat(chatPath);
+        readChat(chatPath);
     }
 }
 
 void ChatParser::readChat(const HUGO::String& chatPath){
-    //To do
+    
+    /*
+    std::ifstream file(chatPath);
+    if(!file.is_open()){
+        //Error opening file
+    }
+
+    std::streambuf* cinbuf = std::cin.rdbuf(file.rdbuf());
+
+    //while not end of file
+    HUGO::String sceneName = "\0";
+
+    HUGO::String input;
+    
+    std::cin >> input;
+    while(std::cin){
+
+        if(input == "SCENE") std::cin >> sceneName;
+
+        if(input == "COMPONENT") m_scene_data[sceneName].
+
+        std::cin >> input;
+    }
+
+    std::cin.rdbuf(cinbuf);
+    */
+}
+
+void ChatParser::handleType(const HUGO::String& type){
+
+    
 }
 
 EntityData ChatParser::getPrefabData(const HUGO::String& prefabName){

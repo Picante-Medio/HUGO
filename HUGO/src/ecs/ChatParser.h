@@ -5,6 +5,7 @@
 #include <any>
 #include <vector>
 #include <memory>
+#include <HugoMath.h>
 
 
 namespace HUGO{
@@ -32,6 +33,13 @@ namespace HUGO{
 		std::unordered_map<HUGO::String, EntityData> m_prefab_data;
 
 		void readChat(const HUGO::String& chatPath);
+
+		//Massive switch-case for the parser (omg)
+		void handleType(const HUGO::String& type);
+
+		HUGO::Vector3 readVector3();
+		HUGO::Int readInt();
+		HUGO::Float readFloat();
 	public:
 
 		//Initialize empty database. Function readChatFolder must be called to fill the database.

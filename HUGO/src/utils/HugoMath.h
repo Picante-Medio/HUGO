@@ -124,5 +124,7 @@ namespace HUGO {
         bool operator >  ( const Degree& d ) const;
 	};
 
-
+	//I dont know if this is necessary, but just in case
+	using Int = int;
+	using Float = float;
 }
