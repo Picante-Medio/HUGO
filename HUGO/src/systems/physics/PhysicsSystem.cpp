@@ -118,7 +118,7 @@ void PhysicsSystem::fixedUpdate(double dt)
         RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
         TransformComponent& transform = pack.get<TransformComponent&>();
         
-        HUGOMotionState* motionState = static_cast<HUGOMotionState*>(rb.simulationRigidBody->getMotionState());
+        HUGOMotionState* motionState = static_cast<HUGOMotionState*>(getRigidBodyObject(rb.objectID).bulletRB->getMotionState());
         motionState->updateBulletTransform(transform);
     }
 }
