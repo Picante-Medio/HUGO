@@ -2,7 +2,7 @@
 
 #include <OgreCommon.h>
 #include <OgreConfigFile.h>
-#include <OgreResourceGroupManager.h>
+
 #include <SDL2/SDL.h>
 #include <SDL_video.h>
 #include <cstddef>
@@ -75,28 +75,16 @@ void Core::initOgre()
 
     m_ogreRoot->getRenderSystem()->setConfigOption("Full Screen", "No");
     locateResources();
-    m_ogreRoot->initialise(false); //To ensure ogre knows sdl is the window owner
-
-#ifdef __linux__
-    SDL_setenv("SDL_VIDEODRIVER", "x11", 1);
-#endif
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
-    SDL_Window* sdlWindow = SDL_CreateWindow("Ogre", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 800, SDL_WINDOW_OPENGL);
-    SDL_SysWMinfo wmInfo;
-    SDL_VERSION(&wmInfo.version);
-    SDL_GetWindowWMInfo(sdlWindow, &wmInfo);
-    SDL_Log("Video driver: %s", SDL_GetCurrentVideoDriver());
-    loadResources();
-    
+    m_ogreRoot->initialise(false);
     Ogre::NameValuePairList params;
-#ifdef __linux__
-    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.x11.window);
-#elif _WIN32
-    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.win.window);
-#endif
-    params["externalWindowHandle"] = std::to_string(windowHandle);
-    params["parentWindowHandle"] = std::to_string(windowHandle);
     m_renderWindow = m_ogreRoot->createRenderWindow("Ogre Test Window", 1000, 800, false, &params);
+
+    unsigned long windowHandle = 0;
+    m_renderWindow->getCustomAttribute("EGLWINDOW", &windowHandle);
+    SDL_Log("EGL window handle: %lu", windowHandle);
+
+    SDL_Init(SDL_INIT_EVENTS);
+    SDL_CreateWindowFrom((void*)windowHandle);
 }
 
 void HUGO::Core::locateResources()
