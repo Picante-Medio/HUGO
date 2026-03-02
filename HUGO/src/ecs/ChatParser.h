@@ -20,6 +20,8 @@ namespace HUGO{
 		
 		std::vector<EntityData> entities;
 		std::vector<HUGO::String> systems;
+
+		std::vector<HUGO::String> resources;
 	};
 
 	//This class normally will be called by the ResourceManager in order to:

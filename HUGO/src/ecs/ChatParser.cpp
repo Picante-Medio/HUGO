@@ -56,11 +56,20 @@ void ChatParser::handleSceneType(){
     //Initialize scene data of name sceneName
     m_sceneData[sceneName].entities = std::vector<EntityData>();
     m_sceneData[sceneName].systems = std::vector<HUGO::String>();
+    m_sceneData[sceneName].resources = std::vector<HUGO::String>();
     
     HUGO::String input;
     std::cin >> input;
 
     while(std::cin){
+
+        if(input == "RESOURCE"){
+            HUGO::String resourcePath;
+            std::cin >> resourcePath;
+
+            m_sceneData[sceneName].resources.push_back(resourcePath);
+        }
+
         if (input == "ENTITY"){
             std::vector<HUGO::EntityData>& sceneEntities = m_sceneData[sceneName].entities;
             sceneEntities.push_back(EntityData());
