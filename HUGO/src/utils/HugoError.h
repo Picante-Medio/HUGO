@@ -1,34 +1,41 @@
 #include <string>
 #include <variant>
+#include <assert.h>
 
 #include "HugoTypes.h"
 
-// Struct genérico de error
+// Generic struct error
 struct Error {
-  virtual HUGO::String description() { return ""; }
+  virtual HUGO::String description() = 0;
 };
 
-// Clase error o tipo usando variants
-template <typename T> 
-class ErrorOrType {
-  bool error;
-  std::variant<Error, T> info;
-
-public:
-  explicit ErrorOrType(Error err) : error(true), info(err) {}
-  explicit ErrorOrType(T value) : error(false), info(value) {}
-
-  inline bool isError() { return error; }
-  inline Error getError() { return std::get<Error>(info); }
-  inline T getValue() { return std::get<T>(info); }
-};
-
-// Void errors
-using ErrorOrVoid = ErrorOrType<std::monostate>;
-
-// Errores pre-implementados
-
+// Default error
 struct StringError : Error {
   HUGO::String errorMessage;
   HUGO::String description() override { return errorMessage; }
+};
+
+// Error class using variants
+template <typename T, typename ErrorT = StringError> 
+class ErrorOrType {
+  std::variant<ErrorT, T> info;
+protected:
+  bool error;
+
+public:
+  explicit ErrorOrType(ErrorT err) : error(true), info(err) {}
+  explicit ErrorOrType(T value) : error(false), info(value) {}
+
+  inline bool isError() { return error; }
+  inline ErrorT getError() { return std::get<ErrorT>(info); }
+  virtual inline T getValue() { 
+    assert(!error && "Called getValue() on an error result");
+    return std::get<T>(info); 
+  }
+};
+
+// Void errors
+class ErrorOrVoid : public ErrorOrType<std::monostate> {
+public:
+  inline ErrorOrVoid() : ErrorOrType<std::monostate> (std::monostate()) {}
 };
