@@ -1,9 +1,11 @@
 #include <string>
 #include <variant>
 
+#include "HugoTypes.h"
+
 // Struct genérico de error
 struct Error {
-  virtual std::string description() { return ""; }
+  virtual HUGO::String description() { return ""; }
 };
 
 // Clase error o tipo usando variants
@@ -24,6 +26,6 @@ public:
 // Errores pre-implementados
 
 struct StringError : Error {
-  std::string errorMessage;
-  std::string description() override { return errorMessage; }
+  HUGO::String errorMessage;
+  HUGO::String description() override { return errorMessage; }
 };
