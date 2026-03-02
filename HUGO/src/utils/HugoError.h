@@ -18,9 +18,9 @@ public:
   explicit ErrorOrType(Error err) : error(true), info(err) {}
   explicit ErrorOrType(T value) : error(false), info(value) {}
 
-  inline bool isError() { return isError; }
+  inline bool isError() { return error; }
   inline Error getError() { return std::get<Error>(info); }
-  inline Error getValue() { return std::get<T>(info); }
+  inline T getValue() { return std::get<T>(info); }
 };
 
 // Void errors
