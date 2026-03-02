@@ -10,8 +10,10 @@
 #include "Query.h"
 #include "System.h"
 #include "HugoTypes.h"
+#include "BulletSimulation.h"
 
-class Scene {
+class Scene : public std::enable_shared_from_this<Scene> {
+  
   EntityTable entityTable;
   ComponentDenseTable componentTable;
   std::vector<std::shared_ptr<System>> systems;

@@ -30,7 +30,7 @@ struct ConeColliderInfo {
 
 struct Shape{
 
-    friend class PhysicsSystem;
+    friend class BulletSimulation;
     // Shape's geometry is determined by the variant. Which struct is held can be checked with std::holds_alternative
     std::variant<BoxColliderInfo, SphereColliderInfo, CapsuleColliderInfo, CylinderColliderInfo, ConeColliderInfo> info;
 
@@ -40,7 +40,7 @@ private:
 
 struct RigidBodyComponent: public Component
 {
-    friend class PhysicsSystem;
+    friend class BulletSimulation;
     
     RigidBodyComponent(EntityID entity, Shape shape);
 
@@ -87,5 +87,5 @@ private:
 
     // Once created shape shouldn't be modified
     Shape rbShape;
-    HUGO::BulletObjectID objectID = HUGO::INVALID_BULLET_OBJECT_ID;
+    HUGO::BulletObjectID objectID = HUGO::INVALID_BULLET_RB_ID;
 };

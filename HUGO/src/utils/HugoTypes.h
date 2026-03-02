@@ -2,7 +2,9 @@
 #include <functional>
 #include <limits>
 #include <string>
-#include "PhysicsSimulation.h"
+
+class BulletSimulation;
+class btRigidBody;
 
 namespace HUGO{
     using OgreObjectID = int;
@@ -80,7 +82,7 @@ namespace HUGO{
     // -------- PHYSICS TYPES --------
 
     using BulletObjectID = int;
-    constexpr BulletObjectID INVALID_BULLET_OBJECT_ID = std::numeric_limits<int>::max();
+    constexpr BulletObjectID INVALID_BULLET_RB_ID = std::numeric_limits<int>::max();
 
     using BulletShapeID = int;
     constexpr BulletShapeID INVALID_BULLET_SHAPE_ID = std::numeric_limits<int>::max();

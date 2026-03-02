@@ -1,9 +1,9 @@
 #include "Scene.h"
 
-#include "Ecs.h"
 #include <memory>
 #include <utility>
 #include <vector>
+#include "Ecs.h"
 
 Scene::Scene() {
   initSimulation();
@@ -11,7 +11,7 @@ Scene::Scene() {
 
 void 
 Scene::initSimulation() {
-  simulation = std::make_unique<HUGO::Simulation>();
+  simulation = std::make_unique<HUGO::Simulation>(shared_from_this());
 }
 
 void 
