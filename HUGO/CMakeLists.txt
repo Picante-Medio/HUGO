@@ -58,8 +58,7 @@ foreach(path ${BULLET_SRC_DIRS})
 endforeach()
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
-    ${INCLUDE_DIRS}
-    ${miniaudio_SOURCE_DIR})
+    ${INCLUDE_DIRS})
 
 set(BASE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/dependencies/${CMAKE_SYSTEM_PROCESSOR})
 
@@ -106,7 +105,8 @@ set(HUGO_LINKED_LIBRARIES
     RenderSystem_GL3Plus
     RenderSystem_GL
     SDL2::SDL2
-    SDL2::SDL2main)
+    SDL2::SDL2main
+    miniaudio)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     ${HUGO_LINKED_LIBRARIES})
