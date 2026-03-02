@@ -1,4 +1,3 @@
-#pragma once
 #include "RigidBodyComponent.h"
 
 RigidBodyComponent::RigidBodyComponent(EntityID entity, Shape shape)

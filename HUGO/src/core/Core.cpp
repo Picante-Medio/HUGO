@@ -132,14 +132,16 @@ void HUGO::Core::loadResources()
 }
 //HUGO main loop
 void Core::run(){
-    bool exit = false;
-
+  bool exit = false;
+  Input& input = Input::Instance();
+  
 	while (!exit) {
         vt.update();
-		double startTime = vt.getDeltaTime();
-        SDL_Event event;
-        Input::Instance().handleInput();
-        if(Input::Instance().isQuitPressed()) {
+    
+        double startTime = vt.getDeltaTime();
+
+        input.handleInput();
+        if(input.isQuitPressed()) {
             exit = true;
         }
         scenePtr->fixedUpdate(startTime);
@@ -147,7 +149,9 @@ void Core::run(){
         scenePtr->update(startTime);
 
         m_ogreRoot->renderOneFrame();
+
         double frameTime = vt.getDeltaTime() - startTime;
+
         if (frameTime < 0.016) {
             SDL_Delay(static_cast<Uint32>((0.016 - frameTime) * 1000.0));
         }
