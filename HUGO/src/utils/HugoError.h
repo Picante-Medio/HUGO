@@ -23,6 +23,9 @@ public:
   inline Error getValue() { return std::get<T>(info); }
 };
 
+// Void errors
+using ErrorOrVoid = ErrorOrType<std::monostate>;
+
 // Errores pre-implementados
 
 struct StringError : Error {
