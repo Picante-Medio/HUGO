@@ -56,6 +56,8 @@ namespace HUGO{
 
 		//Returns scene data associated with sceneName
 		SceneData getSceneData(const HUGO::String& sceneName);
+
+		const std::unordered_map<HUGO::String, SceneData>& getAllSceneData();
 	};
 
 }

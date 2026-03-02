@@ -174,6 +174,10 @@ SceneData ChatParser::getSceneData(const HUGO::String & sceneName){
     return res->second;
 }
 
+const std::unordered_map<HUGO::String, SceneData>& ChatParser::getAllSceneData(){
+    return m_sceneData;
+}
+
 //------Read type methods---------
 
 HUGO::Vector3 ChatParser::readVector3(){
