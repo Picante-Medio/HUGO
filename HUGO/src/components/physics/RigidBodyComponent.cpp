@@ -73,52 +73,52 @@ void RigidBodyComponent::setRotationOffset(HUGO::Quaternion offset)
 #pragma region Getters
 // ----------------------Getters----------------------
 
-float RigidBodyComponent::getRestitution()
+float RigidBodyComponent::getRestitution() const
 {
     return restitution;
 }
     
-float RigidBodyComponent::getFriction()
+float RigidBodyComponent::getFriction() const
 {
     return friction;
 }
     
-float RigidBodyComponent::getMass()
+float RigidBodyComponent::getMass() const
 {
     return mass;
 }
     
-float RigidBodyComponent::getDamping()
+float RigidBodyComponent::getDamping() const
 {
     return damping;
 }
 
-HUGO::Vector3 RigidBodyComponent::getLinearVelocity()
+HUGO::Vector3 RigidBodyComponent::getLinearVelocity() const
 {
     return linearVelocity;
 }
     
-HUGO::Vector3 RigidBodyComponent::getAngularVelocity()
+HUGO::Vector3 RigidBodyComponent::getAngularVelocity() const
 {
     return angularVelocity;
 }
     
-HUGO::Vector3 RigidBodyComponent::getLinearAcceleration()
+HUGO::Vector3 RigidBodyComponent::getLinearAcceleration() const
 {
     return linearAcceleration;
 }
     
-HUGO::Vector3 RigidBodyComponent::getAngularAcceleration()
+HUGO::Vector3 RigidBodyComponent::getAngularAcceleration() const
 {
     return angularAcceleration;
 }
 
-HUGO::Vector3 RigidBodyComponent::getPositionOffset()
+HUGO::Vector3 RigidBodyComponent::getPositionOffset() const
 {
     return positionOffset;
 }
     
-HUGO::Quaternion RigidBodyComponent::getRotationOffset()
+HUGO::Quaternion RigidBodyComponent::getRotationOffset() const
 {
     return rotationOffset;
 }

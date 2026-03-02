@@ -58,7 +58,7 @@ class PhysicsSystem : public System {
     std::vector<std::size_t> objectIdToIndex;
 
     // We use ids to shapes so various rb can use the same shape
-    PagedArray<ShapeObject, 128> shapes;
+    PagedArray<ShapeObject, 128> shapeObjects;
     std::vector<HUGO::BulletShapeID> freeBulletShapeId;
     std::vector<std::size_t> shapeIdToIndex;
     

@@ -59,18 +59,18 @@ struct RigidBodyComponent: public Component
     void setRotationOffset(HUGO::Quaternion offset);
 
     // Getters
-    float getRestitution();
-    float getFriction();
-    float getMass();
-    float getDamping();
+    float getRestitution() const;
+    float getFriction() const;
+    float getMass() const;
+    float getDamping() const;
 
-    HUGO::Vector3 getLinearVelocity();
-    HUGO::Vector3 getAngularVelocity();
-    HUGO::Vector3 getLinearAcceleration();
-    HUGO::Vector3 getAngularAcceleration();
+    HUGO::Vector3 getLinearVelocity() const;
+    HUGO::Vector3 getAngularVelocity() const;
+    HUGO::Vector3 getLinearAcceleration() const;
+    HUGO::Vector3 getAngularAcceleration() const;
 
-    HUGO::Vector3 getPositionOffset();
-    HUGO::Quaternion getRotationOffset();
+    HUGO::Vector3 getPositionOffset() const;
+    HUGO::Quaternion getRotationOffset() const;
 
 private:
     float restitution;

@@ -8,12 +8,6 @@ namespace HUGO{
     using OgreObjectID = int;
     constexpr OgreObjectID INVALID_OGRE_OBJECT_ID = std::numeric_limits<int>::max();
 
-    using BulletObjectID = int;
-    constexpr BulletObjectID INVALID_BULLET_OBJECT_ID = std::numeric_limits<int>::max();
-
-    using BulletShapeID = int;
-    constexpr BulletShapeID INVALID_BULLET_SHAPE_ID = std::numeric_limits<int>::max();
-
     using AudioID = int;
     using SceneID = int;
 
@@ -84,14 +78,19 @@ namespace HUGO{
     
 
     // -------- PHYSICS TYPES --------
-    
+
+    using BulletObjectID = int;
+    constexpr BulletObjectID INVALID_BULLET_OBJECT_ID = std::numeric_limits<int>::max();
+
+    using BulletShapeID = int;
+    constexpr BulletShapeID INVALID_BULLET_SHAPE_ID = std::numeric_limits<int>::max();
+
     // #ifdef BULLET_PHYSICS
     using Simulation = BulletSimulation;
     using simulationRB = btRigidBody;
     // #else
     // ...
     // #endif
-
 
     // -------- Collider Types --------
     enum class ColliderType 

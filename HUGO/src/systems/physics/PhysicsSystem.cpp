@@ -156,7 +156,7 @@ HUGO::BulletShapeID PhysicsSystem::createShapeObject(Shape& shape)
     shape.id = id;
 
     //store object
-    std::size_t index = shapes.push_back(std::move(obj));
+    std::size_t index = shapeObjects.push_back(std::move(obj));
     shapeIdToIndex[id] = index;
 
     return id;
@@ -164,7 +164,7 @@ HUGO::BulletShapeID PhysicsSystem::createShapeObject(Shape& shape)
 
 ShapeObject& PhysicsSystem::getShapeObject(const HUGO::BulletShapeID id)
 {
-    return shapes[shapeIdToIndex[id]];
+    return shapeObjects[shapeIdToIndex[id]];
 }
 
 void PhysicsSystem::removeShapeObject(HUGO::BulletShapeID& id)
@@ -173,18 +173,18 @@ void PhysicsSystem::removeShapeObject(HUGO::BulletShapeID& id)
     if (id != HUGO::INVALID_BULLET_SHAPE_ID){
         
         std::size_t index = shapeIdToIndex[id];
-        std::size_t lastIndex = shapes.size() - 1;
+        std::size_t lastIndex = shapeObjects.size() - 1;
 
-        destroyShapeObject(shapes[index]);
+        destroyShapeObject(shapeObjects[index]);
 
         if (index != lastIndex) {
             // mover último objeto al hueco
-            shapes[index] = std::move(shapes[lastIndex]);
-            HUGO::BulletShapeID movedID = shapes[index].id;
+            shapeObjects[index] = std::move(shapeObjects[lastIndex]);
+            HUGO::BulletShapeID movedID = shapeObjects[index].id;
             shapeIdToIndex[movedID] = index;
         }
 
-        shapes.remove(lastIndex);
+        shapeObjects.remove(lastIndex);
         freeBulletShapeId.push_back(id);
         id = HUGO::INVALID_BULLET_SHAPE_ID;
     }
