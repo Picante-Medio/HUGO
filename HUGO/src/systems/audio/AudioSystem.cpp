@@ -27,7 +27,7 @@ AudioInfo AudioSystem::createVoice(HUGO::AudioID id)
 
     if (!info.ptr->init(engine.get(), fullPath.c_str(), 0))
         throw std::runtime_error("Failed loading audio");
-
+    
     return info;
 }
 
@@ -326,11 +326,15 @@ void AudioSystem::endCallback(void* data, ma_sound* pSound)
 }
 
 // HELPERS
-void AudioSystem::loadAudiosFromFile(const char* path)
+ErrorOrVoid AudioSystem::loadAudiosFromFile(const char* path)
 {
     std::ifstream file(path);
-    if (!file.is_open())
-        throw std::runtime_error("Could not open audio file list");
+    if (!file.is_open()){
+        StringError error;
+        error.errorMessage = "Could not open audio file list";
+        return ErrorOrVoid(error);
+    }
+        
 
     std::string line;
 
@@ -356,6 +360,7 @@ void AudioSystem::loadAudiosFromFile(const char* path)
 
         pools.emplace_back(); // pool aligned with id
     }
+    return ErrorOrVoid();
 }
 
 
@@ -466,13 +471,16 @@ void AudioSystem::fixedUpdate(double dt)
 {
 }
 
-void AudioSystem::addAudio(const char* name, HUGO::AudioTypes type)
+ErrorOrVoid AudioSystem::addAudio(const char* name, HUGO::AudioTypes type)
 {
     std::string audioName = name;
 
     auto it = nameToID.find(audioName);
-    if (it == nameToID.end())
-        throw std::runtime_error("Audio already registered");
+    if (it == nameToID.end()){
+        StringError error;
+        error.errorMessage = "Audio already registered";
+        return ErrorOrVoid(error);
+    }
 
     HUGO::AudioID id = nextID++;
 
@@ -480,6 +488,7 @@ void AudioSystem::addAudio(const char* name, HUGO::AudioTypes type)
     nameToID[audioName] = id;
 
     pools.emplace_back();
+    return ErrorOrVoid();
 }
 
 void AudioSystem::createTestEntity()

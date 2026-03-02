@@ -153,11 +153,11 @@ public:
     virtual ~AudioSystem() = default;
     
     // Load assets
-    void loadAudiosFromFile(const char* path);
+    ErrorOrVoid loadAudiosFromFile(const char* path);
     void update(double dt) override;
     void fixedUpdate(double dt) override;
 
-    void addAudio(const char* name, HUGO::AudioTypes type);
+    ErrorOrVoid addAudio(const char* name, HUGO::AudioTypes type);
 
     /* ====================================
        ONLY FOR TESTING! IT WILL BE DELETED

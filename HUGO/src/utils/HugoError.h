@@ -38,4 +38,5 @@ public:
 class ErrorOrVoid : public ErrorOrType<std::monostate> {
 public:
   inline ErrorOrVoid() : ErrorOrType<std::monostate> (std::monostate()) {}
+  inline ErrorOrVoid(StringError err) : ErrorOrType<std::monostate> (err) {}
 };
