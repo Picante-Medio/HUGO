@@ -30,56 +30,69 @@ set(INSTALL_CMAKE_FILES OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(miniaudio bullet3)
 
-#find_package(PNG REQUIRED)
-#find_package(BZip2 REQUIRED)
-#find_package(Brotli REQUIRED)
-
-if(LINUX)
-    set(CMAKE_EXE_LINKER_FLAGS "-lpng -lbz2 -lbrotlidec -lpthread -lm")
-endif()
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(BASE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/dependencies/${CMAKE_SYSTEM_PROCESSOR})
+file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
-if (WIN32)
-    set(CMAKE_PREFIX_PATH 
-        ${BASE_PREFIX_PATH}/sdl2
-        ${BASE_PREFIX_PATH}/ogre
-        CACHE PATH "prefix path"
-    )
-else()
-    set(CMAKE_PREFIX_PATH 
-        ${BASE_PREFIX_PATH}/ogre
-        CACHE PATH "prefix path"
-    )
-    
-    file(GLOB OGRE_PLUGINS
-        "${BASE_PREFIX_PATH}/ogre/lib/OGRE/*.so"
-        "${BASE_PREFIX_PATH}/ogre/lib/OGRE/*.so.*"
-    )
-endif()
+add_executable(${PROJECT_NAME} ${SRC_FILES})
 
-find_package(SDL2 CONFIG REQUIRED)
-find_package(OGRE CONFIG REQUIRED COMPONENTS
-    Overlay)
 file(GLOB_RECURSE SRC_DIRS CONFIGURE_DEPENDS LIST_DIRECTORIES true ${CMAKE_SOURCE_DIR}/src/*)
 
-set(INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/src")
+set(INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src
+    ${bullet3_SOURCE_DIR}/src)
+
 foreach(path ${SRC_DIRS})
     if(IS_DIRECTORY "${path}")
         list(APPEND INCLUDE_DIRS "${path}")
     endif()
 endforeach()
 
-file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cpp)
+list(APPEND INCLUDE_DIRS "${bullet3_SOURCE_DIR}/src")
 
-add_executable(${PROJECT_NAME} ${SRC_FILES})
+file(GLOB_RECURSE BULLET_SRC_DIRS CONFIGURE_DEPENDS LIST_DIRECTORIES true ${bullet3_SOURCE_DIR}/src/*)
+
+foreach(path ${BULLET_SRC_DIRS})
+    if(IS_DIRECTORY "${path}")
+        list(APPEND INCLUDE_DIRS "${path}")
+    endif()
+endforeach()
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
     ${INCLUDE_DIRS}
-    ${miniaudio_SOURCE_DIR}
-    ${bullet3_SOURCE_DIR}/src)
+    ${miniaudio_SOURCE_DIR})
+
+set(BASE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/dependencies/${CMAKE_SYSTEM_PROCESSOR})
+
+if(WIN32)
+    set(CMAKE_PREFIX_PATH 
+        ${BASE_PREFIX_PATH}/sdl2
+        ${BASE_PREFIX_PATH}/ogre
+        CACHE PATH "prefix path"
+    )
+elseif(LINUX)
+    set(CMAKE_PREFIX_PATH
+        ${BASE_PREFIX_PATH}/ogre
+        CACHE PATH "prefix path")
+
+    set(CMAKE_EXE_LINKER_FLAGS "-lpng -lbz2 -lbrotlidec -lpthread -lm")
+    
+    # find_package(Threads REQUIRED)
+    # find_library(BROTLIDEC_LIB brotlidec REQUIRED)
+    # find_library(PNG_LIB png REQUIRED)
+    # find_library(BZ2_LIB bz2 REQUIRED)
+    # find_library(M_LIB m REQUIRED)
+
+    # list(APPEND HUGO_LINKED_LIBRARIES
+    #     Threads::Threads
+    #     ${BROTLIDEC_LIB}
+    #     ${PNG_LIB}
+    #     ${BZ2_LIB}
+    #     ${M_LIB})
+endif()
+
+find_package(SDL2 CONFIG REQUIRED)
+find_package(OGRE CONFIG REQUIRED COMPONENTS
+    Overlay)
 
 set(HUGO_LINKED_LIBRARIES
     BulletDynamics

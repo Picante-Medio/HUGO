@@ -1,6 +1,6 @@
 #pragma once
 #include "Ogre.h"
-#include "../bullet3-src/src/btBulletDynamicsCommon.h"
+#include "btBulletDynamicsCommon.h"
 
 namespace HUGO {
 	struct Degree;
