@@ -25,16 +25,9 @@ class Scene : public std::enable_shared_from_this<Scene> {
   }
 
   // Physics simulation
-  void initSimulation();
-  
   template <typename T>
   T* getSimulation() {
     return static_cast<T>(simulation->getSimulation());
-  }
-
-  template <typename T>
-  void addShapeToSimulation(T* collisionShape) {
-    simulation->addShape(collisionShape);
   }
 
   std::unique_ptr<HUGO::Simulation> simulation;
@@ -43,6 +36,8 @@ public:
   Scene();
 
   inline void addSystem(std::shared_ptr<System> system) { systems.push_back(system); }
+
+  void initSimulation();
 
   // Logic update
   void update(double dt);

@@ -6,7 +6,7 @@
 #include "Ecs.h"
 
 Scene::Scene() {
-  initSimulation();
+
 }
 
 void 

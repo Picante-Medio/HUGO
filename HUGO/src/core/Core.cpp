@@ -29,6 +29,7 @@ void Core::init(){
     initModules();
     
     scenePtr = std::make_shared<Scene>();
+    scenePtr->initSimulation();
 
     std::shared_ptr<AudioSystem> audioSystem = std::make_shared<AudioSystem>(scenePtr, maEngine);
     audioSystem->loadAudiosFromFile("test_media/AudioList.txt");
@@ -38,7 +39,6 @@ void Core::init(){
     std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr, m_ogreRoot, m_renderWindow);
     scenePtr->addSystem(renderSystem);
     renderSystem->createTestEntity();
-    //std::shared_ptr<PhysicsSystem> physicsSystem = std::make_shared<PhysicsSystem>(scenePtr);
     
     //m_resourceManager = std::make_shared<HUGO::ResourceManager>(maEngine, m_ogreRoot);
 }
