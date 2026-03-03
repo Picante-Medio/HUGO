@@ -1,8 +1,5 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
-
-#include <OgreCommon.h>
-#include <OgreConfigOptionMap.h>
 #include <iostream>
 
 #include "RenderSystem.h"
@@ -194,7 +191,7 @@ HUGO::OgreObjectID RenderSystem::createOgreObject(const std::string &meshName, c
     return id;
 }
 
-OgreObject &RenderSystem::getOgreObject(HUGO::OgreObjectID id)
+OgreObject& RenderSystem::getOgreObject(HUGO::OgreObjectID id)
 {
     return ogreObjects[idToIndex[id]];
 }
@@ -288,18 +285,8 @@ void RenderSystem::setMaterial(EntityID entity, const std::string &materialName)
 {
     scene->addComponent<MaterialDirtyTag>(entity, materialName);
 }
+
 // Helper function for Camera creation
-// EntityID RenderSystem::createCameraEntity()
-// {
-//     EntityID entity = scene->createEntity();
-    
-//     scene->addComponent<TransformComponent>(entity);
-//     scene->addComponent<CameraComponent>(entity);
-    
-//     registerCameraEntity(entity);
-    
-//     return entity;
-// }
 EntityID RenderSystem::createCameraEntity(const HUGO::Vector3& position)
 {
     EntityID entity = scene->createEntity();
@@ -391,7 +378,7 @@ void RenderSystem::unregisterViewportEntity(EntityID entity)
 #pragma region  OgreCamera and ViewPort Creation 
 void RenderSystem::createOgreCamera(EntityID entity)
 {
-    CameraResources res;
+    CameraInfo res;
     
     // Get the transform component of the camera to set the initial position
     const TransformComponent* transformComp = nullptr;
@@ -451,7 +438,7 @@ void RenderSystem::createOgreCamera(EntityID entity)
 
 void RenderSystem::createOgreLight(EntityID entity)
 {
-    LightResources res;
+    LightInfo res;
     
     // Get the transform component of the light to set the initial position
     const TransformComponent* transformComp = nullptr;
@@ -486,7 +473,7 @@ void RenderSystem::createOgreLight(EntityID entity)
 
     // Get Ogre light type from LightComponent
     Ogre::Light::LightTypes ogreType;
-    switch (lightComp->lightType) {
+    switch (lightComp->getLightType()) {
         case HUGO::LightType::LT_POINT:
             ogreType = Ogre::Light::LT_POINT;
             break;
@@ -502,28 +489,28 @@ void RenderSystem::createOgreLight(EntityID entity)
     }
 
     res.ogreLight->setType(ogreType);
-    res.ogreLight->setDiffuseColour(Ogre::ColourValue(lightComp->diffuse.x, lightComp->diffuse.y, lightComp->diffuse.z, lightComp->diffuse.w));
-    res.ogreLight->setSpecularColour(Ogre::ColourValue(lightComp->specular.x, lightComp->specular.y, lightComp->specular.z, lightComp->specular.w));
-    
+    res.ogreLight->setDiffuseColour(Ogre::ColourValue(lightComp->getDiffuse().x, lightComp->getDiffuse().y, lightComp->getDiffuse().z, lightComp->getDiffuse().w));
+    res.ogreLight->setSpecularColour(Ogre::ColourValue(lightComp->getSpecular().x, lightComp->getSpecular().y, lightComp->getSpecular().z, lightComp->getSpecular().w));
+
     // parameters for spot light
-    if (lightComp->lightType == HUGO::LightType::LT_SPOTLIGHT) {
-        res.ogreLight->setSpotlightRange(Ogre::Radian(lightComp->spotInner.valueRadians())
-            , Ogre::Radian(lightComp->spotOuter.valueRadians()), lightComp->spotFalloff);
-        
-        if (lightComp->spotNearClip > 0) {
-            res.ogreLight->setSpotlightNearClipDistance(lightComp->spotNearClip);
+    if (lightComp->getLightType() == HUGO::LightType::LT_SPOTLIGHT) {
+        res.ogreLight->setSpotlightRange(Ogre::Radian(lightComp->getSpotInner().valueRadians())
+            , Ogre::Radian(lightComp->getSpotOuter().valueRadians()), lightComp->getSpotFallOff());
+
+        if (lightComp->getSpotNearClip() > 0) {
+            res.ogreLight->setSpotlightNearClipDistance(lightComp->getSpotNearClip());
         }
     }
     
     // parameters for directional light
-    if (lightComp->lightType != HUGO::LightType::LT_DIRECTIONAL) {
-        res.ogreLight->setAttenuation( lightComp->attenuation.w, lightComp->attenuation.x,  
-                                       lightComp->attenuation.y, lightComp->attenuation.z);
+    if (lightComp->getLightType() != HUGO::LightType::LT_DIRECTIONAL) {
+        res.ogreLight->setAttenuation( lightComp->getAttenuation().w, lightComp->getAttenuation().x,  
+                                       lightComp->getAttenuation().y, lightComp->getAttenuation().z);
     }
 
     // shadows
-    if(lightComp->shadowFarDist > 0){
-        res.ogreLight->setShadowFarDistance(lightComp->shadowFarDist);
+    if(lightComp->getShadowFarDistance() > 0){
+        res.ogreLight->setShadowFarDistance(lightComp->getShadowFarDistance());
     }
 
     res.node = sceneManager->getRootSceneNode()->createChildSceneNode(nodeName);
@@ -531,7 +518,7 @@ void RenderSystem::createOgreLight(EntityID entity)
     res.node->setPosition(transformComp->position.toOgre());
 
     // for dirrectonal light
-    if (lightComp->lightType == HUGO::LightType::LT_DIRECTIONAL) {
+    if (lightComp->getLightType() == HUGO::LightType::LT_DIRECTIONAL) {
         res.node->setOrientation(transformComp->rotation.toOgre());
     }
 
@@ -540,7 +527,7 @@ void RenderSystem::createOgreLight(EntityID entity)
 
 void RenderSystem::createOgreViewport(EntityID entity)
 {
-    ViewportResources res;
+    ViewportInfo res;
     
     const ViewportComponent* viewportComp = nullptr;
     for(auto& pack : scene->query<ViewportComponent>()) {

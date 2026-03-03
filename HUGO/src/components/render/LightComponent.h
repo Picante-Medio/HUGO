@@ -6,6 +6,7 @@
 
 struct LightComponent: public Component
 {
+private:
     HUGO::Vector4 diffuse = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f);
     HUGO::Vector4 specular = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f);
     HUGO::LightType lightType = HUGO::LightType::LT_POINT;
@@ -28,11 +29,39 @@ struct LightComponent: public Component
     float shadowNearClipDist;
     float shadowFarClipDist;
 
+public:
     LightComponent(EntityID entity,
                    HUGO::Vector4 diff, HUGO::Vector4 specular, HUGO::LightType lType
                    , const HUGO::Radian& outer, const HUGO::Radian& inner
-                   , float falloff, float nearClip, float shadowNearClipDist, float shadowFarClipDist)
-        : Component(entity), diffuse(diff), specular(specular), lightType(lType), spotOuter(outer)
-        , spotInner(inner), spotFalloff(falloff), spotNearClip(nearClip)
-        , shadowNearClipDist(shadowNearClipDist), shadowFarClipDist(shadowFarClipDist) {}
+                   , float falloff, float nearClip, float shadowNearClipDist, float shadowFarClipDist);
+
+    // Setters
+    void setDiffuse(HUGO::Vector4 nDiff);
+    void setSpecular(HUGO::Vector4 nSpec);
+    void setLightType(HUGO::LightType lightT);
+    void setSpotOuter(HUGO::Radian sOuter);
+    void setSpotInner(HUGO::Radian sInner);
+    void setSpotFallOff(float sFallOf);
+    void setSpotNearClip(float sNearClip);
+    void setAttenuation(HUGO::Vector4 nAtte);
+    void setShadowFarDistance(float nShadowDistance);
+    void setShadowFarDistanceSquared(float nShadowDistanceSquared);
+    void setIndexInFrame(size_t nIndexInFrame);
+    void setShadowNearClipDist(float nShadowNearClipDist);
+    void setShadowFarClipDist(float nShadowFarClipDist);
+
+    // Getters
+    HUGO::Vector4 getDiffuse() const;
+    HUGO::Vector4 getSpecular() const;
+    HUGO::LightType getLightType() const;
+    HUGO::Radian getSpotOuter() const;
+    HUGO::Radian getSpotInner() const;
+    float getSpotFallOff() const;
+    float getSpotNearClip() const;
+    HUGO::Vector4 getAttenuation() const;
+    float getShadowFarDistance() const;
+    float getShadowFarDistanceSquared() const;
+    size_t getIndexInFrame() const;
+    float getShadowNearClipDistance() const;
+    float getShadowFarClipDistance() const;
 };

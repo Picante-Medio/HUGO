@@ -11,37 +11,41 @@
 
 struct RenderComponent;
 
+   // OgreObject Information
 struct OgreObject{
     HUGO::OgreObjectID id;
     Ogre::Entity* ogreEntity = nullptr;
     Ogre::SceneNode* ogreSceneNode = nullptr;
 };
 
-// For multiple cameras and viewports
-struct CameraResources {
-    Ogre::Camera* ogreCamera = nullptr;
-    Ogre::SceneNode* node = nullptr;
-};
-
-struct ViewportResources {
-    Ogre::Viewport* ogreViewport = nullptr;
-    EntityID lastCameraEntity = 0;
-};
-
-struct LightResources {
-    Ogre::Light* ogreLight = nullptr;
-    EntityID lastCameraEntity = 0;
-    Ogre::SceneNode* node = nullptr;
-};
-
 class RenderSystem : public System{
+    // Ogre Camera Information
+    struct CameraInfo {
+        Ogre::Camera* ogreCamera = nullptr;
+        Ogre::SceneNode* node = nullptr;
+    };
+
+    // Ogre Viewport Information
+    struct ViewportInfo {
+        EntityID lastCameraEntity = 0;
+        Ogre::Viewport* ogreViewport = nullptr;
+    };
+
+    // Ogre Light Information
+    struct LightInfo {
+        Ogre::Light* ogreLight = nullptr;
+        Ogre::SceneNode* node = nullptr;
+    };
+
+ 
+
     std::shared_ptr<Ogre::Root> ogreRoot;
     Ogre::SceneManager* sceneManager = nullptr;
     Ogre::RenderWindow* renderWindow = nullptr; 
 
-    std::unordered_map<EntityID, CameraResources> cameraMap; // Provisional
-    std::unordered_map<EntityID, ViewportResources> viewportMap; // Provisional
-    std::unordered_map<EntityID, LightResources> lightMap; // Provisional
+    std::unordered_map<EntityID, CameraInfo> cameraMap; // Provisional
+    std::unordered_map<EntityID, ViewportInfo> viewportMap; // Provisional
+    std::unordered_map<EntityID, LightInfo> lightMap; // Provisional
 
     std::vector<HUGO::OgreObjectID> freeOgreObjectId;
     std::vector<std::size_t> idToIndex;
