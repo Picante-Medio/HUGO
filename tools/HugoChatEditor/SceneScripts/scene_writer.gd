@@ -24,15 +24,14 @@ static func write():
 		push_error("Could not open file for writing: %s" % file_path)
 		return
 	
-	for prefab:StringName in root.prefabs:
-		file.store_line("PREFAB " + prefab + ".chat")
-	file.store_line("")
-	
 	if root is not Entity:
+		file.store_line("SCENE")
 		for system:SCENE_TRACKER.SYSTEMS in root.systems:
 			var system_name:String = SCENE_TRACKER.SYSTEMS.keys()[system]
 			file.store_line("SYSTEM " + system_name)
 		file.store_line("")
+	else:
+		file.store_line("PREFAB")
 	
 	for entity_key in root.entities.keys():
 		file.store_line("ENTITY " + str(entity_key) + " " + str(entity_map[entity_key]))

@@ -11,5 +11,7 @@ static func format(variant:Variant):
 		return "MESH " + variant.resource_path
 	elif variant is PackedScene:
 		return "PREFAB " + variant.resource_path
+	elif  variant is String:
+		return "STRING \n" + variant
 	
-	return type_string(typeof(variant)) + " " + str(variant)
+	return type_string(typeof(variant)).to_upper() + " " + str(variant)

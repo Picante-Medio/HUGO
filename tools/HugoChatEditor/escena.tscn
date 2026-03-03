@@ -3,39 +3,51 @@
 [ext_resource type="Script" uid="uid://cft1fgdpqn2vu" path="res://SceneScripts/scene_tracker.gd" id="1_865ah"]
 [ext_resource type="PackedScene" uid="uid://krs4pyuy4e" path="res://Prefabs/alfonso.tscn" id="2_fanfj"]
 [ext_resource type="Script" uid="uid://dimuk3ggoam44" path="res://Entities/entity3d.gd" id="3_sks45"]
+[ext_resource type="Script" uid="uid://bnjt3w18hk2gs" path="res://NativeComponents/MeshRendererComponent.gd" id="4_d4yc1"]
+[ext_resource type="SphereMesh" uid="uid://citadnjn16yba" path="res://sphere.tres" id="4_ssasw"]
 [ext_resource type="Script" uid="uid://dcc6b5sxl6c7u" path="res://Entities/entity.gd" id="5_d4yc1"]
+[ext_resource type="Script" uid="uid://chfil18rmq2xi" path="res://Components/AudioComponent.gd" id="6_77l53"]
 
 [node name="Escena" type="Node3D" unique_id=1674858039 groups=["SCENE_TRACKER"]]
 script = ExtResource("1_865ah")
 entities = Dictionary[String, Dictionary]({
 "Alfonso": {
-"MeshInstance3D": Dictionary[String, Variant]({
-"mesh": "String res://sphere.tres"
+"MeshRendererComponent": Dictionary[String, Variant]({
+"mesh": "STRING 
+res://sphere.tres"
 }),
-"Parent": {
-"value int": 2
+"ParentComponent": {
+"value": "int 2"
 }
 },
 "David": {
-"Parent": {
-"value int": 3
+"ParentComponent": {
+"value": "int 3"
 }
 },
 "Entity": {},
 "Guille": {
-"Parent": {
-"value int": 0
+"AudioComponent": Dictionary[String, Variant]({
+"audioId": "INT 0",
+"pitch": "FLOAT 0.0",
+"volume": "FLOAT 0.0"
+}),
+"MeshRendererComponent": Dictionary[String, Variant]({
+"mesh": "STRING 
+res://sphere.tres"
+}),
+"ParentComponent": {
+"value": "int 0"
 }
 },
 "Juan": {
-"Transform": Dictionary[String, Variant]({
+"TransformComponent": Dictionary[String, Variant]({
 "position": "VECTOR_3 0.56475341320038 0.0 0.0",
 "rotation": "VECTOR_3 0.0 0.0 0.0",
 "scale": "VECTOR_3 1.0 1.0 1.0"
 })
 }
 })
-prefabs = Array[StringName]([&"alfonso"])
 metadata/_custom_type_script = "uid://cft1fgdpqn2vu"
 
 [node name="Juan" type="Node3D" parent="." unique_id=660153118]
@@ -46,6 +58,15 @@ metadata/_custom_type_script = "uid://dimuk3ggoam44"
 [node name="Guille" type="Node3D" parent="Juan" unique_id=761297550]
 script = ExtResource("5_d4yc1")
 metadata/_custom_type_script = "uid://dcc6b5sxl6c7u"
+
+[node name="MeshRenderer" type="MeshInstance3D" parent="Juan/Guille" unique_id=1900278368]
+mesh = ExtResource("4_ssasw")
+script = ExtResource("4_d4yc1")
+metadata/_custom_type_script = "uid://bnjt3w18hk2gs"
+
+[node name="AudioComponent" type="Node" parent="Juan/Guille" unique_id=146731479]
+script = ExtResource("6_77l53")
+metadata/_custom_type_script = "uid://chfil18rmq2xi"
 
 [node name="Entity" type="Node3D" parent="." unique_id=402391702]
 script = ExtResource("5_d4yc1")

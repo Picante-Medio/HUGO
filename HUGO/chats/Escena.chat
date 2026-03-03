@@ -1,25 +1,32 @@
-PREFAB alfonso.chat
-
+SCENE
 
 ENTITY Juan 0
-	COMPONENT Transform
+	COMPONENT TransformComponent
 		[position] VECTOR_3 0.56475341320038 0.0 0.0
 		[rotation] VECTOR_3 0.0 0.0 0.0
 		[scale] VECTOR_3 1.0 1.0 1.0
 
 ENTITY Guille 1
-	COMPONENT Parent
-		[value int] 0
+	COMPONENT ParentComponent
+		[value] INT 0
+	COMPONENT MeshRendererComponent
+		[mesh] STRING 
+res://sphere.tres
+	COMPONENT AudioComponent
+		[audioId] INT 0
+		[volume] FLOAT 0.0
+		[pitch] FLOAT 0.0
 
 ENTITY Entity 2
 
 ENTITY Alfonso 3
-	COMPONENT Parent
-		[value int] 2
-	COMPONENT MeshInstance3D
-		[mesh] String res://sphere.tres
+	COMPONENT ParentComponent
+		[value] INT 2
+	COMPONENT MeshRendererComponent
+		[mesh] STRING 
+res://sphere.tres
 
 ENTITY David 4
-	COMPONENT Parent
-		[value int] 3
+	COMPONENT ParentComponent
+		[value] INT 3
 

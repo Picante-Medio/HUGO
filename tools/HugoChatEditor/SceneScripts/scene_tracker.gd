@@ -5,7 +5,6 @@ class_name SCENE_TRACKER
 
 @export var entities:Dictionary[String, Dictionary]
 @export var systems:Array[SYSTEMS]
-@export var prefabs:Array[StringName]
 
 @export_tool_button("Save Scene") var button = SceneWriter.write
 
@@ -24,12 +23,6 @@ func add_entity(entity:Entity):
 	var entity_name:String = entity.name
 	while entities.has(entity_name):
 		entity_name = entity_name + str("_O")
-	
-	if self is not Entity and entity.scene_file_path != "":
-		print(scene_file_path + " is not " + entity.scene_file_path)
-		var scene_paths:PackedStringArray = entity.scene_file_path.split("/")
-		var scene_name:String = scene_paths[scene_paths.size()-1].split(".tscn")[0]
-		if not prefabs.has(scene_name): prefabs.push_back(scene_name)
 		
 	entity.name = entity_name
 	entities.get_or_add(entity_name, {})
@@ -43,16 +36,17 @@ func gather_entities(parent:Node):
 			add_entity(child)
 			
 			if parent is Entity:
-				entities.get(child.name).get_or_add("Parent", {"value int" : entities_map[parent.name]})
+				entities.get(child.name).get_or_add("ParentComponent", {"value" :  "INT " + str(entities_map[parent.name])})
 				
 			gather_entities(child)
 			
 			if child is Entity3D:
-				entities.get(child.name).get_or_add("Transform", child.get_component())
+				entities.get(child.name).get_or_add("TransformComponent", child.get_component())
 			
 		if child.has_method("get_component"):
 			if parent is Entity:
-				entities.get(parent.name).get_or_add(child.get_class(), child.get_component())
+				var child_class_name:String = child.get_script().resource_path.get_file().split(".gd")[0]
+				entities.get(parent.name).get_or_add(child_class_name, child.get_component())
 				
 	return entities
 
