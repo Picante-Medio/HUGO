@@ -87,11 +87,11 @@ void RenderSystem::handleTag()
             it->second.node->setOrientation(tr.rotation.toOgre());
             
             // update projection parameters
-            if (camera.projectionType == HUGO::ProjectionType::Perspective) {
-                it->second.ogreCamera->setFOVy(Ogre::Degree(camera.fovY));
+            if (camera.getProjectionType() == HUGO::ProjectionType::Perspective) {
+                it->second.ogreCamera->setFOVy(Ogre::Degree(camera.getFOVY()));
             }
-            it->second.ogreCamera->setNearClipDistance(camera.nearClip);
-            it->second.ogreCamera->setFarClipDistance(camera.farClip);
+            it->second.ogreCamera->setNearClipDistance(camera.getNearClip());
+            it->second.ogreCamera->setFarClipDistance(camera.getFarClip());
         }
         // eliminate the tag
         scene->removeComponent<CameraDirtyTag>(entity);
@@ -412,16 +412,16 @@ void RenderSystem::createOgreCamera(EntityID entity)
     res.ogreCamera = sceneManager->createCamera(camName);
 
     // Default parameters
-    res.ogreCamera->setNearClipDistance(cameraComp->nearClip);
-    res.ogreCamera->setFarClipDistance(cameraComp->farClip);
-    res.ogreCamera->setAutoAspectRatio(cameraComp->autoAspectRatio);
-    
-    if (cameraComp->projectionType == HUGO::ProjectionType::Perspective) {
+    res.ogreCamera->setNearClipDistance(cameraComp->getNearClip());
+    res.ogreCamera->setFarClipDistance(cameraComp->getFarClip());
+    res.ogreCamera->setAutoAspectRatio(cameraComp->getAutoAspectRatio());
+
+    if (cameraComp->getProjectionType() == HUGO::ProjectionType::Perspective) {
         res.ogreCamera->setProjectionType(Ogre::PT_PERSPECTIVE);
-        res.ogreCamera->setFOVy(Ogre::Degree(cameraComp->fovY));
+        res.ogreCamera->setFOVy(Ogre::Degree(cameraComp->getFOVY()));
     } else {
         res.ogreCamera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
-        res.ogreCamera->setOrthoWindow(cameraComp->orthoWidth, cameraComp->orthoHeight);
+        res.ogreCamera->setOrthoWindow(cameraComp->getOrthographicDimensions().first, cameraComp->getOrthographicDimensions().second);
     }
 
     // create node and attach camera
