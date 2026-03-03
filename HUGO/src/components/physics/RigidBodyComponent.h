@@ -48,7 +48,8 @@ struct RigidBodyComponent: public Component
     void setRestitution(float nRestitution);
     void setFriction(float nFriction);
     void setMass(float nMass);
-    void setDamping(float nDamping);
+    void setLinearDamping(float nDamping);
+    void setAngularDamping(float nDamping);
     void setLinearVelocity(HUGO::Vector3 nVelocity);
     void setAngularVelocity(HUGO::Vector3 nVelocity);
 
@@ -64,12 +65,11 @@ struct RigidBodyComponent: public Component
     float getRestitution() const;
     float getFriction() const;
     float getMass() const;
-    float getDamping() const;
+    float getLinearDamping() const;
+    float getAngularDamping() const;
 
     HUGO::Vector3 getLinearVelocity() const;
     HUGO::Vector3 getAngularVelocity() const;
-    HUGO::Vector3 getLinearAcceleration() const;
-    HUGO::Vector3 getAngularAcceleration() const;
 
     HUGO::Vector3 getPositionOffset() const;
     HUGO::Quaternion getRotationOffset() const;
@@ -87,8 +87,7 @@ private:
         TORQUE_IMPULSE_APPLIED = 128,
         FORCE_APPLIED = 256,
         TORQUE_APPLIED = 512,
-        POSITION_OFFSET_UPDATED = 1024,
-        ROTATION_OFFSET_UPDATED = 2048
+        TRANSFORM_OFFSET_UPDATED = 1024
     };
 
     int flags;
@@ -96,14 +95,13 @@ private:
     float restitution;
     float friction;
     float mass;
-    float damping;
+    float linearDamping;
+    float angularDamping;
     HUGO::Vector3 positionOffset;
     HUGO::Quaternion rotationOffset;
 
     HUGO::Vector3 linearVelocity;
     HUGO::Vector3 angularVelocity;
-    HUGO::Vector3 linearAcceleration;
-    HUGO::Vector3 angularAcceleration;
 
     HUGO::Vector3 impulseApplied;
     HUGO::Vector3 torqueImpulseApplied;

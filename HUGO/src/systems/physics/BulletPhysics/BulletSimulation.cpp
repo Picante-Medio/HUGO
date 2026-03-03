@@ -251,47 +251,52 @@ void BulletSimulation::destroyRigidBodyObject(RigidBodyObject& RbObj)
 }
 #pragma endregion
 
+#pragma region RigidBody
 void BulletSimulation::checkFlags(RigidBodyComponent& hgRB)
 {
     if(hgRB.flags != 0){
         RigidBodyObject* obj = rigidBodies[rbIdToIndex[hgRB.objectID]];
 
         if(hgRB.flags & RigidBodyComponent::RESTITUTION_UPDATED){
-
+            obj->bulletRB->setRestitution(hgRB.restitution);
         }
         if(hgRB.flags & RigidBodyComponent::FRICTION_UPDATED){
-
+            obj->bulletRB->setFriction(hgRB.friction);
         }
         if(hgRB.flags & RigidBodyComponent::MASS_UPDATED){
-            
+            obj->bulletRB->setMassProps(hgRB.mass, HUGO::Vector3().toBullet());
         }
         if(hgRB.flags & RigidBodyComponent::DAMPING_UPDATED){
-            
+            obj->bulletRB->setDamping(hgRB.linearDamping, hgRB.angularDamping);
         }
         if(hgRB.flags & RigidBodyComponent::LINEAR_VELOCITY_UPDATED){
-            
+            obj->bulletRB->setLinearVelocity(hgRB.linearVelocity);
         }
         if(hgRB.flags & RigidBodyComponent::ANGULAR_VELOCITY_UPDATED){
-            
+            obj->bulletRB->setAngularVelocity(hgRB.angularVelocity);
         }
         if(hgRB.flags & RigidBodyComponent::IMPULSE_APPLIED){
-            
+            obj->bulletRB->applyCentralImpulse(hgRB.impulseApplied);
+            hgRB.linearVelocity = obj->bulletRB->getLinearVelocity();
         }
         if(hgRB.flags & RigidBodyComponent::TORQUE_IMPULSE_APPLIED){
-            
+            obj->bulletRB->applyTorqueImpulse(hgRB.torqueImpulseApplied);
+            hgRB.angularVelocity = obj->bulletRB->getAngularVelocity();
         }
         if(hgRB.flags & RigidBodyComponent::FORCE_APPLIED){
-            
+            obj->bulletRB->applyCentralForce(hgRB.forceApplied);
         }
         if(hgRB.flags & RigidBodyComponent::TORQUE_APPLIED){
-            
+            obj->bulletRB->applyTorque(hgRB.torqueApplied);
         }
-        if(hgRB.flags & RigidBodyComponent::POSITION_OFFSET_UPDATED){
-            
+        if(hgRB.flags & RigidBodyComponent::TRANSFORM_OFFSET_UPDATED){
+            btTransform btTrans = obj->bulletRB->getCenterOfMassTransform();
+            btTrans.setRotation(btTrans.getRotation() + hgRB.rotationOffset.toBullet());
+            btTrans.setOrigin(btTrans.getOrigin() + hgRB.positionOffset.toBullet());
+            obj->bulletRB->setCenterOfMassTransform(btTrans);
         }
-        if(hgRB.flags & RigidBodyComponent::ROTATION_OFFSET_UPDATED){
-            
-        }
+
+        hgRB.flags = 0;
     }
 }
 
@@ -306,7 +311,8 @@ void BulletSimulation::syncRigidBodies() {
             //create a new RigidBodyObject
             rb.objectID = createRigidBodyObject(rb, transform, bodyType::STATIC);
         }
-        
+
+        checkFlags(rb);
     }
     
     // Kinematic rigidBodies (creation and update)
@@ -321,6 +327,8 @@ void BulletSimulation::syncRigidBodies() {
         
         HUGOMotionState* motionState = static_cast<HUGOMotionState*>(getRigidBodyObject(rb.objectID).bulletRB->getMotionState());
         motionState->updateBulletTransform();
+
+        checkFlags(rb);
     }
     
     // Dynamic rigidBodies
@@ -333,5 +341,7 @@ void BulletSimulation::syncRigidBodies() {
             rb.objectID = createRigidBodyObject(rb, transform, bodyType::DYNAMIC);
         }
         
+        checkFlags(rb);
     }
 }
+#pragma endregion

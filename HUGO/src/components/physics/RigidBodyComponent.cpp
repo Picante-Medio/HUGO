@@ -27,9 +27,15 @@ void RigidBodyComponent::setMass(float nMass)
     flags = flags | UpdateFlags::MASS_UPDATED;
 }
     
-void RigidBodyComponent::setDamping(float nDamping)
+void RigidBodyComponent::setLinearDamping(float nDamping)
 {
-    damping = nDamping;
+    linearDamping = nDamping;
+    flags = flags | UpdateFlags::DAMPING_UPDATED;
+}
+
+void RigidBodyComponent::setAngularDamping(float nDamping)
+{
+    angularDamping = nDamping;
     flags = flags | UpdateFlags::DAMPING_UPDATED;
 }
 
@@ -72,13 +78,13 @@ void RigidBodyComponent::applyTorque(HUGO::Vector3 nTorque)
 void RigidBodyComponent::setPositionOffset(HUGO::Vector3 offset)
 {
     positionOffset = offset;
-    flags = flags | UpdateFlags::POSITION_OFFSET_UPDATED;
+    flags = flags | UpdateFlags::TRANSFORM_OFFSET_UPDATED;
 }
     
 void RigidBodyComponent::setRotationOffset(HUGO::Quaternion offset)
 {
     rotationOffset = offset;
-    flags = flags | UpdateFlags::ROTATION_OFFSET_UPDATED;
+    flags = flags | UpdateFlags::TRANSFORM_OFFSET_UPDATED;
 }
 #pragma endregion
 
@@ -100,9 +106,14 @@ float RigidBodyComponent::getMass() const
     return mass;
 }
     
-float RigidBodyComponent::getDamping() const
+float RigidBodyComponent::getLinearDamping() const
 {
-    return damping;
+    return linearDamping;
+}
+
+float RigidBodyComponent::getAngularDamping() const
+{
+    return angularDamping;
 }
 
 HUGO::Vector3 RigidBodyComponent::getLinearVelocity() const
@@ -113,16 +124,6 @@ HUGO::Vector3 RigidBodyComponent::getLinearVelocity() const
 HUGO::Vector3 RigidBodyComponent::getAngularVelocity() const
 {
     return angularVelocity;
-}
-    
-HUGO::Vector3 RigidBodyComponent::getLinearAcceleration() const
-{
-    return linearAcceleration;
-}
-    
-HUGO::Vector3 RigidBodyComponent::getAngularAcceleration() const
-{
-    return angularAcceleration;
 }
 
 HUGO::Vector3 RigidBodyComponent::getPositionOffset() const
