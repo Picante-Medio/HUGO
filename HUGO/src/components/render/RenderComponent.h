@@ -1,25 +1,29 @@
 #pragma once
-
 #include "Component.h"
-#include <string>
 #include "HugoTypes.h"
 
 struct RenderComponent: public Component
 {
-    std::string meshName;
-    std::string materialName;
-    RenderComponent(EntityID entity, 
-                        const std::string& meshName,
-                        const std::string& materialName="") 
-        : Component(entity), meshName(meshName), materialName(materialName){};
-    
-    friend class RenderSystem;
 private:
     HUGO::OgreObjectID objectID = HUGO::INVALID_OGRE_OBJECT_ID;
+    HUGO::String meshName;
+    HUGO::String materialName;
+public:
+    RenderComponent(EntityID entity, 
+                        const HUGO::String& meshName,
+                        const HUGO::String& materialName="") 
+        : Component(entity), meshName(meshName), materialName(materialName){};
+    
+    void setMeshName(const HUGO::String& newMeshName);
+    void setMaterialName(const HUGO::String& newMaterialName);
+    HUGO::String getMeshName() const;
+    HUGO::String getMaterialName() const;
+    
+    friend class RenderSystem;
 };
 
 struct MaterialDirtyTag : public Component {
-    std::string materialName;
-    MaterialDirtyTag(EntityID entity, const std::string& materialName) 
+    HUGO::String materialName;
+    MaterialDirtyTag(EntityID entity, const HUGO::String& materialName) 
         : Component(entity), materialName(materialName) {}
 };

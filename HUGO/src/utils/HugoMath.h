@@ -1,6 +1,4 @@
 #pragma once
-#include "Ogre.h"
-
 namespace HUGO {
 	struct Degree;
     struct Radian;
@@ -23,8 +21,6 @@ namespace HUGO {
 
 		float length() const;
 		Vector3 normalized() const;
-
-		Ogre::Vector3 toOgre() const;
 	};
 
 	Vector3 operator*(float scalar, const Vector3& v);
@@ -55,8 +51,6 @@ namespace HUGO {
 
 		Quaternion();
 		Quaternion(float w, float x, float y, float z);
-
-		Ogre::Quaternion toOgre() const;
 	};
 	
 	struct Radian {
@@ -85,8 +79,6 @@ namespace HUGO {
         bool operator != ( const Radian& d ) const;
         bool operator >= ( const Radian& d ) const;
         bool operator >  ( const Radian& d ) const;
-
-		Ogre::Radian toOgre() const;
     };
 
 	struct Degree {
@@ -121,8 +113,6 @@ namespace HUGO {
         bool operator != ( const Degree& d ) const;
         bool operator >= ( const Degree& d ) const;
         bool operator >  ( const Degree& d ) const;
-
-		Ogre::Degree toOgre() const;
 	};
 
 	//I dont know if this is necessary, but just in case

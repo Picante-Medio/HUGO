@@ -1,5 +1,5 @@
 #pragma once
-
+#include <memory>
 #include "btBulletDynamicsCommon.h"
 #include "TransformComponent.h"
 

@@ -10,14 +10,6 @@
 #include "HugoMath.h"
 
 struct RenderComponent;
-
-   // OgreObject Information
-struct OgreObject{
-    HUGO::OgreObjectID id;
-    Ogre::Entity* ogreEntity = nullptr;
-    Ogre::SceneNode* ogreSceneNode = nullptr;
-};
-
 class RenderSystem : public System{
     // Ogre Camera Information
     struct CameraInfo {
@@ -37,8 +29,13 @@ class RenderSystem : public System{
         Ogre::SceneNode* node = nullptr;
     };
 
- 
-
+    // OgreObject Information
+    struct OgreObject{
+        HUGO::OgreObjectID id;
+        Ogre::Entity* ogreEntity = nullptr;
+        Ogre::SceneNode* ogreSceneNode = nullptr;
+    };
+    
     std::shared_ptr<Ogre::Root> ogreRoot;
     Ogre::SceneManager* sceneManager = nullptr;
     Ogre::RenderWindow* renderWindow = nullptr; 

@@ -11,6 +11,8 @@
 #include "LightComponent.h"
 #include "CameraTags.h"
 #include "HugoTypes.h"
+#include "HugoError.h"
+#include "OgreUtils.h"
 
 RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> ogreRoot, Ogre::RenderWindow* window)
     :System(scene), ogreRoot(ogreRoot), renderWindow(window), idToIndex(), freeOgreObjectId()
@@ -54,20 +56,44 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
     EntityID defaultViewport = createViewportEntity();    
     setMainViewport(defaultViewport);
 
-    // Ogre::Light* light = sceneManager->createLight();
-    // light->setType(Ogre::Light::LT_DIRECTIONAL);
-    // light->setDiffuseColour(0.7f, 0.7f, 0.7f);
-    // Ogre::SceneNode* nodeDir = sceneManager->getRootSceneNode()->createChildSceneNode();
-    // nodeDir->setDirection(Ogre::Vector3(-1, -1, 0));
-    // nodeDir->attachObject(light);
-
     createLightEntity( HUGO::Vector3(-50, 300, 800), HUGO::Vector4(0.4f, 0.2f, 0.4f, 0.2f)
         , HUGO::Vector4(0.0f, 0.0f, 0.0f, 0.0f), HUGO::LightType::LT_POINT, HUGO::Radian(0), HUGO::Radian(0), 0, 0.1f, 0.1f, 300);   
 }
 
 RenderSystem::~RenderSystem()
 {
-   
+    for(auto& v: viewportMap){
+        if(v.second.ogreViewport){
+            renderWindow->removeViewport(v.second.ogreViewport->getZOrder());
+            v.second.ogreViewport = nullptr;
+        }
+    }
+    viewportMap.clear();
+
+    for(auto& c: cameraMap){
+        if(c.second.node){
+            c.second.node->detachAllObjects();
+            sceneManager->destroySceneNode(c.second.node);
+            c.second.node = nullptr;
+        }
+        if(c.second.ogreCamera){
+            sceneManager->destroyCamera(c.second.ogreCamera);
+            c.second.ogreCamera = nullptr;
+        }
+    }
+    cameraMap.clear();
+
+    for(std::size_t i =0; i<ogreObjects.size(); ++i){
+        destroyOgreObject(ogreObjects[i]);
+    }
+    ogreObjects.clear();
+    idToIndex.clear();
+    freeOgreObjectId.clear();
+
+    if(sceneManager){
+        ogreRoot->destroySceneManager(sceneManager);
+        sceneManager = nullptr;
+    }
 }
 
 #pragma region Tags
@@ -83,8 +109,8 @@ void RenderSystem::handleTag()
         auto it = cameraMap.find(entity);
         if (it != cameraMap.end()) {
             //update node transform
-            it->second.node->setPosition(tr.position.toOgre());
-            it->second.node->setOrientation(tr.rotation.toOgre());
+            it->second.node->setPosition(OgreUtils::vector3ToOgre(tr.position));
+            it->second.node->setOrientation(OgreUtils::quaternionToOgre(tr.rotation));
             
             // update projection parameters
             if (camera.getProjectionType() == HUGO::ProjectionType::Perspective) {
@@ -191,7 +217,8 @@ HUGO::OgreObjectID RenderSystem::createOgreObject(const std::string &meshName, c
     return id;
 }
 
-OgreObject& RenderSystem::getOgreObject(HUGO::OgreObjectID id)
+RenderSystem::OgreObject& 
+RenderSystem::getOgreObject(HUGO::OgreObjectID id)
 {
     return ogreObjects[idToIndex[id]];
 }
@@ -252,15 +279,16 @@ void RenderSystem::update(double dt)
         OgreObject& obj = getOgreObject(rc.objectID);
 
         //update transform
-        obj.ogreSceneNode->setPosition(tr.position.toOgre());
-        obj.ogreSceneNode->setOrientation(tr.rotation.toOgre());
-        obj.ogreSceneNode->setScale(tr.scale.toOgre());
+        obj.ogreSceneNode->setPosition(OgreUtils::vector3ToOgre(tr.position));
+        obj.ogreSceneNode->setOrientation(OgreUtils::quaternionToOgre(tr.rotation));
+        obj.ogreSceneNode->setScale(OgreUtils::vector3ToOgre(tr.scale));
     }
 
 }
 
 void RenderSystem::fixedUpdate(double dt)
 {
+
 }
 
 #pragma endregion
@@ -278,7 +306,6 @@ void RenderSystem::createTestEntity()
 
     setMaterial(e1, "prueba/ColorVerde");
 }
-
 #pragma endregion
 
 void RenderSystem::setMaterial(EntityID entity, const std::string &materialName)
@@ -427,8 +454,8 @@ void RenderSystem::createOgreCamera(EntityID entity)
     // create node and attach camera
     res.node = sceneManager->getRootSceneNode()->createChildSceneNode(nodeName);
     res.node->attachObject(res.ogreCamera);
-    res.node->setPosition(transformComp->position.toOgre());
-    res.node->setOrientation(transformComp->rotation.toOgre());
+    res.node->setPosition(OgreUtils::vector3ToOgre(transformComp->position));
+    res.node->setOrientation(OgreUtils::quaternionToOgre(transformComp->rotation));
     
     cameraMap[entity] = res;
     
@@ -515,11 +542,11 @@ void RenderSystem::createOgreLight(EntityID entity)
 
     res.node = sceneManager->getRootSceneNode()->createChildSceneNode(nodeName);
     res.node->attachObject(res.ogreLight);
-    res.node->setPosition(transformComp->position.toOgre());
+    res.node->setPosition(OgreUtils::vector3ToOgre(transformComp->position));
 
     // for dirrectonal light
     if (lightComp->getLightType() == HUGO::LightType::LT_DIRECTIONAL) {
-        res.node->setOrientation(transformComp->rotation.toOgre());
+        res.node->setOrientation(OgreUtils::quaternionToOgre(transformComp->rotation));
     }
 
     lightMap[entity] = res;
