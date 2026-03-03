@@ -12,22 +12,29 @@ const PREFABS_PATH = "res://Prefabs/"
 
 const OUTPUT_ENUMS_PATH = "Enums.gd"
 
-var enums_dictionary:Dictionary
-var types_dictionary:Dictionary
-var components_dictionary:Dictionary
+static var enums_dictionary:Dictionary
+static var types_dictionary:Dictionary
+static var components_dictionary:Dictionary
 
 const WHITE_LIST:Array[String] = ["string", "int", "float", "Vector2", "Vector3", "Vector4", "Quaternion"]
 const BLACK_LIST:Array[String] = ["TransformComponent", "CameraComponent", "RenderComponent"]
 
 func _run() -> void:
+	sync()
+	
+static func sync():
+	components_dictionary = {}
+	enums_dictionary = {}
+	components_dictionary = {}
+	
 	parse_hugo_types()
 	write_enums()
-	write_components()
 	parse_components(COMPONENTS_PATH)
 	create_prefabs(PREFABS_PATH)
+	write_components()
 	EditorInterface.get_resource_filesystem().scan_sources()
 
-func create_prefabs(path:String):
+static func create_prefabs(path:String):
 	var dir := DirAccess.open(path)
 
 	dir.list_dir_begin()
@@ -49,7 +56,7 @@ func create_prefabs(path:String):
 
 	dir.list_dir_end()
 
-func ensure_folder(path: String) -> void:
+static func ensure_folder(path: String) -> void:
 	var abs_path := ProjectSettings.globalize_path(path)
 	if DirAccess.dir_exists_absolute(abs_path): return
 
@@ -57,14 +64,8 @@ func ensure_folder(path: String) -> void:
 	if err != OK:
 		push_error("Error creando carpeta: " + abs_path)
 
-func write_components():
+static func write_components():
 	ensure_folder(OUTPUT_COMPONENTS_PATH)
-
-	for key in components_dictionary.keys():
-		var value = components_dictionary[key]
-		print("\nCOMPONENT : " + key)
-		for v in value:
-			print(v[0] + " " + v[1])
 
 	for component_name:String in components_dictionary.keys():
 		var file := FileAccess.open(OUTPUT_COMPONENTS_PATH.path_join(component_name + ".gd"), FileAccess.WRITE)
@@ -91,7 +92,7 @@ func write_components():
 
 		file.close()
 
-func write_enums():
+static func write_enums():
 	var file := FileAccess.open(OUTPUT_ENUMS_PATH, FileAccess.WRITE)
 	file.store_line("class_name ENUMS")
 
@@ -105,7 +106,7 @@ func write_enums():
 
 	file.close()
 
-func hugo_check_line(line: String) -> void:
+static func hugo_check_line(line: String) -> void:
 	if line.begins_with("using "):
 		var alias_name:String = line.split("using")[1].split("=")[0].strip_edges()
 		var variant_name:String = line.split("=")[1].split(";")[0].strip_edges()
@@ -116,7 +117,7 @@ func hugo_check_line(line: String) -> void:
 		var enum_name:String = line.split("}")[1].split(";")[0].strip_edges()
 		enums_dictionary.get_or_add(enum_name, enum_values)
 
-func parse_hugo_types() -> void:
+static func parse_hugo_types() -> void:
 	var file := FileAccess.open(HUGO_TYPES_PATH, FileAccess.READ)
 
 	while not file.eof_reached():
@@ -125,13 +126,13 @@ func parse_hugo_types() -> void:
 
 	file.close()
 
-func parse_components(path: String) -> void:
+static func parse_components(path: String) -> void:
 	var dir := DirAccess.open(path)
 
 	dir.list_dir_begin()
 
 	var name := dir.get_next()
-
+	
 	while name != "":
 		if name != "." and name != "..":
 			var full_path := path.path_join(name)
@@ -145,7 +146,7 @@ func parse_components(path: String) -> void:
 
 	dir.list_dir_end()
 
-func hugo_parse_component(path: String) -> void:
+static func hugo_parse_component(path: String) -> void:
 	var file := FileAccess.open(path, FileAccess.READ)
 	var line := file.get_line().strip_edges()
 
@@ -163,6 +164,7 @@ func hugo_parse_component(path: String) -> void:
 	complete_whitelist.append_array(WHITE_LIST)
 	complete_whitelist.append_array(types_dictionary.keys())
 
+	print(path)
 	while not file.eof_reached():
 		line = file.get_line().strip_edges()
 		if not line.contains(";"): continue
