@@ -1,6 +1,5 @@
 #pragma once
 #include "Ogre.h"
-#include "btBulletDynamicsCommon.h"
 
 namespace HUGO {
 	struct Degree;
@@ -26,7 +25,6 @@ namespace HUGO {
 		Vector3 normalized() const;
 
 		Ogre::Vector3 toOgre() const;
-		btVector3 toBullet() const;
 	};
 
 	Vector3 operator*(float scalar, const Vector3& v);
@@ -59,10 +57,9 @@ namespace HUGO {
 		Quaternion(float w, float x, float y, float z);
 
 		Ogre::Quaternion toOgre() const;
-		btQuaternion toBullet() const;
 	};
 	
-	 struct Radian {
+	struct Radian {
         float rad;
 
         Radian(float r = 0);

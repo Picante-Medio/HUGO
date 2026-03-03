@@ -61,10 +61,6 @@ namespace HUGO {
 		return Ogre::Vector3(x, y, z);
 	}
 
-	btVector3 Vector3::toBullet() const {
-		return btVector3(x, y, z);
-	}
-
 	Vector3 operator*(float scalar, const Vector3& v) {
 		return Vector3(v.x * scalar, v.y * scalar, v.z * scalar);
 	}
@@ -127,10 +123,6 @@ namespace HUGO {
 
 	Ogre::Quaternion Quaternion::toOgre() const {
 		return Ogre::Quaternion(w, x, y, z);
-	}
-
-	btQuaternion Quaternion::toBullet() const {
-		return btQuaternion(x, y, z, w);
 	}
 
 	// --------------------- RADIAN ---------------------

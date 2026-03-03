@@ -3,6 +3,7 @@
 #include "HugoMotionState.h"
 #include "RigidBodyComponent.h"
 #include "PhysicsTags.h"
+#include "BulletUtils.h"
 
 BulletSimulation::BulletSimulation(std::shared_ptr<Scene> scene)
 : PhysicsSimulation(scene)
@@ -72,7 +73,7 @@ HUGO::BulletShapeID BulletSimulation::createShapeObject(Shape& shape)
 
     btCollisionShape* resShape = nullptr;
     if(std::holds_alternative<BoxColliderInfo>(shape.info)){
-        resShape = new btBoxShape(std::get<BoxColliderInfo>(shape.info).halfExtents.toBullet());
+        resShape = new btBoxShape(BulletUtils::vector3ToBullet(std::get<BoxColliderInfo>(shape.info).halfExtents));
     }
     else if(std::holds_alternative<SphereColliderInfo>(shape.info)){
         resShape = new btSphereShape(std::get<SphereColliderInfo>(shape.info).r);
@@ -82,7 +83,7 @@ HUGO::BulletShapeID BulletSimulation::createShapeObject(Shape& shape)
         resShape = new btCapsuleShape(aux.r, aux.height);
     }
     else if(std::holds_alternative<CylinderColliderInfo>(shape.info)){
-        resShape = new btCylinderShape(std::get<CylinderColliderInfo>(shape.info).halfExtents.toBullet());
+        resShape = new btCylinderShape(BulletUtils::vector3ToBullet(std::get<CylinderColliderInfo>(shape.info).halfExtents));
     }
     else{ // Cone
         ConeColliderInfo aux = std::get<ConeColliderInfo>(shape.info);

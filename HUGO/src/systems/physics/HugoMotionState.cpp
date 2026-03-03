@@ -1,4 +1,5 @@
 #include "HugoMotionState.h"
+#include "BulletUtils.h"
 
 
 HUGOMotionState::HUGOMotionState(const btTransform initialPos, std::shared_ptr<TransformComponent> transform, btTransform offset)
@@ -18,8 +19,8 @@ void HUGOMotionState::updateBulletTransform()
 {
     // Uses associated HUGO::TransformComponent to update itself
     btTransform auxTransform = btTransform(
-                               hugoTransform->rotation.toBullet(), 
-                               hugoTransform->position.toBullet());
+                               BulletUtils::quaternionToBullet(hugoTransform->rotation), 
+                               BulletUtils::vector3ToBullet(hugoTransform->position));
 
     btTransformRegister = auxTransform * centerOfMassOffset;
 }
