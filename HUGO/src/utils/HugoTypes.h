@@ -81,8 +81,8 @@ namespace HUGO{
 
     // -------- PHYSICS TYPES --------
 
-    using BulletObjectID = int;
-    constexpr BulletObjectID INVALID_BULLET_RB_ID = std::numeric_limits<int>::max();
+    using BulletRigidbodyID = int;
+    constexpr BulletRigidbodyID INVALID_BULLET_RB_ID = std::numeric_limits<int>::max();
 
     using BulletShapeID = int;
     constexpr BulletShapeID INVALID_BULLET_SHAPE_ID = std::numeric_limits<int>::max();

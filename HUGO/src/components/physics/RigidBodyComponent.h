@@ -110,5 +110,5 @@ private:
 
     // Once created shape shouldn't be modified
     Shape rbShape;
-    HUGO::BulletObjectID objectID = HUGO::INVALID_BULLET_RB_ID;
+    HUGO::BulletRigidbodyID objectID = HUGO::INVALID_BULLET_RB_ID;
 };
