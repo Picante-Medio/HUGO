@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://cft1fgdpqn2vu" path="res://SceneScripts/scene_tracker.gd" id="1_865ah"]
 [ext_resource type="PackedScene" uid="uid://krs4pyuy4e" path="res://Prefabs/alfonso.tscn" id="2_fanfj"]
 [ext_resource type="Script" uid="uid://dimuk3ggoam44" path="res://Entities/entity3d.gd" id="3_sks45"]
-[ext_resource type="Script" uid="uid://bnjt3w18hk2gs" path="res://NativeComponents/MeshRendererComponent.gd" id="4_d4yc1"]
+[ext_resource type="Script" uid="uid://bnjt3w18hk2gs" path="res://NativeComponents/RenderComponent.gd" id="4_d4yc1"]
 [ext_resource type="SphereMesh" uid="uid://citadnjn16yba" path="res://sphere.tres" id="4_ssasw"]
 [ext_resource type="Script" uid="uid://dcc6b5sxl6c7u" path="res://Entities/entity.gd" id="5_d4yc1"]
 [ext_resource type="Script" uid="uid://chfil18rmq2xi" path="res://Components/AudioComponent.gd" id="6_77l53"]
@@ -17,12 +17,12 @@ entities = Dictionary[String, Dictionary]({
 res://sphere.tres"
 }),
 "ParentComponent": {
-"value": "int 2"
+"value": "INT 2"
 }
 },
 "David": {
 "ParentComponent": {
-"value": "int 3"
+"value": "INT 3"
 }
 },
 "Entity": {},
@@ -37,7 +37,7 @@ res://sphere.tres"
 res://sphere.tres"
 }),
 "ParentComponent": {
-"value": "int 0"
+"value": "INT 0"
 }
 },
 "Juan": {
@@ -62,6 +62,8 @@ metadata/_custom_type_script = "uid://dcc6b5sxl6c7u"
 [node name="MeshRenderer" type="MeshInstance3D" parent="Juan/Guille" unique_id=1900278368]
 mesh = ExtResource("4_ssasw")
 script = ExtResource("4_d4yc1")
+materialName = null
+objectID = null
 metadata/_custom_type_script = "uid://bnjt3w18hk2gs"
 
 [node name="AudioComponent" type="Node" parent="Juan/Guille" unique_id=146731479]

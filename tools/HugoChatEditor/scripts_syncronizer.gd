@@ -17,7 +17,7 @@ var types_dictionary:Dictionary
 var components_dictionary:Dictionary
 
 const WHITE_LIST:Array[String] = ["string", "int", "float", "Vector2", "Vector3", "Vector4", "Quaternion"]
-const BLACK_LIST:Array[String] = ["TransformComponent", "CameraComponent"]
+const BLACK_LIST:Array[String] = ["TransformComponent", "CameraComponent", "RenderComponent"]
 
 func _run() -> void:
 	parse_hugo_types()

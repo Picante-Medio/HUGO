@@ -1,14 +1,13 @@
 @tool
-extends Component
-class_name RenderComponent
+extends MeshInstance3D
+class_name MeshRenderer
 
-@export var meshName:String
 @export var materialName:String
 @export var objectID:int
 
 func get_component() -> Dictionary[String, Variant]:
 	return {
-		"meshName" : FormatWriter.format(meshName),
+		"mesh" : FormatWriter.format(mesh.resource_path),
 		"materialName" : FormatWriter.format(materialName),
 		"objectID" : FormatWriter.format(objectID),
 	}
