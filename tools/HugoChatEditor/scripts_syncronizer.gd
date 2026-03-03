@@ -23,7 +23,6 @@ func _run() -> void:
 	parse_hugo_types()
 	write_enums()
 	write_components()
-	create_chat_parser()
 	parse_components(COMPONENTS_PATH)
 	create_prefabs(PREFABS_PATH)
 	EditorInterface.get_resource_filesystem().scan_sources()
@@ -49,53 +48,6 @@ func create_prefabs(path:String):
 		name = dir.get_next()
 
 	dir.list_dir_end()
-
-func create_chat_parser() -> void:
-	var file := FileAccess.open(OUTPUT_CHAT_PARSER_PATH, FileAccess.READ_WRITE)
-	
-	var file_text = file.get_as_text()
-	
-	var includes_gap = file_text.split("//COMPONENTS_INCLUDE")
-	var includes:String = "//COMPONENTS_INCLUDE\n"
-	
-	assert(includes_gap.size() != 1)
-
-	for component in components_dictionary.keys():
-		includes += '#include "' + component + '.h"\n'
-	includes += "//COMPONENTS_INCLUDE\n"
-	
-	var includes_pointer:int = 2
-	if includes_gap.size() == 2: includes_pointer = 1
-	
-	file_text = includes_gap[0] + includes + includes_gap[includes_pointer]
-	
-	var construction_gap = file_text.split("//COMPONENTS_CONSTRUCTION")
-	var construction:String = "//COMPONENTS_CONSTRUCTION\n"
-	
-	assert(construction_gap.size() != 1)
-	
-	var construction_pointer:int = 2
-	if construction_gap.size() == 2: construction_pointer = 1
-
-	var i:int = 0
-	for component in components_dictionary.keys():
-		if i == 0: construction += "\t\t\tif"
-		else: construction += "\t\t\telse if"
-		construction += '("' + component + '" == componentName' + ")\n"
-
-		var args:String = ""
-		var arg_index := 0
-		for parameter in components_dictionary[component]:
-			args = args + "args[" + str(arg_index) + "],"
-			arg_index += 1
-
-		args = args.substr(0, args.length() - 1)
-		construction += "\t\t\t\tscene.addComponent<" + component + ">(entity, " + args + ");\n"
-		i += 1
-	construction += "//COMPONENTS_CONSTRUCTION\n"
-	
-	file_text = construction_gap[0] + construction + construction_gap[construction_pointer]
-	file.store_string(file_text)
 
 func ensure_folder(path: String) -> void:
 	var abs_path := ProjectSettings.globalize_path(path)
