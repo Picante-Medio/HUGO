@@ -59,6 +59,8 @@ class BulletSimulation : public PhysicsSimulation {
     void removeRigidBodyObject(HUGO::BulletObjectID& id);
     void destroyRigidBodyObject(RigidBodyObject& RbObj);
 
+    // Check for updates on a specific RB
+    void checkFlags(RigidBodyComponent& hgRB);
     // Creates and adds rigidbodies to simulation. Updates kinematic bodies.
     void syncRigidBodies();
 

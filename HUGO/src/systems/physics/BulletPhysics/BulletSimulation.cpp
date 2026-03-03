@@ -251,6 +251,50 @@ void BulletSimulation::destroyRigidBodyObject(RigidBodyObject& RbObj)
 }
 #pragma endregion
 
+void BulletSimulation::checkFlags(RigidBodyComponent& hgRB)
+{
+    if(hgRB.flags != 0){
+        RigidBodyObject* obj = rigidBodies[rbIdToIndex[hgRB.objectID]];
+
+        if(hgRB.flags & RigidBodyComponent::RESTITUTION_UPDATED){
+
+        }
+        if(hgRB.flags & RigidBodyComponent::FRICTION_UPDATED){
+
+        }
+        if(hgRB.flags & RigidBodyComponent::MASS_UPDATED){
+            
+        }
+        if(hgRB.flags & RigidBodyComponent::DAMPING_UPDATED){
+            
+        }
+        if(hgRB.flags & RigidBodyComponent::LINEAR_VELOCITY_UPDATED){
+            
+        }
+        if(hgRB.flags & RigidBodyComponent::ANGULAR_VELOCITY_UPDATED){
+            
+        }
+        if(hgRB.flags & RigidBodyComponent::IMPULSE_APPLIED){
+            
+        }
+        if(hgRB.flags & RigidBodyComponent::TORQUE_IMPULSE_APPLIED){
+            
+        }
+        if(hgRB.flags & RigidBodyComponent::FORCE_APPLIED){
+            
+        }
+        if(hgRB.flags & RigidBodyComponent::TORQUE_APPLIED){
+            
+        }
+        if(hgRB.flags & RigidBodyComponent::POSITION_OFFSET_UPDATED){
+            
+        }
+        if(hgRB.flags & RigidBodyComponent::ROTATION_OFFSET_UPDATED){
+            
+        }
+    }
+}
+
 void BulletSimulation::syncRigidBodies() {
     // Add new rigidBodies to simulation and Update kinematic bodies
     // Static rigidBodies 

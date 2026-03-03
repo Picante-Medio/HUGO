@@ -49,6 +49,8 @@ struct RigidBodyComponent: public Component
     void setFriction(float nFriction);
     void setMass(float nMass);
     void setDamping(float nDamping);
+    void setLinearVelocity(HUGO::Vector3 nVelocity);
+    void setAngularVelocity(HUGO::Vector3 nVelocity);
 
     void applyImpulse(HUGO::Vector3 nImpulse); // Modifies linear velocity
     void applyTorqueImpulse(HUGO::Vector3 nImpulse); // Modifies angular velocity
@@ -73,6 +75,24 @@ struct RigidBodyComponent: public Component
     HUGO::Quaternion getRotationOffset() const;
 
 private:
+
+    enum UpdateFlags{
+        RESTITUTION_UPDATED = 1,
+        FRICTION_UPDATED = 2,
+        MASS_UPDATED = 4,
+        DAMPING_UPDATED = 8,
+        LINEAR_VELOCITY_UPDATED = 16,
+        ANGULAR_VELOCITY_UPDATED = 32,
+        IMPULSE_APPLIED = 64,
+        TORQUE_IMPULSE_APPLIED = 128,
+        FORCE_APPLIED = 256,
+        TORQUE_APPLIED = 512,
+        POSITION_OFFSET_UPDATED = 1024,
+        ROTATION_OFFSET_UPDATED = 2048
+    };
+
+    int flags;
+
     float restitution;
     float friction;
     float mass;
@@ -84,6 +104,11 @@ private:
     HUGO::Vector3 angularVelocity;
     HUGO::Vector3 linearAcceleration;
     HUGO::Vector3 angularAcceleration;
+
+    HUGO::Vector3 impulseApplied;
+    HUGO::Vector3 torqueImpulseApplied;
+    HUGO::Vector3 forceApplied;
+    HUGO::Vector3 torqueApplied;
 
     // Once created shape shouldn't be modified
     Shape rbShape;

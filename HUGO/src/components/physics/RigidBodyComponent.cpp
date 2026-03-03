@@ -3,6 +3,7 @@
 RigidBodyComponent::RigidBodyComponent(EntityID entity, Shape shape)
 : Component(entity)
 , rbShape(shape)
+, flags(0)
 {}
 
 #pragma region Setters
@@ -11,61 +12,73 @@ RigidBodyComponent::RigidBodyComponent(EntityID entity, Shape shape)
 void RigidBodyComponent::setRestitution(float nRestitution)
 {
     restitution = nRestitution;
-    // Update in bullet
+    flags = flags | UpdateFlags::RESTITUTION_UPDATED;
 }
 
 void RigidBodyComponent::setFriction(float nFriction)
 {
     friction = nFriction;
-    // Update in bullet
+    flags = flags | UpdateFlags::FRICTION_UPDATED;
 }
     
 void RigidBodyComponent::setMass(float nMass)
 {
     mass = nMass;
-    // Update in bullet
+    flags = flags | UpdateFlags::MASS_UPDATED;
 }
     
 void RigidBodyComponent::setDamping(float nDamping)
 {
     damping = nDamping;
-    // Update in bullet
+    flags = flags | UpdateFlags::DAMPING_UPDATED;
+}
+
+void RigidBodyComponent::setLinearVelocity(HUGO::Vector3 nVelocity)
+{
+    linearVelocity = nVelocity;
+    flags = flags | UpdateFlags::LINEAR_VELOCITY_UPDATED;
+}
+
+void RigidBodyComponent::setAngularVelocity(HUGO::Vector3 nVelocity)
+{
+    angularVelocity = nVelocity;
+    flags = flags | UpdateFlags::ANGULAR_VELOCITY_UPDATED;
 }
 
 void RigidBodyComponent::applyImpulse(HUGO::Vector3 nImpulse)
 {
-    // Update in bullet
-    // linearVelocity = {bullet.linearVelocity}
+    impulseApplied = nImpulse;
+    flags = flags | UpdateFlags::IMPULSE_APPLIED;
 }
     
 void RigidBodyComponent::applyTorqueImpulse(HUGO::Vector3 nImpulse)
 {
-    // Update in bullet
-    // angularVelocity = {bullet.angularVelocity}
+    torqueImpulseApplied = nImpulse;
+    flags = flags | UpdateFlags::TORQUE_IMPULSE_APPLIED;
 }
     
 void RigidBodyComponent::applyForce(HUGO::Vector3 nForce)
 {
-    // Update in bullet
-    // linearAcceleration = {bullet.linearAcceleration}
+    forceApplied = nForce;
+    flags = flags | UpdateFlags::FORCE_APPLIED;
 }
     
 void RigidBodyComponent::applyTorque(HUGO::Vector3 nTorque)
 {
-    // Update in bullet
-    // angularAcceleration = {bullet.angularAcceleration}
+    torqueApplied = nTorque;
+    flags = flags | UpdateFlags::TORQUE_APPLIED;
 }
 
 void RigidBodyComponent::setPositionOffset(HUGO::Vector3 offset)
 {
     positionOffset = offset;
-    // Update in bullet
+    flags = flags | UpdateFlags::POSITION_OFFSET_UPDATED;
 }
     
 void RigidBodyComponent::setRotationOffset(HUGO::Quaternion offset)
 {
     rotationOffset = offset;
-    // Update in bullet
+    flags = flags | UpdateFlags::ROTATION_OFFSET_UPDATED;
 }
 #pragma endregion
 
