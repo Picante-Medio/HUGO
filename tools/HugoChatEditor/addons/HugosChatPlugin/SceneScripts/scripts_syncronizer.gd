@@ -167,7 +167,7 @@ static func hugo_parse_component(path: String) -> void:
 	print(path)
 	while not file.eof_reached():
 		line = file.get_line().strip_edges()
-		if not line.contains(";"): continue
+		if not line.contains(";") or line.contains("void"): continue
 
 		var cleaned_parameter:String = line.split("::")[1] if line.split("::").size() > 1 else line.split("::")[0]
 		cleaned_parameter = cleaned_parameter.split("=")[0]
