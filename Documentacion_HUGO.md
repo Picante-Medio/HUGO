@@ -73,8 +73,9 @@ public:
     - InputListener
 
 - **Audio**
-    - SoundPlayer
-    - SoundListener
+    - AudioPlayer (contiene información de cada audio)
+    - Audio3D
+    - AudioListener
 
 - **UI**
     - TextLabel
@@ -139,7 +140,7 @@ Las librerías que utilizará el motor son las siguientes:
 | -------- | --------- | --------------------------------------------------------------------------- |
 | OGRE3D   | 14.5.0    | Gráficos 3D (modelos, animaciones, shaders, generación de ventana, layouts) |
 | SDL2     | 2.32.10   | Input (como dependencia de OGRE3D)                                          |
-| FMod     | 2.03.12   | Implementación de efectos de sonido y música                                |
+| Miniaudio    |   | Implementación de efectos de sonido y música                                |
 | Physx    | 9.19.0218 | Físicas y detección de colisiones                                           |
 
 
@@ -154,10 +155,79 @@ El proyecto se construye con el uso de cmake, la estructura del directorio del p
 └── *src/* -> Código fuente del motor
 
 # Implementación de las librerías externas
-Para permitir la comunicación del motor con librerías externas como OGRE3D, Physx, o FMOD, se ha pensado en la implementación de dichas funcionalidades dentro de los sistemas de las escenas de juego, formando parte de la arquitectura ECS pensada. Estos sistemas serían los principales representantes de dichas librerías, y servirían como capa intermedia de comunicación entre el mundo de nuestro motor y la funcionalidad que proporciona cada librería.
+Para permitir la comunicación del motor con librerías externas como OGRE3D, Physx, o Miniaudio, se ha pensado en la implementación de dichas funcionalidades dentro de los sistemas de las escenas de juego, formando parte de la arquitectura ECS pensada. Estos sistemas serían los principales representantes de dichas librerías, y servirían como capa intermedia de comunicación entre el mundo de nuestro motor y la funcionalidad que proporciona cada librería.
 
 ## Funcionalidad de los sistemas
-Hacen uso de la información que contienen los componentes. Por ejemplo, OgreSystem (sistema de renderizado que hace uso de Ogre3D), recorrería todos las entidades que cuentan con una posición y una malla, y las actualizaría en su propio mundo para así mostrarse correctamente en pantalla. PhysxSystem se encargaría de recorrer a todas las entidades que cuentan con un Rigidbody y actualizaría su posición en base a las posiciones simuladas dentro del mundo de Physx.
+Hacen uso de la información que contienen los componentes. Por ejemplo, RenderSystem (sistema de renderizado que hace uso de Ogre3D), recorrería todos las entidades que cuentan con una posición y una malla, y las actualizaría en su propio mundo para así mostrarse correctamente en pantalla. PhysicSystem se encargaría de recorrer a todas las entidades que cuentan con un Rigidbody y actualizaría su posición en base a las posiciones simuladas dentro del mundo de Physx. AudioSystem cargará archivos de audio en memoria (efectos de sonido) o streaming (canciones), cambiar parámetros y reproducir sonidos.
+
+### AudioSystem
+**Componentes**
+Este sistema ofrece dos componentes por defecto: AudioComponent y Audio3DComponent, siendo el primero aquello para modificar parámetros genéricos de un audio y lo otro para cambiar valores de un audio 3D como (factor de Doppler, distancia mínima y máxima, etc.). 
+
+Además, tiene un archivo llamado ```AudioTags.h``` que contiene todas las etiquetas que ofrece el sistema (reproducir/parar un sonido, cambiar valores de un audio específico).
+
+**Implementación del sistema**
+Para este sistema, se han implementado tres estructuras auxiliares:
+- ```AudioInfo```: contiene el puntero inteligente de ma_sound y un booleano para indicar si está usado (necesario para el pool).
+- ```AudioEntry```: incluye nombre de un audio, ruta relativa del archivo y el tipo de audio (SOUND2D, SOUND3D, MUSIC). La diferencia entre sound y music es que los audios de tipo sound se cargan en memoria mientras que music se reproduce en streaming.
+- ```AudioPool```: incorpora un vector de AudioInfo (polifonía) y un índice para actualizar (Round-Robin).
+
+En adición, hemos utilizado tres estructuras de datos: 
+- ```audios``` :vector de datos de un audio (AudioEntry)
+- ```pools```: vector de pool de audios (uno por cada audio)
+- ```nameToID```: unordered_map de nombre-audioID (para acceder de forma más eficiente a un sonido que genera Miniaudio)
+
+Es importante anotar que un objeto de tipo ```ma_sound``` no puede reproducirse a la vez, por eso hemos optado por añadir un vector para cada audio. 
+
+Para acceder a un objeto ```ma_sound``` específico:
+1. Reusar una voz libre previamente creada 
+2. Si todas las voces están ocupadas, introducimos una voz nueva si el tamaño actual del vector no supera un límite, o descartamos una posición siguiendo la política Round-Robin.
+
+**Bucle principal de este sistema**
+```cpp
+// la complejidad de cada bucle es, como máximo, queueSize (un número pequeño)
+// aunque se añade la complejidad nos ofrece más riqueza y funcionalidad al sistema
+
+//query para cambios en audios 3D
+for (auto& pack->query<Audio3DInfoComponent, 
+                       TransformComponent, 
+                       Audio3DDirtyTag>()){
+    process3DChanges(audio, tr, tag);
+    //se puede coger cualquier componente porque comparten la entidad
+    removeComponent<Audio3DDirtyTag>(tag.entity);
+}
+
+//query para cambios genéricos de audios
+for (auto& pack->query<AudioComponent, 
+                       AudioDirtyTag>()){
+    processChanges(audio, tag);
+    removeComponent<AudioDirtyTag>(tag.entity);
+}
+
+//query para reproducir audios
+for (auto& pack->query<AudioComponent, 
+                       AudioPlayTag>()){
+    playAudio(audio.id);
+    removeComponent<AudioPlayTag>(tag.entity);
+}
+
+//query para parar audios
+for (auto& pack->query<AudioComponent, 
+                       AudioStopTag>()){
+    stopAudio(audio.id);
+    removeComponent<AudioStopTag>(tag.entity);
+}
+```
+**Carga de audio**
+Los audios a incluir al motor se leerán desde un archivo .txt llamado ```ÀudioList.txt``` que tiene el siguiente formato: 
+``` txt
+Cada línea sería un audio
+# son comentarios
+; separa cada campo
+Sintaxis: nombre;ruta_relativa;tipo
+tipo-> 0: sonido 2D; 1: sonido 3D; 2: música
+```
+Se llama en ```Core``` una función de ```AudioSystem``` para cargar todos los audios. 
 
 ## Forma de comunicación con estos sistemas
 Una forma de introducir estas notificaciones es a través de **tags**. Los tags son simplemente componentes que un sistema añade a una entidad para que otro sistema lo detecte y haga algo en consecuencia. 
@@ -192,7 +262,7 @@ A la hora de usar imágenes, hemos distinguido dos tipos de ellas: vectoriales y
 - **No vectoriales:** Los formatos permitidos son .png, .jpg, .bmp. OGRE3D soporta estos tipos de archivos.
 
 ## Audio
-Los archivos de audio que FMOD permite son .mp3, .wav y .ogg. Serán los únicos archivos de audio del motor. 
+Los archivos de audio permitidos son .mp3, .wav y .flac. Serán los únicos archivos de audio del motor. 
 
 ## Mapas de Juego
 Usaremos GodotEngine como editor de escenas 3D, ya que el formato de escena de Godot (.tscn) puede leerse como una lista de nodos con nombres, posiciones y componentes. Implementaremos un lector de .tscn que cree entidades en nuestro motor.
