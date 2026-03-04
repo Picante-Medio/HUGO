@@ -10,7 +10,7 @@ class RigidBodyComponent;
 class Shape;
 
 struct RigidBodyObject{
-    HUGO::SimulationRBID id;
+    HUGO::RigidBodyID id;
     btRigidBody* bulletRB = nullptr;
 };
 
@@ -32,16 +32,10 @@ class BulletSimulation : public IPhysicsSimulation {
 
 
     // ------ Rigidbody & collision shapes management ------
-
-    enum bodyType{
-        DYNAMIC,
-        STATIC,
-        KINEMATIC
-    };
     
     // Same logic as in RenderSystem. Credits to them, they did a really good job.
     PagedArray<RigidBodyObject, 128> rigidBodies;
-    std::vector<HUGO::SimulationRBID> freeBulletRBObjectId;
+    std::vector<HUGO::RigidBodyID> freeBulletRBObjectId;
     std::vector<std::size_t> rbIdToIndex;
 
     // We use ids to shapes so various rb can use the same shape
@@ -54,9 +48,9 @@ class BulletSimulation : public IPhysicsSimulation {
     void removeShapeObject(HUGO::CollisionShapeID& id);
     void destroyShapeObject(ShapeObject& shObj);
 
-    HUGO::SimulationRBID createRigidBodyObject(RigidBodyComponent& hgRb, const TransformComponent& tf, bodyType type);
-    RigidBodyObject& getRigidBodyObject(const HUGO::SimulationRBID id);
-    void removeRigidBodyObject(HUGO::SimulationRBID& id);
+    HUGO::RigidBodyID createRigidBodyObject(RigidBodyComponent& hgRb, const TransformComponent& tf, HUGO::BodyType type);
+    RigidBodyObject& getRigidBodyObject(const HUGO::RigidBodyID id);
+    void removeRigidBodyObject(HUGO::RigidBodyID& id);
     void destroyRigidBodyObject(RigidBodyObject& RbObj);
 
     // Check for updates on a specific RB

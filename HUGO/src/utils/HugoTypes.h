@@ -78,11 +78,11 @@ namespace HUGO{
 
     // -------- PHYSICS TYPES --------
 
-    using SimulationRBID = int;
-    constexpr SimulationRBID INVALID_BULLET_RB_ID = std::numeric_limits<int>::max();
+    using RigidBodyID = int;
+    constexpr RigidBodyID INVALID_RB_ID = std::numeric_limits<int>::max();
 
     using CollisionShapeID = int;
-    constexpr CollisionShapeID INVALID_BULLET_SHAPE_ID = std::numeric_limits<int>::max();
+    constexpr CollisionShapeID INVALID_SHAPE_ID = std::numeric_limits<int>::max();
 
     // -------- Collider Types --------
     enum class ColliderType 
@@ -94,5 +94,10 @@ namespace HUGO{
         CONE
     };
 
+    enum BodyType{
+        DYNAMIC,
+        STATIC,
+        KINEMATIC
+    };
 
 }

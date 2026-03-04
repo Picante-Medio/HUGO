@@ -35,7 +35,7 @@ struct Shape{
     std::variant<BoxColliderInfo, SphereColliderInfo, CapsuleColliderInfo, CylinderColliderInfo, ConeColliderInfo> info;
 
 private:
-    HUGO::CollisionShapeID id;
+    HUGO::CollisionShapeID id = HUGO::INVALID_SHAPE_ID;
 };
 
 struct RigidBodyComponent: public Component
@@ -110,5 +110,5 @@ private:
 
     // Once created shape shouldn't be modified
     Shape rbShape;
-    HUGO::SimulationRBID objectID = HUGO::INVALID_BULLET_RB_ID;
+    HUGO::RigidBodyID objectID = HUGO::INVALID_RB_ID;
 };
