@@ -9,7 +9,7 @@
 #include "CameraComponent.h"
 #include "ViewportComponent.h"
 #include "LightComponent.h"
-#include "CameraTags.h"
+#include "RenderTags.h"
 #include "HugoTypes.h"
 #include "HugoError.h"
 #include "OgreUtils.h"
@@ -27,8 +27,7 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
     //sceneManager->setDisplaySceneNodes(true);
 
     // Basic light
-    sceneManager->setAmbientLight(Ogre::ColourValue(0.15f, 0.15f, 0.15f));
-
+    setAmbientLight(0.15f, 0.15f, 0.15f);
     const Ogre::ConfigOptionMap& options = ogreRoot->getRenderSystem()->getConfigOptions();
 
     auto it = options.find("Video Mode");
@@ -58,6 +57,8 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
 
     createLightEntity( HUGO::Vector3(-50, 300, 800), HUGO::Vector4(0.4f, 0.2f, 0.4f, 0.2f)
         , HUGO::Vector4(0.0f, 0.0f, 0.0f, 0.0f), HUGO::LightType::LT_POINT, HUGO::Radian(0), HUGO::Radian(0), 0, 0.1f, 0.1f, 300);   
+
+    createTestEntity();
 }
 
 RenderSystem::~RenderSystem()
@@ -123,6 +124,54 @@ void RenderSystem::handleTag()
         scene->removeComponent<CameraDirtyTag>(entity);
     }
 
+    // Light update
+    for(auto&pack : scene->query<LightDirtyTag, LightComponent, TransformComponent>()){
+        LightDirtyTag& tag = pack.get<LightDirtyTag&>();
+        LightComponent& light = pack.get<LightComponent&>();
+        TransformComponent& tr = pack.get<TransformComponent&>();
+        EntityID entity = tag.entity;
+
+        auto it = lightMap.find(entity);
+        if (it != lightMap.end()) {
+            // update position
+            it->second.node->setPosition(OgreUtils::vector3ToOgre(tr.position));
+            
+            // for dirrectonal light
+            if (light.getLightType() == HUGO::LightType::LT_DIRECTIONAL) {
+                it->second.node->setOrientation(OgreUtils::quaternionToOgre(tr.rotation));
+            }
+
+            // update diffuse and specular
+            it->second.ogreLight->setDiffuseColour(Ogre::ColourValue(light.getDiffuse().x, light.getDiffuse().y, light.getDiffuse().z, light.getDiffuse().w));
+            it->second.ogreLight->setSpecularColour(Ogre::ColourValue(light.getSpecular().x, light.getSpecular().y, light.getSpecular().z, light.getSpecular().w));
+            
+            // update attenuation
+            it->second.ogreLight->setAttenuation(light.getAttenuation().x ,light.getAttenuation().w, light.getAttenuation().y, light.getAttenuation().z);
+            
+            if (light.getLightType() == HUGO::LightType::LT_SPOTLIGHT) {
+                it->second.ogreLight->setSpotlightRange(Ogre::Radian(light.getSpotInner().valueRadians())
+                    , Ogre::Radian(light.getSpotOuter().valueRadians()), light.getSpotFallOff());
+
+                if (light.getSpotNearClip() > 0) {
+                    it->second.ogreLight->setSpotlightNearClipDistance(light.getSpotNearClip());
+                }
+            }
+            
+            // parameters for directional light
+            if (light.getLightType() != HUGO::LightType::LT_DIRECTIONAL) {
+                it->second.ogreLight->setAttenuation( light.getAttenuation().w, light.getAttenuation().x,  
+                                            light.getAttenuation().y, light.getAttenuation().z);
+            }
+
+            // shadows
+            if(light.getShadowFarDistance() > 0){
+                it->second.ogreLight->setShadowFarDistance(light.getShadowFarDistance());
+            }
+        }
+        // eliminate the tag
+        scene->removeComponent<LightDirtyTag>(entity);
+    }
+
     // Viewport update
     for(auto& pack : scene->query<ViewportDirtyTag, ViewportComponent>()) {
         ViewportDirtyTag& tag = pack.get<ViewportDirtyTag&>();
@@ -132,20 +181,20 @@ void RenderSystem::handleTag()
         auto it = viewportMap.find(entity);
         if (it != viewportMap.end() && it->second.ogreViewport) {
             // update dimensions
-            it->second.ogreViewport->setDimensions(viewport.left, viewport.top,viewport.width, viewport.height);
+            it->second.ogreViewport->setDimensions(viewport.getLeft(), viewport.getTop(), viewport.getWidth(), viewport.getHeight());
             
             // update color
             it->second.ogreViewport->setBackgroundColour(Ogre::ColourValue(
-                viewport.clearColor.x, viewport.clearColor.y, 
-                viewport.clearColor.z, viewport.clearColor.w
+                viewport.getClearColor().x, viewport.getClearColor().y, 
+                viewport.getClearColor().z, viewport.getClearColor().w
             ));
 
             // update the camera if it has changed
-            if (viewport.cameraEntity != it->second.lastCameraEntity) {
-                auto camIt = cameraMap.find(viewport.cameraEntity);
+            if (viewport.getCameraEntity() != it->second.lastCameraEntity) {
+                auto camIt = cameraMap.find(viewport.getCameraEntity());
                 if (camIt != cameraMap.end()) {
                     it->second.ogreViewport->setCamera(camIt->second.ogreCamera);
-                    it->second.lastCameraEntity = viewport.cameraEntity;
+                    it->second.lastCameraEntity = viewport.getCameraEntity();
                 }
             }
         }
@@ -567,11 +616,11 @@ void RenderSystem::createOgreViewport(EntityID entity)
     
     Ogre::Camera* cam = nullptr;
     
-    if (viewportComp->cameraEntity != 0) {
-        auto camIt = cameraMap.find(viewportComp->cameraEntity);
+    if (viewportComp->getCameraEntity() != 0) {
+        auto camIt = cameraMap.find(viewportComp->getCameraEntity());
         if (camIt != cameraMap.end()) {
             cam = camIt->second.ogreCamera;
-            res.lastCameraEntity = viewportComp->cameraEntity;
+            res.lastCameraEntity = viewportComp->getCameraEntity();
         }
     }
     
@@ -592,19 +641,19 @@ void RenderSystem::createOgreViewport(EntityID entity)
     // create ogre viewport
     res.ogreViewport = renderWindow->addViewport(
         cam,
-        viewportComp->zOrder,
-        viewportComp->left,
-        viewportComp->top,
-        viewportComp->width,
-        viewportComp->height
+        viewportComp->getZOrder(),
+        viewportComp->getLeft(),
+        viewportComp->getTop(),
+        viewportComp->getWidth(),
+        viewportComp->getHeight()
     );
 
     // background color
     res.ogreViewport->setBackgroundColour(Ogre::ColourValue(
-        viewportComp->clearColor.x,
-        viewportComp->clearColor.y,
-        viewportComp->clearColor.z,
-        viewportComp->clearColor.w
+        viewportComp->getClearColor().x,
+        viewportComp->getClearColor().y,
+        viewportComp->getClearColor().z,
+        viewportComp->getClearColor().w
     ));
     
     cam->setAspectRatio(float(res.ogreViewport->getActualWidth()) / float(res.ogreViewport->getActualHeight()));
@@ -687,14 +736,4 @@ void RenderSystem::setMainViewport(EntityID viewportEntity)
     if (viewportMap.find(viewportEntity) != viewportMap.end()) {
         mainViewportEntity = viewportEntity;
     }
-}
-
-EntityID RenderSystem::getMainCamera() const
-{
-    return mainCameraEntity;
-}
-
-EntityID RenderSystem::getMainViewport() const
-{
-    return mainViewportEntity;
 }

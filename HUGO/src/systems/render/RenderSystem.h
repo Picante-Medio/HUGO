@@ -63,31 +63,10 @@ class RenderSystem : public System{
 
     void handleTag();
 
-    //OgreObjects
-    HUGO::OgreObjectID createOgreObject(const std::string& meshName, const std::string& materialName="");
-    OgreObject& getOgreObject(HUGO::OgreObjectID id);
-    void removeOgreObject(HUGO::OgreObjectID& id);
-    void destroyOgreObject(OgreObject& obj);
-      
-public:
-    RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> root, Ogre::RenderWindow* window);
-    ~RenderSystem() override;
-    
-    void update(double dt) override;
-    void fixedUpdate(double dt) override;
-
     void createTestEntity();
+
     // Materials
-    void setMaterial(EntityID entity,const std::string& materialName);
-    
-    // Creation of viewport and camera (helpers)
-    EntityID createCameraEntity(const HUGO::Vector3& position = HUGO::Vector3(0, 0, 0));
-    EntityID createViewportEntity();
-    EntityID createLightEntity(const HUGO::Vector3& position = HUGO::Vector3(0, 0, 0)
-                   , HUGO::Vector4 diff = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f), HUGO::Vector4 specular= HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f)
-                   , HUGO::LightType lType = HUGO::LightType::LT_POINT
-                   , const HUGO::Radian& outer = HUGO::Radian(0.0f), const HUGO::Radian& inner = HUGO::Radian(0.0f)
-                   , float falloff = 1.0f, float nearClip = 1.0f, float shadowNearClipDist = 1.0f, float shadowFarClipDist = 100.0f);
+    void setMaterial(EntityID entity,const std::string& materialName);   
 
     // Register and unregister for cameras and viewports created outside the RenderSystem
     void registerCameraEntity(EntityID entity);
@@ -103,13 +82,35 @@ public:
     void setWindowed(bool fullScreen);
     void resizeScreen(unsigned int widthPt, unsigned int heightPt);
 
-    // Main camera and viewport configuration
-    void setMainCamera(EntityID cameraEntity);
-    EntityID getMainCamera() const;
-    
-    void setMainViewport(EntityID viewportEntity);
-    EntityID getMainViewport() const;
+    //OgreObjects
+    HUGO::OgreObjectID createOgreObject(const std::string& meshName, const std::string& materialName="");
+    OgreObject& getOgreObject(HUGO::OgreObjectID id);
+    void removeOgreObject(HUGO::OgreObjectID& id);
+    void destroyOgreObject(OgreObject& obj);
 
+
+    // Creation of viewport and camera (helpers)
+    EntityID createCameraEntity(const HUGO::Vector3& position = HUGO::Vector3(0, 0, 0));
+    EntityID createViewportEntity();
+    EntityID createLightEntity(const HUGO::Vector3& position = HUGO::Vector3(0, 0, 0)
+                   , HUGO::Vector4 diff = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f), HUGO::Vector4 specular= HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f)
+                   , HUGO::LightType lType = HUGO::LightType::LT_POINT
+                   , const HUGO::Radian& outer = HUGO::Radian(0.0f), const HUGO::Radian& inner = HUGO::Radian(0.0f)
+                   , float falloff = 1.0f, float nearClip = 1.0f, float shadowNearClipDist = 1.0f, float shadowFarClipDist = 100.0f);
+
+                   
     // Global light configuration
     void setAmbientLight(float r, float g, float b);
+
+    // Main camera and viewport configuration
+    void setMainCamera(EntityID cameraEntity);
+    
+    void setMainViewport(EntityID viewportEntity);
+      
+public:
+    RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> root, Ogre::RenderWindow* window);
+    ~RenderSystem() override;
+    
+    void update(double dt) override;
+    void fixedUpdate(double dt) override;
 };

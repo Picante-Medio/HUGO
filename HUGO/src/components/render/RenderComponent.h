@@ -22,8 +22,3 @@ public:
     friend class RenderSystem;
 };
 
-struct MaterialDirtyTag : public Component {
-    HUGO::String materialName;
-    MaterialDirtyTag(EntityID entity, const HUGO::String& materialName) 
-        : Component(entity), materialName(materialName) {}
-};

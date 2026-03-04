@@ -5,6 +5,8 @@
 
 struct ViewportComponent: public Component
 {
+private:
+
     // Coordinates reletad to the window (0-1)
     float left = 0.0f;
     float top = 0.0f;
@@ -23,9 +25,32 @@ struct ViewportComponent: public Component
     EntityID cameraEntity = 0;
     
     bool active = true;
-    
+
+public:
     ViewportComponent(EntityID entity,
-                    float l = 0.0f, float t = 0.0f, float w = 1.0f, float h = 1.0f, int z = 0)
-      : Component(entity)
-      , left(l), top(t), width(w), height(h), zOrder(z) {}
+                    float l = 0.0f, float t = 0.0f, float w = 1.0f, float h = 1.0f, int z = 0);
+
+    // Setters
+    void setLeft(float l);
+    void setTop(float t);
+    void setWidth(float w);
+    void setHeight(float h);
+    void setZOrder(int z);
+    void setClearColor(const HUGO::Vector4& color);
+    void setClearDepth(bool clear);
+    void setClearStencil(bool clear);
+    void setCameraEntity(EntityID camera);
+    void setActive(bool active);
+
+    // Getters
+    float getLeft() const;
+    float getTop() const;
+    float getWidth() const;
+    float getHeight() const;
+    int getZOrder() const;
+    HUGO::Vector4 getClearColor() const;
+    bool getClearDepth() const;
+    bool getClearStencil() const;
+    EntityID getCameraEntity() const;   
+    bool isActive() const;
 };
