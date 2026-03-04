@@ -9,7 +9,7 @@ using EntityID = unsigned long int;
 using ComponentID = unsigned int;
 
 // Component ID limit
-constexpr ComponentID MAX_COMPONENTS = 256;
+constexpr ComponentID MAX_COMPONENTS = 255;
 
 // Index on the component dense list
 using DenseListIndex = unsigned long int;
