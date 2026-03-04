@@ -11,7 +11,6 @@ namespace HUGO{
         
         std::shared_ptr<ma_engine> m_miniAudio_engine;
         std::shared_ptr<Ogre::Root> m_ogreRoot;
-        Ogre::ResourceGroupManager& m_ogreResourceGroupManager;
         ChatParser m_chatParser;
 
         public:
