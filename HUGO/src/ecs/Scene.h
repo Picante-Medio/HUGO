@@ -7,7 +7,7 @@
 #include "ComponentDenseTable.h"
 #include "Ecs.h"
 #include "EntityTable.h"
-#include "Query.h"
+#include "HQuery.h"
 #include "System.h"
 #include "HugoTypes.h"
 #include "BulletSimulation.h"
@@ -79,8 +79,8 @@ public:
   }
 
   template <typename... Ts> 
-  Query<Ts...> query() {
-    Query<Ts...> returnedQuery;
+  HUGO::Query<Ts...> query() {
+    HUGO::Query<Ts...> returnedQuery;
 
     // Expand the parameter pack to get the affected components by ID
     std::vector<ComponentID> ids = getAllComponentIds<Ts...>();
