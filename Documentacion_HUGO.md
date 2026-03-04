@@ -85,7 +85,6 @@ public:
 
 ## Sistemas de H.U.G.O
 - RenderSystem
-- PhysicsSystem
 - InputSystem
 - AudioSystem
 - UISystem
@@ -141,7 +140,7 @@ Las librerías que utilizará el motor son las siguientes:
 | OGRE3D   | 14.5.0    | Gráficos 3D (modelos, animaciones, shaders, generación de ventana, layouts) |
 | SDL2     | 2.32.10   | Input (como dependencia de OGRE3D)                                          |
 | Miniaudio    |   | Implementación de efectos de sonido y música                                |
-| Physx    | 9.19.0218 | Físicas y detección de colisiones                                           |
+| Bullet    | 3.25 | Físicas y detección de colisiones                                           |
 
 
 # Estuctura de directorios del motor
@@ -158,15 +157,15 @@ El proyecto se construye con el uso de cmake, la estructura del directorio del p
 Para permitir la comunicación del motor con librerías externas como OGRE3D, Physx, o Miniaudio, se ha pensado en la implementación de dichas funcionalidades dentro de los sistemas de las escenas de juego, formando parte de la arquitectura ECS pensada. Estos sistemas serían los principales representantes de dichas librerías, y servirían como capa intermedia de comunicación entre el mundo de nuestro motor y la funcionalidad que proporciona cada librería.
 
 ## Funcionalidad de los sistemas
-Hacen uso de la información que contienen los componentes. Por ejemplo, RenderSystem (sistema de renderizado que hace uso de Ogre3D), recorrería todos las entidades que cuentan con una posición y una malla, y las actualizaría en su propio mundo para así mostrarse correctamente en pantalla. PhysicSystem se encargaría de recorrer a todas las entidades que cuentan con un Rigidbody y actualizaría su posición en base a las posiciones simuladas dentro del mundo de Physx. AudioSystem cargará archivos de audio en memoria (efectos de sonido) o streaming (canciones), cambiar parámetros y reproducir sonidos.
+Hacen uso de la información que contienen los componentes. Por ejemplo, RenderSystem (sistema de renderizado que hace uso de Ogre3D), recorrería todos las entidades que cuentan con una posición y una malla, y las actualizaría en su propio mundo para así mostrarse correctamente en pantalla. AudioSystem cargará archivos de audio en memoria (efectos de sonido) o streaming (canciones), cambiar parámetros y reproducir sonidos.
 
 ### AudioSystem
-**Componentes**
+**Componentes**  
 Este sistema ofrece dos componentes por defecto: AudioComponent y Audio3DComponent, siendo el primero aquello para modificar parámetros genéricos de un audio y lo otro para cambiar valores de un audio 3D como (factor de Doppler, distancia mínima y máxima, etc.). 
 
 Además, tiene un archivo llamado ```AudioTags.h``` que contiene todas las etiquetas que ofrece el sistema (reproducir/parar un sonido, cambiar valores de un audio específico).
 
-**Implementación del sistema**
+**Implementación del sistema**  
 Para este sistema, se han implementado tres estructuras auxiliares:
 - ```AudioInfo```: contiene el puntero inteligente de ma_sound y un booleano para indicar si está usado (necesario para el pool).
 - ```AudioEntry```: incluye nombre de un audio, ruta relativa del archivo y el tipo de audio (SOUND2D, SOUND3D, MUSIC). La diferencia entre sound y music es que los audios de tipo sound se cargan en memoria mientras que music se reproduce en streaming.
@@ -218,7 +217,7 @@ for (auto& pack->query<AudioComponent,
     removeComponent<AudioStopTag>(tag.entity);
 }
 ```
-**Carga de audio**
+**Carga de audio**  
 Los audios a incluir al motor se leerán desde un archivo .txt llamado ```ÀudioList.txt``` que tiene el siguiente formato: 
 ``` txt
 Cada línea sería un audio
@@ -250,6 +249,70 @@ Al implementar las funcionalidades externas de las librerías como sistemas dent
 * Como tentativa, se encapsularía toda la funcionalidad de cada librería en un sólo sistema, lo que provoca que el seguimiento de la comunicación con cada librería sea más cómodo e intuitivo.
 
 * Se reutiliza código ya hecho. Al tratarse de implementar sistemas, no hace falta programar una infraestructura distinta para estas funcionalidades ni mantenerla, sino que se reutiliza una parte fundamental de la arquitectura.
+
+## Simulación de físicas
+El caso de las físicas es distinto. Debido a la naturaleza de la librería física es necesario establecer un orden de ejecución muy concreto que no es posible garantizar si se tratan las físicas desde un sistema de ECS. Por esa misma razón hemos decidido implementarlas con una clase abstracta **Simulación**. 
+
+### Implementación
+
+**Interfaces**
+- IPhysicsModule
+- IphysicsSimulation
+
+**Estructuras**
+- BulletUtils
+- Shape
+    - BoxColliderInfo
+    - SphereColliderInfo
+    - CapsuleColliderInfo
+    - CylinderColliderInfo
+    - ConeColliderInfo
+- RigidBodyComponent
+- StaticRBTag
+- KinematicRBTag
+
+**Clases**
+- BulletModule
+- BulletSimulation
+- HugoMotionState
+
+### Pipeline de físicas a nivel de usuario
+Para crear un cuerpo físico el usuario debe crear una estructura llamada ``Shape`` que recibe hasta cinco tipos distintos de información para crear una forma:
+
+- Caja
+- Esfera
+- Cápsula
+- Cilindro
+- Cono
+
+Esta información es representada a través de cinco estructuras que recibe como argumento la clase Shape.
+
+>**Nota**: La clase ``Shape`` solo es capaz de recibir una estructura de información. Puede ser cualquiera de las cinco pero solo una de ellas por ``Shape`` (p.ej: una estructura ``Shape`` no puede tener un BoxColliderInfo y un CapsuleColliderInfo a la vez pero es posible hacer dos ``Shape`` una con un tipo de información y otra con otro). Para ello hace uso de ``std::variant``.
+
+Cuando se crea un ``RigidbodyComponent`` se le asigna una ``Shape`` para definir su forma y tamaño. Esta diferenciación entre la forma y el cuerpo permite asociar a distintos cuerpos la misma forma y el mismo tamaño. En la simulación física, todos esos cuerpos también comparten los mismos datos de su forma. De esta forma el usuario puede reaprovechar una misma forma para varios cuerpos.
+
+Para hacer que los cuerpos sean **Kinemáticos** o **Estáticos** se deben añadir las tags ``KinematicRBTag`` y ``StaticRBTag`` respectivamente a la entidad a la que se le añada el ``RigidbodyComponent`` inmediatamente después de hacerlo. Si se añade la tag en cualquier otro momento no se puede garantizar que se vaya a crear un cuerpo con las propiedades deseadas.
+
+### IPhysicsSimulation
+Esta es una interfaz que permite a cualquier usuario implementar la simulación como desee. Tiene métodos virtuales para destruir la simulación que esté gestionando ahora mismo y para hacer un step en el mundo de físicas.
+
+> **Nota**: Un step es una simulación de un tiempo x (normalmente milesimas) que hace el mundo de físicas para simular el movimiento físico de los objetos afectados por el mundo en ese tiempo.
+
+Nuestra implementación de la interfaz es ``BulletSimulation``. Esta interfaz contiene un mundo de Bullet (btWorld) y se encarga de inicializarlo y ejecutar su step cuando sea necesario. Además tiene un registro de todas las formas y todos los cuerpos que hay en la simulación con un ID asociado al componente ``RigidbodyComponent`` de HUGO que tenga una entidad asociada.
+
+En cada frame se encarga de actualizar la información de los rigidbodies de bullet con respecto a los de HUGO si es que han cambiado, actualiza los transforms de bullet en función de los de HUGO para cuerpos kinemáticos y hace uso de una clase ``HugoMotionState`` que hereda de la interfaz ``MotionState`` de bullet creada especificamente para coordinar de forma automática los transforms de físicas con los de renderizado. Esta clase ``HugoMotionState`` es gestionada por la librería de bullet.
+
+La sincronización que no ocurre a través de ``HugoMotionState`` se lleva a cabo usando queries de ECS de la escena asociada a la simulación. La simulación es también la encargada de crear un rigidbody y una shape de bullet si durante la sincronización encuentra un ``RigidbodyComponent`` de HUGO que no tiene uno de bullet asociado (es decir, si su ID es inválido).
+
+### IPhysicsModule
+Esta es una interfaz que se encarga de gestionar las simulaciones (IPhysicsSimulation) del motor. Tiene una lista de simulaciones activas e inactivas y normalmente habrá siempre una simulación por escena. Tiene métodos virtuales para crear una nueva simulación, destruirla, activarla, desactivarla y ejecutar el step de todas las simulaciones activas.
+
+Nuestra implementación de la interfaz es ``BulletModule`` que simplemente se encarga de aplicar todas las gestiones ya mencionadas sobre las ``BulletSimulation`` registradas, usando cuando sea necesario los métodos que implementa la librería de bullet.
+
+``BulletModule`` se inicializa en ``Core`` y se ejecutan sus métodos cuando es necesario para actualizar todas las simulaciones activas cuando corresponda.
+
+### BulletUtils
+Una estructura con conversiones de vectores y cuaterniones del motor al de la librería de físicas y viceversa para garantizar la buena comunicación entre ambos. Es necesario implementar nuevas transformaciones si se quisiera utilizar otro motor de físicas que usara vectores/cuaterniones distintos a los del motor.
 
 # Pipeline de generación de contenido
 
