@@ -24,7 +24,7 @@ struct TransformComponent;
    ====================*/
 
 struct AudioInfo {
-    std::unique_ptr<Audio> ptr;
+    std::shared_ptr<Audio> ptr;
     bool inUse = false;
 };
 
@@ -68,7 +68,7 @@ private:
        =================*/
 
     // create a ma_sound ptr
-    AudioInfo createVoice(HUGO::AudioID id);
+    ErrorOrType<AudioInfo> createVoice(HUGO::AudioID id);
 
     // acquire reusable voice (reuse/create/steal)
     ma_sound* getSound(HUGO::AudioID id);

@@ -18,17 +18,17 @@ AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, std::shared_ptr<ma_engine
 {   
 }
 
-AudioInfo AudioSystem::createVoice(HUGO::AudioID id)
+ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id)
 {
     AudioInfo info;
-    info.ptr = std::make_unique<Audio>();
+    info.ptr = std::make_shared<Audio>();
 
     std::string fullPath = audios[id].filename;
 
     if (!info.ptr->init(engine.get(), fullPath.c_str(), 0))
         throw std::runtime_error("Failed loading audio");
     
-    return info;
+    return ErrorOrType<AudioInfo>(info);
 }
 
 ma_sound* AudioSystem::getSound(HUGO::AudioID id)
@@ -49,7 +49,7 @@ ma_sound* AudioSystem::getSound(HUGO::AudioID id)
     // create new if it is allowed
     if (pool.voices.size() < queueSize)
     {
-        pool.voices.emplace_back(createVoice(id));
+        pool.voices.emplace_back(createVoice(id).getValue());
 
         AudioInfo& v = pool.voices.back();
         v.inUse = true;
@@ -387,8 +387,8 @@ void AudioSystem::update(double dt)
     for (auto& pack :
          scene->query<AudioComponent, AudioDirtyTag>())
     {
-        auto& c   = pack.get<AudioComponent&>();
-        auto& tag = pack.get<AudioDirtyTag&>();
+        AudioComponent& c   = pack.get<AudioComponent&>();
+        AudioDirtyTag& tag = pack.get<AudioDirtyTag&>();
 
         processChanges(c, tag);
 
@@ -399,7 +399,7 @@ void AudioSystem::update(double dt)
     for (auto& pack :
          scene->query<AudioComponent, AudioPlayTag>())
     {
-        auto& c = pack.get<AudioComponent&>();
+        AudioComponent& c = pack.get<AudioComponent&>();
 
         ma_sound* s = acquireVoice(c);
         playAudio(s);
@@ -413,7 +413,7 @@ void AudioSystem::update(double dt)
     for (auto& pack :
          scene->query<AudioComponent, AudioStopTag>())
     {
-        auto& c = pack.get<AudioComponent&>();
+        AudioComponent& c = pack.get<AudioComponent&>();
 
         if (c.activePtr)
             stopAudio(c.activePtr);
@@ -428,7 +428,7 @@ void AudioSystem::update(double dt)
 
     for (auto& pack : scene->query<AudioComponent>())
     {
-        auto& sc = pack.get<AudioComponent&>();
+        AudioComponent& sc = pack.get<AudioComponent&>();
         EntityID id = sc.entity;
 
         if (i > 0)
