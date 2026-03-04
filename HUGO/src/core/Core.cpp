@@ -146,7 +146,6 @@ void Core::run(){
             exit = true;
         }
         scenePtr->fixedUpdate(startTime);
-        // scenePtr->stepPhysics(startTime);
         physicsModule->performSimulations(startTime);
         scenePtr->update(startTime);
 
