@@ -6,6 +6,7 @@
 #include "OgreRoot.h"
 #include "HugoVirtualTimer.h"
 #include "miniaudio.h"
+#include "BulletModule.h"
 
 class Scene;
 class VirtualTimer;
@@ -29,6 +30,11 @@ namespace HUGO {
         void initMiniaudio();
         void destroyMiniaudio();
         std::shared_ptr<ma_engine> maEngine;
+
+        // Physics
+        void initPhysicsModule();
+        void destroyPhysicsModule();
+        std::shared_ptr<IPhysicsModule> physicsModule;
 
         VirtualTimer vt;
         std::shared_ptr<Scene> scenePtr;

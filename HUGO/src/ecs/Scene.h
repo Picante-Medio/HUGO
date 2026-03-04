@@ -10,7 +10,6 @@
 #include "HQuery.h"
 #include "System.h"
 #include "HugoTypes.h"
-#include "BulletSimulation.h"
 
 class Scene : public std::enable_shared_from_this<Scene> {
   
@@ -24,29 +23,16 @@ class Scene : public std::enable_shared_from_this<Scene> {
         entityTable.getDenseListIndex(entity, componentID));
   }
 
-  // Physics simulation
-  template <typename T>
-  T* getSimulation() {
-    return static_cast<T>(simulation->getSimulation());
-  }
-
-  std::unique_ptr<HUGO::Simulation> simulation;
-
 public:
   Scene();
 
   inline void addSystem(std::shared_ptr<System> system) { systems.push_back(system); }
-
-  void initSimulation();
 
   // Logic update
   void update(double dt);
 
   // Physics update
   void fixedUpdate(double dt);
-
-  // Physics step
-  void stepPhysics(double dt);
 
   // Entity handling
   EntityID createEntity();

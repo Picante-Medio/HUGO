@@ -10,11 +10,6 @@ Scene::Scene() {
 }
 
 void 
-Scene::initSimulation() {
-  simulation = std::make_unique<HUGO::Simulation>(shared_from_this());
-}
-
-void 
 Scene::update(double dt) {
   for(std::shared_ptr<System> system : systems) 
     system->update(dt);
@@ -24,11 +19,6 @@ void
 Scene::fixedUpdate(double dt) {
   for(std::shared_ptr<System> system : systems) 
     system->fixedUpdate(dt);
-}
-
-void
-Scene::stepPhysics(double dt) {
-  simulation->stepSimulation(dt);
 }
 
 EntityID 

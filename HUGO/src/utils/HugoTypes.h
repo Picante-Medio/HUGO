@@ -3,9 +3,6 @@
 #include <limits>
 #include <string>
 
-class BulletSimulation;
-class btRigidBody;
-
 namespace HUGO{
     using OgreObjectID = int;
     constexpr OgreObjectID INVALID_OGRE_OBJECT_ID = std::numeric_limits<int>::max();
@@ -86,13 +83,6 @@ namespace HUGO{
 
     using BulletShapeID = int;
     constexpr BulletShapeID INVALID_BULLET_SHAPE_ID = std::numeric_limits<int>::max();
-
-    // #ifdef BULLET_PHYSICS
-    using Simulation = BulletSimulation;
-    using simulationRB = btRigidBody;
-    // #else
-    // ...
-    // #endif
 
     // -------- Collider Types --------
     enum class ColliderType 

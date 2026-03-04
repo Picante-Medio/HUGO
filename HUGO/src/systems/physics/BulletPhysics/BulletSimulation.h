@@ -2,7 +2,7 @@
 
 #include "PagedArray.h"
 #include "btBulletDynamicsCommon.h"
-#include "PhysicsSimulation.h"
+#include "IPhysicsSimulation.h"
 #include "HugoTypes.h"
 
 class TransformComponent;
@@ -19,7 +19,7 @@ struct ShapeObject{
     btCollisionShape* bulletShape = nullptr;
 };
 
-class BulletSimulation : public PhysicsSimulation {
+class BulletSimulation : public IPhysicsSimulation {
 
     // ------ Simulation & configuration ------
 
@@ -61,14 +61,22 @@ class BulletSimulation : public PhysicsSimulation {
 
     // Check for updates on a specific RB
     void checkFlags(RigidBodyComponent& hgRB);
-    // Creates and adds rigidbodies to simulation. Updates kinematic bodies.
-    void syncRigidBodies();
 
-    public:
+    // @brief Creates and adds rigidbodies to simulation. Updates kinematic bodies.
+    void syncBodiesToBullet();
+
+    void stepSimulation(double dt);
+
+    // Already performed by the motion state
+    // void syncBodiesToGame(); 
+
+public:
     
     BulletSimulation(std::shared_ptr<Scene> scene);
     ~BulletSimulation();
 
-    void* getSimulation() override;
-    void stepSimulation(double dt);
+    // void* getSimulation() override;
+
+    // Sync bodies to bullet, step simulation, sync bodies back to game
+    void performSimulation(double dt) override;
 };

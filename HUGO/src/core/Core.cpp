@@ -15,6 +15,7 @@
 #include "RenderSystem.h"
 #include "AudioSystem.h"
 #include "Scene.h"
+#include "BulletModule.h"
 //#include "ResourceManager.h"
 
 // se podría hacer clase singleton¿? -Marco
@@ -29,7 +30,6 @@ void Core::init(){
     initModules();
     
     scenePtr = std::make_shared<Scene>();
-    scenePtr->initSimulation();
 
     std::shared_ptr<AudioSystem> audioSystem = std::make_shared<AudioSystem>(scenePtr, maEngine);
     audioSystem->loadAudiosFromFile("test_media/AudioList.txt");
@@ -47,6 +47,7 @@ void Core::init(){
 void Core::destroy(){
     destroyOgre();
     destroyMiniaudio();
+    destroyPhysicsModule();
 }
 
 //--------------------------- IMODULES INITIALIZATION --------------------
@@ -55,6 +56,7 @@ void HUGO::Core::initModules()
 {
     initMiniaudio();
     initOgre();
+    initPhysicsModule();
 }
 
 void Core::initOgre()
@@ -144,7 +146,8 @@ void Core::run(){
             exit = true;
         }
         scenePtr->fixedUpdate(startTime);
-        scenePtr->stepPhysics(startTime);
+        // scenePtr->stepPhysics(startTime);
+        physicsModule->performSimulations(startTime);
         scenePtr->update(startTime);
 
         m_ogreRoot->renderOneFrame();
@@ -180,4 +183,12 @@ void HUGO::Core::initMiniaudio()
 void HUGO::Core::destroyMiniaudio()
 {
     ma_engine_uninit(maEngine.get());
+}
+
+void HUGO::Core::initPhysicsModule() {
+    physicsModule = std::make_shared<BulletModule>();
+}
+
+void HUGO::Core::destroyPhysicsModule() {
+    // ...
 }

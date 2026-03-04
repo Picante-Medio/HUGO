@@ -6,7 +6,7 @@
 #include "BulletUtils.h"
 
 BulletSimulation::BulletSimulation(std::shared_ptr<Scene> scene)
-: PhysicsSimulation(scene)
+: IPhysicsSimulation(scene)
 {
     // We are using bullet's default collision configuration. Custom configuration is recommended for more complexity
     collisionConfig = new btDefaultCollisionConfiguration();
@@ -58,12 +58,17 @@ BulletSimulation::~BulletSimulation() {
 
 }
 
-void* BulletSimulation::getSimulation() {
-    return static_cast<void*>(btWorld);
+// void* BulletSimulation::getSimulation() {
+//     return static_cast<void*>(btWorld);
+// }
+
+void BulletSimulation::performSimulation(double dt) {
+    syncBodiesToBullet();
+    stepSimulation(dt);
+    // syncBodiesToGame();
 }
 
 void BulletSimulation::stepSimulation(double dt) {
-    syncRigidBodies();
     btWorld->stepSimulation(dt);
 }
 
@@ -300,7 +305,7 @@ void BulletSimulation::checkFlags(RigidBodyComponent& hgRB)
     }
 }
 
-void BulletSimulation::syncRigidBodies() {
+void BulletSimulation::syncBodiesToBullet() {
     // Add new rigidBodies to simulation and Update kinematic bodies
     // Static rigidBodies 
     for(auto& pack: scene->query<StaticRBTag, RigidBodyComponent, TransformComponent>()) {
