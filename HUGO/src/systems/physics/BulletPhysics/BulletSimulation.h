@@ -10,12 +10,12 @@ class RigidBodyComponent;
 class Shape;
 
 struct RigidBodyObject{
-    HUGO::BulletRigidbodyID id;
+    HUGO::SimulationRBID id;
     btRigidBody* bulletRB = nullptr;
 };
 
 struct ShapeObject{
-    HUGO::BulletShapeID id;
+    HUGO::CollisionShapeID id;
     btCollisionShape* bulletShape = nullptr;
 };
 
@@ -41,22 +41,22 @@ class BulletSimulation : public IPhysicsSimulation {
     
     // Same logic as in RenderSystem. Credits to them, they did a really good job.
     PagedArray<RigidBodyObject, 128> rigidBodies;
-    std::vector<HUGO::BulletRigidbodyID> freeBulletRBObjectId;
+    std::vector<HUGO::SimulationRBID> freeBulletRBObjectId;
     std::vector<std::size_t> rbIdToIndex;
 
     // We use ids to shapes so various rb can use the same shape
     PagedArray<ShapeObject, 128> collisionShapes;
-    std::vector<HUGO::BulletShapeID> freeBulletShapeId;
+    std::vector<HUGO::CollisionShapeID> freeBulletShapeId;
     std::vector<std::size_t> shapeIdToIndex;
     
-    HUGO::BulletShapeID createShapeObject(Shape& shape);
-    ShapeObject& getShapeObject(const HUGO::BulletShapeID id);
-    void removeShapeObject(HUGO::BulletShapeID& id);
+    HUGO::CollisionShapeID createShapeObject(Shape& shape);
+    ShapeObject& getShapeObject(const HUGO::CollisionShapeID id);
+    void removeShapeObject(HUGO::CollisionShapeID& id);
     void destroyShapeObject(ShapeObject& shObj);
 
-    HUGO::BulletRigidbodyID createRigidBodyObject(RigidBodyComponent& hgRb, const TransformComponent& tf, bodyType type);
-    RigidBodyObject& getRigidBodyObject(const HUGO::BulletRigidbodyID id);
-    void removeRigidBodyObject(HUGO::BulletRigidbodyID& id);
+    HUGO::SimulationRBID createRigidBodyObject(RigidBodyComponent& hgRb, const TransformComponent& tf, bodyType type);
+    RigidBodyObject& getRigidBodyObject(const HUGO::SimulationRBID id);
+    void removeRigidBodyObject(HUGO::SimulationRBID& id);
     void destroyRigidBodyObject(RigidBodyObject& RbObj);
 
     // Check for updates on a specific RB
