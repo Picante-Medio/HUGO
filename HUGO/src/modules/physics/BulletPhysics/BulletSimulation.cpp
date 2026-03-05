@@ -349,8 +349,6 @@ void BulletSimulation::syncBodiesToBullet() {
         }
         
         checkFlags(rb);
-
-        std::cout << "Sync to Bullet: " << rigidBodies[rb.objectID].bulletRB->getLinearVelocity().getY() << '\n';
     }
 }
 
