@@ -16,6 +16,8 @@ Los **componentes** solo son responsables de almacenar el estado del juego. Son 
 ```cpp
 struct Component {
     EntityID myEntity;
+public:
+    Component(EntityID myEntity) : myEntity {}
 };
 ```
 
@@ -24,28 +26,44 @@ Los **sistemas** alteran la información provista por los componentes, añadiend
 // Los sistemas operan sobre entidades y componentes, a través de las escenas
 class System {
 protected:
-    std::shared_ptr<Scene> myScene;
+    std::shared_ptr<Scene> scene;
 public:
-    virtual void update(float dt);
+  System(std::shared_ptr<Scene> scene): scene(scene) {}
+  virtual void update(double dt) = 0;
+  virtual void fixedUpdate(double dt) = 0;
 };
 ```
 
 Las **escenas** son los contenedores de componentes y sistemas.
-- Guardan todos los componentes en una tabla densa y los asocian a sus entidades a través de una tabla de indirecciones **(estructura sparse set)**
+- Implementan la estructura sparse-set en dos clases, `EntityTable` y `ComponentDenseTable`, para almacenar los componentes de cada entidad *contiguos en memoria*
 - Almacenan los sitemas en un vector y los actualizan
+- Crean estructuras iterables para recorrer entidades que tienen ciertos componentes (Instancias de la clase `Query`)
+    - La única forma de ver o alterar el contenido de los componentes es a través de estas queries
 ```cpp
 class Scene {
 protected:
-    std::vector<System> systems; //Vector de sistemas
+  EntityTable entityTable;
+  ComponentDenseTable componentTable;
+  std::vector<std::shared_ptr<System>> systems;
 
-    // Implementación de sparse-set de componentes
 public:
-    // Actualización del estado
-    void update(float dt); //Update lógico
+    void update(float dt); //Llama a update de todos los sistemas en la lista
+    void fixedUpdate(float dt); //Llama a fixedUpdate de todos los sistemas en la lista
 
     // Manejo de entidades
+    EntityID createEntity();
+    void removeEntity(EntityID entity);
 
     // Manejo de componentes
+    template <typename T, typename... Ts>
+    void addComponent(EntityID entity, Ts &&...args);
+
+    template<tpename T>
+    void removeComponent(EntityID entity);
+
+    // Accesor a modo de iterador a los componentes
+    template <typename... Ts> 
+    Query<Ts...> query();
 };
 ```
 \
@@ -92,12 +110,12 @@ public:
 # Arquitectura del core del motor
 
 ## Game
-Clase de inicialización. Es responsable de cargar la biblioteca dinámica del juego en cuestión, inicializar todos los módulos de dependencias y cargar los datos de juego (config.lua para configuración general del juego y .tscn de la primera escena, nombre indicado en el archivo de configuración).
+Clase de inicialización. Es responsable de cargar la biblioteca dinámica del juego en cuestión, inicializar todos los módulos de dependencias y cargar los datos de juego (como archivos chat de contenido de escenas).
 
 Una vez inicializado el juego mantiene el bucle de tiempo y se compensa pérdida de frames en caso de que sea necesario.
 
 ### Scene Parser
-Clase auxiliar encargada de leer los TSCN de escenas, validarlos y devolver un objeto Scene con la escena construida. 
+Clase auxiliar encargada de leer los archivos `.chat` (mapas) de escenas, validarlos y devolver un objeto Scene con la escena construida. 
 
 ## Factorías
 Se definen dos clases que serviran como factorías de objetos externos:
@@ -135,12 +153,12 @@ Se define como clase. Es responsable de cargar los assets de juego y tiene méto
 
 # Dependencias externas
 Las librerías que utilizará el motor son las siguientes:
-| Librería | Versión   | Uso                                                                         |
-| -------- | --------- | --------------------------------------------------------------------------- |
-| OGRE3D   | 14.5.0    | Gráficos 3D (modelos, animaciones, shaders, generación de ventana, layouts) |
-| SDL2     | 2.32.10   | Input (como dependencia de OGRE3D)                                          |
-| Miniaudio    |   | Implementación de efectos de sonido y música                                |
-| Bullet    | 3.25 | Físicas y detección de colisiones                                           |
+| Librería  | Versión | Uso                                                                         |
+| --------- | ------- | --------------------------------------------------------------------------- |
+| OGRE3D    | 14.5.0  | Gráficos 3D (modelos, animaciones, shaders, generación de ventana, layouts) |
+| SDL2      | 2.32.10 | Input (como dependencia de OGRE3D)                                          |
+| Miniaudio | 0.11.24 | Implementación de efectos de sonido y música                                |
+| Bullet3   | 3.25.5  | Físicas y detección de colisiones                                           |
 
 
 # Estuctura de directorios del motor
@@ -325,7 +343,29 @@ A la hora de usar imágenes, hemos distinguido dos tipos de ellas: vectoriales y
 - **No vectoriales:** Los formatos permitidos son .png, .jpg, .bmp. OGRE3D soporta estos tipos de archivos.
 
 ## Audio
-Los archivos de audio permitidos son .mp3, .wav y .flac. Serán los únicos archivos de audio del motor. 
+Los archivos de audio que admite Miniaudio son .mp3, .wav y .flac. Serán los únicos archivos de audio del motor. 
 
 ## Mapas de Juego
-Usaremos GodotEngine como editor de escenas 3D, ya que el formato de escena de Godot (.tscn) puede leerse como una lista de nodos con nombres, posiciones y componentes. Implementaremos un lector de .tscn que cree entidades en nuestro motor.
+Usaremos GodotEngine como editor de escenas 3D, pero en vez de usar sus archivos de esccena nativos `.tscn`, crearemos un plugin de Godot que traduzca el contenido del editor a un formato propio que hemos llamado `.chat`, siglas de *chat is HUGO's alternative to tscn* (otra sigla recursiva).
+    - El plugin creará archivos de GDScript a partir de las declaraciones .h de los componentes del motor y los juegos.
+    - Las entidades existirán en un mapa del nodo padre de las escenas.
+    - Los sistemas existirán en un enum del nodo padre de las escenas.
+
+El siguiente es un ejemplo de cómo se verá una escena en un archivo `.chat`
+```chat
+SCENE miEscena
+
+ENTITY Sinbad 0
+
+COMPONENT Nickname
+    label STRING
+        my name is Sinbad!
+
+ENTITY Cube 1
+
+COMPONENT Transform
+    position VECTOR_3 0 1 3
+
+COMPONENT Counter
+    count INT 0
+```
