@@ -1,9 +1,10 @@
 #include "RigidBodyComponent.h"
 
-RigidBodyComponent::RigidBodyComponent(EntityID entity, Shape shape)
+RigidBodyComponent::RigidBodyComponent(EntityID entity, Shape shape, float mass)
 : Component(entity)
 , rbShape(shape)
 , flags(0)
+, mass(mass)
 {}
 
 #pragma region Setters

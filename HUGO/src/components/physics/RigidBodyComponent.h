@@ -42,7 +42,7 @@ struct RigidBodyComponent: public Component
 {
     friend class BulletSimulation;
     
-    RigidBodyComponent(EntityID entity, Shape shape);
+    RigidBodyComponent(EntityID entity, Shape shape, float mass = 0.f);
 
     // Setters
     void setRestitution(float nRestitution);

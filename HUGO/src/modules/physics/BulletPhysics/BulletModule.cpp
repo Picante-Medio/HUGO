@@ -1,5 +1,6 @@
 #include "BulletModule.h"
 #include "IPhysicsSimulation.h"
+#include "BulletSimulation.h"
 
 BulletModule::BulletModule()
 : IPhysicsModule()
@@ -17,7 +18,9 @@ BulletModule::~BulletModule() {
 }
 
 void BulletModule::createSceneSimulation(std::shared_ptr<Scene> scene) {
-    // create BulletSimulation and ad it to activeSimulations container
+    // create BulletSimulation and add it to activeSimulations container
+    std::shared_ptr<IPhysicsSimulation> simulation = std::make_shared<BulletSimulation>(scene);
+    activeSimulations.push_back(simulation);
 }
 
 void BulletModule::destroySceneSimulation(std::shared_ptr<Scene> scene) {

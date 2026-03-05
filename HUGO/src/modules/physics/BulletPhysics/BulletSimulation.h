@@ -69,7 +69,7 @@ public:
     BulletSimulation(std::shared_ptr<Scene> scene);
     ~BulletSimulation();
 
-    // void* getSimulation() override;
+    void destroySimulation();
 
     // Sync bodies to bullet, step simulation, sync bodies back to game
     void performSimulation(double dt) override;

@@ -18,6 +18,8 @@
 #include "BulletModule.h"
 //#include "ResourceManager.h"
 
+#include "PhysicsTestSystem.h"
+
 // se podría hacer clase singleton¿? -Marco
 using namespace HUGO;
 Core::Core()
@@ -40,6 +42,11 @@ void Core::init(){
     scenePtr->addSystem(renderSystem);
     
     //m_resourceManager = std::make_shared<HUGO::ResourceManager>(maEngine, m_ogreRoot);
+
+    // Physics testing
+    physicsModule->createSceneSimulation(scenePtr);
+    std::shared_ptr<PhysicsTestSystem> testSystem = std::make_shared<PhysicsTestSystem>(scenePtr);
+    scenePtr->addSystem(testSystem);
 }
 
 //Destruction of HUGO modules. End of HUGO

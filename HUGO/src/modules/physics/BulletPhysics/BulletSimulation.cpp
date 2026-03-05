@@ -26,6 +26,10 @@ BulletSimulation::BulletSimulation(std::shared_ptr<Scene> scene)
 }
 
 BulletSimulation::~BulletSimulation() {
+    destroySimulation();
+}
+
+void BulletSimulation::destroySimulation() {
     // remove and delete rigidbodies
     for (int i = btWorld->getNumCollisionObjects() - 1; i >= 0; i--)
 	{
@@ -55,7 +59,6 @@ BulletSimulation::~BulletSimulation() {
     delete overlappingPairCache;
     delete dispatcher;
     delete collisionConfig;
-
 }
 
 void BulletSimulation::performSimulation(double dt) {
@@ -175,10 +178,10 @@ HUGO::RigidBodyID BulletSimulation::createRigidBodyObject(RigidBodyComponent& hg
     // Set flags for static, dynamic or kinematic
     switch(type){
         case HUGO::BodyType::STATIC:
-            rb->setFlags(rb->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+            rb->setCollisionFlags(rb->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
             break;
         case HUGO::BodyType::KINEMATIC:
-            rb->setFlags(rb->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+            rb->setCollisionFlags(rb->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
             rb->setActivationState(DISABLE_DEACTIVATION);
             break;
         case HUGO::BodyType::DYNAMIC:
