@@ -48,14 +48,11 @@ void PhysicsTestSystem::fixedUpdate(double dt) {
         RigidBodyComponent& body = pack.get<RigidBodyComponent&>();
 
         body.applyForce(HUGO::Vector3(10,0,0));
-        std::cout << "a\n";
     }
 }
 
 void PhysicsTestSystem::update(double dt) {
     for(auto pack : scene->query<TransformComponent, RigidBodyComponent, DynamicRBTag>()) {
         TransformComponent& body = pack.get<TransformComponent&>();
-
-        std::cout << "Posicion del body: (" << body.position.x << " " << body.position.y << " " << body.position.z << ")\n"; 
     }
 }
