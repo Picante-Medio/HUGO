@@ -26,17 +26,31 @@ ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id)
     std::string fullPath = audios[id].filename;
 
     if (!info.ptr->init(engine.get(), fullPath.c_str(), 0))
-        throw std::runtime_error("Failed loading audio");
+    {
+        StringError err;
+        err.errorMessage = "Failed loading audio";
+        return ErrorOrType<AudioInfo>(err);
+    }
     
     return ErrorOrType<AudioInfo>(info);
 }
-
+/**
+ * @brief get an available sound instance from the pool.
+ *
+ * The system first tries to reuse a free voice from the pool. If none are
+ * available, it will create a new voice as long as the pool has not reached
+ * the maximum queue size. If the pool is full, a voice will be reused using
+ * a round-robin stealing strategy.
+ *
+ * @param id Audio identifier used to select the corresponding audio pool.
+ * @return Pointer to the acquired ma_sound instance.
+ */
 ma_sound* AudioSystem::getSound(HUGO::AudioID id)
 {
     AudioPool& pool = pools[id];
 
-    // reuse free voice
-    // O(N) but N is a small number
+    // STEP 1 : Try reusing an existing free voice
+    // O(N) search, but N is small (queueSize)
     for (auto& voice : pool.voices)
     {
         if (!voice.inUse)
@@ -46,7 +60,7 @@ ma_sound* AudioSystem::getSound(HUGO::AudioID id)
         }
     }
 
-    // create new if it is allowed
+    // STEP 2 : Create a new voice if we haven't reached the pool limit yet.
     if (pool.voices.size() < queueSize)
     {
         pool.voices.emplace_back(createVoice(id).getValue());
@@ -63,7 +77,7 @@ ma_sound* AudioSystem::getSound(HUGO::AudioID id)
         return v.ptr->get();
     }
 
-    // else, we need to steal a position (round robin)
+    // STEP 3 : If pool is full, reuse an existing voice. Round-robin ensures fair distribution.
     AudioInfo& stolen = pool.voices[pool.stealIndex];
     pool.stealIndex =
         (pool.stealIndex + 1) % pool.voices.size();
@@ -76,11 +90,14 @@ ma_sound* AudioSystem::getSound(HUGO::AudioID id)
     return stolen.ptr->get();
 }
 
+// get the currently active sound pointer for a component
 ma_sound *AudioSystem::getExistingSound(AudioComponent &c)
 {
     return c.activePtr; 
 }
 
+// ensures a component has a valid voice
+// only creates one if it doesn't exist yet
 ma_sound *AudioSystem::acquireVoice(AudioComponent &c)
 {
     if (!c.activePtr)
@@ -89,6 +106,7 @@ ma_sound *AudioSystem::acquireVoice(AudioComponent &c)
 
         if (c.onEnd)
         {
+            // if the component has an callback, we attach it to the sound
             ma_sound_set_end_callback(
                 c.activePtr,
                 &AudioSystem::endCallback,
@@ -136,15 +154,6 @@ void AudioSystem::processChanges(AudioComponent& c, const AudioDirtyTag& t)
 
     if (t.flags & HUGO::STARTTIME)
         setAudioPosition(s, c.startTime);
-
-    if (t.flags & HUGO::START)
-        playAudio(s);
-
-    if (t.flags & HUGO::STOP)
-    {
-        // stop playback and release the active voice reference
-        stopAudio(s);
-    }
 }
 
 void AudioSystem::process3DChanges(const Audio3DInfoComponet &c, const TransformComponent& tr, const Audio3DDirtyTag& t)
