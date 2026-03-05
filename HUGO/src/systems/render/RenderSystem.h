@@ -111,6 +111,6 @@ public:
     RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> root, Ogre::RenderWindow* window);
     ~RenderSystem() override;
     
-    void update(double dt) override;
     void fixedUpdate(double dt) override;
+    void update(double dt) override;
 };

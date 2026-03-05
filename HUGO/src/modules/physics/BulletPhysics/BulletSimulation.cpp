@@ -156,7 +156,7 @@ void BulletSimulation::destroyShapeObject(ShapeObject& shObj)
 
 
 #pragma region BulletObject
-HUGO::RigidBodyID BulletSimulation::createRigidBodyObject(RigidBodyComponent& hgRb, const TransformComponent& tf, HUGO::BodyType type)
+HUGO::RigidBodyID BulletSimulation::createRigidBodyObject(RigidBodyComponent& hgRb, TransformComponent& tf, HUGO::BodyType type)
 {
 
     // Create/reuse shape object
@@ -169,7 +169,7 @@ HUGO::RigidBodyID BulletSimulation::createRigidBodyObject(RigidBodyComponent& hg
     }
 
     // Create state
-    HUGOMotionState* state = new HUGOMotionState(btTransform(), std::make_shared<TransformComponent>(tf));
+    HUGOMotionState* state = new HUGOMotionState(btTransform(), tf);
     state->updateBulletTransform();
 
     // Create bullet rb
@@ -207,6 +207,9 @@ HUGO::RigidBodyID BulletSimulation::createRigidBodyObject(RigidBodyComponent& hg
     //store object
     std::size_t index = rigidBodies.push_back(std::move(obj));
     rbIdToIndex[id] = index;
+
+    //add to simulation
+    btWorld->addRigidBody(rb);
 
     return id;
 }
@@ -346,6 +349,12 @@ void BulletSimulation::syncBodiesToBullet() {
         }
         
         checkFlags(rb);
+
+        std::cout << "Sync to Bullet: " << rigidBodies[rb.objectID].bulletRB->getLinearVelocity().getY() << '\n';
     }
 }
+
+// void BulletSimulation::syncBodiesToGame() {
+
+// }
 #pragma endregion

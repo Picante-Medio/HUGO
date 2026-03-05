@@ -58,7 +58,7 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::R
     createLightEntity( HUGO::Vector3(-50, 300, 800), HUGO::Vector4(0.4f, 0.2f, 0.4f, 0.2f)
         , HUGO::Vector4(0.0f, 0.0f, 0.0f, 0.0f), HUGO::LightType::LT_POINT, HUGO::Radian(0), HUGO::Radian(0), 0, 0.1f, 0.1f, 300);   
 
-    createTestEntity();
+    // createTestEntity();
 }
 
 RenderSystem::~RenderSystem()
@@ -307,6 +307,11 @@ void RenderSystem::destroyOgreObject(OgreObject &obj)
 #pragma endregion
 
 #pragma region Updates
+void RenderSystem::fixedUpdate(double dt)
+{
+
+}
+
 void RenderSystem::update(double dt)
 { 
     handleTag();
@@ -332,11 +337,6 @@ void RenderSystem::update(double dt)
         obj.ogreSceneNode->setOrientation(OgreUtils::quaternionToOgre(tr.rotation));
         obj.ogreSceneNode->setScale(OgreUtils::vector3ToOgre(tr.scale));
     }
-
-}
-
-void RenderSystem::fixedUpdate(double dt)
-{
 
 }
 
