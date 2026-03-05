@@ -26,7 +26,10 @@ BulletSimulation::BulletSimulation(std::shared_ptr<Scene> scene)
 }
 
 BulletSimulation::~BulletSimulation() {
-    destroySimulation();
+    // This call is done by BulletModule in its destructor. calling it again will result in an unhandled exception
+    // while trying to delete a deleted world
+
+    // destroySimulation();
 }
 
 void BulletSimulation::destroySimulation() {
