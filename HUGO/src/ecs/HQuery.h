@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdlib>
 #include <tuple>
 #include <vector>
@@ -45,5 +46,7 @@ namespace HUGO {
 
 		ComponentTuple<Ts...>& operator[](size_t index) { return componentPacks[index]; }
 		const ComponentTuple<Ts...>& at(size_t index) const { return componentPacks.at(index); }
+    const size_t size() { return componentPacks.size(); }
+
 	};
 };
