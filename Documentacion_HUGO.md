@@ -86,6 +86,7 @@ public:
     - Camera
     - Animation
     - Light
+    - Viewport
 
 - **Input**
     - InputListener
@@ -267,6 +268,60 @@ Al implementar las funcionalidades externas de las librerías como sistemas dent
 * Como tentativa, se encapsularía toda la funcionalidad de cada librería en un sólo sistema, lo que provoca que el seguimiento de la comunicación con cada librería sea más cómodo e intuitivo.
 
 * Se reutiliza código ya hecho. Al tratarse de implementar sistemas, no hace falta programar una infraestructura distinta para estas funcionalidades ni mantenerla, sino que se reutiliza una parte fundamental de la arquitectura.
+
+## RenderSystem
+Es el sistema que se encarga de gestionar el renderizado del motor. Conecta las entidades de HUGO con Ogre, permitiendo visualizar en pantalla las entidades del motor que tenga el RenderComponent, CameraComponent, ViewportComponent y LightComponent. Es el responsable de crear el SceneManager de Ogre.
+
+
+## Responsabilidades Principales
+
+- Crear y eliminar objetos de Ogre (entidades, sceneNode, luces, cámaras, viewports).
+- Sincronizar el transform de las entidades en Ogre.
+- Gestionar cámaras, viewports, materiales y el tamaño de la ventana.
+
+## Componentes Relacionados
+
+El RenderSystem trabaja con los siguientes componentes que pueden ser añadidos a las entidades:
+
+| Componente | Descripción |
+|------------|-------------|
+| `RenderComponent` | Permite asociar un mesh y material a una entidad para que sea renderizada |
+| `CameraComponent` | Define los parámetros de una cámara (FOV, planos near/far, tipo de proyección) |
+| `ViewportComponent` | Define un viewport de renderizado (dimensiones, color de fondo, cámara asociada) |
+| `LightComponent` | Define una luz (tipo, colores, atenuación, parámetros de sombras) |
+| `TransformComponent` | Define la posición, rotación y escala de la entidad |
+
+### Mapas de Correspondencia
+El sistema utiliza mapas para relacionar las entidades HUGO con sus contrapartes en Ogre3D:
+
+```cpp
+std::unordered_map<EntityID, CameraInfo> cameraMap;     // Entidad -> Información de cámara
+std::unordered_map<EntityID, ViewportInfo> viewportMap; // Entidad -> Información de viewport
+std::unordered_map<EntityID, LightInfo> lightMap;       // Entidad -> Información de luz
+```
+## Estructuras Internas de Almacenamiento
+
+Internamente, el sistema almacena los objetos de Ogre en structs, y utiliza estructuras de datos para relacionar cada entidad de HUGO con su objeto de Ogre.:
+
+### CameraInfo
+```cpp
+struct CameraInfo {
+    Ogre::Camera* ogreCamera = nullptr;   // Cámara de Ogre
+    Ogre::SceneNode* node = nullptr;      // Nodo de escena que contiene la cámara
+};
+```
+### OgreObject
+```cpp
+struct OgreObject {
+    HUGO::OgreObjectID id;                    // Identificador único del objeto 
+    Ogre::Entity* ogreEntity = nullptr;       // Entidad de Ogre (mesh)
+    Ogre::SceneNode* ogreSceneNode = nullptr; // Nodo de escena
+};
+```
+
+Para gestionar las entidades renderizables, se ha utilizado un TAD propio, llamada PagedArray, que consiste en un vector de arrays. Cada entidad renderizable tiene un OgreObjectID que corresponda a un objeto de Ogre. Y la correspondencia entre el ID y la posición del PagedArray se realiza mediante un vector idToIndex. Además, se utiliza un vector freeOgreObjectID para reutilizar IDs.
+
+Faltan los mensajes de cuando se crean las entidades del render system desde fuera.
 
 ## Simulación de físicas
 El caso de las físicas es distinto. Debido a la naturaleza de la librería física es necesario establecer un orden de ejecución muy concreto que no es posible garantizar si se tratan las físicas desde un sistema de ECS. Por esa misma razón hemos decidido implementarlas con una clase abstracta **Simulación**. 
