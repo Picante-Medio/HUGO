@@ -102,6 +102,7 @@ void Core::initOgre()
         throw std::runtime_error("SDL_GetWindowWMInfo failed");
     }
     SDL_Log("Video driver: %s", SDL_GetCurrentVideoDriver());
+    SDL_SetWindowFullscreen(sdlWindow,SDL_WINDOW_FULLSCREEN_DESKTOP);
 
     Ogre::NameValuePairList params;
     #ifdef __linux__
