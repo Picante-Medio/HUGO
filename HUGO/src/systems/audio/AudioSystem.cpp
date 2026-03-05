@@ -1,6 +1,7 @@
 #include "AudioSystem.h"
 
 #include "AudioComponent.h"
+#include "AudioListenerComponent.h"
 #include "Audio3DInfoComponet.h"
 
 #include "Scene.h"
@@ -118,7 +119,21 @@ ma_sound *AudioSystem::acquireVoice(AudioComponent &c)
     return c.activePtr;
 }
 
-void AudioSystem::processChanges(AudioComponent& c, const AudioDirtyTag& t)
+void AudioSystem::updateListeners(const AudioListenerComponent& a, const TransformComponent& tr)
+{
+    HUGO::Vector3 forward = tr.rotation.forward();
+    HUGO::Vector3 up      = tr.rotation.up();
+
+    ma_engine_listener_set_position(engine.get(), 0, tr.position.x, tr.position.y, tr.position.z);
+
+    ma_engine_listener_set_direction(engine.get(), 0, forward.x, forward.y,forward.z);
+
+    ma_engine_listener_set_world_up(engine.get(), 0, up.x, up.y, up.z);
+
+    ma_engine_listener_set_velocity(engine.get(), 0, a.listenerVelocity.x, a.listenerVelocity.y,a.listenerVelocity.z);
+}
+
+void AudioSystem::processChanges(AudioComponent &c, const AudioDirtyTag &t)
 {
     // if nothing changed in this component, return
     if (t.flags == HUGO::NONE)
@@ -377,6 +392,17 @@ void AudioSystem::update(double dt)
 {
     elapsedTime += dt;
 
+    // synk audio listeners
+    for (auto& pack : scene->query<AudioListenerComponent,
+                               TransformComponent,
+                               TransformDirtyTag>())
+    {
+        AudioListenerComponent& listener = pack.get<AudioListenerComponent&>();
+        TransformComponent& tr   = pack.get<TransformComponent&>();
+        TransformDirtyTag& tag  = pack.get<TransformDirtyTag&>();
+        updateListeners(listener, tr);
+        scene->removeComponent<TransformDirtyTag>(tag.entity);
+    }
     // 3D changes
     for (auto& pack :
          scene->query<Audio3DInfoComponet,
@@ -389,7 +415,7 @@ void AudioSystem::update(double dt)
 
         process3DChanges(info, tr, tag);
 
-        scene->removeComponent<Audio3DDirtyTag>(info.entity);
+        scene->removeComponent<Audio3DDirtyTag>(tag.entity);
     }
 
     // general changes

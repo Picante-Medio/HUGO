@@ -15,3 +15,7 @@ struct TransformComponent: public Component
                         const HUGO::Vector3& scale = HUGO::Vector3(1, 1, 1)): 
                         Component(entity), position(position), rotation(rotation), scale(scale) {}
 };
+
+struct TransformDirtyTag: public Component{
+    TransformDirtyTag(EntityID entity): Component(entity){}
+};

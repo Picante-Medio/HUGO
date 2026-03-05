@@ -60,7 +60,7 @@ namespace HUGO {
 		return Vector3(v.x * scalar, v.y * scalar, v.z * scalar);
 	}
 
-	Vector4::Vector4() 
+    Vector4::Vector4() 
         : x(0), y(0), z(0), w(0) {}
 	Vector4::Vector4(float x, float y, float z, float w) 
         : x(x), y(y), z(z), w(w) {}
@@ -116,7 +116,52 @@ namespace HUGO {
 	Quaternion::Quaternion(float w, float x, float y, float z) 
 		: w(w), x(x), y(y), z(z) {}
 
-	// --------------------- RADIAN ---------------------
+    Quaternion Quaternion::inverse() const
+    {
+        float norm = w*w + x*x + y*y + z*z;
+
+		return Quaternion(
+			w / norm,
+			-x / norm,
+			-y / norm,
+			-z / norm
+		);
+    }
+
+    Vector3 Quaternion::forward() const
+	{
+		return (*this) * Vector3(0,0,1);
+	}
+
+	Vector3 Quaternion::up() const
+	{
+		return (*this) * Vector3(0,1,0);
+	}
+
+	Vector3 Quaternion::right() const
+	{
+		return (*this) * Vector3(1,0,0);
+	}
+
+	Quaternion operator*(const Quaternion& a, const Quaternion& b)
+	{
+		return Quaternion(
+			a.w*b.w - a.x*b.x - a.y*b.y - a.z*b.z,
+			a.w*b.x + a.x*b.w + a.y*b.z - a.z*b.y,
+			a.w*b.y - a.x*b.z + a.y*b.w + a.z*b.x,
+			a.w*b.z + a.x*b.y - a.y*b.x + a.z*b.w
+		);
+	}
+	
+	Vector3 operator*(const Quaternion &q, const Vector3 &v)
+    {
+       HUGO::Vector3 qv(q.x, q.y, q.z);
+	   HUGO::Vector3 t = 2.0f * qv.cross(v);
+	   HUGO::Vector3 result = v + q.w * t + qv.cross(t);
+	   return result;
+    }
+
+    // --------------------- RADIAN ---------------------
 	Radian::Radian(float r) 
 		: rad(r) {}
 

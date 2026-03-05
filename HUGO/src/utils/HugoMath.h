@@ -16,6 +16,7 @@ namespace HUGO {
 
 		float operator* (const Vector3& other) const;
 		Vector3 operator* (float scalar) const;
+		
         
 		Vector3 cross(const Vector3& other) const;
 
@@ -51,8 +52,17 @@ namespace HUGO {
 
 		Quaternion();
 		Quaternion(float w, float x, float y, float z);
+
+		//helpers which are useful to audio listener and other contexts
+		Quaternion inverse() const;
+
+		Vector3 Quaternion::forward() const;
+		Vector3 Quaternion::up() const;
+		Vector3 Quaternion::right() const;
 	};
-	
+	Quaternion operator*(const Quaternion& a, const Quaternion& b);
+		// multiplying a quaternion
+	Vector3 operator*(const Quaternion& q, const Vector3& v);
 	struct Radian {
         float rad;
 

@@ -16,6 +16,7 @@
 
 // forward declarations
 struct AudioComponent;
+struct AudioListenerComponent;
 struct Audio3DInfoComponet;
 struct TransformComponent;
 
@@ -87,6 +88,7 @@ private:
        and update them with the audios
        ============================================== */
 
+    void updateListeners(const AudioListenerComponent& a, const TransformComponent& tr);
     void processChanges(AudioComponent& c, const AudioDirtyTag& t);
     void process3DChanges(const Audio3DInfoComponet& c,
                           const TransformComponent& tr,
