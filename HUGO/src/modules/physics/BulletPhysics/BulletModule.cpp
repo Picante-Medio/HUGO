@@ -9,11 +9,15 @@ BulletModule::BulletModule()
 }
 
 BulletModule::~BulletModule() {
-    for(std::shared_ptr<IPhysicsSimulation> simulation : inactiveSimulations)
+
+    // These calls are done by BulletSimulation in its destructor. calling it again will result in an unhandled exception
+    // while trying to delete a deleted world
+
+    /* for(std::shared_ptr<IPhysicsSimulation> simulation : inactiveSimulations)
         simulation->destroySimulation();
 
     for(std::shared_ptr<IPhysicsSimulation> simulation : activeSimulations)
-        simulation->destroySimulation();
+        simulation->destroySimulation();*/
 
 }
 

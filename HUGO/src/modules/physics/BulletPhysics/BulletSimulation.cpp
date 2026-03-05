@@ -26,10 +26,7 @@ BulletSimulation::BulletSimulation(std::shared_ptr<Scene> scene)
 }
 
 BulletSimulation::~BulletSimulation() {
-    // This call is done by BulletModule in its destructor. calling it again will result in an unhandled exception
-    // while trying to delete a deleted world
-
-    // destroySimulation();
+    destroySimulation();
 }
 
 void BulletSimulation::destroySimulation() {
@@ -339,7 +336,7 @@ void BulletSimulation::syncBodiesToBullet() {
     }
     
     // Dynamic rigidBodies
-    for(auto& pack: scene->query<RigidBodyComponent, TransformComponent>()) {
+    for(auto& pack: scene->query<DynamicRBTag, RigidBodyComponent, TransformComponent>()) {
         RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
         TransformComponent& transform = pack.get<TransformComponent&>();
         
