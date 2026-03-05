@@ -46,8 +46,6 @@ void PhysicsTestSystem::fixedUpdate(double dt) {
 
     for(auto pack : scene->query<TransformComponent, RigidBodyComponent, DynamicRBTag>()) {
         RigidBodyComponent& body = pack.get<RigidBodyComponent&>();
-
-        body.applyForce(HUGO::Vector3(10,0,0));
     }
 }
 
