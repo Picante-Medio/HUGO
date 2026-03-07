@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "RenderSystem.h"
+#include "PhysicsTags.h"
 #include "Scene.h"
 #include "RenderComponent.h"
 #include "TransformComponent.h"
@@ -338,6 +339,11 @@ void RenderSystem::update(double dt)
         obj.ogreSceneNode->setScale(OgreUtils::vector3ToOgre(tr.scale));
     }
 
+    for(auto& pack : scene->query<TransformComponent,RenderComponent,DynamicRBTag>()) {
+        RenderComponent& rc = pack.get<RenderComponent&>();
+
+        std::cout << "Render position: " << getOgreObject(rc.objectID).ogreSceneNode->getPosition().x << " " << getOgreObject(rc.objectID).ogreSceneNode->getPosition().y << " " << getOgreObject(rc.objectID).ogreSceneNode->getPosition().z << "\n";
+    }
 }
 
 #pragma endregion

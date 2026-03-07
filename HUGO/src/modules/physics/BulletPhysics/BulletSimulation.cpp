@@ -349,6 +349,8 @@ void BulletSimulation::syncBodiesToBullet() {
         }
         
         checkFlags(rb);
+        RigidBodyObject aux = getRigidBodyObject(rb.objectID);
+        std::cout << "Rigidbody position: " << aux.bulletRB->getCenterOfMassPosition().getX() << " " << aux.bulletRB->getCenterOfMassPosition().getY() << " " << aux.bulletRB->getCenterOfMassPosition().getZ() << "\n";
     }
 }
 
