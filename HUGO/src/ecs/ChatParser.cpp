@@ -18,14 +18,15 @@ ErrorOrVoid ChatParser::readChatFolder(const HUGO::String& chatFolder){
     std::filesystem::path chatFolderPath{chatFolder};
     chatFolderPath = std::filesystem::current_path()/chatFolderPath;
 
-    std::filesystem::directory_iterator dirIt = std::filesystem::directory_iterator(chatFolderPath);
     //If dir not found or dir empty
-    if(dirIt == std::filesystem::directory_iterator()){
+    if(!std::filesystem::exists(chatFolderPath)){
         StringError err;
-        err.errorMessage = "Folder {" + chatFolderPath.filename().string() + "} doesn't exist or is empty";
+        err.errorMessage = "Folder {" + chatFolderPath.string() + "} doesn't exist";
 
         return ErrorOrVoid(err);
     }
+
+    std::filesystem::directory_iterator dirIt = std::filesystem::directory_iterator(chatFolderPath);
 
     //Iterate all the entries found in dir
     for(const auto& entry : dirIt) {
@@ -105,12 +106,6 @@ ErrorOrType<HUGO::Float> readFloat(){
     return ErrorOrType<HUGO::Float>(err);
 }
 
-/*
-...
-valueName STRING
-    Hola, que tal estas
-...
-*/
 ErrorOrType<HUGO::String> readString(){
     HUGO::String res;
     if (getline(std::cin, res)) return ErrorOrType<HUGO::String>(res);

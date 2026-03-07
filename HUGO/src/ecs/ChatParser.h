@@ -47,7 +47,8 @@ namespace HUGO{
 		//Initialize empty database. Function readChatFolder must be called to fill the database.
 		ChatParser();
 
-		//Adds to the database the data from all .chat files of chatFolder path
+		//Adds to the database the data from all .chat files of chatFolder path.
+		//@param chatFolder Path relative to the executable file (normally HUGO/bin)
 		ErrorOrVoid readChatFolder(const HUGO::String& chatFolder);
 
 		//Returns entity data associated with prefabName
