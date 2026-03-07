@@ -53,7 +53,5 @@ void PhysicsTestSystem::fixedUpdate(double dt) {
 void PhysicsTestSystem::update(double dt) {
     for(auto pack : scene->query<TransformComponent, RigidBodyComponent, DynamicRBTag>()) {
         TransformComponent& body = pack.get<TransformComponent&>();
-
-        std::cout << "Transform position: " << body.position.x << " " << body.position.y << " " << body.position.z << "\n";
     }
 }
