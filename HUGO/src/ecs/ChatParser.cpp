@@ -32,7 +32,9 @@ ErrorOrVoid ChatParser::readChatFolder(const HUGO::String& chatFolder){
         ErrorOrVoid err = readChat(chatPath);
         //If error has ben returned from reading .chat, chat parser should stop reading and return the error
         if (err.isError()){
-            return err;
+            StringError retError;
+            retError.errorMessage = "Error reading .chat in path {" + chatPath+ "}: " + err.getError().description();
+            return ErrorOrVoid(retError);
         }
     }
 
@@ -46,7 +48,7 @@ ErrorOrVoid ChatParser::readChat(const HUGO::String& chatPath){
     if(!file.is_open()){
         //Error opening file
         StringError err;
-        err.errorMessage = "File {" + chatPath + "} can't be opened";
+        err.errorMessage = "File can't be opened";
         return ErrorOrVoid(err);
     }
 
@@ -76,37 +78,44 @@ ErrorOrVoid ChatParser::readChat(const HUGO::String& chatPath){
 
 ErrorOrType<HUGO::Vector3> readVector3(){
     Vector3 res;
-    std::cin >> res.x >> res.y >> res.z;
+    if (std::cin >> res.x >> res.y >> res.z) return ErrorOrType<HUGO::Vector3>(res);
 
-    return ErrorOrType<HUGO::Vector3>(res);
+    StringError err;
+    err.errorMessage = "Error reading VECTOR_3";
+    return ErrorOrType<HUGO::Vector3>(err);
 }
 
 ErrorOrType<HUGO::Int> readInt(){
     HUGO::Int res;
-    std::cin >> res;
+    if (std::cin >> res) return ErrorOrType<HUGO::Int>(res);
 
-    return ErrorOrType<HUGO::Int>(res);
+    StringError err;
+    err.errorMessage = "Error reading INT";
+    return ErrorOrType<HUGO::Int>(err);
 }
 
 ErrorOrType<HUGO::Float> readFloat(){
     HUGO::Float res;
-    std::cin >> res;
+    if (std::cin >> res) return ErrorOrType<HUGO::Float>(res);
 
-    return ErrorOrType<HUGO::Float>(res);
+    StringError err;
+    err.errorMessage = "Error reading FLOAT";
+    return ErrorOrType<HUGO::Float>(err);
 }
 
+/*
+...
+valueName STRING
+    Hola, que tal estas
+...
+*/
 ErrorOrType<HUGO::String> readString(){
     HUGO::String res;
+    if (getline(std::cin, res)) return ErrorOrType<HUGO::String>(res);
 
-    /*
-    ...
-    valueName STRING
-        Hola, que tal estas
-    ...
-    */
-    getline(std::cin, res);
-
-    return ErrorOrType<HUGO::String>(res);
+    StringError err;
+    err.errorMessage = "Error reading STRING";
+    return ErrorOrType<HUGO::String>(err);
 }
 
 //Checks if input is VEC3, FLOAT, INT, or STRING and adds it to the parameters of compData. If an error occurred, returns the error.

@@ -35,9 +35,12 @@ namespace HUGO{
 		std::unordered_map<HUGO::String, SceneData> m_sceneData;
 		std::unordered_map<HUGO::String, EntityData> m_prefabData;
 
+		//Open .chat file and read it
 		ErrorOrVoid readChat(const HUGO::String& chatPath);
 
+		//Read previously opened file as Scene
 		ErrorOrVoid handleSceneType();
+		//Read previously opened file as Prefab
 		ErrorOrVoid handlePrefabType();
 	public:
 
