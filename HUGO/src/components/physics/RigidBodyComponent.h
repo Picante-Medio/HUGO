@@ -61,6 +61,8 @@ struct RigidBodyComponent: public Component
     void setPositionOffset(HUGO::Vector3 offset);
     void setRotationOffset(HUGO::Quaternion offset);
 
+    void setActive(bool isActive);
+
     // Getters
     float getRestitution() const;
     float getFriction() const;
@@ -73,6 +75,8 @@ struct RigidBodyComponent: public Component
 
     HUGO::Vector3 getPositionOffset() const;
     HUGO::Quaternion getRotationOffset() const;
+
+    bool getActive() const;
 
 private:
 
@@ -87,7 +91,8 @@ private:
         TORQUE_IMPULSE_APPLIED = 128,
         FORCE_APPLIED = 256,
         TORQUE_APPLIED = 512,
-        TRANSFORM_OFFSET_UPDATED = 1024
+        TRANSFORM_OFFSET_UPDATED = 1024,
+        ACTIVE_UPDATED = 2048
     };
 
     int flags;
@@ -107,6 +112,8 @@ private:
     HUGO::Vector3 torqueImpulseApplied;
     HUGO::Vector3 forceApplied;
     HUGO::Vector3 torqueApplied;
+
+    bool active;
 
     // Once created shape shouldn't be modified
     Shape rbShape;

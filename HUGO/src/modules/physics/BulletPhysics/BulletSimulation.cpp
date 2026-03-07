@@ -302,6 +302,13 @@ void BulletSimulation::checkFlags(RigidBodyComponent& hgRB)
             btTrans.setOrigin(btTrans.getOrigin() + BulletUtils::vector3ToBullet(hgRB.positionOffset));
             obj.bulletRB->setCenterOfMassTransform(btTrans);
         }
+        if(hgRB.flags & RigidBodyComponent::ACTIVE_UPDATED){
+            if(hgRB.active)
+                // true isn't for setting if it's active or unactive but to force the activation even in DISABLE_DEACTIVATION mode
+                obj.bulletRB->activate(true);
+            else
+                obj.bulletRB->setActivationState(DISABLE_SIMULATION);
+        }
 
         hgRB.flags = 0;
     }

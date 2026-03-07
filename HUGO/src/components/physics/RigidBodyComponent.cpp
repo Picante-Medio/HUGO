@@ -5,6 +5,15 @@ RigidBodyComponent::RigidBodyComponent(EntityID entity, Shape shape, float mass)
 , rbShape(shape)
 , flags(0)
 , mass(mass)
+, restitution(0.f) // default bullet value
+, friction(.5f) // default bullet value
+, linearDamping(0.f) // default bullet value
+, angularDamping(0.f) // default bullet value
+, positionOffset(HUGO::Vector3()) // default bullet value
+, rotationOffset(HUGO::Quaternion()) // default bullet value
+, linearVelocity(HUGO::Vector3()) // default bullet value
+, angularVelocity(HUGO::Vector3()) // default bullet value
+, active(true)
 {}
 
 #pragma region Setters
@@ -87,6 +96,12 @@ void RigidBodyComponent::setRotationOffset(HUGO::Quaternion offset)
     rotationOffset = offset;
     flags = flags | UpdateFlags::TRANSFORM_OFFSET_UPDATED;
 }
+
+void RigidBodyComponent::setActive(bool isActive)
+{
+    active = isActive;
+    flags = flags | UpdateFlags::ACTIVE_UPDATED;
+}
 #pragma endregion
 
 #pragma region Getters
@@ -135,4 +150,9 @@ HUGO::Vector3 RigidBodyComponent::getPositionOffset() const
 HUGO::Quaternion RigidBodyComponent::getRotationOffset() const
 {
     return rotationOffset;
+}
+
+bool RigidBodyComponent::getActive() const
+{
+    return active;
 }
