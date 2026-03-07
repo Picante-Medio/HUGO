@@ -56,9 +56,9 @@ namespace HUGO {
 		//helpers which are useful to audio listener and other contexts
 		Quaternion inverse() const;
 
-		Vector3 Quaternion::forward() const;
-		Vector3 Quaternion::up() const;
-		Vector3 Quaternion::right() const;
+		Vector3 forward() const;
+		Vector3 up() const;
+		Vector3 right() const;
 	};
 	Quaternion operator*(const Quaternion& a, const Quaternion& b);
 		// multiplying a quaternion

@@ -6,6 +6,7 @@
 #include <vector>
 #include <memory>
 #include <HugoMath.h>
+#include "HugoError.h"
 
 
 namespace HUGO{

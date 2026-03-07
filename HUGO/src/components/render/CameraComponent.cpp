@@ -1,4 +1,3 @@
-#pragma once
 #include "CameraComponent.h"
 
 CameraComponent::CameraComponent(EntityID entity, float fov, float nearP, float farP, int prio, bool isActive)

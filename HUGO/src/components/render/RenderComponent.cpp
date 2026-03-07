@@ -1,4 +1,3 @@
-#pragma once
 #include "RenderComponent.h"
 
 void RenderComponent::setMeshName(const HUGO::String &newMeshName)

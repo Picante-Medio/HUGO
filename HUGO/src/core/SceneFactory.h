@@ -1,7 +1,6 @@
 #pragma once
 #include "ChatParser.h"
 #include "HugoTypes.h"
-#include "HugoError.h"
 
 class Scene;
 
