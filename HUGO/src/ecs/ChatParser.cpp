@@ -15,25 +15,27 @@ ChatParser::ChatParser(): m_sceneData(), m_prefabData(){
 
 ErrorOrVoid ChatParser::readChatFolder(const HUGO::String& chatFolder){
 
-    std::filesystem::directory_iterator dirIt = std::filesystem::directory_iterator(chatFolder);
+    std::filesystem::path chatFolderPath{chatFolder};
+    chatFolderPath = std::filesystem::current_path()/chatFolderPath;
 
+    std::filesystem::directory_iterator dirIt = std::filesystem::directory_iterator(chatFolderPath);
     //If dir not found or dir empty
-    if(dirIt == std::filesystem::end(dirIt)){
+    if(dirIt == std::filesystem::directory_iterator()){
         StringError err;
-        err.errorMessage = "Folder {" + chatFolder + "} doesn't exist or is empty";
+        err.errorMessage = "Folder {" + chatFolderPath.filename().string() + "} doesn't exist or is empty";
 
         return ErrorOrVoid(err);
     }
 
     //Iterate all the entries found in dir
-    for(const auto& entry : std::filesystem::directory_iterator(chatFolder)) {
-        HUGO::String chatPath = chatFolder + static_cast<HUGO::String>(entry.path().filename().generic_string());
+    for(const auto& entry : dirIt) {
 
-        ErrorOrVoid err = readChat(chatPath);
+        std::filesystem::path chatPath = chatFolderPath/entry.path();
+        ErrorOrVoid err = readChat(chatPath.string());
         //If error has ben returned from reading .chat, chat parser should stop reading and return the error
         if (err.isError()){
             StringError retError;
-            retError.errorMessage = "Error reading .chat in path {" + chatPath+ "}: " + err.getError().description();
+            retError.errorMessage = "Error reading .chat in path {" + chatPath.filename().string()+ "}: " + err.getError().description();
             return ErrorOrVoid(retError);
         }
     }
@@ -147,6 +149,8 @@ ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData& comp
         }
 
         if(input == "STRING"){
+            char emptySpace;
+            std::cin >> emptySpace;
             ErrorOrType<HUGO::String> s = readString();
 
             if(s.isError()) return ErrorOrVoid(s.getError());
@@ -160,8 +164,10 @@ ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData& comp
 #pragma endregion
 
 ErrorOrVoid ChatParser::handleSceneType(){
+    char emptySpaceChar;
+    std::cin >> emptySpaceChar;
     HUGO::String sceneName;
-    std::cin >> sceneName;
+    getline(std::cin, sceneName);
 
     //Initialize scene data of name sceneName
     m_sceneData[sceneName].entities = std::vector<EntityData>();
@@ -191,8 +197,11 @@ ErrorOrVoid ChatParser::handleSceneType(){
             m_sceneData[sceneName].entities.back().push_back(compData);
         }
 
-        ErrorOrVoid parameterReadErr = parameterReaderHelper(input, m_sceneData[sceneName].entities.back().back());
-        if(parameterReadErr.isError()) return parameterReadErr;
+        //If it already has an entity and this entity has a component, it can check if possible parameters for the component have been read.
+        if(m_sceneData[sceneName].entities.size() > 0 && m_sceneData[sceneName].entities.back().size() > 0){
+            ErrorOrVoid parameterReadErr = parameterReaderHelper(input, m_sceneData[sceneName].entities.back().back());
+            if(parameterReadErr.isError()) return parameterReadErr;
+        }
 
         std::cin >> input;
     }
@@ -201,8 +210,14 @@ ErrorOrVoid ChatParser::handleSceneType(){
 }
 
 ErrorOrVoid ChatParser::handlePrefabType(){
+    char emptySpaceChar;
+    std::cin >> emptySpaceChar;
+
     HUGO::String prefabName;
-    std::cin >> prefabName;
+    getline(std::cin, prefabName);
+
+    HUGO::Int prefabID;
+    std::cin >> prefabID;
 
     m_prefabData[prefabName] = EntityData();
 

@@ -20,6 +20,8 @@
 
 #include "PhysicsTestSystem.h"
 
+#include "ChatParser.h"
+
 // se podría hacer clase singleton¿? -Marco
 using namespace HUGO;
 Core::Core()
@@ -32,6 +34,9 @@ void Core::init(){
     initModules();
     
     scenePtr = std::make_shared<Scene>();
+
+    ChatParser chatParser = ChatParser();
+    auto err = chatParser.readChatFolder("../chats");
 
     std::shared_ptr<AudioSystem> audioSystem = std::make_shared<AudioSystem>(scenePtr, maEngine);
     audioSystem->loadAudiosFromFile("test_media/AudioList.txt");

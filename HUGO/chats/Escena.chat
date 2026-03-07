@@ -1,4 +1,4 @@
-SCENE
+SCENE Escena1
 
 ENTITY Juan 0
 	COMPONENT TransformComponent
@@ -10,8 +10,7 @@ ENTITY Guille 1
 	COMPONENT ParentComponent
 		[value] INT 0
 	COMPONENT MeshRendererComponent
-		[mesh] STRING 
-res://sphere.tres
+		[mesh] STRING res://sphere.tres
 	COMPONENT AudioComponent
 		[audioId] INT 0
 		[volume] FLOAT 0.0
@@ -23,8 +22,7 @@ ENTITY Alfonso 3
 	COMPONENT ParentComponent
 		[value] INT 2
 	COMPONENT MeshRendererComponent
-		[mesh] STRING 
-res://sphere.tres
+		[mesh] STRING res://sphere.tres
 
 ENTITY David 4
 	COMPONENT ParentComponent
