@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 #include <variant>
 #include <assert.h>
@@ -13,6 +14,8 @@ struct Error {
 // Default error
 struct StringError : Error {
   HUGO::String errorMessage;
+  StringError(HUGO::String error) : errorMessage(error) {};
+  StringError() {};
   HUGO::String description() override { return errorMessage; }
 };
 
