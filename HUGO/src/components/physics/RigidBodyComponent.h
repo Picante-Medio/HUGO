@@ -62,6 +62,9 @@ struct RigidBodyComponent: public Component
     void setRotationOffset(HUGO::Quaternion offset);
 
     void setActive(bool isActive);
+    void setAsleep(bool isAsleep);
+    void setLinearSleepingThreshold(float nThreshold);
+    void setAngularSleepingThreshold(float nThreshold);
 
     // Getters
     float getRestitution() const;
@@ -77,6 +80,9 @@ struct RigidBodyComponent: public Component
     HUGO::Quaternion getRotationOffset() const;
 
     bool getActive() const;
+    bool getAsleep() const;
+    float getLinearSleepingThreshold() const;
+    float getAngularSleepingThreshold() const;
 
 private:
 
@@ -92,7 +98,9 @@ private:
         FORCE_APPLIED = 256,
         TORQUE_APPLIED = 512,
         TRANSFORM_OFFSET_UPDATED = 1024,
-        ACTIVE_UPDATED = 2048
+        ACTIVE_UPDATED = 2048,
+        SLEEP_UPDATED = 4096,
+        SLEEPING_THRESHOLD_UPDATED = 8192
     };
 
     int flags;
@@ -114,6 +122,9 @@ private:
     HUGO::Vector3 torqueApplied;
 
     bool active;
+    bool asleep;
+    float linearSleepingThreshold;
+    float angularSleepingThreshold;
 
     // Once created shape shouldn't be modified
     Shape rbShape;

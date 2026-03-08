@@ -14,6 +14,9 @@ RigidBodyComponent::RigidBodyComponent(EntityID entity, Shape shape, float mass)
 , linearVelocity(HUGO::Vector3()) // default bullet value
 , angularVelocity(HUGO::Vector3()) // default bullet value
 , active(true)
+, asleep(false)
+, linearSleepingThreshold(.8f)
+, angularSleepingThreshold(1.f)
 {}
 
 #pragma region Setters
@@ -102,6 +105,24 @@ void RigidBodyComponent::setActive(bool isActive)
     active = isActive;
     flags = flags | UpdateFlags::ACTIVE_UPDATED;
 }
+
+void RigidBodyComponent::setAsleep(bool isAsleep)
+{
+    asleep = isAsleep;
+    flags = flags | UpdateFlags::SLEEP_UPDATED;
+}
+
+void RigidBodyComponent::setLinearSleepingThreshold(float nThreshold)
+{
+    linearSleepingThreshold = nThreshold;
+    flags = flags | UpdateFlags::SLEEPING_THRESHOLD_UPDATED;
+}
+
+void RigidBodyComponent::setAngularSleepingThreshold(float nThreshold)
+{
+    angularSleepingThreshold = nThreshold;
+    flags = flags | UpdateFlags::SLEEPING_THRESHOLD_UPDATED;
+}
 #pragma endregion
 
 #pragma region Getters
@@ -155,4 +176,19 @@ HUGO::Quaternion RigidBodyComponent::getRotationOffset() const
 bool RigidBodyComponent::getActive() const
 {
     return active;
+}
+
+bool RigidBodyComponent::getAsleep() const
+{
+    return asleep;
+}
+
+float RigidBodyComponent::getLinearSleepingThreshold() const
+{
+    return linearSleepingThreshold;
+}
+    
+float RigidBodyComponent::getAngularSleepingThreshold() const
+{
+    return angularSleepingThreshold;
 }

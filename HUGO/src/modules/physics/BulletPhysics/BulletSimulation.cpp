@@ -64,7 +64,7 @@ void BulletSimulation::destroySimulation() {
 void BulletSimulation::performSimulation(double dt) {
     syncBodiesToBullet();
     stepSimulation(dt);
-    // syncBodiesToGame();
+    syncBodiesToGame();
 }
 
 void BulletSimulation::stepSimulation(double dt) {
@@ -304,10 +304,19 @@ void BulletSimulation::checkFlags(RigidBodyComponent& hgRB)
         }
         if(hgRB.flags & RigidBodyComponent::ACTIVE_UPDATED){
             if(hgRB.active)
-                // true isn't for setting if it's active or unactive but to force the activation even in DISABLE_DEACTIVATION mode
+            obj.bulletRB->forceActivationState(ACTIVE_TAG);
+            else
+            obj.bulletRB->setActivationState(DISABLE_SIMULATION);
+        }
+        if(hgRB.flags & RigidBodyComponent::SLEEP_UPDATED){
+            if(!hgRB.asleep)
+                // true isn't for setting if it's active or unactive but to force the activation even if the object isn't dynamic
                 obj.bulletRB->activate(true);
             else
-                obj.bulletRB->setActivationState(DISABLE_SIMULATION);
+                obj.bulletRB->setActivationState(ISLAND_SLEEPING);
+        }
+        if(hgRB.flags & RigidBodyComponent::SLEEPING_THRESHOLD_UPDATED){
+            obj.bulletRB->setSleepingThresholds(hgRB.linearSleepingThreshold, hgRB.angularSleepingThreshold);
         }
 
         hgRB.flags = 0;
@@ -359,7 +368,16 @@ void BulletSimulation::syncBodiesToBullet() {
     }
 }
 
-// void BulletSimulation::syncBodiesToGame() {
+void BulletSimulation::syncBodiesToGame() {
 
-// }
+    for(auto& pack: scene->query<RigidBodyComponent, TransformComponent>()) {
+        RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
+        btRigidBody* btRb = getRigidBodyObject(rb.objectID).bulletRB;
+        
+        if(btRb->wantsSleeping())
+            rb.asleep = true;
+        else
+            rb.asleep = false;
+    }
+}
 #pragma endregion

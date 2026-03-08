@@ -61,8 +61,8 @@ class BulletSimulation : public IPhysicsSimulation {
 
     void stepSimulation(double dt);
 
-    // Already performed by the motion state
-    // void syncBodiesToGame(); 
+    // @brief Updates the asleep parameter of the RB using their bullet counterpart
+    void syncBodiesToGame(); 
 
 public:
     
