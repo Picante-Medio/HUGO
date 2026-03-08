@@ -28,12 +28,12 @@ PhysicsTestSystem::PhysicsTestSystem(std::shared_ptr<Scene> scene)
     scene->addComponent<DynamicRBTag>(e2);
     scene->addComponent<RenderComponent>(e2, "cube.mesh");
     
-    // // Entidad 3: Cuerpo kinemático
-    // EntityID e3 = scene->createEntity();
-    // scene->addComponent<TransformComponent>(e3, HUGO::Vector3(-30, 30, -50), HUGO::Quaternion(1,5,5,0), HUGO::Vector3(0.15, 0.25, 0.15));
-    // scene->addComponent<RigidBodyComponent>(e3, shape, 5.f);
-    // scene->addComponent<KinematicRBTag>(e3);
-    // scene->addComponent<RenderComponent>(e3, "cube.mesh", "ColorVerde");
+    // Entidad 3: Cuerpo kinemático
+    EntityID e3 = scene->createEntity();
+    scene->addComponent<TransformComponent>(e3, HUGO::Vector3(-30, 30, -50), HUGO::Quaternion(1,5,5,0), HUGO::Vector3(0.15, 0.25, 0.15));
+    scene->addComponent<RigidBodyComponent>(e3, shape, 5.f);
+    scene->addComponent<KinematicRBTag>(e3);
+    scene->addComponent<RenderComponent>(e3, "cube.mesh", "ColorVerde");
 }
 
 PhysicsTestSystem::~PhysicsTestSystem() {
