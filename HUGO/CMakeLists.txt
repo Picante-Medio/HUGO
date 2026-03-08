@@ -11,12 +11,14 @@ FetchContent_Declare(
     miniaudio
     GIT_REPOSITORY https://github.com/mackron/miniaudio.git
     GIT_TAG 0.11.24
+    GIT_SHALLOW TRUE
 )
 
 FetchContent_Declare(
     bullet3
     GIT_REPOSITORY https://github.com/bulletphysics/bullet3.git
     GIT_TAG 3.25
+    GIT_SHALLOW TRUE
 )
 
 FetchContent_Declare(
