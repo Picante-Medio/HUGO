@@ -44,6 +44,9 @@ namespace HUGO {
 
         //Resource Manager
         std::shared_ptr<ResourceManager> m_resourceManager;
+
+        // Lua
+        void initLua();
     
     public:
         Core();

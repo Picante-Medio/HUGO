@@ -10,7 +10,9 @@
 #include <Ogre.h>
 #include <memory>
 #include <SDL2/SDL_syswm.h>
+#include <string>
 
+#include "HugoError.h"
 #include "Input.h"
 #include "RenderSystem.h"
 #include "AudioSystem.h"
@@ -76,6 +78,7 @@ void HUGO::Core::initModules()
     initMiniaudio();
     initOgre();
     initPhysicsModule();
+    initLua();
 }
 
 void Core::initOgre()
@@ -210,4 +213,9 @@ void HUGO::Core::initPhysicsModule() {
 
 void HUGO::Core::destroyPhysicsModule() {
     // ...
+}
+
+void HUGO::Core::initLua() {
+    LuaBinder& luaBinder = LuaBinder::Instance();
+    luaBinder.Init();
 }
