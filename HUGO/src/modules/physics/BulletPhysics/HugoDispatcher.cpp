@@ -1,5 +1,3 @@
-#pragma once
-
 #include "HugoDispatcher.h"
 #include "RigidBodyComponent.h"
 

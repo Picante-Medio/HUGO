@@ -1,5 +1,3 @@
-#pragma once
-
 #include "HugoLineDrawer.h"
 //#include "OgreUtils.h"
 using namespace HUGO;
