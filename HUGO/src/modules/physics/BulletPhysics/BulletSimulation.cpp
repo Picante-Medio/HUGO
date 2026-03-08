@@ -211,6 +211,9 @@ HUGO::RigidBodyID BulletSimulation::createRigidBodyObject(RigidBodyComponent& hg
     //add to simulation
     btWorld->addRigidBody(rb);
 
+    //save reference to HugoRB in bulletRB
+    rb->setUserPointer(&hgRb);
+
     return id;
 }
     

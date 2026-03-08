@@ -192,3 +192,8 @@ float RigidBodyComponent::getAngularSleepingThreshold() const
 {
     return angularSleepingThreshold;
 }
+
+std::vector<int> RigidBodyComponent::getCollisionInfo() const
+{
+    return collisionInfo;
+}

@@ -41,6 +41,7 @@ private:
 struct RigidBodyComponent: public Component
 {
     friend class BulletSimulation;
+    friend class HugoDispatcher;
     
     RigidBodyComponent(EntityID entity, Shape shape, float mass = 0.f);
 
@@ -84,6 +85,8 @@ struct RigidBodyComponent: public Component
     float getLinearSleepingThreshold() const;
     float getAngularSleepingThreshold() const;
 
+    std::vector<int> getCollisionInfo() const;
+
 private:
 
     enum UpdateFlags{
@@ -125,6 +128,8 @@ private:
     bool asleep;
     float linearSleepingThreshold;
     float angularSleepingThreshold;
+
+    std::vector<int> collisionInfo;
 
     // Once created shape shouldn't be modified
     Shape rbShape;
