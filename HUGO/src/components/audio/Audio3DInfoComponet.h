@@ -3,9 +3,11 @@
 #include "HugoMath.h"
 #include "HugoTypes.h"
 
+#include "HugoComponentMacros.h"
+
 // 3D SFX component
-struct Audio3DInfoComponet: public Component
-{
+HCOMPONENT(Audio3DInfoComponet)
+
     HUGO::AudioID audioId;
 
     // 3D attenuation distances
@@ -38,5 +40,5 @@ struct Audio3DInfoComponet: public Component
           minDistance(minDistance), maxDistance(maxDistance), velocity(velocity), direction(direction), // default facing +Z
           dopplerFactor(dooplerFactor), rolloff(roolof),
           coneInnerAngle(coneInnerAngle), coneOuterAngle(coneOuterAngle), coneOuterGain(coneOuterGain){}
-};
 
+END_HCOMPONENT()

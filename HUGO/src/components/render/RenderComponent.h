@@ -2,8 +2,10 @@
 #include "Component.h"
 #include "HugoTypes.h"
 
-struct RenderComponent: public Component
-{
+#include "HugoComponentMacros.h"
+
+HCOMPONENT(RenderComponent)
+
 private:
     HUGO::OgreObjectID objectID = HUGO::INVALID_OGRE_OBJECT_ID;
     HUGO::String meshName;
@@ -20,5 +22,6 @@ public:
     HUGO::String getMaterialName() const;
     
     friend class RenderSystem;
-};
+
+END_HCOMPONENT()
 

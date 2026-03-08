@@ -15,29 +15,30 @@ constexpr ComponentID MAX_COMPONENTS = 255;
 using DenseListIndex = unsigned long int;
 
 
-/**
-  * @brief auxiliar function that generates IDs dinamically every time it is called
-  * @return a unique ID
-*/
-inline ComponentID getNextID() {
-  static ComponentID index = 0;
-  index += 1;
-  if(index >= MAX_COMPONENTS) throw "Too many components";
-  return index - 1;
-}
 
-/**
-  * @brief returns a unique ID for every type that it is called with
-  * @tparam T the type of the component that needs a unique ID
-  * @return a unique ID
-*/
-template<typename T>
-inline ComponentID getComponentId() {
-  static ComponentID index = getNextID();
-  return index;
-}
+// /**
+//   * @brief auxiliar function that generates IDs dinamically every time it is called
+//   * @return a unique ID
+// */
+// inline ComponentID getNextID() {
+//   static ComponentID index = 0;
+//   index += 1;
+//   if(index >= MAX_COMPONENTS) throw "Too many components";
+//   return index - 1;
+// }
 
-template<typename... Ts>
-std::vector<ComponentID> getAllComponentIds() {
-    return { getComponentId<Ts>()... };
-}
+// /**
+//   * @brief returns a unique ID for every type that it is called with
+//   * @tparam T the type of the component that needs a unique ID
+//   * @return a unique ID
+// */
+// template<typename T>
+// inline ComponentID getComponentId() {
+//   static ComponentID index = getNextID();
+//   return index;
+// }
+
+// template<typename... Ts>
+// std::vector<ComponentID> getAllComponentIds() {
+//     return { getComponentId<Ts>()... };
+// }

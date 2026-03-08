@@ -7,6 +7,7 @@
 #include "Ecs.h"
 #include "DenseList.h"
 
+#include "ComponentRegistry.h"
 
 /**
   * @brief a list of DenseList objects, each DenseList of a different type of component
@@ -20,7 +21,7 @@ class ComponentDenseTable {
   */
   template<typename T>
   void ensureListExists() {
-    ComponentID componentID = getComponentId<T>();
+    ComponentID componentID = ComponentRegistry::getComponentId<T>();
     if(componentLists[componentID] != nullptr) return;
     componentLists[componentID] = std::make_unique<DenseList<T>>();
   }
@@ -33,7 +34,7 @@ class ComponentDenseTable {
   template<typename T>
   std::shared_ptr<DenseList<T>> getComponentList() {
     ensureListExists<T>();
-    ComponentID cmpID = getComponentId<T>();
+    ComponentID cmpID = ComponentRegistry::getComponentId<T>();
     return std::static_pointer_cast<DenseList<T>>(componentLists[cmpID]);
   }
 
@@ -92,7 +93,7 @@ public:
   */
   template<typename T>
   DenseListIndex getCount() const {
-    return getCount(getComponentId<T>());
+    return getCount(ComponentRegistry::getComponentId<T>());
   }
 
   std::vector<EntityID> affectedEntities(ComponentID componentID); 

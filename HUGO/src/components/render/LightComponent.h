@@ -4,8 +4,10 @@
 #include "HugoMath.h"
 #include "HugoTypes.h"
 
-struct LightComponent: public Component
-{
+#include "HugoComponentMacros.h"
+
+HCOMPONENT(LightComponent)
+
 private:
     HUGO::Vector4 diffuse = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f);
     HUGO::Vector4 specular = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -64,4 +66,5 @@ public:
     size_t getIndexInFrame() const;
     float getShadowNearClipDistance() const;
     float getShadowFarClipDistance() const;
-};
+
+END_HCOMPONENT()

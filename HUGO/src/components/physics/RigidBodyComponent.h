@@ -6,6 +6,8 @@
 #include "HugoTypes.h"
 #include "HugoMath.h"
 
+#include "HugoComponentMacros.h"
+
 struct BoxColliderInfo {
     HUGO::Vector3 halfExtents;
 };
@@ -38,8 +40,8 @@ private:
     HUGO::CollisionShapeID id = HUGO::INVALID_SHAPE_ID;
 };
 
-struct RigidBodyComponent: public Component
-{
+HCOMPONENT(RigidBodyComponent)
+
     friend class BulletSimulation;
     friend class HugoDispatcher;
     
@@ -134,4 +136,5 @@ private:
     // Once created shape shouldn't be modified
     Shape rbShape;
     HUGO::RigidBodyID objectID = HUGO::INVALID_RB_ID;
-};
+
+END_HCOMPONENT()

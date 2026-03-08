@@ -3,9 +3,10 @@
 #include "HugoTypes.h"
 #include <functional>
 
+#include "HugoComponentMacros.h"
+
 class ma_sound;
-struct AudioComponent: public Component
-{
+HCOMPONENT(AudioComponent)
     HUGO::AudioTypes type;
     HUGO::AudioID audioId;
     float volume;
@@ -27,4 +28,4 @@ struct AudioComponent: public Component
         :Component(entity), type(type),audioId(audioId), volume(volume), loop(loop), 
         playOnStart(playOnStart), pitch(pitch), startTime(startTime),
         activePtr(nullptr),isPlaying(false), onEnd(nullptr){}
-};
+END_HCOMPONENT()

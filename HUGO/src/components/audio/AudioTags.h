@@ -3,35 +3,33 @@
 #include "Component.h"
 #include "HugoTypes.h"
 
-struct AudioDirtyTag : public Component
-{
-    HUGO::AudioDirtyFlags flags;
+#include "HugoComponentMacros.h"
+
+HCOMPONENT(AudioDirtyTag)
+
+    HUGO::AudioDirtyFlags flags = HUGO::AudioDirtyFlags::NONE;
 
     AudioDirtyTag(EntityID entity,
-                  HUGO::AudioDirtyFlags flags = HUGO::AudioDirtyFlags::NONE)
+                  HUGO::AudioDirtyFlags flags)
         : Component(entity), flags(flags) {}
-};
 
-struct Audio3DDirtyTag : public Component
-{
-    HUGO::Audio3DDirtyFlags flags;
+END_HCOMPONENT()
+
+HCOMPONENT(Audio3DDirtyTag)
+
+    HUGO::Audio3DDirtyFlags flags = HUGO::Audio3DDirtyFlags::NONE_3D;
 
     Audio3DDirtyTag(EntityID entity,
-                  HUGO::Audio3DDirtyFlags flags = HUGO::Audio3DDirtyFlags::NONE_3D)
+                  HUGO::Audio3DDirtyFlags flags)
         : Component(entity), flags(flags) {}
-};
 
-struct AudioPlayTag: public Component{
-    AudioPlayTag(EntityID entity)
-            : Component(entity){}
-};
+END_HCOMPONENT()
 
-struct AudioStopTag: public Component{
-    AudioStopTag(EntityID entity)
-            : Component(entity){}
-};
+HCOMPONENT(AudioPlayTag)
+END_HCOMPONENT()
 
-struct AudioResumeTag: public Component{
-    AudioResumeTag(EntityID entity)
-            : Component(entity){}
-};
+HCOMPONENT(AudioStopTag)
+END_HCOMPONENT()
+
+HCOMPONENT(AudioResumeTag)
+END_HCOMPONENT()

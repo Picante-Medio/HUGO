@@ -1,15 +1,13 @@
 #pragma once
 
 #include "Component.h"
+#include "HugoComponentMacros.h"
 
-struct StaticRBTag : public Component {
-    StaticRBTag(EntityID entity) : Component(entity) {}
-};
+HCOMPONENT(StaticRBTag)
+END_HCOMPONENT()
 
-struct KinematicRBTag : public Component {
-    KinematicRBTag(EntityID entity) : Component(entity) {}
-};
+HCOMPONENT(KinematicRBTag)
+END_HCOMPONENT()
 
-struct DynamicRBTag : public Component {
-    DynamicRBTag(EntityID entity) : Component(entity) {}
-};
+HCOMPONENT(DynamicRBTag)
+END_HCOMPONENT()

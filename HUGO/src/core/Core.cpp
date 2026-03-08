@@ -21,6 +21,7 @@
 #include "PhysicsTestSystem.h"
 
 #include "ChatParser.h"
+#include "ComponentRegistryInitializer.h"
 
 // se podría hacer clase singleton¿? -Marco
 using namespace HUGO;
@@ -30,6 +31,9 @@ Core::Core()
 
 //Initialization of HUGO modules and loading of games dynamic lib
 void Core::init(){
+
+    ComponentRegistry::setInstance(std::make_shared<ComponentRegistryInitializer>());
+
     vt.reset();
     initModules();
     

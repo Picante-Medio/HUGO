@@ -2,9 +2,10 @@
 
 #include "Component.h"
 #include "HugoMath.h"
+#include "HugoComponentMacros.h"
 
-struct ViewportComponent: public Component
-{
+HCOMPONENT(ViewportComponent)
+
 private:
 
     // Coordinates reletad to the window (0-1)
@@ -27,8 +28,9 @@ private:
     bool active = true;
 
 public:
+
     ViewportComponent(EntityID entity,
-                    float l = 0.0f, float t = 0.0f, float w = 1.0f, float h = 1.0f, int z = 0);
+                    float l, float t = 0.0f, float w = 1.0f, float h = 1.0f, int z = 0);
 
     // Setters
     void setLeft(float l);
@@ -53,4 +55,5 @@ public:
     bool getClearStencil() const;
     EntityID getCameraEntity() const;   
     bool isActive() const;
-};
+
+END_HCOMPONENT()

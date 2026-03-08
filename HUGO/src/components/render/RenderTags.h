@@ -4,20 +4,21 @@
 #include "HugoMath.h"
 #include "HugoTypes.h"
 
-struct CameraDirtyTag : public Component {
-    CameraDirtyTag(EntityID entity) : Component(entity) {}
-};
+#include "HugoComponentMacros.h"
 
-struct ViewportDirtyTag : public Component {
-    ViewportDirtyTag(EntityID entity) : Component(entity) {}
-};
+HCOMPONENT(CameraDirtyTag)
+END_HCOMPONENT()
 
-struct LightDirtyTag : public Component {
-    LightDirtyTag(EntityID entity) : Component(entity) {}
-};
+HCOMPONENT(ViewportDirtyTag)
+END_HCOMPONENT()
 
-struct MaterialDirtyTag : public Component {
+HCOMPONENT(LightDirtyTag)
+END_HCOMPONENT()
+
+HCOMPONENT(MaterialDirtyTag)
+
     HUGO::String materialName;
     MaterialDirtyTag(EntityID entity, const HUGO::String& materialName) 
         : Component(entity), materialName(materialName) {}
-};
+
+END_HCOMPONENT()
