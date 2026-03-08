@@ -23,8 +23,8 @@ FetchContent_Declare(
 
 FetchContent_Declare(
     lua
-    GIT_REPOSITORY "https://github.com/walterschell/Lua.git"
-    GIT_TAG "v5.4.5"
+    GIT_REPOSITORY https://github.com/walterschell/Lua.git
+    GIT_TAG v5.4.5
     GIT_SHALLOW TRUE
 )
 
@@ -40,6 +40,9 @@ set(INSTALL_CMAKE_FILES OFF CACHE BOOL "" FORCE)
 set(LUA_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
 set(LUA_BUILD_BINARY OFF CACHE BOOL "" FORCE)
 set(LUA_BUILD_COMPILER OFF CACHE BOOL "" FORCE)
+
+    # Poniendo esta opción que sale en el cmake toplevel de lua compila y linkea correctamente
+set(LUA_BUILD_AS_CXX ON CACHE BOOL "" FORCE) 
 
 FetchContent_MakeAvailable(miniaudio bullet3 lua)
 
@@ -108,6 +111,7 @@ find_package(OGRE CONFIG REQUIRED COMPONENTS
     Overlay)
 
 set(HUGO_LINKED_LIBRARIES
+    lua_static
     BulletDynamics
     BulletCollision
     Bullet3Common

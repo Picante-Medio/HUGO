@@ -3,8 +3,9 @@
 #include "HugoTypes.h"
 
 #include <lua.h>
-#include <lauxlib.h>
 #include <lualib.h>
+#include <lauxlib.h>
+
 #include <luaconf.h>
 #include <type_traits>
 #include <utility>

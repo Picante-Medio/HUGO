@@ -23,6 +23,8 @@
 #include "ChatParser.h"
 #include "ComponentRegistryInitializer.h"
 
+#include "LuaBinder.h"
+
 // se podría hacer clase singleton¿? -Marco
 using namespace HUGO;
 Core::Core()
@@ -31,6 +33,8 @@ Core::Core()
 
 //Initialization of HUGO modules and loading of games dynamic lib
 void Core::init(){
+
+    //LuaBinder::Instance().Init();
 
     ComponentRegistry::setInstance(std::make_shared<ComponentRegistryInitializer>());
 
