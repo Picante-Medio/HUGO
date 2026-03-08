@@ -19,6 +19,13 @@ FetchContent_Declare(
     GIT_TAG 3.25
 )
 
+FetchContent_Declare(
+    lua
+    GIT_REPOSITORY "https://github.com/walterschell/Lua.git"
+    GIT_TAG "v5.4.5"
+    GIT_SHALLOW TRUE
+)
+
 set(BUILD_BULLET2_DEMOS OFF CACHE BOOL "" FORCE)
 set(BUILD_CPU_DEMOS OFF CACHE BOOL "" FORCE)
 set(BUILD_OPENGL3_DEMOS OFF CACHE BOOL "" FORCE)
@@ -27,8 +34,12 @@ set(BUILD_EXTRAS OFF CACHE BOOL "" FORCE)
 set(BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
 set(INSTALL_LIBS OFF CACHE BOOL "" FORCE)
 set(INSTALL_CMAKE_FILES OFF CACHE BOOL "" FORCE)
+# Lua 
+set(LUA_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+set(LUA_BUILD_BINARY OFF CACHE BOOL "" FORCE)
+set(LUA_BUILD_COMPILER OFF CACHE BOOL "" FORCE)
 
-FetchContent_MakeAvailable(miniaudio bullet3)
+FetchContent_MakeAvailable(miniaudio bullet3 lua)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
