@@ -43,7 +43,7 @@ private:
 HCOMPONENT(RigidBodyComponent)
 
     friend class BulletSimulation;
-    friend class HugoDispatcher;
+    friend class HUGODispatcher;
     
     RigidBodyComponent(EntityID entity, Shape shape, float mass = 0.f);
 
@@ -87,7 +87,7 @@ HCOMPONENT(RigidBodyComponent)
     float getLinearSleepingThreshold() const;
     float getAngularSleepingThreshold() const;
 
-    std::vector<int> getCollisionInfo() const;
+    std::vector<unsigned long int> getCollisionInfo() const;
 
 private:
 
@@ -131,7 +131,7 @@ private:
     float linearSleepingThreshold;
     float angularSleepingThreshold;
 
-    std::vector<int> collisionInfo;
+    std::vector<unsigned long int> collisionInfo;
 
     // Once created shape shouldn't be modified
     Shape rbShape;

@@ -4,6 +4,7 @@
 #include "RigidBodyComponent.h"
 #include "PhysicsTags.h"
 #include "BulletUtils.h"
+#include "HugoDispatcher.h"
 
 BulletSimulation::BulletSimulation(std::shared_ptr<Scene> scene)
 : IPhysicsSimulation(scene)
@@ -12,7 +13,7 @@ BulletSimulation::BulletSimulation(std::shared_ptr<Scene> scene)
     collisionConfig = new btDefaultCollisionConfiguration();
 
     // We are using single-thread dispatcher (narrowphase)
-    dispatcher = new btCollisionDispatcher(collisionConfig);
+    dispatcher = new HUGODispatcher(collisionConfig);
 
     // We set the broadphase as a DBVT (tree/hierarchy broadphase)
     overlappingPairCache = new btDbvtBroadphase();
@@ -338,6 +339,7 @@ void BulletSimulation::syncBodiesToBullet() {
             rb.objectID = createRigidBodyObject(rb, transform, HUGO::BodyType::STATIC);
         }
 
+        rb.collisionInfo.clear();
         checkFlags(rb);
     }
     
@@ -354,6 +356,7 @@ void BulletSimulation::syncBodiesToBullet() {
         HUGOMotionState* motionState = static_cast<HUGOMotionState*>(getRigidBodyObject(rb.objectID).bulletRB->getMotionState());
         motionState->updateBulletTransform();
 
+        rb.collisionInfo.clear();
         checkFlags(rb);
     }
     
@@ -367,6 +370,7 @@ void BulletSimulation::syncBodiesToBullet() {
             rb.objectID = createRigidBodyObject(rb, transform, HUGO::BodyType::DYNAMIC);
         }
         
+        rb.collisionInfo.clear();
         checkFlags(rb);
     }
 }
