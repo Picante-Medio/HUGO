@@ -70,7 +70,7 @@ endforeach()
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
     ${INCLUDE_DIRS}
-    ${CMAKE_SOURCE_DIR}/HugoCore)
+    ${CMAKE_SOURCE_DIR}/include)
 
 set(BASE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/dependencies/${CMAKE_SYSTEM_PROCESSOR})
 
