@@ -2,8 +2,10 @@
 #include "Component.h"
 #include "HugoMath.h"
 
-struct AudioListenerComponent : public Component
-{
+#include "HugoComponentMacros.h"
+
+HCOMPONENT(AudioListenerComponent)
+
     // velocity for Doppler calculations
     HUGO::Vector3 listenerVelocity;
     // master volume for this listener
@@ -16,4 +18,5 @@ struct AudioListenerComponent : public Component
           listenerVelocity(velocity),
           masterVolume(masterVolume)
     {}
-};
+
+END_HCOMPONENT()
