@@ -16,10 +16,12 @@ public:
                         const HUGO::String& materialName="") 
         : Component(entity), meshName(meshName), materialName(materialName){};
     
-    void setMeshName(const HUGO::String& newMeshName);
-    void setMaterialName(const HUGO::String& newMaterialName);
-    HUGO::String getMeshName() const;
-    HUGO::String getMaterialName() const;
+    // Setters
+    void setMeshName(const HUGO::String& newMeshName) { meshName = newMeshName; }
+    void setMaterialName(const HUGO::String& newMaterialName) { materialName = newMaterialName; }
+    // Getters
+    HUGO::String getMeshName() const { return meshName; }
+    HUGO::String getMaterialName() const { return materialName; }
     
     friend class RenderSystem;
 

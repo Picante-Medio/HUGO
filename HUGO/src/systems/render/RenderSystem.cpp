@@ -14,39 +14,21 @@
 #include "HugoError.h"
 #include "OgreUtils.h"
 
-RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> ogreRoot, Ogre::RenderWindow* window)
-    :System(scene), ogreRoot(ogreRoot), renderWindow(window), idToIndex(), freeOgreObjectId()
+RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* window)
+    :System(scene), renderWindow(window), idToIndex(), freeOgreObjectId()
 {
+    ogreRoot = std::shared_ptr<Ogre::Root>(Ogre::Root::getSingletonPtr(), [](Ogre::Root*){ });
     try {
         sceneManager = ogreRoot->createSceneManager();
     }
     catch (const Ogre::Exception& e) {
         throw std::runtime_error("[RenderSystem] SceneManager creation failed: " + std::string(e.getDescription()));
     }
-    
+   
     //sceneManager->setDisplaySceneNodes(true);
 
     // Basic light
     setAmbientLight(0.15f, 0.15f, 0.15f);
-    const Ogre::ConfigOptionMap& options = ogreRoot->getRenderSystem()->getConfigOptions();
-
-    auto it = options.find("Video Mode");
-
-    if (it != options.end()) {
-        for (const auto& value : it->second.possibleValues) {
-
-            int width = 0;
-            int height = 0;
-
-            char temp = 0;
-
-            std::stringstream sStream(value);
-            sStream >> width >> temp >> height;
-
-            if (width > 0 && height > 0)
-                resolutions.emplace_back(width, height);
-        }
-    }
 
     // Camera and viewport creation for testing
     EntityID defaultCamera = createCameraEntity(HUGO::Vector3(0, 0, 200));
@@ -675,36 +657,6 @@ void RenderSystem::updateViewportDimensions()
     }
 }
 
-
-void RenderSystem::setfullScreen()
-{
-     if (!renderWindow) return;
-    auto [w, h] = resolutions[resolutions.size() - 1];
-    renderWindow->setFullscreen(true, w, h);
-    
-    // Update all viewports
-    updateViewportDimensions();
-
-}
-
-void RenderSystem::setWindowed(bool fullScreen)
-{
-    if (!renderWindow) return;
-    Ogre::RenderWindowDescription desc = ogreRoot->getRenderSystem()->getRenderWindowDescription();
-    renderWindow->setFullscreen(fullScreen, desc.width, desc.height);
-
-    // Update all viewports
-    updateViewportDimensions();
-}
-
-void RenderSystem::resizeScreen(unsigned int widthPt, unsigned int heightPt)
-{
-    if (!renderWindow) return;
-    renderWindow->resize(widthPt, heightPt);
-
-    // Update all viewports
-    updateViewportDimensions();
-}
 #pragma endregion
 
 void RenderSystem::setAmbientLight(float r, float g, float b)

@@ -54,7 +54,7 @@ void Core::init(){
     scenePtr->addSystem(audioSystem);
     audioSystem->createTestEntity();
     
-    std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr, m_ogreRoot, m_renderWindow);
+    std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr, m_renderWindow);
     scenePtr->addSystem(renderSystem);
 
     std::shared_ptr<UISystem> uiSystem = std::make_shared<UISystem>(scenePtr, m_renderWindow);

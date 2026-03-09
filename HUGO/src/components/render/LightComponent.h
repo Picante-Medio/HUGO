@@ -35,36 +35,39 @@ public:
     LightComponent(EntityID entity,
                    HUGO::Vector4 diff, HUGO::Vector4 specular, HUGO::LightType lType
                    , const HUGO::Radian& outer, const HUGO::Radian& inner
-                   , float falloff, float nearClip, float shadowNearClipDist, float shadowFarClipDist);
+                   , float falloff, float nearClip, float shadowNearClipDist, float shadowFarClipDist)
+        : Component(entity), diffuse(diff), specular(specular), lightType(lType), spotOuter(outer)
+        , spotInner(inner), spotFalloff(falloff), spotNearClip(nearClip)
+        , shadowNearClipDist(shadowNearClipDist), shadowFarClipDist(shadowFarClipDist) {}
 
     // Setters
-    void setDiffuse(HUGO::Vector4 nDiff);
-    void setSpecular(HUGO::Vector4 nSpec);
-    void setLightType(HUGO::LightType lightT);
-    void setSpotOuter(HUGO::Radian sOuter);
-    void setSpotInner(HUGO::Radian sInner);
-    void setSpotFallOff(float sFallOf);
-    void setSpotNearClip(float sNearClip);
-    void setAttenuation(HUGO::Vector4 nAtte);
-    void setShadowFarDistance(float nShadowDistance);
-    void setShadowFarDistanceSquared(float nShadowDistanceSquared);
-    void setIndexInFrame(size_t nIndexInFrame);
-    void setShadowNearClipDist(float nShadowNearClipDist);
-    void setShadowFarClipDist(float nShadowFarClipDist);
+    void setDiffuse(HUGO::Vector4 nDiff) { diffuse = nDiff; }
+    void setSpecular(HUGO::Vector4 nSpec) { specular = nSpec; }
+    void setLightType(HUGO::LightType lightT) { lightType = lightT; }
+    void setSpotOuter(HUGO::Radian sOuter) { spotOuter = sOuter; }
+    void setSpotInner(HUGO::Radian sInner) { spotInner = sInner; }
+    void setSpotFallOff(float sFallOff) { spotFalloff = sFallOff; }
+    void setSpotNearClip(float sNearClip) { spotNearClip = sNearClip; }
+    void setAttenuation(HUGO::Vector4 nAtte) { attenuation = nAtte; }
+    void setShadowFarDistance(float nShadowDistance) { shadowFarDist = nShadowDistance; }
+    void setShadowFarDistanceSquared(float nShadowDistanceSquared) { shadowFarDistSquared = nShadowDistanceSquared; }
+    void setIndexInFrame(size_t nIndexInFrame) { indexInFrame = nIndexInFrame; }
+    void setShadowNearClipDist(float nShadowNearClipDist) { shadowNearClipDist = nShadowNearClipDist; }
+    void setShadowFarClipDist(float nShadowFarClipDist) { shadowFarClipDist = nShadowFarClipDist; }
 
     // Getters
-    HUGO::Vector4 getDiffuse() const;
-    HUGO::Vector4 getSpecular() const;
-    HUGO::LightType getLightType() const;
-    HUGO::Radian getSpotOuter() const;
-    HUGO::Radian getSpotInner() const;
-    float getSpotFallOff() const;
-    float getSpotNearClip() const;
-    HUGO::Vector4 getAttenuation() const;
-    float getShadowFarDistance() const;
-    float getShadowFarDistanceSquared() const;
-    size_t getIndexInFrame() const;
-    float getShadowNearClipDistance() const;
-    float getShadowFarClipDistance() const;
+    HUGO::Vector4 getDiffuse() const { return diffuse; }
+    HUGO::Vector4 getSpecular() const { return specular; }
+    HUGO::LightType getLightType() const { return lightType; }
+    HUGO::Radian getSpotOuter() const { return spotOuter; }
+    HUGO::Radian getSpotInner() const { return spotInner; }
+    float getSpotFallOff() const { return spotFalloff; }
+    float getSpotNearClip() const { return spotNearClip; }
+    HUGO::Vector4 getAttenuation() const { return attenuation; }
+    float getShadowFarDistance() const { return shadowFarDist; }
+    float getShadowFarDistanceSquared() const { return shadowFarDistSquared; }
+    size_t getIndexInFrame() const { return indexInFrame; }
+    float getShadowNearClipDistance() const { return shadowNearClipDist; }
+    float getShadowFarClipDistance() const { return shadowFarClipDist; }
 
 END_HCOMPONENT()

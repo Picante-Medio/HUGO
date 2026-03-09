@@ -52,7 +52,6 @@ class RenderSystem : public System{
     EntityID mainCameraEntity = 0;
     EntityID mainViewportEntity = 0;
 
-    std::vector<std::pair<int, int>> resolutions;
 
     void updateViewportDimensions();
 
@@ -75,11 +74,6 @@ class RenderSystem : public System{
     void unregisterCameraEntity(EntityID entity);
     void unregisterViewportEntity(EntityID entity);
     void unregisterLightEntity(EntityID entity);
-
-    // Window configuration
-    void setfullScreen();
-    void setWindowed(bool fullScreen);
-    void resizeScreen(unsigned int widthPt, unsigned int heightPt);
 
     //OgreObjects
     ErrorOrType<HUGO::OgreObjectID> createOgreObject(const std::string& meshName, const std::string& materialName="");
@@ -107,7 +101,7 @@ class RenderSystem : public System{
     void setMainViewport(EntityID viewportEntity);
       
 public:
-    RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> root, Ogre::RenderWindow* window);
+    RenderSystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* window);
     ~RenderSystem() override;
     
     void fixedUpdate(double dt) override;
