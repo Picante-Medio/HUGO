@@ -288,17 +288,19 @@ void BulletSimulation::checkFlags(RigidBodyComponent& hgRB)
         }
         if(hgRB.flags & RigidBodyComponent::IMPULSE_APPLIED){
             obj.bulletRB->applyCentralImpulse(BulletUtils::vector3ToBullet(hgRB.impulseApplied));
-            hgRB.linearVelocity = BulletUtils::btVector3ToVector3(obj.bulletRB->getLinearVelocity());
+            hgRB.impulseApplied = HUGO::Vector3();
         }
         if(hgRB.flags & RigidBodyComponent::TORQUE_IMPULSE_APPLIED){
             obj.bulletRB->applyTorqueImpulse(BulletUtils::vector3ToBullet(hgRB.torqueImpulseApplied));
-            hgRB.angularVelocity = BulletUtils::btVector3ToVector3(obj.bulletRB->getAngularVelocity());
+            hgRB.torqueImpulseApplied = HUGO::Vector3();
         }
         if(hgRB.flags & RigidBodyComponent::FORCE_APPLIED){
             obj.bulletRB->applyCentralForce(BulletUtils::vector3ToBullet(hgRB.forceApplied));
+            hgRB.forceApplied = HUGO::Vector3();
         }
         if(hgRB.flags & RigidBodyComponent::TORQUE_APPLIED){
             obj.bulletRB->applyTorque(BulletUtils::vector3ToBullet(hgRB.torqueApplied));
+            hgRB.torqueApplied = HUGO::Vector3();
         }
         if(hgRB.flags & RigidBodyComponent::TRANSFORM_OFFSET_UPDATED){
             btTransform btTrans = obj.bulletRB->getCenterOfMassTransform();
@@ -385,6 +387,13 @@ void BulletSimulation::syncBodiesToGame() {
             rb.asleep = true;
         else
             rb.asleep = false;
+        
+        // Update velocity if the object collided
+        rb.linearVelocity = BulletUtils::btVector3ToVector3(btRb->getLinearVelocity());
+        rb.angularVelocity = BulletUtils::btVector3ToVector3(btRb->getAngularVelocity());
+
+        // Clear forces applied this frame
+        btRb->clearForces();
     }
 }
 #pragma endregion

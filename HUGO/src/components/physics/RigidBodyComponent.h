@@ -33,6 +33,14 @@ struct ConeColliderInfo {
 struct Shape{
 
     friend class BulletSimulation;
+
+    // Default constructor for macros
+    Shape(){
+        BoxColliderInfo mInfo;
+        mInfo.halfExtents = HUGO::Vector3(.5f, .5f, .5f);
+        info = mInfo;
+    }
+
     // Shape's geometry is determined by the variant. Which struct is held can be checked with std::holds_alternative
     std::variant<BoxColliderInfo, SphereColliderInfo, CapsuleColliderInfo, CylinderColliderInfo, ConeColliderInfo> info;
 
@@ -45,49 +53,134 @@ HCOMPONENT(RigidBodyComponent)
     friend class BulletSimulation;
     friend class HUGODispatcher;
     
-    RigidBodyComponent(EntityID entity, Shape shape, float mass = 0.f);
+    RigidBodyComponent(EntityID entity, Shape shape, float mass = .0f)
+    : Component(entity)
+    , rbShape(shape)
+    , flags(0)
+    , mass(mass)
+    , restitution(0.f) // default bullet value
+    , friction(.5f) // default bullet value
+    , linearDamping(0.f) // default bullet value
+    , angularDamping(0.f) // default bullet value
+    , positionOffset(HUGO::Vector3()) // default bullet value
+    , rotationOffset(HUGO::Quaternion()) // default bullet value
+    , linearVelocity(HUGO::Vector3()) // default bullet value
+    , angularVelocity(HUGO::Vector3()) // default bullet value
+    , active(true)
+    , asleep(false)
+    , linearSleepingThreshold(.8f)
+    , angularSleepingThreshold(1.f)
+    {}
 
-    // Setters
-    void setRestitution(float nRestitution);
-    void setFriction(float nFriction);
-    void setMass(float nMass);
-    void setLinearDamping(float nDamping);
-    void setAngularDamping(float nDamping);
-    void setLinearVelocity(HUGO::Vector3 nVelocity);
-    void setAngularVelocity(HUGO::Vector3 nVelocity);
+    // ----------------------Setters----------------------
+    void setRestitution(float nRestitution){
+        restitution = nRestitution;
+        flags = flags | UpdateFlags::RESTITUTION_UPDATED;
+    }
 
-    void applyImpulse(HUGO::Vector3 nImpulse); // Modifies linear velocity
-    void applyTorqueImpulse(HUGO::Vector3 nImpulse); // Modifies angular velocity
-    void applyForce(HUGO::Vector3 nForce); // Modifies linear acceleration
-    void applyTorque(HUGO::Vector3 nTorque); // Modifies angular acceleration
+    void setFriction(float nFriction){
+        friction = nFriction;
+        flags = flags | UpdateFlags::FRICTION_UPDATED;
+    }
 
-    void setPositionOffset(HUGO::Vector3 offset);
-    void setRotationOffset(HUGO::Quaternion offset);
+    void setMass(float nMass){
+        mass = nMass;
+        flags = flags | UpdateFlags::MASS_UPDATED;
+    }
 
-    void setActive(bool isActive);
-    void setAsleep(bool isAsleep);
-    void setLinearSleepingThreshold(float nThreshold);
-    void setAngularSleepingThreshold(float nThreshold);
+    void setLinearDamping(float nDamping){
+        linearDamping = nDamping;
+        flags = flags | UpdateFlags::DAMPING_UPDATED;
+    }
 
-    // Getters
-    float getRestitution() const;
-    float getFriction() const;
-    float getMass() const;
-    float getLinearDamping() const;
-    float getAngularDamping() const;
+    void setAngularDamping(float nDamping){
+        angularDamping = nDamping;
+        flags = flags | UpdateFlags::DAMPING_UPDATED;
+    }
 
-    HUGO::Vector3 getLinearVelocity() const;
-    HUGO::Vector3 getAngularVelocity() const;
+    void setLinearVelocity(HUGO::Vector3 nVelocity){
+        linearVelocity = nVelocity;
+        flags = flags | UpdateFlags::LINEAR_VELOCITY_UPDATED;
+    }
 
-    HUGO::Vector3 getPositionOffset() const;
-    HUGO::Quaternion getRotationOffset() const;
+    void setAngularVelocity(HUGO::Vector3 nVelocity){
+        angularVelocity = nVelocity;
+        flags = flags | UpdateFlags::ANGULAR_VELOCITY_UPDATED;
+    }
 
-    bool getActive() const;
-    bool getAsleep() const;
-    float getLinearSleepingThreshold() const;
-    float getAngularSleepingThreshold() const;
+    // Modifies linear velocity
+    void applyImpulse(HUGO::Vector3 nImpulse){
+        impulseApplied = nImpulse;
+        flags = flags | UpdateFlags::IMPULSE_APPLIED;
+    } 
 
-    std::vector<unsigned long int> getCollisionInfo() const;
+    // Modifies angular velocity
+    void applyTorqueImpulse(HUGO::Vector3 nImpulse){
+        torqueImpulseApplied = nImpulse;
+        flags = flags | UpdateFlags::TORQUE_IMPULSE_APPLIED;
+    }
+
+    // Modifies linear acceleration
+    void applyForce(HUGO::Vector3 nForce){
+        forceApplied = nForce;
+        flags = flags | UpdateFlags::FORCE_APPLIED;
+    }
+
+    // Modifies angular acceleration
+    void applyTorque(HUGO::Vector3 nTorque){
+        torqueApplied = nTorque;
+        flags = flags | UpdateFlags::TORQUE_APPLIED;
+    }
+
+    void setPositionOffset(HUGO::Vector3 offset){
+        positionOffset = offset;
+        flags = flags | UpdateFlags::TRANSFORM_OFFSET_UPDATED;
+    }
+
+    void setRotationOffset(HUGO::Quaternion offset){
+        rotationOffset = offset;
+        flags = flags | UpdateFlags::TRANSFORM_OFFSET_UPDATED;
+    }
+
+    void setActive(bool isActive){
+        active = isActive;
+        flags = flags | UpdateFlags::ACTIVE_UPDATED;
+    }
+
+    void setAsleep(bool isAsleep){
+        asleep = isAsleep;
+        flags = flags | UpdateFlags::SLEEP_UPDATED;
+    }
+
+    void setLinearSleepingThreshold(float nThreshold){
+        linearSleepingThreshold = nThreshold;
+        flags = flags | UpdateFlags::SLEEPING_THRESHOLD_UPDATED;
+    }
+
+    void setAngularSleepingThreshold(float nThreshold){
+        angularSleepingThreshold = nThreshold;
+        flags = flags | UpdateFlags::SLEEPING_THRESHOLD_UPDATED;
+    }
+
+    // ----------------------Getters----------------------
+    inline float getRestitution() const { return restitution; }
+    inline float getFriction() const { return friction; }
+    inline float getMass() const { return mass; }
+    inline float getLinearDamping() const { return linearDamping; }
+    inline float getAngularDamping() const { return angularDamping; }
+
+    inline HUGO::Vector3 getLinearVelocity() const { return linearVelocity; }
+    inline HUGO::Vector3 getAngularVelocity() const { return angularVelocity; }
+
+    inline HUGO::Vector3 getPositionOffset() const { return positionOffset; }
+    inline HUGO::Quaternion getRotationOffset() const { return rotationOffset; }
+
+    inline bool getActive() const { return active; }
+    inline bool getAsleep() const { return asleep; }
+    inline float getLinearSleepingThreshold() const { return linearSleepingThreshold; }
+    inline float getAngularSleepingThreshold() const { return angularSleepingThreshold; }
+
+    inline std::vector<unsigned long int> getCollisionInfo() const { return collisionInfo; }
 
 private:
 
