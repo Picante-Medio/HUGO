@@ -16,6 +16,7 @@
 #include "Input.h"
 #include "RenderSystem.h"
 #include "AudioSystem.h"
+#include "UISystem.h"
 #include "Scene.h"
 #include "BulletModule.h"
 //#include "ResourceManager.h"
@@ -46,7 +47,7 @@ void Core::init(){
     scenePtr = std::make_shared<Scene>();
 
     ChatParser chatParser = ChatParser();
-    auto err = chatParser.readChatFolder("../chats");
+    ErrorOrVoid err = chatParser.readChatFolder("../chats");
 
     std::shared_ptr<AudioSystem> audioSystem = std::make_shared<AudioSystem>(scenePtr, maEngine);
     audioSystem->loadAudiosFromFile("AudioList.txt");
@@ -55,6 +56,10 @@ void Core::init(){
     
     std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr, m_ogreRoot, m_renderWindow);
     scenePtr->addSystem(renderSystem);
+
+    std::shared_ptr<UISystem> uiSystem = std::make_shared<UISystem>(scenePtr, m_renderWindow);
+    scenePtr->addSystem(uiSystem);
+
     
     //m_resourceManager = std::make_shared<HUGO::ResourceManager>(maEngine, m_ogreRoot);
 
