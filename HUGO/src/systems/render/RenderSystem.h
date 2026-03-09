@@ -10,8 +10,6 @@
 #include "HugoMath.h"
 #include "HugoError.h"
 
-struct SDL_Window;
-
 struct RenderComponent;
 class RenderSystem : public System{
     // Ogre Camera Information
@@ -42,7 +40,6 @@ class RenderSystem : public System{
     std::shared_ptr<Ogre::Root> ogreRoot;
     Ogre::SceneManager* sceneManager = nullptr;
     Ogre::RenderWindow* renderWindow = nullptr; 
-    SDL_Window* sdlWindow = nullptr;
 
     std::unordered_map<EntityID, CameraInfo> cameraMap; // Provisional
     std::unordered_map<EntityID, ViewportInfo> viewportMap; // Provisional
@@ -109,14 +106,8 @@ class RenderSystem : public System{
     
     void setMainViewport(EntityID viewportEntity);
       
-    //Ogre
-    void initOgre();
-    void locateResources();
-    void loadResources();
-    void destroyOgre();
-
 public:
-    RenderSystem(std::shared_ptr<Scene> scene);
+    RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> root, Ogre::RenderWindow* window);
     ~RenderSystem() override;
     
     void fixedUpdate(double dt) override;

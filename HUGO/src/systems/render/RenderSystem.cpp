@@ -1,9 +1,6 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <iostream>
-#include <SDL2/SDL.h>
-#include <SDL_video.h>
-#include <SDL2/SDL_syswm.h>
 
 #include "RenderSystem.h"
 #include "Scene.h"
@@ -17,11 +14,9 @@
 #include "HugoError.h"
 #include "OgreUtils.h"
 
-RenderSystem::RenderSystem(std::shared_ptr<Scene> scene)
-    :System(scene), idToIndex(), freeOgreObjectId()
+RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Ogre::Root> ogreRoot, Ogre::RenderWindow* window)
+    :System(scene), ogreRoot(ogreRoot), renderWindow(window), idToIndex(), freeOgreObjectId()
 {
-    initOgre();
-    
     try {
         sceneManager = ogreRoot->createSceneManager();
     }
@@ -33,6 +28,25 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene)
 
     // Basic light
     setAmbientLight(0.15f, 0.15f, 0.15f);
+    const Ogre::ConfigOptionMap& options = ogreRoot->getRenderSystem()->getConfigOptions();
+
+    auto it = options.find("Video Mode");
+
+    if (it != options.end()) {
+        for (const auto& value : it->second.possibleValues) {
+
+            int width = 0;
+            int height = 0;
+
+            char temp = 0;
+
+            std::stringstream sStream(value);
+            sStream >> width >> temp >> height;
+
+            if (width > 0 && height > 0)
+                resolutions.emplace_back(width, height);
+        }
+    }
 
     // Camera and viewport creation for testing
     EntityID defaultCamera = createCameraEntity(HUGO::Vector3(0, 0, 200));
@@ -49,7 +63,6 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene)
 
 RenderSystem::~RenderSystem()
 {
-    destroyOgre();
     for(auto& v: viewportMap){
         if(v.second.ogreViewport){
             renderWindow->removeViewport(v.second.ogreViewport->getZOrder());
@@ -82,107 +95,6 @@ RenderSystem::~RenderSystem()
         ogreRoot->destroySceneManager(sceneManager);
         sceneManager = nullptr;
     }
-}
-
-
-void RenderSystem::initOgre()
-{
-    ogreRoot = std::make_shared<Ogre::Root>("plugins.cfg", "ogre.cfg");
-    if (!ogreRoot->restoreConfig()) {
-        Ogre::LogManager::getSingleton().logMessage("Initialize::configure_ogre => " +
-        std::string("ERROR: unable to configure Ogre"));
-    }
-    //If there is another rendering system available, we could choose between one or another
-    for(Ogre::RenderSystem* renderSys: ogreRoot->getAvailableRenderers()){
-        if(renderSys->getName() == "OpenGL Rendering Subsystem"){
-            ogreRoot->setRenderSystem(renderSys);
-            break;
-        }
-    }
-
-    ogreRoot->getRenderSystem()->setConfigOption("Full Screen", "No");
-
-    ogreRoot->initialise(false);
-    locateResources();
-    loadResources();
-
-    #ifdef __linux__
-        SDL_setenv("SDL_VIDEODRIVER", "x11", 1);
-    #endif
-
-    if (SDL_Init(SDL_INIT_EVENTS) != 0) {
-        throw std::runtime_error("SDL_Init failed");
-    }
-    
-    sdlWindow = SDL_CreateWindow("Ogre Test Window",SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                    1000, 800, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE);
-    SDL_SysWMinfo wmInfo;
-    SDL_VERSION(&wmInfo.version);
-    if (!SDL_GetWindowWMInfo(sdlWindow, &wmInfo)) {
-        throw std::runtime_error("SDL_GetWindowWMInfo failed");
-    }
-    SDL_Log("Video driver: %s", SDL_GetCurrentVideoDriver());
-    //SDL_SetWindowFullscreen(sdlWindow,SDL_WINDOW_FULLSCREEN_DESKTOP);
-
-    Ogre::NameValuePairList params;
-    #ifdef __linux__
-    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.x11.window);
-    #elif _WIN32
-    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.win.window);
-    #endif
-    
-    params["externalWindowHandle"] = Ogre::StringConverter::toString(windowHandle);
-    renderWindow = ogreRoot->createRenderWindow("Ogre Test Window", 1000, 800, false, &params);
-    
-    const Ogre::ConfigOptionMap& options = ogreRoot->getRenderSystem()->getConfigOptions();
-    auto it = options.find("Video Mode");
-    if (it != options.end()) {
-        for (const auto& value : it->second.possibleValues) {
-            int width = 0;
-            int height = 0;
-            char temp = 0;
-            std::stringstream sStream(value);
-            sStream >> width >> temp >> height;
-            if (width > 0 && height > 0) {
-                resolutions.emplace_back(width, height);
-            }
-        }
-    }
-}
-
-void RenderSystem::locateResources()
-{
-  Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
-    Ogre::ConfigFile cf;
-    cf.load("resources.cfg");
-
-  Ogre::ConfigFile::SettingsBySection_ seci = cf.getSettingsBySection();
-    Ogre::String sec, type, arch;
-    for(auto& s : cf.getSettingsBySection()) {
-        sec = s.first;
-        for (auto& t : s.second)
-        {
-            type = t.first;
-            arch = t.second;
-            rgm.addResourceLocation(arch,type,sec);
-        }
-    }
-}
-
-void RenderSystem::loadResources()
-{
-    Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-    
-}
-
-void RenderSystem::destroyOgre()
-{
-    renderWindow->destroy();
-
-    ogreRoot->shutdown();
-
-    SDL_DestroyWindow(sdlWindow);
-    SDL_Quit();
 }
 
 #pragma region Tags
@@ -403,8 +315,6 @@ void RenderSystem::fixedUpdate(double dt)
 
 void RenderSystem::update(double dt)
 { 
-    ogreRoot->renderOneFrame();
-
     handleTag();
 
     //Update transform of entity with renderComponent

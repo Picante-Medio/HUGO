@@ -17,7 +17,7 @@ private:
     Ogre::RenderWindow* renderWindow = nullptr;
     Ogre::Overlay* getOverlay(const std::string& name);
 public:
-    UISystem(std::shared_ptr<Scene> scene);
+    UISystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* window);
 
    virtual ~UISystem() = default;
 
