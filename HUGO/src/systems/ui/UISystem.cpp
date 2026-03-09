@@ -2,6 +2,7 @@
 
 #include "Scene.h"
 #include "UICanvasComponent.h"
+#include <OgreRoot.h>
 
 /**
  * @brief get a specific overlay element from OverlayManager
@@ -18,8 +19,9 @@ Ogre::Overlay *UISystem::getOverlay(const std::string &name)
     return overlayManager.getByName(name);
 }
 
-UISystem::UISystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow *window) : System(scene), renderWindow(window)
+UISystem::UISystem(std::shared_ptr<Scene> scene) : System(scene)
 {
+    renderWindow = Ogre::Root::getSingleton().getAutoCreatedWindow();
 }
 
 void UISystem::update(double dt)

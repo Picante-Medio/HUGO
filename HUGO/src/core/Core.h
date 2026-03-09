@@ -18,14 +18,6 @@ namespace HUGO {
     class Core {
         void initModules();
 
-        //Ogre
-        void initOgre();
-        void destroyOgre();
-
-        std::shared_ptr<Ogre::Root> m_ogreRoot;
-        Ogre::RenderWindow* m_renderWindow;
-        SDL_Window* sdlWindow;
-
         //Miniaudio
         void initMiniaudio();
         void destroyMiniaudio();
@@ -38,9 +30,6 @@ namespace HUGO {
 
         VirtualTimer vt;
         std::shared_ptr<Scene> scenePtr;
-        
-        void locateResources();
-        void loadResources();
 
         //Resource Manager
         std::shared_ptr<ResourceManager> m_resourceManager;
