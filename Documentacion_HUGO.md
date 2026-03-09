@@ -347,7 +347,58 @@ El caso de las físicas es distinto. Debido a la naturaleza de la librería fís
 **Clases**
 - BulletModule
 - BulletSimulation
-- HugoMotionState
+- HUGOMotionState
+- HUGODispatcher
+
+### RigidbodyComponent
+
+Un **Rigidbody**, o un cuerpo rígido, es la forma que tiene **HUGO** y otros muchos motores de definir la forma y las propiedades de objetos que tienen que ser afectados por el sistema de físicas (gravedad, colisiones, velocidad, fuerzas, etc.). En nuestro motor un **Rigidbody** define las siguientes propiedades físicas:
+
+- Restitución
+- Fricción
+- Masa
+- Damping lineal y angular
+- Velocidad lineal y angular
+- Offset de posición y rotación (con respecto al transform de la entidad)
+
+Los atributos del ``RigidbodyComponent`` solamente serán accesibles a través de getters y setters definidos en la estructura. Esto se debe a que cuando se modifican los valores del cuerpo físico de **HUGO** también deben modificarse los de **bullet**. Para ello existen una serie de flags que se activan cuando el usuario modifica alguno de los valores del **Rigidbody** utilizando sus setters. De esta forma, en cada frame, actualiza los valores en **bullet** en función de las flags.
+
+También existen setters para aplicarle impulso y/o fuerza a un **Rigidbody** en el frame en el que se setea la fuerza/impulso.
+
+#### Sleep y Active
+
+Los cuerpos tienen tres posibles estados: **Active**, **Asleep** y **Inactive**. 
+
+- **Active** es el estado por defecto. Si un **RigidBody** está activo, se actualizará en cada frame y se procesarán las colisiones que tenga. 
+
+- **Asleep** es un estado pensado para ahorrar recursos. Si un cuerpo no se mueve más de un umbral en un tiempo determinado, **bullet** considerará que ese cuerpo está quieto y no lo actualizará. De esta forma no se procesan datos sobre una entidad que no cambia. **El estado del RigidBody pasa a ser Activo en cuanto actualiza alguna de alguna forma alguna de sus propiedades**. Las propiedades de un RigidBody pueden cambiar porque:
+
+    - El usuario cambia la propiedadcon su setter
+    - El RigidBody colisiona contra otro
+    - El usuario aplica una fuerza/impulso sobre el rigidbody
+
+    Es posible dormir un **RigidBody** manualmente y setear a mano el umbral lineal y angular a partir del cual un objeto se duerme con los setters ``setAsleep``, ``setLinearSleepingThreshold`` y ``setAngularSleepingThreshold`` respectivamente.
+
+- **Inactive** dejará al **Rigidbody** en un estado en el que no se actualiza en ningún frame. Sigue siendo posible cambiar los valores del **RigidBody** y que estén cambiados al reactivarlo, pero mientras esté en este estado **el RigidBody no se va a ver afectado por ningún tipo de fuerza/impulso y no va a detectar colisiones de ningún tipo**. Se puede activar/desactivar el RigidBody con el método ``SetActive``.
+
+>**Nota**: un **RigidBody** inactivo no se puede poner en estado dormido usando ``setAsleep``, es necesario activarlo primero para poder dormirlo. Esto debido a que el estado **Asleep** es innecesario si un objeto está inactivo.
+
+#### Colisiones
+
+Para la gestión de colisiones, **HUGO** tiene una clase ``HUGODispatcher`` que se encarga de actualizar en cada frame una propiedad del ``RigidBodyComponent`` llamada ``collisionInfo``. Esta propiedad es una lista de ids de las **entidades** con las que está colisionando un **RigidBody**. En cada frame ``HUGODispatcher`` recorre todas las colisiones que ha habido en el mundo fisico y añade a cada **RigidBody** que haya chocado con otro el id de la **entidad** a la que pertenece. Por supuesto, una colisión solo se procesa si ambas entidades tienen **Rigidbodies**. Por lo tanto se puede asegurar que todas las entidades registradas en el ``collisionInfo`` de un Rigidbody tienen un **Rigidbody** en el frame en el que han sido registradas.
+
+La lista se actualiza en cada frame. Esto facilita las interacciones entre entidades al colisionar. Por ejemplo, imaginemos que queremos hacer en un sistema que todas las entidades con "FooComponent" añadan un componente "BarComponent" que añada lógica a la entidad.
+
+````cpp
+for(auto pack : scene->query<RigidBodyComponent, FooComponent>){
+    RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
+    float force = 10.f;
+
+    for(unsigned long int entity : rb.getCollisionInfo()){
+        scene->addComponent<BarComponent>(entity, Args...);
+    }
+}
+````
 
 ### Pipeline de físicas a nivel de usuario
 Para crear un cuerpo físico el usuario debe crear una estructura llamada ``Shape`` que recibe hasta cinco tipos distintos de información para crear una forma:
@@ -364,7 +415,7 @@ Esta información es representada a través de cinco estructuras que recibe como
 
 Cuando se crea un ``RigidbodyComponent`` se le asigna una ``Shape`` para definir su forma y tamaño. Esta diferenciación entre la forma y el cuerpo permite asociar a distintos cuerpos la misma forma y el mismo tamaño. En la simulación física, todos esos cuerpos también comparten los mismos datos de su forma. De esta forma el usuario puede reaprovechar una misma forma para varios cuerpos.
 
-Para hacer que los cuerpos sean **Kinemáticos** o **Estáticos** se deben añadir las tags ``KinematicRBTag`` y ``StaticRBTag`` respectivamente a la entidad a la que se le añada el ``RigidbodyComponent`` inmediatamente después de hacerlo. Si se añade la tag en cualquier otro momento no se puede garantizar que se vaya a crear un cuerpo con las propiedades deseadas.
+Para hacer que los cuerpos sean **Dinámicos**, **Kinemáticos** o **Estáticos** se deben añadir las tags ``DynamicRBTag``, ``KinematicRBTag`` y ``StaticRBTag`` (incluídas en la cabecera ``PhysicsTags.h``) respectivamente a la entidad a la que se le añada el ``RigidbodyComponent`` inmediatamente después de hacerlo. Si se añade la tag en cualquier otro momento no se puede garantizar que se vaya a crear un cuerpo con las propiedades deseadas.
 
 ### IPhysicsSimulation
 Esta es una interfaz que permite a cualquier usuario implementar la simulación como desee. Tiene métodos virtuales para destruir la simulación que esté gestionando ahora mismo y para hacer un step en el mundo de físicas.
