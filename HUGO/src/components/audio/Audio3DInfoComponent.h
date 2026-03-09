@@ -6,7 +6,7 @@
 #include "HugoComponentMacros.h"
 
 // 3D SFX component
-HCOMPONENT(Audio3DInfoComponet)
+HCOMPONENT(Audio3DInfoComponent)
 
     HUGO::AudioID audioId;
 
