@@ -32,7 +32,7 @@ HCOMPONENT(Audio3DInfoComponet)
     float coneOuterGain; // gain outside the cone
 
     // Default constructor
-    Audio3DInfoComponet(EntityID entity, HUGO::AudioID id, float minDistance= 1.0f, float maxDistance = 100.0f, 
+    Audio3DInfoComponent(EntityID entity, HUGO::AudioID id, float minDistance= 1.0f, float maxDistance = 100.0f, 
         const HUGO::Vector3& velocity = HUGO::Vector3(0.0f, 0.0f, 0.0f), 
         const HUGO::Vector3& direction = HUGO::Vector3(0.0f, 0.0f, 1.0f),
         float dooplerFactor = 1.0f, float roolof=1.0f, 

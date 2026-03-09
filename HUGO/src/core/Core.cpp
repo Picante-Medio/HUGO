@@ -49,7 +49,7 @@ void Core::init(){
     auto err = chatParser.readChatFolder("../chats");
 
     std::shared_ptr<AudioSystem> audioSystem = std::make_shared<AudioSystem>(scenePtr, maEngine);
-    audioSystem->loadAudiosFromFile("test_media/AudioList.txt");
+    audioSystem->loadAudiosFromFile("AudioList.txt");
     scenePtr->addSystem(audioSystem);
     audioSystem->createTestEntity();
     
