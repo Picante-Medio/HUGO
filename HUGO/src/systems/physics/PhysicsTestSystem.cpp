@@ -16,14 +16,14 @@ PhysicsTestSystem::PhysicsTestSystem(std::shared_ptr<Scene> scene)
 
     // Entidad 1: Cuerpo estático
     EntityID e1 = scene->createEntity();
-    scene->addComponent<TransformComponent>(e1, HUGO::Vector3(20, -30, -50), HUGO::Quaternion(1,0,0,0), HUGO::Vector3(1, 0.05, 0.5));
+    scene->addComponent<TransformComponent>(e1, HUGO::Vector3(20, -30, -50), HUGO::Quaternion(1,0,0,0), HUGO::Vector3(1, 0.05f, 0.5f));
     scene->addComponent<RigidBodyComponent>(e1, shape);
     scene->addComponent<StaticRBTag>(e1);
     scene->addComponent<RenderComponent>(e1, "cube.mesh", "ColorVerde");
     
     // Entidad 2: Cuerpo dinámico
     EntityID e2 = scene->createEntity();
-    scene->addComponent<TransformComponent>(e2,  HUGO::Vector3(20, 30, -50), HUGO::Quaternion(1,0,0,0), HUGO::Vector3(0.15, 0.25, 0.15));
+    scene->addComponent<TransformComponent>(e2,  HUGO::Vector3(20, 30, -50), HUGO::Quaternion(1,0,0,0), HUGO::Vector3(0.15f, 0.25f, 0.15f));
     scene->addComponent<RigidBodyComponent>(e2, shape, 5.f);
     scene->addComponent<DynamicRBTag>(e2);
     scene->addComponent<RenderComponent>(e2, "cube.mesh");

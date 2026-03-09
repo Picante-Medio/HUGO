@@ -10,7 +10,7 @@
 
 class Scene;
 class VirtualTimer;
-class SDL_Window;
+struct SDL_Window;
 
 namespace HUGO {
     class ResourceManager;

@@ -8,6 +8,7 @@
 #include "PagedArray.h"
 #include "HugoTypes.h"
 #include "HugoMath.h"
+#include "HugoError.h"
 
 struct RenderComponent;
 class RenderSystem : public System{
@@ -55,15 +56,13 @@ class RenderSystem : public System{
 
     void updateViewportDimensions();
 
-    void createOgreCamera(EntityID entity);
-    void createOgreLight(EntityID entity);
+    ErrorOrVoid createOgreCamera(EntityID entity);
+    ErrorOrVoid createOgreLight(EntityID entity);
     void createOgreViewport(EntityID entity);
     // void destroyOgreCamera(EntityID entity);
     // void destroyOgreViewport(EntityID entity);
 
     void handleTag();
-
-    void createTestEntity();
 
     // Materials
     void setMaterial(EntityID entity,const std::string& materialName);   
@@ -83,7 +82,7 @@ class RenderSystem : public System{
     void resizeScreen(unsigned int widthPt, unsigned int heightPt);
 
     //OgreObjects
-    HUGO::OgreObjectID createOgreObject(const std::string& meshName, const std::string& materialName="");
+    ErrorOrType<HUGO::OgreObjectID> createOgreObject(const std::string& meshName, const std::string& materialName="");
     OgreObject& getOgreObject(HUGO::OgreObjectID id);
     void removeOgreObject(HUGO::OgreObjectID& id);
     void destroyOgreObject(OgreObject& obj);

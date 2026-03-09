@@ -5,7 +5,7 @@
 
 #include "HugoComponentMacros.h"
 
-class ma_sound;
+struct ma_sound;
 HCOMPONENT(AudioComponent)
     HUGO::AudioTypes type;
     HUGO::AudioID audioId;

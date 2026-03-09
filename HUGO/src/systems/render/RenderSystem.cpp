@@ -220,7 +220,7 @@ void RenderSystem::handleTag()
 #pragma endregion
 
 #pragma region OgreObject
-HUGO::OgreObjectID RenderSystem::createOgreObject(const std::string &meshName, const std::string &materialName)
+ErrorOrType<HUGO::OgreObjectID> RenderSystem::createOgreObject(const std::string &meshName, const std::string &materialName)
 {
     Ogre::Entity* ent = nullptr;
     Ogre::SceneNode* node = nullptr;
@@ -237,11 +237,12 @@ HUGO::OgreObjectID RenderSystem::createOgreObject(const std::string &meshName, c
         node->attachObject(ent);
     }
     catch (const Ogre::Exception& e){
-        std::cerr << "[RenderSystem] Failed to create OgreObject: "<< std::string(e.getDescription()) << '\n';
+        StringError err;
+        err.errorMessage = "[RenderSystem] Failed to create OgreObject: "+ std::string(e.getDescription());
         if (ent) sceneManager->destroyEntity(ent);
         if (node) sceneManager->destroySceneNode(node);
 
-        return HUGO::INVALID_OGRE_OBJECT_ID;
+        return ErrorOrType<HUGO::OgreObjectID>(err);
     }
     
     HUGO::OgreObjectID id;
@@ -263,7 +264,7 @@ HUGO::OgreObjectID RenderSystem::createOgreObject(const std::string &meshName, c
     std::size_t index = ogreObjects.push_back(std::move(obj));
     idToIndex[id] = index;
 
-    return id;
+    return ErrorOrType<HUGO::OgreObjectID>(id);
 }
 
 RenderSystem::OgreObject& 
@@ -323,12 +324,13 @@ void RenderSystem::update(double dt)
 
         if (rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) {
             //create a new ogreObject
-            rc.objectID = createOgreObject(rc.meshName,rc.materialName);
-
-            if (rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) {
-                std::cerr << "[RenderSystem] RenderComponent could not create OgreObject"<<'\n';
+            ErrorOrType<HUGO::OgreObjectID> e = createOgreObject(rc.meshName,rc.materialName);
+            if (e.isError()) {
+                rc.objectID=HUGO::INVALID_OGRE_OBJECT_ID;
+                std::cerr<< e.getError().errorMessage;
                 continue;
             }
+            rc.objectID = e.getValue();
         } 
         OgreObject& obj = getOgreObject(rc.objectID);
 
@@ -339,21 +341,6 @@ void RenderSystem::update(double dt)
     }
 }
 
-#pragma endregion
-
-#pragma region Testing
-void RenderSystem::createTestEntity()
-{
-    EntityID e1 = scene->createEntity();
-    scene->addComponent<TransformComponent>(e1, HUGO::Vector3(-30,10,10), HUGO::Quaternion(1,0,0,0), HUGO::Vector3(0.2f,0.2f,0.2f));
-    scene->addComponent<RenderComponent>(e1, "cube.mesh");
-
-    EntityID e2 = scene->createEntity();
-    scene->addComponent<TransformComponent>(e2, HUGO::Vector3(30,10,10), HUGO::Quaternion(1,0,0,0), HUGO::Vector3(0.2f,0.2f,0.2f));
-    scene->addComponent<RenderComponent>(e2, "sphere.mesh","prueba/ColorRosa");
-
-    setMaterial(e1, "prueba/ColorVerde");
-}
 #pragma endregion
 
 void RenderSystem::setMaterial(EntityID entity, const std::string &materialName)
@@ -406,7 +393,10 @@ void RenderSystem::registerCameraEntity(EntityID entity)
         return;
     }
     
-    createOgreCamera(entity);
+    ErrorOrVoid e = createOgreCamera(entity);
+    if(e.isError()){
+        std::cerr<<e.getError().errorMessage;
+    }
 }
 
 void RenderSystem::registerViewportEntity(EntityID entity)
@@ -425,7 +415,10 @@ void RenderSystem::registerLightEntity(EntityID entity)
         return;
     }
     
-    createOgreLight(entity);
+    ErrorOrVoid e = createOgreLight(entity);
+    if(e.isError()){
+        std::cerr<<e.getError().errorMessage;
+    }
 }
 
 void RenderSystem::unregisterCameraEntity(EntityID entity)
@@ -451,7 +444,7 @@ void RenderSystem::unregisterViewportEntity(EntityID entity)
 
 // ==================== Ogre Camera and ViewPort Creation ====================
 #pragma region  OgreCamera and ViewPort Creation 
-void RenderSystem::createOgreCamera(EntityID entity)
+ErrorOrVoid RenderSystem::createOgreCamera(EntityID entity)
 {
     CameraInfo res;
     
@@ -477,7 +470,7 @@ void RenderSystem::createOgreCamera(EntityID entity)
 
     if (!transformComp || !cameraComp) {
         // gestion de errores
-        std::cerr<<"[RenderSystem] Camera entity "<< std::to_string(entity) << "missing required components"<<"\n";
+        return ErrorOrVoid("[RenderSystem] Camera entity "+ std::to_string(entity) + "missing required components");
     }
 
     // Unique name for the camera
@@ -509,9 +502,10 @@ void RenderSystem::createOgreCamera(EntityID entity)
     
     // Añadir tag para sincronización futura
     scene->addComponent<CameraDirtyTag>(entity);
+    return ErrorOrVoid();
 }
 
-void RenderSystem::createOgreLight(EntityID entity)
+ErrorOrVoid RenderSystem::createOgreLight(EntityID entity)
 {
     LightInfo res;
     
@@ -537,7 +531,7 @@ void RenderSystem::createOgreLight(EntityID entity)
 
     if (!transformComp || !lightComp) {
         // gestion de errores
-        std::cerr<<"[RenderSystem] Light entity "<< std::to_string(entity) << "missing required components"<<"\n";
+        return ErrorOrVoid("[RenderSystem] Light entity "+ std::to_string(entity) + "missing required components");
     }
 
     // Unique name for the light
@@ -598,6 +592,7 @@ void RenderSystem::createOgreLight(EntityID entity)
     }
 
     lightMap[entity] = res;
+    return ErrorOrVoid();
 }
 
 void RenderSystem::createOgreViewport(EntityID entity)

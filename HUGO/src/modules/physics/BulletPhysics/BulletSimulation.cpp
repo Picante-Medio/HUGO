@@ -23,7 +23,7 @@ BulletSimulation::BulletSimulation(std::shared_ptr<Scene> scene)
 
     // Finally we create the world and set its gravity
     btWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfig);
-    btWorld->setGravity(btVector3(0, -9.8, 0));
+    btWorld->setGravity(btVector3(0, -9.8f, 0));
 }
 
 BulletSimulation::~BulletSimulation() {
@@ -69,7 +69,7 @@ void BulletSimulation::performSimulation(double dt) {
 }
 
 void BulletSimulation::stepSimulation(double dt) {
-    btWorld->stepSimulation(dt);
+    btWorld->stepSimulation(static_cast<btScalar>(dt));
 }
 
 #pragma region ShapeObject

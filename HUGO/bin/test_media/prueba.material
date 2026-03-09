@@ -23,3 +23,15 @@ material prueba/ColorRosa
 		}
     }
 }
+material prueba/Textura
+{
+	technique
+	{
+		pass
+		{
+            texture_unit{
+                texture spaceSky.jpg
+            }
+		}
+	}
+}
