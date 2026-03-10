@@ -48,16 +48,17 @@ class BulletSimulation : public IPhysicsSimulation {
     ShapeObject& getShapeObject(const HUGO::CollisionShapeID id);
     void removeShapeObject(HUGO::CollisionShapeID& id);
     void destroyShapeObject(ShapeObject& shObj);
+    btCollisionShape* getorCreateShape(HUGO::CollisionShapeID& id, ColliderComponent& hgCol);
 
     HUGO::CollisionObjectID createColliderObject(ColliderComponent& hgCol, TransformComponent& tf);
     HUGO::CollisionObjectID upgradeToRigidBodyObject(ColliderComponent& hgCol, RigidBodyComponent& hgRb, TransformComponent& tf, HUGO::BodyType type);
     CollisionObject& getCollisionObject(const HUGO::CollisionObjectID id);
     void removeRigidBodyObject(HUGO::CollisionObjectID& id);
     void removeColliderObject(HUGO::CollisionObjectID& id);
-    void destroyCollisionObject(CollisionObject& RbObj);
 
     // Check for updates on a specific RB
-    void checkFlags(RigidBodyComponent& hgRB);
+    void checkRigidBodyFlags(RigidBodyComponent& hgRB);
+    void checkColliderFlags(ColliderComponent& hgCol);
 
     // @brief Creates and adds rigidbodies to simulation. Updates kinematic bodies.
     void syncBodiesToBullet();
