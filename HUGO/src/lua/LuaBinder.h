@@ -16,19 +16,17 @@
 #pragma region HelperFunctions
 template<typename T>
 T lua_get(lua_State* lua, int idx) {
-    if constexpr (std::is_same_v<T, HUGO::Int> || std::is_same_v<T, int>)
+    if constexpr (std::is_same_v<T, HUGO::Int> || std::is_same_v<T, int> 
+        || std::is_same_v<T, HUGO::Float> || std::is_same_v<T, double> || std::is_same_v<T, float>)
         return (HUGO::Int)luaL_checknumber(lua, idx);
-
-    else if constexpr (std::is_same_v<T, HUGO::Float> || std::is_same_v<T, double> || std::is_same_v<T, float>)
-        return (HUGO::Float)luaL_checknumber(lua, idx);
 
     else if constexpr (std::is_same_v<T, bool>)
         return lua_toboolean(lua, idx);
 
     else if constexpr (std::is_same_v<T, HUGO::String> || std::is_same_v<T, std::string>)
-        return luaL_checkstring(lua, idx);
+        return HUGO::String(luaL_checkstring(lua, idx));
     else
-        static_assert(sizeof(T) == 0, "lua_get: unsupported type");
+        static_assert(sizeof(T) == 0, "Lua: You should only declare functions with parameters of basic types that lua can read");
 }
 
 template<typename T>
@@ -46,7 +44,7 @@ static void lua_push_result(lua_State* lua, T value) {
         lua_pushstring(lua, value.c_str());
 
     else 
-        throw "You should only declare functions with parameters of basic types that lua can read";
+        throw "Lua: You should only declare functions with parameters of basic types that lua can read";
 }
 #pragma endregion
 
@@ -62,7 +60,6 @@ struct LuaRuntimeError : Error {
 class LuaBinder {
     //pointer to the lua interpeter instance
     lua_State* lua;
-    HUGO::String lastError;
 
     template<typename ReturnType, typename ...ArgTypes, std::size_t... I>
     static int callLuaFunc(lua_State* lua, ReturnType(*func)(ArgTypes...), std::index_sequence<I...>) {
@@ -101,8 +98,13 @@ public:
             return callLuaFunc(L, fn, std::index_sequence_for<ArgTypes...>{});
         }, 1);
 
+        // Create the function call with name in lua
         lua_setglobal(lua, luaName.c_str());
     }
+
+    //Functions to call entire lua files
+    //
+    ErrorOrVoid runFile(HUGO::String path); 
 
     template<typename T>
     ErrorOrType<T, StringError> getFromFile(HUGO::String path) {
@@ -126,22 +128,21 @@ public:
         return ErrorOrType<T, StringError>(result);
     }
 
-    ErrorOrVoid runFile(HUGO::String path) {
-        // If path is invalid
-        if (luaL_loadfile(lua, path.c_str()) != LUA_OK) {
-            StringError error = StringError(HUGO::String(lua_tostring(lua, -1)));
-            lua_pop(lua, 1);
-            return ErrorOrVoid(error);
-        }
+    //Functions to call strings as lua code
+    ErrorOrVoid interpretString(HUGO::String command);
 
-        // If lua crashes on runtime
-        if (lua_pcall(lua, 0, 0, 0) != LUA_OK) {
+    template<typename T>
+    ErrorOrType<T> getFromString(HUGO::String command) {
+        //if string is invalid
+        if (luaL_dostring(lua, command.c_str()) != LUA_OK) {
             StringError error = StringError(HUGO::String(lua_tostring(lua, -1)));
             lua_pop(lua, 1);
-            return ErrorOrVoid(error);
+            return ErrorOrType<int>(error);
         }
 
         //Otherwise
-        return ErrorOrVoid();
+        T result = lua_get<T>(lua, -1);
+        lua_pop(lua, 1);
+        return ErrorOrType<T, StringError>(result);
     }
 };
