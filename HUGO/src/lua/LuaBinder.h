@@ -74,6 +74,17 @@ class LuaBinder {
         }
     }
 
+    template<typename ClassType, typename ReturnType, typename... ArgTypes, std::size_t... I>
+    static int callLuaMethod(lua_State* lua, ClassType* obj, ReturnType(ClassType::*fn)(ArgTypes...), std::index_sequence<I...>) {
+        if constexpr (std::is_same_v<ReturnType, void>) {
+            (obj->*fn)(lua_get<ArgTypes>(lua, I + 1)...);
+            return 0;
+        } else {
+            ReturnType result = (obj->*fn)(lua_get<ArgTypes>(lua, I + 1)...);
+            lua_push_result(lua, result);
+            return 1;
+        }
+    }
 public:
     static LuaBinder &Instance();
     ~LuaBinder();
@@ -100,6 +111,24 @@ public:
 
         // Create the function call with name in lua
         lua_setglobal(lua, luaName.c_str());
+    }
+
+    template<typename ClassType, typename ReturnType, typename... ArgTypes>
+    void registerMethod(ClassType& obj, ReturnType(ClassType::*fn)(ArgTypes...), HUGO::String name) {
+        using Function = ReturnType(ClassType::*)(ArgTypes...);
+
+        struct Method { ClassType* object; Function func; };
+
+        Method* method = (Method*)lua_newuserdata(lua, sizeof(Method));
+        method->object = &obj;
+        method->func = fn;
+
+        lua_pushcclosure(lua, [](lua_State* L) -> int {
+            Method* method = (Method*)lua_touserdata(L, lua_upvalueindex(1));
+            return callLuaMethod(L, method->object, method->func, std::index_sequence_for<ArgTypes...>{});
+        }, 1);
+
+        lua_setglobal(lua, name.c_str());
     }
 
     //Functions to call entire lua files
