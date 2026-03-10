@@ -6,6 +6,7 @@
 
 #include "Scene.h"
 #include "TransformComponent.h"
+#include "LuaBinder.h"
 
 #include <fstream>
 #include <sstream>
@@ -14,6 +15,7 @@ AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, std::shared_ptr<ma_engine
     const std::string& path, int queueSize)
     : System(scene), engine(maEngine), path(path), audios(), nameToID(), pools(), nextID(0), queueSize(queueSize)
 {   
+    LuaBinder::Instance().registerMethod<AudioSystem, void, int>(*this, &AudioSystem::playAudioLUA, "playAudio");
 }
 
 ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id)
