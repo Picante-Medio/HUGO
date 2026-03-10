@@ -1,69 +1,49 @@
 #pragma once
 
 #include <string>
-#include <variant>
 #include "Component.h"
 #include "HugoTypes.h"
 #include "HugoMath.h"
 
 #include "HugoComponentMacros.h"
 
-struct BoxColliderInfo {
-    HUGO::Vector3 halfExtents;
-};
-
-struct SphereColliderInfo {
-    float r;
-};
-
-struct CapsuleColliderInfo {
-    float r;
-    float height;
-};
-
-struct CylinderColliderInfo {
-    HUGO::Vector3 halfExtents;
-};
-
-struct ConeColliderInfo {
-    float r;
-    float height;
-};
-
-struct Shape{
-
-    friend class BulletSimulation;
-
-    // Default constructor for macros
-    Shape(){
-        BoxColliderInfo mInfo;
-        mInfo.halfExtents = HUGO::Vector3(.5f, .5f, .5f);
-        info = mInfo;
-    }
-
-    // Shape's geometry is determined by the variant. Which struct is held can be checked with std::holds_alternative
-    std::variant<BoxColliderInfo, SphereColliderInfo, CapsuleColliderInfo, CylinderColliderInfo, ConeColliderInfo> info;
-
-private:
-    HUGO::CollisionShapeID id = HUGO::INVALID_SHAPE_ID;
-};
-
 HCOMPONENT(RigidBodyComponent)
 
-    friend class BulletSimulation;
-    friend class HUGODispatcher;
+    // ----------------------Attributes----------------------
+    enum UpdateFlags{
+        MASS_UPDATED = 1,
+        DAMPING_UPDATED = 2,
+        LINEAR_VELOCITY_UPDATED = 4,
+        ANGULAR_VELOCITY_UPDATED = 8,
+        IMPULSE_APPLIED = 16,
+        TORQUE_IMPULSE_APPLIED = 32,
+        FORCE_APPLIED = 64,
+        TORQUE_APPLIED = 128,
+        SLEEP_UPDATED = 256,
+        SLEEPING_THRESHOLD_UPDATED = 512
+    };
+
+    int flags = 0;
+
+    float mass = 0.f;
+    float linearDamping = 0.f;
+    float angularDamping = 0.f;
+
+    HUGO::Vector3 linearVelocity = HUGO::Vector3();
+    HUGO::Vector3 angularVelocity = HUGO::Vector3();
+
+    HUGO::Vector3 impulseApplied = HUGO::Vector3();
+    HUGO::Vector3 torqueImpulseApplied = HUGO::Vector3();
+    HUGO::Vector3 forceApplied = HUGO::Vector3();
+    HUGO::Vector3 torqueApplied = HUGO::Vector3();
+
+    bool asleep = false;
+    float linearSleepingThreshold = 0.8f;
+    float angularSleepingThreshold = 1.f;
+
+    HUGO::CollisionObjectID objectID = HUGO::INVALID_COL_OBJ_ID;
 
     // ----------------------Setters----------------------
-    void setRestitution(float nRestitution){
-        restitution = nRestitution;
-        flags = flags | UpdateFlags::RESTITUTION_UPDATED;
-    }
-
-    void setFriction(float nFriction){
-        friction = nFriction;
-        flags = flags | UpdateFlags::FRICTION_UPDATED;
-    }
-
     void setMass(float nMass){
         mass = nMass;
         flags = flags | UpdateFlags::MASS_UPDATED;
@@ -113,21 +93,6 @@ HCOMPONENT(RigidBodyComponent)
         flags = flags | UpdateFlags::TORQUE_APPLIED;
     }
 
-    void setPositionOffset(HUGO::Vector3 offset){
-        positionOffset = offset;
-        flags = flags | UpdateFlags::TRANSFORM_OFFSET_UPDATED;
-    }
-
-    void setRotationOffset(HUGO::Quaternion offset){
-        rotationOffset = offset;
-        flags = flags | UpdateFlags::TRANSFORM_OFFSET_UPDATED;
-    }
-
-    void setActive(bool isActive){
-        active = isActive;
-        flags = flags | UpdateFlags::ACTIVE_UPDATED;
-    }
-
     void setAsleep(bool isAsleep){
         asleep = isAsleep;
         flags = flags | UpdateFlags::SLEEP_UPDATED;
@@ -144,8 +109,6 @@ HCOMPONENT(RigidBodyComponent)
     }
 
     // ----------------------Getters----------------------
-    inline float getRestitution() const { return restitution; }
-    inline float getFriction() const { return friction; }
     inline float getMass() const { return mass; }
     inline float getLinearDamping() const { return linearDamping; }
     inline float getAngularDamping() const { return angularDamping; }
@@ -153,62 +116,8 @@ HCOMPONENT(RigidBodyComponent)
     inline HUGO::Vector3 getLinearVelocity() const { return linearVelocity; }
     inline HUGO::Vector3 getAngularVelocity() const { return angularVelocity; }
 
-    inline HUGO::Vector3 getPositionOffset() const { return positionOffset; }
-    inline HUGO::Quaternion getRotationOffset() const { return rotationOffset; }
-
-    inline bool getActive() const { return active; }
     inline bool getAsleep() const { return asleep; }
     inline float getLinearSleepingThreshold() const { return linearSleepingThreshold; }
     inline float getAngularSleepingThreshold() const { return angularSleepingThreshold; }
-
-    inline std::vector<unsigned long int> getCollisionInfo() const { return collisionInfo; }
-
-private:
-
-    enum UpdateFlags{
-        RESTITUTION_UPDATED = 1,
-        FRICTION_UPDATED = 2,
-        MASS_UPDATED = 4,
-        DAMPING_UPDATED = 8,
-        LINEAR_VELOCITY_UPDATED = 16,
-        ANGULAR_VELOCITY_UPDATED = 32,
-        IMPULSE_APPLIED = 64,
-        TORQUE_IMPULSE_APPLIED = 128,
-        FORCE_APPLIED = 256,
-        TORQUE_APPLIED = 512,
-        TRANSFORM_OFFSET_UPDATED = 1024,
-        ACTIVE_UPDATED = 2048,
-        SLEEP_UPDATED = 4096,
-        SLEEPING_THRESHOLD_UPDATED = 8192
-    };
-
-    int flags = 0;
-
-    float restitution = 0.f;
-    float friction = 0.5f;
-    float mass = 0.f;
-    float linearDamping = 0.f;
-    float angularDamping = 0.f;
-    HUGO::Vector3 positionOffset = HUGO::Vector3();
-    HUGO::Quaternion rotationOffset = HUGO::Quaternion();
-
-    HUGO::Vector3 linearVelocity = HUGO::Vector3();
-    HUGO::Vector3 angularVelocity = HUGO::Vector3();
-
-    HUGO::Vector3 impulseApplied;
-    HUGO::Vector3 torqueImpulseApplied;
-    HUGO::Vector3 forceApplied;
-    HUGO::Vector3 torqueApplied;
-
-    bool active = true;
-    bool asleep = false;
-    float linearSleepingThreshold = 0.8f;
-    float angularSleepingThreshold = 1.f;
-
-    std::vector<unsigned long int> collisionInfo;
-
-    // Once created shape shouldn't be modified
-    Shape rbShape;
-    HUGO::RigidBodyID objectID = HUGO::INVALID_RB_ID;
 
 END_HCOMPONENT()
