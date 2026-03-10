@@ -122,6 +122,7 @@ set(HUGO_LINKED_LIBRARIES
     OgreOverlay
     RenderSystem_GL3Plus
     RenderSystem_GL
+    Codec_STBI
     SDL2::SDL2
     SDL2::SDL2main
     miniaudio)

@@ -89,14 +89,13 @@ set(OGRE_OPTIONS_OFF
 
     OGRE_BUILD_DEPENDENCIES
     # Las dependencias se buildean a mano porque si Ogre detecta esta flag compila
-    # librerías que no hacen falta, como Bullet o zlib
+    # librerías que no hacen falta, como Bullet bindings o zlib
 
     OGRE_BUILD_PLUGIN_ASSIMP
     OGRE_BUILD_PLUGIN_BSP
     OGRE_BUILD_PLUGIN_DOT_SCENE
     OGRE_BUILD_PLUGIN_GLSLANG
-    OGRE_BUILD_PLUGIN_RSIMAGE
-    OGRE_BUILD_PLUGIN_STBI
+    OGRE_BUILD_PLUGIN_FREEIMAGE
 
     OGRE_BUILD_RENDERSYSTEM_D3D11
     OGRE_BUILD_RENDERSYSTEM_GLES2
@@ -121,7 +120,7 @@ set(OGRE_OPTIONS_OFF
     OGRE_STATIC
 )
 
-foreach(opt IN LISTS OGRE_OPTIONS_OFF)
+foreach(opt IN LISTS OGRE_OPTIONS_OFF) 
     list(APPEND OGRE_OPTIONS -D${opt}:BOOL=OFF)
 endforeach()
 
@@ -134,6 +133,7 @@ set(OGRE_OPTIONS_ON
     OGRE_BUILD_PLUGIN_OCTREE
     OGRE_BUILD_PLUGIN_PCZ
     OGRE_BUILD_PLUGIN_PFX
+    OGRE_BUILD_PLUGIN_STBI 
 
     OGRE_BUILD_RENDERSYSTEM_GL3PLUS
     OGRE_BUILD_RTSHADERSYSTEM_SHADERS
