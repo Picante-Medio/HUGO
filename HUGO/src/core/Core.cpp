@@ -58,6 +58,7 @@ void Core::init(){
     std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr, m_renderWindow);
     scenePtr->addSystem(renderSystem);
 
+    renderSystem->getSM()->addRenderQueueListener(m_ogreOverlaySystem.get());
     std::shared_ptr<UISystem> uiSystem = std::make_shared<UISystem>(scenePtr, m_renderWindow);
     scenePtr->addSystem(uiSystem);
     uiSystem->createTestCanvas();
@@ -106,6 +107,8 @@ void Core::initOgre()
     m_ogreRoot->getRenderSystem()->setConfigOption("Full Screen", "No");
 
     m_ogreRoot->initialise(false);
+
+    m_ogreOverlaySystem = std::make_shared<Ogre::OverlaySystem>();
     locateResources();
     loadResources();
 
@@ -136,8 +139,6 @@ void Core::initOgre()
     
     params["externalWindowHandle"] = Ogre::StringConverter::toString(windowHandle);
     m_renderWindow = m_ogreRoot->createRenderWindow("Ogre Test Window", 1000, 800, false, &params);
-
-    m_ogreOverlayManager = std::make_shared<Ogre::OverlayManager>();
 }
 
 void HUGO::Core::locateResources()
@@ -161,7 +162,6 @@ void HUGO::Core::locateResources()
 void HUGO::Core::loadResources()
 {
     Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-    
 }
 //HUGO main loop
 void Core::run(){
@@ -193,7 +193,6 @@ void Core::run(){
 
 
 void Core::destroyOgre(){
-    m_ogreOverlayManager->destroyAll();
     m_renderWindow->destroy();
 
     m_ogreRoot->shutdown();

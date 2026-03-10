@@ -3,6 +3,9 @@
 #include "UICanvasComponent.h"
 #include "UITags.h"
 
+#include "OgreLogManager.h"
+#include "OgreRoot.h"
+#include "OgreSceneManager.h"
 UISystem::UISystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* window)
     : System(scene), renderWindow(window)
 {
@@ -153,8 +156,14 @@ void UISystem::processVisibility()
             // apply visibility to Ogre
             if (canvas.isVisible) {
                 cache->overlay->show();
+                if (cache->container) {
+                    cache->container->show();
+                }
             } else {
                 cache->overlay->hide();
+                if (cache->container) {
+                    cache->container->hide();
+                }
             }
             
             // update cache
@@ -176,14 +185,15 @@ void UISystem::clearEntityCache(EntityID entity)
 
 void UISystem::update(double dt)
 {
-    //canvas changes
-    for (auto& pack : scene->query<UICanvasComponent, CanvasDirtyTag>()) {
-        UICanvasComponent& canvas = pack.get<UICanvasComponent&>();
-        EntityID entity = canvas.entity;
+    // //canvas changes
+    // for (auto& pack : scene->query<UICanvasComponent, CanvasDirtyTag>()) {
+    //     UICanvasComponent& canvas = pack.get<UICanvasComponent&>();
+    //     EntityID entity = canvas.entity;
 
-        // remove the dirty tag
-        scene->removeComponent<VisibilityDirtyTag>(entity);
-    }
+    //     // remove the dirty tag
+    //     scene->removeComponent<VisibilityDirtyTag>(entity);
+    // }
+    processVisibility();
 }
 
 void UISystem::fixedUpdate(double dt) {}
@@ -196,39 +206,41 @@ void UISystem::createTestCanvas()
     
     for (auto& pack: scene->query<UICanvasComponent>()){
         UICanvasComponent& canvas = pack.get<UICanvasComponent&>();
+        Ogre::OverlayManager& om = Ogre::OverlayManager::getSingleton();
+
+       // 1. first: load the .overlay script
+        Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton().
+            openResource("testCanvas.overlay", "General"); // Ajusta nombre y grupo
+        om.parseScript(stream, "General");
+        Ogre::Overlay* overlay = om.getByName("testCanvas/SimpleTest");
         
-        // 1. first, get the overlay to read its properties
-        ErrorOrType<Ogre::Overlay*> overlayResult = getOverlay(canvas.overlayName);
-        if (overlayResult.isError()) {
-            return;
-        }
-        Ogre::Overlay* overlay = overlayResult.getValue();
-        
-        // 2. read values from .overlay script
+        // 3. read values from .overlay script
         canvas.zOrder = overlay->getZOrder();
         
-        // 3. get container to read position/size
+        // 4. get container to read position/size
         auto containerResult = getContainer(canvas.containerName);
         if (!containerResult.isError()) {
             Ogre::OverlayContainer* container = containerResult.getValue();
-            
+    
+            // metrics mode
+            canvas.metricsMode = container->getMetricsMode();
+
             // position and size
             canvas.left = container->getLeft();
             canvas.top = container->getTop();
             canvas.width = container->getWidth();
             canvas.height = container->getHeight();
             
-            // metrics mode
-            canvas.metricsMode = container->getMetricsMode();
-            
             // material
             canvas.backgroundMaterial = container->getMaterialName();
+            container->setMaterialName("UI/Red");
         }
         
-        // 4. override visibility
+        // 5. override visibility
         canvas.isVisible = true;
+        scene->addComponent<VisibilityDirtyTag>(ent);
         
-        // 5. create cache with the pointers and store in canvas map
+        // 6. create cache with the pointers and store in canvas map
         canvasCache[ent] = createCanvasCache(canvas);
     }
 }

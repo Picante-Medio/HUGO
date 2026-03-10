@@ -32,7 +32,7 @@ HCOMPONENT(UICanvasComponent)
         Ogre::GuiMetricsMode mode = Ogre::GuiMetricsMode::GMM_RELATIVE,
         HUGO::Float left = 0.0f, HUGO::Float top =0.0f,
         HUGO::Float width = 1.0f, HUGO::Float height = 1.0f,
-        const HUGO::String& material = "BaseWhite"): 
+        const HUGO::String& material = ""): 
     Component(entity), overlayName(name), containerName(name + "Container"), 
     isVisible(false), zOrder(order), metricsMode(mode),
     left(left), top(top), width(width), height(height), backgroundMaterial(material)

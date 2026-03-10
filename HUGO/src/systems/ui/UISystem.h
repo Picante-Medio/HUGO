@@ -71,6 +71,8 @@ private:
     
     // Utility
     void clearEntityCache(EntityID entity);
+
+    
 #pragma endregion
 
 public:
@@ -81,5 +83,6 @@ public:
     void fixedUpdate(double dt) override;
     
     void createTestCanvas();
+    void debugOverlay(const Ogre::String &overlayName);
     void clearAllCaches();
 };

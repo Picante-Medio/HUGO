@@ -106,4 +106,6 @@ public:
     
     void fixedUpdate(double dt) override;
     void update(double dt) override;
+
+    Ogre::SceneManager* getSM() const;
 };

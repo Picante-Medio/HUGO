@@ -2,7 +2,7 @@ testCanvas/SimpleTest
 {
     zorder 10
 
-    container Panel(testCanvasContainer)
+    container Panel(testCanvas/SimpleTestContainer)
     {
         metrics_mode relative
         left 0.1
@@ -10,7 +10,6 @@ testCanvas/SimpleTest
         width 0.3
         height 0.2
         
-        material BaseWhite
-        colour 0 0 1 1
+        material_name UI/Red 
     }
 }

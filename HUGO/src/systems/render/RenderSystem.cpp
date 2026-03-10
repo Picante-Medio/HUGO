@@ -683,3 +683,8 @@ void RenderSystem::setMainViewport(EntityID viewportEntity)
         mainViewportEntity = viewportEntity;
     }
 }
+
+Ogre::SceneManager *RenderSystem::getSM() const
+{
+    return sceneManager;
+}
