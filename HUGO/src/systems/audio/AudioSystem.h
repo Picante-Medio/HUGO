@@ -103,6 +103,7 @@ private:
 
    void playAudio(ma_sound* s);
    void playAudio(HUGO::AudioID id);
+   void playAudioLUA(int id);
 
    void stopAudio(ma_sound* s);
    void resumeAudio(ma_sound* s);
