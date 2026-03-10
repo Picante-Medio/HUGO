@@ -35,27 +35,3 @@ material prueba/Textura
 		}
 	}
 }
-
-// material forOverlays
-material UI/Red
-{
-    technique
-    {
-        pass
-        {
-            // MUST BE INCLUDED
-            lighting off
-            depth_check off
-            depth_write off
-            scene_blend alpha_blend
-            
-            ambient 1.0 0.0 0.0
-            diffuse 1.0 0.0 0.0 1.0
-            emissive 1.0 0.0 0.0
-
-			texture_unit{
-                colour_op replace
-            }
-        }
-    }
-}

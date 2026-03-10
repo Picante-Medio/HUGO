@@ -232,8 +232,10 @@ void UISystem::createTestCanvas()
             canvas.height = container->getHeight();
             
             // material
-            canvas.backgroundMaterial = container->getMaterialName();
             container->setMaterialName("UI/Red");
+            //container->setColour(Ogre::ColourValue(1.0f, 1.0f, 0.0f, 1.0f));
+            canvas.backgroundMaterial = container->getMaterialName();
+            container->initialise();
         }
         
         // 5. override visibility

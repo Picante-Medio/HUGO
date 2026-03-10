@@ -1,0 +1,12 @@
+// material forOverlays
+material UI/Red
+{
+    technique
+    {
+        pass
+        {
+            diffuse 1.0 0.0 0.0 1.0
+            emissive 1.0 0.0 0.0
+        }
+    }
+}

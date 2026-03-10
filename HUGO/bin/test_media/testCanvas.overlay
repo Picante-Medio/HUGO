@@ -4,12 +4,16 @@ testCanvas/SimpleTest
 
     container Panel(testCanvas/SimpleTestContainer)
     {
-        metrics_mode relative
-        left 0.1
+        // MUST BE INCLUDED
+        lighting off
+        depth_check off
+        depth_write off
+        scene_blend alpha_blend
+
+        // Center it horizontally, put it at the top
+        left 0.6
         top 0.1
         width 0.3
         height 0.2
-        
-        material_name UI/Red 
     }
 }
