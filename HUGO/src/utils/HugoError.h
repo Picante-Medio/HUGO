@@ -26,8 +26,8 @@ protected:
   bool error;
 
 public:
-  explicit ErrorOrType(ErrorT err) : error(true), info(err) {}
-  explicit ErrorOrType(T value) : error(false), info(value) {}
+  explicit ErrorOrType(ErrorT err) : info(err), error(true) {}
+  explicit ErrorOrType(T value) : info(value), error(false) {}
 
   inline bool isError() { return error; }
   inline ErrorT getError() { return std::get<ErrorT>(info); }
