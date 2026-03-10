@@ -4,6 +4,7 @@
 #include "AudioListenerComponent.h"
 #include "Audio3DInfoComponent.h"
 
+#include "HugoTypes.h"
 #include "Scene.h"
 #include "TransformComponent.h"
 #include "LuaBinder.h"
@@ -141,6 +142,11 @@ void AudioSystem::playAudio(HUGO::AudioID id)
 {
     ma_sound* s = getSound(id);
     playAudio(s);
+}
+
+
+void AudioSystem::playAudioLUA(int id) {
+    playAudio(static_cast<HUGO::AudioID>(id));
 }
 
 void AudioSystem::stopAudio(ma_sound* s)
