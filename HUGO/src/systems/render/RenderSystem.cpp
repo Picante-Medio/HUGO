@@ -335,7 +335,8 @@ EntityID RenderSystem::createCameraEntity(const HUGO::Vector3& position)
 {
     EntityID entity = scene->createEntity();
     
-    scene->addComponent<TransformComponent>(entity,position);
+    TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(entity);
+    transform.position = position;
     scene->addComponent<CameraComponent>(entity);
     
     registerCameraEntity(entity);
@@ -358,7 +359,8 @@ EntityID RenderSystem::createViewportEntity()
 EntityID RenderSystem::createLightEntity(const HUGO::Vector3 &position, HUGO::Vector4 diff, HUGO::Vector4 specular, HUGO::LightType lType, const HUGO::Radian &outer, const HUGO::Radian &inner, float falloff, float nearClip, float shadowNearClipDist, float shadowFarClipDist)
 {
     EntityID entity = scene->createEntity();
-    scene->addComponent<TransformComponent>(entity,position);
+    TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(entity);
+    transform.position = position;
     scene->addComponent<LightComponent>(entity, diff, specular, lType, outer, inner, falloff, nearClip, shadowNearClipDist, shadowFarClipDist);
     
     registerLightEntity(entity);
