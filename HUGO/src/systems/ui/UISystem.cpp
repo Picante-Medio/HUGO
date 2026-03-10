@@ -229,6 +229,8 @@ void UISystem::createTestCanvas()
             canvas.height = container->getHeight();
             
             // material
+            container->setMaterialName("UI/Red");
+            container->setColour(Ogre::ColourValue::Red);
             canvas.backgroundMaterial = container->getMaterialName();
         }
         
