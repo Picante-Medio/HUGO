@@ -9,9 +9,6 @@
 
 HCOMPONENT(RigidBodyComponent)
 
-    friend class BulletSimulation;
-    friend class HUGODispatcher;
-
     // ----------------------Attributes----------------------
     enum UpdateFlags{
         MASS_UPDATED = 1,

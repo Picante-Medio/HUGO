@@ -7,11 +7,12 @@
 
 class TransformComponent;
 class RigidBodyComponent;
+class ColliderComponent;
 class Shape;
 
-struct RigidBodyObject{
+struct CollisionObject{
     HUGO::CollisionObjectID id;
-    btRigidBody* bulletRB = nullptr;
+    btCollisionObject* bulletRB = nullptr;
 };
 
 struct ShapeObject{
@@ -34,7 +35,7 @@ class BulletSimulation : public IPhysicsSimulation {
     // ------ Rigidbody & collision shapes management ------
     
     // Same logic as in RenderSystem. Credits to them, they did a really good job.
-    PagedArray<RigidBodyObject, 128> rigidBodies;
+    PagedArray<CollisionObject, 128> rigidBodies;
     std::vector<HUGO::CollisionObjectID> freeBulletRBObjectId;
     std::vector<std::size_t> rbIdToIndex;
 
@@ -43,15 +44,17 @@ class BulletSimulation : public IPhysicsSimulation {
     std::vector<HUGO::CollisionShapeID> freeBulletShapeId;
     std::vector<std::size_t> shapeIdToIndex;
     
-    HUGO::CollisionShapeID createShapeObject(Shape& shape);
+    HUGO::CollisionShapeID createShapeObject(ColliderComponent& col);
     ShapeObject& getShapeObject(const HUGO::CollisionShapeID id);
     void removeShapeObject(HUGO::CollisionShapeID& id);
     void destroyShapeObject(ShapeObject& shObj);
 
-    HUGO::CollisionObjectID createRigidBodyObject(RigidBodyComponent& hgRb, TransformComponent& tf, HUGO::BodyType type);
-    RigidBodyObject& getRigidBodyObject(const HUGO::CollisionObjectID id);
+    HUGO::CollisionObjectID createColliderObject(ColliderComponent& hgCol, TransformComponent& tf);
+    HUGO::CollisionObjectID upgradeToRigidBodyObject(ColliderComponent& hgCol, RigidBodyComponent& hgRb, TransformComponent& tf, HUGO::BodyType type);
+    CollisionObject& getCollisionObject(const HUGO::CollisionObjectID id);
     void removeRigidBodyObject(HUGO::CollisionObjectID& id);
-    void destroyRigidBodyObject(RigidBodyObject& RbObj);
+    void removeColliderObject(HUGO::CollisionObjectID& id);
+    void destroyCollisionObject(CollisionObject& RbObj);
 
     // Check for updates on a specific RB
     void checkFlags(RigidBodyComponent& hgRB);
