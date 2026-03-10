@@ -52,25 +52,6 @@ HCOMPONENT(RigidBodyComponent)
 
     friend class BulletSimulation;
     friend class HUGODispatcher;
-    
-    RigidBodyComponent(EntityID entity, Shape shape, float mass = .0f)
-    : Component(entity)
-    , rbShape(shape)
-    , flags(0)
-    , mass(mass)
-    , restitution(0.f) // default bullet value
-    , friction(.5f) // default bullet value
-    , linearDamping(0.f) // default bullet value
-    , angularDamping(0.f) // default bullet value
-    , positionOffset(HUGO::Vector3()) // default bullet value
-    , rotationOffset(HUGO::Quaternion()) // default bullet value
-    , linearVelocity(HUGO::Vector3()) // default bullet value
-    , angularVelocity(HUGO::Vector3()) // default bullet value
-    , active(true)
-    , asleep(false)
-    , linearSleepingThreshold(.8f)
-    , angularSleepingThreshold(1.f)
-    {}
 
     // ----------------------Setters----------------------
     void setRestitution(float nRestitution){
@@ -201,28 +182,28 @@ private:
         SLEEPING_THRESHOLD_UPDATED = 8192
     };
 
-    int flags;
+    int flags = 0;
 
-    float restitution;
-    float friction;
-    float mass;
-    float linearDamping;
-    float angularDamping;
-    HUGO::Vector3 positionOffset;
-    HUGO::Quaternion rotationOffset;
+    float restitution = 0.f;
+    float friction = 0.5f;
+    float mass = 0.f;
+    float linearDamping = 0.f;
+    float angularDamping = 0.f;
+    HUGO::Vector3 positionOffset = HUGO::Vector3();
+    HUGO::Quaternion rotationOffset = HUGO::Quaternion();
 
-    HUGO::Vector3 linearVelocity;
-    HUGO::Vector3 angularVelocity;
+    HUGO::Vector3 linearVelocity = HUGO::Vector3();
+    HUGO::Vector3 angularVelocity = HUGO::Vector3();
 
     HUGO::Vector3 impulseApplied;
     HUGO::Vector3 torqueImpulseApplied;
     HUGO::Vector3 forceApplied;
     HUGO::Vector3 torqueApplied;
 
-    bool active;
-    bool asleep;
-    float linearSleepingThreshold;
-    float angularSleepingThreshold;
+    bool active = true;
+    bool asleep = false;
+    float linearSleepingThreshold = 0.8f;
+    float angularSleepingThreshold = 1.f;
 
     std::vector<unsigned long int> collisionInfo;
 
