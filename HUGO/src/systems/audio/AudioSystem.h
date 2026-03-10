@@ -73,9 +73,6 @@ private:
    // acquire reusable voice (reuse/create/steal)
    ma_sound* getSound(HUGO::AudioID id);
 
-   // get the sound already owned by the component
-   ma_sound* getExistingSound(AudioComponent& c);
-
    // obtains a playable sound for the component, 
    // reusing or acquiring a new one from the pool
    ma_sound* acquireVoice(AudioComponent& c);
@@ -92,7 +89,7 @@ private:
    void processChanges(AudioComponent& c,
                      const AudioDirtyTag& t);
 
-   void process3DChanges(const AudioComponent& a,
+   void process3DChanges(AudioComponent& a,
                         const Audio3DInfoComponent& c,
                         const TransformComponent& tr,
                         const Audio3DDirtyTag& t);

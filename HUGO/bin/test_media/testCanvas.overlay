@@ -5,10 +5,10 @@ overlay testCanvas/SimpleTest
     overlay_element testCanvas/SimpleTestContainer Panel
     {
         // Center it horizontally, put it at the top
-        left 0.6
-        top 0.1
+        left 0.1
+        top 0.2
         width 0.3
-        height 0.2
+        height 0.1
         //material UI/Red
     }
 }

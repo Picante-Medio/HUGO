@@ -14,14 +14,14 @@
 #include <string>
 #include <unordered_map>
 
-struct UICanvasComponent;
+struct PanelComponent;
 struct CanvasDirtyTag;
 class UISystem : public System
 {
 private:
 
 #pragma region auxiliar TADS for each UI element
-    struct CanvasCache {
+    struct PanelCache {
         Ogre::Overlay* overlay = nullptr;
         Ogre::OverlayContainer* container = nullptr;
         bool lastVisibleState = false;
@@ -38,19 +38,16 @@ private:
     Ogre::RenderWindow* renderWindow;
 
     // one unordered_map per component type
-    std::unordered_map<EntityID, std::shared_ptr<CanvasCache>> canvasCache;
+    std::unordered_map<EntityID, std::shared_ptr<PanelCache>> panelCache;
 #pragma endregion
     
 #pragma region private methods
 /*
     // example .overlay:
-    MyCanvas                     // overlay
+    overlay MyCanvas                     // overlay
     {
-        container Panel(MyPanel) // overlayContainer
+        overlay_element (MyPanel) Panel // overlayContainer
         {
-            element TextArea(MyText)  //overlayElement
-            {
-            }
         }
     }
 */
@@ -61,28 +58,25 @@ private:
     ErrorOrType<Ogre::OverlayContainer*> getContainer(const HUGO::String& name); // get a specific ui element
     
     // Cache helpers
-    std::shared_ptr<UISystem::CanvasCache> createCanvasCache(const UICanvasComponent& canvas);
+    std::shared_ptr<UISystem::PanelCache> createPanelCache(const PanelComponent& p);
 
     // Synchronization
-    void syncCanvas(const UICanvasComponent& canvas, const CanvasDirtyTag& t);
+    void syncCanvas(const PanelComponent& p, const CanvasDirtyTag& t);
 
     // show/hide
     void processVisibility();
     
     // Utility
     void clearEntityCache(EntityID entity);
-
-    
+    void clearAllCaches();
 #pragma endregion
 
 public:
     UISystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* window);
-    virtual ~UISystem() = default;
+    virtual ~UISystem();
 
     void update(double dt) override;
     void fixedUpdate(double dt) override;
     
     void createTestCanvas();
-    void debugOverlay(const Ogre::String &overlayName);
-    void clearAllCaches();
 };

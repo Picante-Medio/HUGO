@@ -111,17 +111,11 @@ ma_sound* AudioSystem::getSound(HUGO::AudioID id)
     return stolen.ptr->get();
 }
 
-// get the currently active sound pointer for a component
-ma_sound *AudioSystem::getExistingSound(AudioComponent &c)
-{
-    return c.activePtr; 
-}
-
 // ensures a component has a valid voice
 // only creates one if it doesn't exist yet
 ma_sound *AudioSystem::acquireVoice(AudioComponent &c)
 {
-    if (!c.activePtr) 
+    if (c.activePtr == nullptr) 
         c.activePtr = getSound(c.audioId);
     return c.activePtr;
 }
@@ -290,27 +284,11 @@ void AudioSystem::updateListeners(const AudioListenerComponent& a, const Transfo
 void AudioSystem::processChanges(AudioComponent &c, const AudioDirtyTag &t)
 {
     // get the pointer to the currently active voice (if it has)
-    ma_sound* s = c.activePtr;
-
-    // acquire a voice ONLY when playback is requested
-    // this avoids creating EXTRA sounds for simple parameter updates
-    if (!s && (t.flags & HUGO::START))
-    {
-        s = getSound(c.audioId);
-        c.activePtr = s;
-    }
-
-    // if we still don't have a valid voice,
-    // there is nothing we can apply changes to
-    if (!s)
-    {
-        return;
-    }
+    ma_sound* s = acquireVoice(c);
 
     if (t.flags  & HUGO::LOOP)
         setLooping(s, c.loop);
 
-    
     if (t.flags & HUGO::VOLUME)
         setVolume(s, c.volume);
 
@@ -321,10 +299,9 @@ void AudioSystem::processChanges(AudioComponent &c, const AudioDirtyTag &t)
         setAudioPosition(s, c.startTime);
 }
 
-void AudioSystem::process3DChanges(const AudioComponent& a, const Audio3DInfoComponent &c, const TransformComponent& tr, const Audio3DDirtyTag& t)
+void AudioSystem::process3DChanges(AudioComponent& a, const Audio3DInfoComponent &c, const TransformComponent& tr, const Audio3DDirtyTag& t)
 {
-    ma_sound* s = a.activePtr;
-    if (!s) return;
+    ma_sound* s = acquireVoice(a);
 
     if (t.flags & HUGO::Audio3DDirtyFlags::MINDISTANCE)
         set3DMinDistance(s, c.minDistance);
@@ -533,11 +510,8 @@ void AudioSystem::update(double dt)
             sc.pitch = 0.75f;
             sc.startTime = 10.0;
 
-            scene->addComponent<AudioDirtyTag>(
-                id,
-                static_cast<HUGO::AudioDirtyFlags>(
-                    HUGO::PITCH | HUGO::STARTTIME | HUGO::START));
-
+            AudioDirtyTag& tag = scene->addAndGetComponent<AudioDirtyTag>(id);
+            tag.flags = static_cast<HUGO::AudioDirtyFlags>(HUGO::PITCH | HUGO::STARTTIME);
             scene->addComponent<AudioPlayTag>(id);
 
             startTriggered = true;
@@ -555,7 +529,10 @@ void AudioSystem::fixedUpdate(double dt)
 void AudioSystem::createTestEntity()
 {
     EntityID ent = scene->createEntity();
-    scene->addComponent<AudioComponent>(ent, HUGO::MUSIC, nameToID["bgm"]);
+    AudioComponent& audio = scene->addAndGetComponent<AudioComponent>(ent);
+    audio.type = HUGO::MUSIC;
+    audio.audioId = nameToID["bgm"];
+    
     scene->addComponent<AudioPlayTag>(ent);
     int i = 0;
     for (auto& pack : scene->query<AudioComponent>()) {
@@ -566,12 +543,12 @@ void AudioSystem::createTestEntity()
             sc.pitch = 2.0f;
             sc.startTime = 30.0;
             sc.volume = 0.1f;
-            scene->addComponent<AudioDirtyTag>(ent, static_cast<HUGO::AudioDirtyFlags>(
+            AudioDirtyTag& tag = scene->addAndGetComponent<AudioDirtyTag>(ent);
+            tag.flags = static_cast<HUGO::AudioDirtyFlags>(
                             HUGO::AudioDirtyFlags::LOOP |
                             HUGO::AudioDirtyFlags::PITCH |
                             HUGO::AudioDirtyFlags::STARTTIME |
-                            HUGO::AudioDirtyFlags::START |
-                            HUGO::AudioDirtyFlags::VOLUME));
+                            HUGO::AudioDirtyFlags::VOLUME);
             scene->addComponent<AudioPlayTag>(ent);
         }
     }

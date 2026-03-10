@@ -1,6 +1,6 @@
 #include "Scene.h"
 #include "UISystem.h"
-#include "UICanvasComponent.h"
+#include "PanelComponent.h"
 #include "UITags.h"
 
 #include "OgreLogManager.h"
@@ -9,6 +9,11 @@
 UISystem::UISystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* window)
     : System(scene), renderWindow(window)
 {
+}
+
+UISystem::~UISystem()
+{
+    clearAllCaches();
 }
 
 ErrorOrType<Ogre::Overlay*> UISystem::getOverlay(const HUGO::String& name)
@@ -68,90 +73,96 @@ ErrorOrType<Ogre::OverlayContainer*> UISystem::getContainer(const HUGO::String& 
 }
 
 // helper method to create canvas cache from component
-std::shared_ptr<UISystem::CanvasCache> UISystem::createCanvasCache(const UICanvasComponent& canvas)
+std::shared_ptr<UISystem::PanelCache> UISystem::createPanelCache(const PanelComponent& p)
 {
-    std::shared_ptr<CanvasCache> cache = std::make_shared<CanvasCache>();
+    std::shared_ptr<PanelCache> cache = std::make_shared<PanelCache>();
     
     // get Ogre objects
-    ErrorOrType<Ogre::Overlay*> overlayResult = getOverlay(canvas.overlayName);
+    ErrorOrType<Ogre::Overlay*> overlayResult = getOverlay(p.overlayName);
     if (!overlayResult.isError()) {
         cache->overlay = overlayResult.getValue();
     }
     
-     ErrorOrType<Ogre::OverlayContainer*> containerResult = getContainer(canvas.containerName);
+    ErrorOrType<Ogre::OverlayContainer*> containerResult = getContainer(p.containerName);
     if (!containerResult.isError()) {
         cache->container = containerResult.getValue();
     }
     
     // store current state from component
-    cache->lastVisibleState = canvas.isVisible;
-    cache->lastZOrder = canvas.zOrder;
-    cache->lastLeft = canvas.left;
-    cache->lastTop = canvas.top;
-    cache->lastWidth = canvas.width;
-    cache->lastHeight = canvas.height;
-    cache->lastMaterial = canvas.backgroundMaterial;
+    cache->lastVisibleState = p.isVisible;
+    cache->lastZOrder = p.zOrder;
+    cache->lastLeft = p.left;
+    cache->lastTop = p.top;
+    cache->lastWidth = p.width;
+    cache->lastHeight = p.height;
+    cache->lastMaterial = p.backgroundMaterial;
     
     return cache;
 }
 
 // SYNCHRONIZATION
-void UISystem::syncCanvas(const UICanvasComponent& canvas, const CanvasDirtyTag& t)
+void UISystem::syncCanvas(const PanelComponent& p, const CanvasDirtyTag& t)
 {
     // try to emplace - if it exists, get iterator; else, creates it
-    auto [it, inserted] = canvasCache.emplace(canvas.entity, nullptr);
+    auto [it, inserted] = panelCache.emplace(p.entity, nullptr);
     
     // it does not exist, so we create one
     if (inserted) {
-        it->second = createCanvasCache(canvas);
+        it->second = createPanelCache(p);
     }
     
-    std::shared_ptr<CanvasCache>& cache = it->second;
-    if (cache == nullptr || cache->overlay == nullptr) return;
+    std::shared_ptr<PanelCache>& cache = it->second;
+    if (cache == nullptr || cache->overlay == nullptr || cache->container == nullptr) return;
     
     // Z-order
     if (t.flags & HUGO::CanvasDirtyFlags::Z_ORDER){
-        cache->overlay->setZOrder(canvas.zOrder);
-        cache->lastZOrder = canvas.zOrder;
+        cache->overlay->setZOrder(p.zOrder);
+        cache->lastZOrder = p.zOrder;
     }
 
     // metrics mode
     if (t.flags & HUGO::CanvasDirtyFlags::METRICS_MODE){
-        cache->container->setMetricsMode(canvas.metricsMode);
+        cache->container->setMetricsMode(p.metricsMode);
     }
     
     // position
     if (t.flags & HUGO::CanvasDirtyFlags::POSITION){
         // left
-        cache->container->setLeft(canvas.left);
-        cache->lastLeft = canvas.left;
+        cache->container->setLeft(p.left);
+        cache->lastLeft = p.left;
         // top
-        cache->container->setTop(canvas.top);
-        cache->lastTop = canvas.top;
+        cache->container->setTop(p.top);
+        cache->lastTop = p.top;
     }
 
     // size
     if (t.flags & HUGO::CanvasDirtyFlags::SIZE){
         // width
-        cache->container->setWidth(canvas.width);
-        cache->lastWidth = canvas.width;
+        cache->container->setWidth(p.width);
+        cache->lastWidth = p.width;
         // height
-        cache->container->setHeight(canvas.height);
-        cache->lastHeight = canvas.height;
+        cache->container->setHeight(p.height);
+        cache->lastHeight = p.height;
+    }
+
+    // material
+    if (t.flags & HUGO::CanvasDirtyFlags::MATERIAL) {
+        cache->container->setMaterialName(p.backgroundMaterial);
+        cache->lastMaterial = p.backgroundMaterial;
     }
 }
 
 void UISystem::processVisibility()
 {
     // canvas
-    for (auto& pack : scene->query<UICanvasComponent, VisibilityDirtyTag>()) {
-        UICanvasComponent& canvas = pack.get<UICanvasComponent&>();
+    for (auto& pack : scene->query<PanelComponent, VisibilityDirtyTag>()) {
+        PanelComponent& canvas = pack.get<PanelComponent&>();
         EntityID entity = canvas.entity;
         
         // get cache for this entity
-        auto it = canvasCache.find(entity);
-        if (it != canvasCache.end() && it->second && it->second->overlay) {
-            std::shared_ptr<CanvasCache> cache = it->second;
+        auto it = panelCache.find(entity);
+        if (it != panelCache.end() && it->second && it->second->overlay) {
+            std::shared_ptr<PanelCache> cache = it->second;
             
             // apply visibility to Ogre
             if (canvas.isVisible) {
@@ -175,8 +186,13 @@ void UISystem::processVisibility()
     }
 }
 
-void UISystem::clearEntityCache(EntityID entity)
-{
+
+void UISystem::clearEntityCache(EntityID entity) {
+    panelCache.erase(entity);
+}
+
+void UISystem::clearAllCaches() {
+    panelCache.clear();
 }
 
 //=============================================================================
@@ -185,14 +201,15 @@ void UISystem::clearEntityCache(EntityID entity)
 
 void UISystem::update(double dt)
 {
-    // //canvas changes
-    // for (auto& pack : scene->query<UICanvasComponent, CanvasDirtyTag>()) {
-    //     UICanvasComponent& canvas = pack.get<UICanvasComponent&>();
-    //     EntityID entity = canvas.entity;
+    //canvas changes
+    for (auto& pack : scene->query<PanelComponent, CanvasDirtyTag>()) {
+        PanelComponent& canvas = pack.get<PanelComponent&>();
+        CanvasDirtyTag& tag = pack.get<CanvasDirtyTag&>();
+        EntityID entity = canvas.entity;
+        syncCanvas(canvas, tag);
+        scene->removeComponent<CanvasDirtyTag>(entity);
+    }
 
-    //     // remove the dirty tag
-    //     scene->removeComponent<VisibilityDirtyTag>(entity);
-    // }
     processVisibility();
 }
 
@@ -201,44 +218,41 @@ void UISystem::fixedUpdate(double dt) {}
 // CREATE TEST CANVAS
 void UISystem::createTestCanvas()
 {
+    Ogre::OverlayManager& om = Ogre::OverlayManager::getSingleton();
     EntityID ent = scene->createEntity();
-    scene->addComponent<UICanvasComponent>(ent, "testCanvas/SimpleTest");
+    PanelComponent& canvas = scene->addAndGetComponent<PanelComponent>(ent);
+    canvas.overlayName =  "testCanvas/SimpleTest";
+    canvas.containerName = canvas.overlayName + "Container";
     
-    for (auto& pack: scene->query<UICanvasComponent>()){
-        UICanvasComponent& canvas = pack.get<UICanvasComponent&>();
-        Ogre::OverlayManager& om = Ogre::OverlayManager::getSingleton();
+    // 1. first: load the .overlay script
+    Ogre::Overlay* overlay = om.getByName(canvas.overlayName);
 
-       // 1. first: load the .overlay script
-        Ogre::Overlay* overlay = om.getByName("testCanvas/SimpleTest");
-        
-        // 3. read values from .overlay script
-        canvas.zOrder = overlay->getZOrder();
-        
-        // 4. get container to read position/size
-        auto containerResult = getContainer(canvas.containerName);
-        if (!containerResult.isError()) {
-            Ogre::OverlayContainer* container = containerResult.getValue();
+    // 2. read values from .overlay script
+    canvas.zOrder = overlay->getZOrder();
 
-            // metrics mode
-            canvas.metricsMode = container->getMetricsMode();
+    // 3. get container to read position/size
+    ErrorOrType<Ogre::OverlayContainer*> containerResult = getContainer(canvas.containerName);
+    if (!containerResult.isError()) {
+        Ogre::OverlayContainer* container = containerResult.getValue();
 
-            // position and size
-            canvas.left = container->getLeft();
-            canvas.top = container->getTop();
-            canvas.width = container->getWidth();
-            canvas.height = container->getHeight();
-            
-            // material
-            container->setMaterialName("UI/Red");
-            container->setColour(Ogre::ColourValue::Red);
-            canvas.backgroundMaterial = container->getMaterialName();
-        }
+        // metrics mode
+        canvas.metricsMode = container->getMetricsMode();
+
+        // position and size
+        canvas.left = container->getLeft();
+        canvas.top = container->getTop();
+        canvas.width = container->getWidth();
+        canvas.height = container->getHeight();
         
-        // 5. override visibility
+        // material
+        container->setMaterialName("UI/Red");
+        canvas.backgroundMaterial = container->getMaterialName();
+
+        // 4. override visibility
         canvas.isVisible = true;
         scene->addComponent<VisibilityDirtyTag>(ent);
-        
-        // 6. create cache with the pointers and store in canvas map
-        canvasCache[ent] = createCanvasCache(canvas);
+    
+        // 5. create cache with the pointers and store in canvas map
+        panelCache[ent] = createPanelCache(canvas);
     }
 }

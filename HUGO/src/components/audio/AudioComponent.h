@@ -7,25 +7,20 @@
 
 struct ma_sound;
 HCOMPONENT(AudioComponent)
-    HUGO::AudioTypes type;
-    HUGO::AudioID audioId;
-    float volume;
-    bool loop;
-    bool playOnStart;
-    float pitch;
+    HUGO::AudioTypes type = HUGO::AudioTypes::LAST_TYPE;
+    HUGO::AudioID audioId = -1;
+    HUGO::Float volume= 1.0f;
+    bool loop = false;
+    bool playOnStart = false;
+    HUGO::Float pitch = 1.0f; 
     // position of the audio in seconds to start to play
-    double startTime;
+    double startTime=0.0;
 
-    ma_sound* activePtr;
+    ma_sound* activePtr = nullptr;
     // flag to know if this sound is playing or not
-    bool isPlaying;
+    bool isPlaying = false;
 
     // callback to be executed when the audio ends
-    std::function<void(HUGO::AudioID)> onEnd;
+    std::function<void(HUGO::AudioID)> onEnd = nullptr;
 
-    AudioComponent(EntityID entity, HUGO::AudioTypes type, HUGO::AudioID audioId, float volume = 1.0f, bool loop = false, 
-        bool playOnStart = false, float pitch = 1.0f, double startTime =0.0)
-        :Component(entity), type(type),audioId(audioId), volume(volume), loop(loop), 
-        playOnStart(playOnStart), pitch(pitch), startTime(startTime),
-        activePtr(nullptr),isPlaying(false), onEnd(nullptr){}
 END_HCOMPONENT()

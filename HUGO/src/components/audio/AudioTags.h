@@ -6,23 +6,11 @@
 #include "HugoComponentMacros.h"
 
 HCOMPONENT(AudioDirtyTag)
-
-    HUGO::AudioDirtyFlags flags;
-
-    AudioDirtyTag(EntityID entity,
-                  HUGO::AudioDirtyFlags flags)
-        : Component(entity), flags(flags) {}
-
+    HUGO::AudioDirtyFlags flags = HUGO::AudioDirtyFlags::NONE_2D;
 END_HCOMPONENT()
 
 HCOMPONENT(Audio3DDirtyTag)
-
-    HUGO::Audio3DDirtyFlags flags;
-
-    Audio3DDirtyTag(EntityID entity,
-                  HUGO::Audio3DDirtyFlags flags)
-        : Component(entity), flags(flags) {}
-
+    HUGO::Audio3DDirtyFlags flags = HUGO::Audio3DDirtyFlags::NONE_3D;
 END_HCOMPONENT()
 
 HCOMPONENT(AudioPlayTag)

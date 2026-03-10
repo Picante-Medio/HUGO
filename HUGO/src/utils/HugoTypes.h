@@ -27,8 +27,7 @@ namespace HUGO{
         VOLUME = 1 << 0,
         PITCH = 1 << 1,
         STARTTIME = 1 << 2,
-        START = 1 << 3,
-        STOP = 1 << 4
+        NONE_2D = 1 << 3
     };
 
     enum Audio3DDirtyFlags
@@ -40,7 +39,8 @@ namespace HUGO{
         DOPPLER = 1 << 3,
         ROLLOF = 1 << 4,
         CONE = 1 << 5,
-        MOVED = 1 << 6
+        MOVED = 1 << 6,
+        NONE_3D = 1 << 7
     };
 
     using AudioEndCallback = std::function<void(HUGO::AudioID)>;
@@ -107,5 +107,6 @@ namespace HUGO{
         POSITION = 1 << 1,
         SIZE = 1 << 2,
         MATERIAL = 1 << 3,
+        NONE_CANVAS = 1 << 4
     };
 }

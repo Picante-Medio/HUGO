@@ -9,9 +9,5 @@ HCOMPONENT(VisibilityDirtyTag)
 END_HCOMPONENT()
 
 HCOMPONENT(CanvasDirtyTag)
-    HUGO::CanvasDirtyFlags flags;
-
-    CanvasDirtyTag(EntityID entity,
-                  HUGO::CanvasDirtyFlags flags)
-        : Component(entity), flags(flags) {} 
+    HUGO::CanvasDirtyFlags flags = HUGO::CanvasDirtyFlags::NONE_CANVAS;
 END_HCOMPONENT()

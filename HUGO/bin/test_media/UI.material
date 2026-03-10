@@ -1,4 +1,5 @@
-// material forOverlays
+// material for Overlays
+// WE HAVE TO add texture_unit!!!!!
 material UI/Red
 {
     technique
@@ -11,7 +12,9 @@ material UI/Red
             depth_write off
             scene_blend alpha_blend
 
-            emissive 1.0 0.0 0.0
+            texture_unit{
+                texture spaceSky.jpg
+            }
         }
     }
 }

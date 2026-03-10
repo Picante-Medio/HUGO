@@ -9,14 +9,6 @@ HCOMPONENT(AudioListenerComponent)
     // velocity for Doppler calculations
     HUGO::Vector3 listenerVelocity = HUGO::Vector3(0,0,0);
     // master volume for this listener
-    float masterVolume;
-
-    AudioListenerComponent(EntityID entity,
-                           const HUGO::Vector3& velocity,
-                           float masterVolume = 1.0f)
-        : Component(entity),
-          listenerVelocity(velocity),
-          masterVolume(masterVolume)
-    {}
+    HUGO::Float masterVolume =1.0f;
 
 END_HCOMPONENT()
