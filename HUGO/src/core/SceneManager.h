@@ -1,5 +1,30 @@
 #pragma once
 
-class SceneManager{
+#include "Scene.h"
+#include <unordered_map>
+#include "ChatParser.h"
 
+#include "HugoError.h"
+
+class SceneManager{
+    HUGO::ChatParser m_chatParser;
+    //Scene map that stores created game scenes.
+    std::unordered_map<HUGO::String, Scene> m_sceneMap;
+
+    //Reads chatParser, creates a scene based on the SceneData, and indexes it in m_sceneMap.
+    ErrorOrVoid loadScene(const HUGO::String& sceneName);
+    //Removes a scene from m_sceneMap, to free space that is not used.
+    ErrorOrVoid unloadScene(const HUGO::String& sceneName);
+public:
+    //initializeParser() must be called after this.
+    SceneManager();
+
+    //Initializes the parser with chat folder
+    ErrorOrVoid initializeParser(const HUGO::String& chatFolder);
+
+    /*
+    Starts scene named sceneName.
+    If a scene were currently running, it will stop running and will be kept in memory for future use.
+    */
+    void setCurrentScene(HUGO::String sceneName);
 };
