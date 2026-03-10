@@ -8,15 +8,10 @@ HCOMPONENT(RenderComponent)
 
 private:
     HUGO::OgreObjectID objectID = HUGO::INVALID_OGRE_OBJECT_ID;
-    HUGO::String meshName;
-    HUGO::String materialName;
+    HUGO::String meshName="cube.mesh";
+    HUGO::String materialName="";
 public:
-    RenderComponent(EntityID entity, 
-                        const HUGO::String& meshName,
-                        const HUGO::String& materialName="") 
-        : Component(entity), meshName(meshName), materialName(materialName){};
-    
-    // Setters
+    // Setter
     void setMeshName(const HUGO::String& newMeshName) { meshName = newMeshName; }
     void setMaterialName(const HUGO::String& newMaterialName) { materialName = newMaterialName; }
     // Getters

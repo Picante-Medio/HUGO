@@ -68,8 +68,8 @@ void Core::init(){
 
     // Physics testing
     physicsModule->createSceneSimulation(scenePtr);
-    std::shared_ptr<PhysicsTestSystem> testSystem = std::make_shared<PhysicsTestSystem>(scenePtr);
-    scenePtr->addSystem(testSystem);
+    //std::shared_ptr<PhysicsTestSystem> testSystem = std::make_shared<PhysicsTestSystem>(scenePtr);
+    //scenePtr->addSystem(testSystem);
 }
 
 //Destruction of HUGO modules. End of HUGO

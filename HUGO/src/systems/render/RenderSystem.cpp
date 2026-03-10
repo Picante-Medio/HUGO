@@ -38,9 +38,19 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* win
     setMainViewport(defaultViewport);
 
     createLightEntity( HUGO::Vector3(-50, 300, 800), HUGO::Vector4(0.4f, 0.2f, 0.4f, 0.2f)
-        , HUGO::Vector4(0.0f, 0.0f, 0.0f, 0.0f), HUGO::LightType::LT_POINT, HUGO::Radian(0), HUGO::Radian(0), 0, 0.1f, 0.1f, 300);   
+        , HUGO::Vector4(0.0f, 0.0f, 0.0f, 0.0f), HUGO::LightType::LT_POINT, HUGO::Radian(0), HUGO::Radian(0), 0, 0.1f, 0.1f, 300); 
+        
+        
 
-    // createTestEntity();
+    //testing
+    EntityID e1 = scene->createEntity();
+    TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(e1);
+    transform.position = HUGO::Vector3(20, -30, -50);
+    transform.scale = HUGO::Vector3(1, 0.05f, 0.5f);
+    RenderComponent& rc = scene->addAndGetComponent<RenderComponent>(e1);
+    rc.meshName = "cube.mesh";
+    rc.materialName = "prueba/ColorRosa";
+    
 }
 
 RenderSystem::~RenderSystem()
@@ -327,7 +337,8 @@ void RenderSystem::update(double dt)
 
 void RenderSystem::setMaterial(EntityID entity, const std::string &materialName)
 {
-    scene->addComponent<MaterialDirtyTag>(entity, materialName);
+    MaterialDirtyTag& m = scene->addAndGetComponent<MaterialDirtyTag>(entity);
+    m.materialName = materialName;
 }
 
 // Helper function for Camera creation
@@ -359,10 +370,20 @@ EntityID RenderSystem::createViewportEntity()
 EntityID RenderSystem::createLightEntity(const HUGO::Vector3 &position, HUGO::Vector4 diff, HUGO::Vector4 specular, HUGO::LightType lType, const HUGO::Radian &outer, const HUGO::Radian &inner, float falloff, float nearClip, float shadowNearClipDist, float shadowFarClipDist)
 {
     EntityID entity = scene->createEntity();
-    TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(entity);
-    transform.position = position;
-    scene->addComponent<LightComponent>(entity, diff, specular, lType, outer, inner, falloff, nearClip, shadowNearClipDist, shadowFarClipDist);
-    
+    TransformComponent& tr = scene->addAndGetComponent<TransformComponent>(entity);
+    tr.position=position;
+
+    LightComponent& light = scene->addAndGetComponent<LightComponent>(entity);
+    light.setDiffuse(diff);
+    light.setSpecular(specular);
+    light.setLightType(lType);
+    light.setSpotOuter(outer);
+    light.setSpotInner(inner);
+    light.setSpotFallOff(falloff);
+    light.setSpotNearClip(nearClip);
+    light.setShadowNearClipDist(shadowNearClipDist);
+    light.setShadowFarClipDist(shadowFarClipDist);
+
     registerLightEntity(entity);
     
     return entity;
@@ -432,21 +453,14 @@ ErrorOrVoid RenderSystem::createOgreCamera(EntityID entity)
 {
     CameraInfo res;
     
-    // Get the transform component of the camera to set the initial position
+    // Get the transformComponent and CameraComponent of the camera to set the initial configuration
     const TransformComponent* transformComp = nullptr;
-    for(auto& pack : scene->query<TransformComponent>()) {
-        const TransformComponent& tr = pack.get<TransformComponent&>();
-        if (tr.entity == entity) {
-            transformComp = &tr;
-            break;
-        }
-    }
-
-    // Get CameraComponent
     const CameraComponent* cameraComp = nullptr;
-    for(auto& pack : scene->query<CameraComponent>()) {
+    for(auto& pack : scene->query<TransformComponent, CameraComponent>()) {
+        const TransformComponent& tr = pack.get<TransformComponent&>();
         const CameraComponent& cam = pack.get<CameraComponent&>();
-        if (cam.entity == entity) {
+        if (tr.entity == entity && cam.entity == entity) {
+            transformComp = &tr;
             cameraComp = &cam;
             break;
         }
@@ -493,21 +507,14 @@ ErrorOrVoid RenderSystem::createOgreLight(EntityID entity)
 {
     LightInfo res;
     
-    // Get the transform component of the light to set the initial position
+    // Get the transformComponent and LightComponentof the light to set the initial configuration
     const TransformComponent* transformComp = nullptr;
-    for(auto& pack : scene->query<TransformComponent>()) {
-        const TransformComponent& tr = pack.get<TransformComponent&>();
-        if (tr.entity == entity) {
-            transformComp = &tr;
-            break;
-        }
-    }
-
-    // Get LightComponent
     const LightComponent* lightComp = nullptr;
-    for(auto& pack : scene->query<LightComponent>()) {
+    for(auto& pack : scene->query<TransformComponent, LightComponent>()) {
+        const TransformComponent& tr = pack.get<TransformComponent&>();
         const LightComponent& light = pack.get<LightComponent&>();
-        if (light.entity == entity) {
+        if (tr.entity == entity && light.entity == entity) {
+            transformComp = &tr;
             lightComp = &light;
             break;
         }

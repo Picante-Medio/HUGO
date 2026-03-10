@@ -28,10 +28,6 @@ private:
     bool active = true;
 
 public:
-
-    ViewportComponent(EntityID entity, float l, float t = 0.0f, float w = 1.0f, float h = 1.0f, int z = 0)
-        : Component(entity), left(l), top(t), width(w), height(h), zOrder(z) {}
-
     // Setters
     void setLeft(float l) { left = l; }
     void setTop(float t) { top = t; }

@@ -24,22 +24,14 @@ private:
     // linear - The linear factor in the attenuation formula: 1 means attenuate evenly over the distance.
     // quadratic - The quadratic factor in the attenuation formula: adds a curvature to the attenuation formula.
     HUGO::Vector4 attenuation = HUGO::Vector4(1.0f, 0.0f, 0.0f, 10000.0f); //range, constant, linear, quadratic
-    float shadowFarDist;
-    float shadowFarDistSquared;
-    size_t indexInFrame;
+    float shadowFarDist = 1.0f;
+    float shadowFarDistSquared = 1.0f;
+    size_t indexInFrame = 0;
 
-    float shadowNearClipDist;
-    float shadowFarClipDist;
+    float shadowNearClipDist = 0.1f;
+    float shadowFarClipDist = 300;
 
 public:
-    LightComponent(EntityID entity,
-                   HUGO::Vector4 diff, HUGO::Vector4 specular, HUGO::LightType lType
-                   , const HUGO::Radian& outer, const HUGO::Radian& inner
-                   , float falloff, float nearClip, float shadowNearClipDist, float shadowFarClipDist)
-        : Component(entity), diffuse(diff), specular(specular), lightType(lType), spotOuter(outer)
-        , spotInner(inner), spotFalloff(falloff), spotNearClip(nearClip)
-        , shadowNearClipDist(shadowNearClipDist), shadowFarClipDist(shadowFarClipDist) {}
-
     // Setters
     void setDiffuse(HUGO::Vector4 nDiff) { diffuse = nDiff; }
     void setSpecular(HUGO::Vector4 nSpec) { specular = nSpec; }

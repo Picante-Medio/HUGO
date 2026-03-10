@@ -21,7 +21,9 @@ PhysicsTestSystem::PhysicsTestSystem(std::shared_ptr<Scene> scene)
     RigidBodyComponent& rb = scene->addAndGetComponent<RigidBodyComponent>(e1);
     // rb->setShape()
     scene->addComponent<StaticRBTag>(e1);
-    scene->addComponent<RenderComponent>(e1, "cube.mesh", "prueba/ColorRosa");
+    RenderComponent& rc = scene->addAndGetComponent<RenderComponent>(e1);
+    rc.setMeshName("cube.mesh");
+    rc.setMaterialName("prueba/ColorRose");
     
     // Entidad 2: Cuerpo dinámico
     EntityID e2 = scene->createEntity();
@@ -31,7 +33,8 @@ PhysicsTestSystem::PhysicsTestSystem(std::shared_ptr<Scene> scene)
     rb = scene->addAndGetComponent<RigidBodyComponent>(e2);
     // rb->setShape()
     scene->addComponent<DynamicRBTag>(e2);
-    scene->addComponent<RenderComponent>(e2, "cube.mesh");
+    rc = scene->addAndGetComponent<RenderComponent>(e2);
+    rc.setMeshName("cube.mesh");
     
     // Entidad 3: Cuerpo kinemático
     // EntityID e3 = scene->createEntity();

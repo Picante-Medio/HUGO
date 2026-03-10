@@ -32,11 +32,6 @@ private:
     HUGO::PolygonMode polygonMode = HUGO::PolygonMode::SOLID;
   
 public:
-
-    CameraComponent(EntityID entity,
-                    float fov, float nearP = 0.1f, float farP = 1000.0f,
-                    int prio = 0, bool isActive = true)
-        : Component(entity), fovY(fov), nearClip(nearP), farClip(farP), priority(prio), active(isActive) {}
     // Setters
     void setProjectionType(HUGO::ProjectionType type) { projectionType = type; }
     void setFOVY(float fov) { fovY = fov; }

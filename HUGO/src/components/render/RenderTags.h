@@ -16,9 +16,5 @@ HCOMPONENT(LightDirtyTag)
 END_HCOMPONENT()
 
 HCOMPONENT(MaterialDirtyTag)
-
-    HUGO::String materialName;
-    MaterialDirtyTag(EntityID entity, const HUGO::String& materialName) 
-        : Component(entity), materialName(materialName) {}
-
+    HUGO::String materialName = "";
 END_HCOMPONENT()
