@@ -37,7 +37,7 @@ class RenderSystem : public System{
         Ogre::SceneNode* ogreSceneNode = nullptr;
     };
     
-    std::shared_ptr<Ogre::Root> ogreRoot;
+    Ogre::Root* ogreRoot;
     Ogre::SceneManager* sceneManager = nullptr;
     Ogre::RenderWindow* renderWindow = nullptr; 
 

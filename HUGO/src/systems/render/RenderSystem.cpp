@@ -17,7 +17,7 @@
 RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* window)
     :System(scene), renderWindow(window), idToIndex(), freeOgreObjectId()
 {
-    ogreRoot = std::shared_ptr<Ogre::Root>(Ogre::Root::getSingletonPtr(), [](Ogre::Root*){ });
+    ogreRoot = Ogre::Root::getSingletonPtr();
     try {
         sceneManager = ogreRoot->createSceneManager();
     }
