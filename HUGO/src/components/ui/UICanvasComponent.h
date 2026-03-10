@@ -1,37 +1,40 @@
 #pragma once
 #include "Component.h"
 
+#include "HugoTypes.h"
 #include "HugoComponentMacros.h"
 
 #include <OgreOverlay.h>
 #include <OgreOverlayManager.h>
 #include <OgreOverlayContainer.h>
 
-#include <string>
-
 HCOMPONENT(UICanvasComponent)
     // names
-    std::string overlayName; // overlay in Ogre
-    std::string containerName; // root container element
+    HUGO::String overlayName; // overlay in Ogre
+    HUGO::String containerName; // root container element
 
     // state
     bool isVisible;
-    int zOrder;
-    std::string metricsMode; // relative/pixels
+    HUGO::Int zOrder;
+    Ogre::GuiMetricsMode metricsMode; // relative/pixels
 
-    // position and size (default: full screen)
-    float left   = 0.0f;
-    float top    = 0.0f;
-    float width  = 1.0f;
-    float height = 1.0f;
+    // position and size (default full screen)
+    HUGO::Float left;
+    HUGO::Float top;
+    HUGO::Float width;
+    HUGO::Float height;
 
     // appearance
-    std::string backgroundMaterial;
-    // float backgroundColor[4]; // RGBA if we dont want to add a .material script
+    HUGO::String backgroundMaterial;
 
-    UICanvasComponent(EntityID entity, const std::string& name, int order = 10): Component(entity), 
-                                                    overlayName(name + "Canvas"), 
-                                                    containerName(name + "CanvasContainer"), 
-                                                    isVisible(false), 
-                                                    zOrder(order){}
+    UICanvasComponent(EntityID entity, const HUGO::String& name, 
+        bool visible = false, HUGO::Int order = 10, 
+        Ogre::GuiMetricsMode mode = Ogre::GuiMetricsMode::GMM_RELATIVE,
+        HUGO::Float left = 0.0f, HUGO::Float top =0.0f,
+        HUGO::Float width = 1.0f, HUGO::Float height = 1.0f,
+        const HUGO::String& material = "BaseWhite"): 
+    Component(entity), overlayName(name), containerName(name + "Container"), 
+    isVisible(false), zOrder(order), metricsMode(mode),
+    left(left), top(top), width(width), height(height), backgroundMaterial(material)
+    {}
 END_HCOMPONENT()

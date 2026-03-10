@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <iostream>
 #include <Ogre.h>
+#include <OgreOverlaySystem.h>
 #include <memory>
 #include <SDL2/SDL_syswm.h>
 #include <string>
@@ -59,6 +60,7 @@ void Core::init(){
 
     std::shared_ptr<UISystem> uiSystem = std::make_shared<UISystem>(scenePtr, m_renderWindow);
     scenePtr->addSystem(uiSystem);
+    uiSystem->createTestCanvas();
 
     
     //m_resourceManager = std::make_shared<HUGO::ResourceManager>(maEngine, m_ogreRoot);
@@ -134,6 +136,8 @@ void Core::initOgre()
     
     params["externalWindowHandle"] = Ogre::StringConverter::toString(windowHandle);
     m_renderWindow = m_ogreRoot->createRenderWindow("Ogre Test Window", 1000, 800, false, &params);
+
+    m_ogreOverlayManager = std::make_shared<Ogre::OverlayManager>();
 }
 
 void HUGO::Core::locateResources()
@@ -189,6 +193,7 @@ void Core::run(){
 
 
 void Core::destroyOgre(){
+    m_ogreOverlayManager->destroyAll();
     m_renderWindow->destroy();
 
     m_ogreRoot->shutdown();

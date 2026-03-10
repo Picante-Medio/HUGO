@@ -287,10 +287,6 @@ void AudioSystem::updateListeners(const AudioListenerComponent& a, const Transfo
 
 void AudioSystem::processChanges(AudioComponent &c, const AudioDirtyTag &t)
 {
-    // if nothing changed in this component, return
-    if (t.flags == HUGO::NONE)
-        return;
-
     // get the pointer to the currently active voice (if it has)
     ma_sound* s = c.activePtr;
 
@@ -325,8 +321,6 @@ void AudioSystem::processChanges(AudioComponent &c, const AudioDirtyTag &t)
 
 void AudioSystem::process3DChanges(const AudioComponent& a, const Audio3DInfoComponent &c, const TransformComponent& tr, const Audio3DDirtyTag& t)
 {
-    if (t.flags == HUGO::Audio3DDirtyFlags::NONE_3D) return;
-
     ma_sound* s = a.activePtr;
     if (!s) return;
 

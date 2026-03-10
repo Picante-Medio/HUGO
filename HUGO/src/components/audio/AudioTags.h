@@ -7,7 +7,7 @@
 
 HCOMPONENT(AudioDirtyTag)
 
-    HUGO::AudioDirtyFlags flags = HUGO::AudioDirtyFlags::NONE;
+    HUGO::AudioDirtyFlags flags;
 
     AudioDirtyTag(EntityID entity,
                   HUGO::AudioDirtyFlags flags)
@@ -17,7 +17,7 @@ END_HCOMPONENT()
 
 HCOMPONENT(Audio3DDirtyTag)
 
-    HUGO::Audio3DDirtyFlags flags = HUGO::Audio3DDirtyFlags::NONE_3D;
+    HUGO::Audio3DDirtyFlags flags;
 
     Audio3DDirtyTag(EntityID entity,
                   HUGO::Audio3DDirtyFlags flags)

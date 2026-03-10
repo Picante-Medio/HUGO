@@ -4,6 +4,7 @@
 
 #include "OgreRenderWindow.h"
 #include "OgreRoot.h"
+#include "OgreOverlayManager.h"
 #include "HugoVirtualTimer.h"
 #include "miniaudio.h"
 #include "BulletModule.h"
@@ -25,6 +26,9 @@ namespace HUGO {
         std::shared_ptr<Ogre::Root> m_ogreRoot;
         Ogre::RenderWindow* m_renderWindow;
         SDL_Window* sdlWindow;
+
+        //Ogre Overlay
+        std::shared_ptr<Ogre::OverlayManager> m_ogreOverlayManager;
 
         //Miniaudio
         void initMiniaudio();

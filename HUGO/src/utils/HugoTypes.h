@@ -7,10 +7,11 @@ namespace HUGO{
     using OgreObjectID = int;
     constexpr OgreObjectID INVALID_OGRE_OBJECT_ID = std::numeric_limits<int>::max();
 
+    using String = std::string;
+
+    // Audio Types
     using AudioID = int;
     using SceneID = int;
-
-    using String = std::string;
 
     enum AudioTypes
     {
@@ -22,26 +23,24 @@ namespace HUGO{
 
     enum AudioDirtyFlags
     {
-        NONE = 0,
-        LOOP = 1 << 0,
-        VOLUME = 1 << 1,
-        PITCH = 1 << 2,
-        STARTTIME = 1 << 3,
-        START = 1 << 4,
-        STOP = 1 << 5
+        LOOP = 0,
+        VOLUME = 1 << 0,
+        PITCH = 1 << 1,
+        STARTTIME = 1 << 2,
+        START = 1 << 3,
+        STOP = 1 << 4
     };
 
     enum Audio3DDirtyFlags
     {
-        NONE_3D = 0,
-        MINDISTANCE = 1 << 0,
-        MAXDISTANCE = 1 << 1,
-        VELOCITY = 1 << 2,
-        DIRECTION = 1 << 3,
-        DOPPLER = 1 << 4,
-        ROLLOF = 1 << 5,
-        CONE = 1 << 6,
-        MOVED = 1 << 7
+        MINDISTANCE = 0,
+        MAXDISTANCE = 1 << 0,
+        VELOCITY = 1 << 1,
+        DIRECTION = 1 << 2,
+        DOPPLER = 1 << 3,
+        ROLLOF = 1 << 4,
+        CONE = 1 << 5,
+        MOVED = 1 << 6
     };
 
     using AudioEndCallback = std::function<void(HUGO::AudioID)>;
@@ -100,4 +99,13 @@ namespace HUGO{
         KINEMATIC
     };
 
+    // UI Types
+    enum CanvasDirtyFlags
+    {
+        Z_ORDER = 0,
+        METRICS_MODE = 1 << 0,
+        POSITION = 1 << 1,
+        SIZE = 1 << 2,
+        MATERIAL = 1 << 3,
+    };
 }
