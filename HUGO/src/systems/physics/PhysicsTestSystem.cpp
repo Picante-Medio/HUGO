@@ -64,14 +64,14 @@ void PhysicsTestSystem::update(double dt) {
         RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
 
         if(rb.getCollisionInfo().empty()){
-            std::cout << "Posicion: " << tf.position.x << " " << tf.position.y << " " << tf.position.z << " No choca\n";
+            //std::cout << "Posicion: " << tf.position.x << " " << tf.position.y << " " << tf.position.z << " No choca\n";
         }
         else if(rb.getCollisionInfo().size() > 1){
-            std::cout << "La colisiones no se estan borrando bien";
+            //std::cout << "La colisiones no se estan borrando bien";
         }
         else
         {
-            std::cout << "Posicion: " << tf.position.x << " " << tf.position.y << " " << tf.position.z << " " << rb.entity << " choca con " << rb.getCollisionInfo().at(0) << "\n";
+            //std::cout << "Posicion: " << tf.position.x << " " << tf.position.y << " " << tf.position.z << " " << rb.entity << " choca con " << rb.getCollisionInfo().at(0) << "\n";
         }
     }
 }
