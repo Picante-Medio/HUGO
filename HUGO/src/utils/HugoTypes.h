@@ -77,8 +77,8 @@ namespace HUGO{
 
     // -------- PHYSICS TYPES --------
 
-    using RigidBodyID = int;
-    constexpr RigidBodyID INVALID_RB_ID = std::numeric_limits<int>::max();
+    using CollisionObjectID = int;
+    constexpr CollisionObjectID INVALID_COL_OBJ_ID = std::numeric_limits<int>::max();
 
     using CollisionShapeID = int;
     constexpr CollisionShapeID INVALID_SHAPE_ID = std::numeric_limits<int>::max();

@@ -10,7 +10,7 @@ class RigidBodyComponent;
 class Shape;
 
 struct RigidBodyObject{
-    HUGO::RigidBodyID id;
+    HUGO::CollisionObjectID id;
     btRigidBody* bulletRB = nullptr;
 };
 
@@ -35,7 +35,7 @@ class BulletSimulation : public IPhysicsSimulation {
     
     // Same logic as in RenderSystem. Credits to them, they did a really good job.
     PagedArray<RigidBodyObject, 128> rigidBodies;
-    std::vector<HUGO::RigidBodyID> freeBulletRBObjectId;
+    std::vector<HUGO::CollisionObjectID> freeBulletRBObjectId;
     std::vector<std::size_t> rbIdToIndex;
 
     // We use ids to shapes so various rb can use the same shape
@@ -48,9 +48,9 @@ class BulletSimulation : public IPhysicsSimulation {
     void removeShapeObject(HUGO::CollisionShapeID& id);
     void destroyShapeObject(ShapeObject& shObj);
 
-    HUGO::RigidBodyID createRigidBodyObject(RigidBodyComponent& hgRb, TransformComponent& tf, HUGO::BodyType type);
-    RigidBodyObject& getRigidBodyObject(const HUGO::RigidBodyID id);
-    void removeRigidBodyObject(HUGO::RigidBodyID& id);
+    HUGO::CollisionObjectID createRigidBodyObject(RigidBodyComponent& hgRb, TransformComponent& tf, HUGO::BodyType type);
+    RigidBodyObject& getRigidBodyObject(const HUGO::CollisionObjectID id);
+    void removeRigidBodyObject(HUGO::CollisionObjectID& id);
     void destroyRigidBodyObject(RigidBodyObject& RbObj);
 
     // Check for updates on a specific RB

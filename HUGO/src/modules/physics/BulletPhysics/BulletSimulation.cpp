@@ -157,7 +157,7 @@ void BulletSimulation::destroyShapeObject(ShapeObject& shObj)
 
 
 #pragma region BulletObject
-HUGO::RigidBodyID BulletSimulation::createRigidBodyObject(RigidBodyComponent& hgRb, TransformComponent& tf, HUGO::BodyType type)
+HUGO::CollisionObjectID BulletSimulation::createRigidBodyObject(RigidBodyComponent& hgRb, TransformComponent& tf, HUGO::BodyType type)
 {
 
     // Create/reuse shape object
@@ -190,7 +190,7 @@ HUGO::RigidBodyID BulletSimulation::createRigidBodyObject(RigidBodyComponent& hg
             break;
     }
 
-    HUGO::RigidBodyID id;
+    HUGO::CollisionObjectID id;
     //reuse id
     if(!freeBulletRBObjectId.empty()){ 
         id= freeBulletRBObjectId.back();
@@ -198,7 +198,7 @@ HUGO::RigidBodyID BulletSimulation::createRigidBodyObject(RigidBodyComponent& hg
     }
     else{
         //generate new ID
-        id = static_cast<HUGO::RigidBodyID>(rbIdToIndex.size());
+        id = static_cast<HUGO::CollisionObjectID>(rbIdToIndex.size());
         rbIdToIndex.push_back(0);
     }
     
@@ -218,14 +218,14 @@ HUGO::RigidBodyID BulletSimulation::createRigidBodyObject(RigidBodyComponent& hg
     return id;
 }
     
-RigidBodyObject& BulletSimulation::getRigidBodyObject(const HUGO::RigidBodyID id)
+RigidBodyObject& BulletSimulation::getRigidBodyObject(const HUGO::CollisionObjectID id)
 {
     return rigidBodies[rbIdToIndex[id]];
 }
     
-void BulletSimulation::removeRigidBodyObject(HUGO::RigidBodyID& id)
+void BulletSimulation::removeRigidBodyObject(HUGO::CollisionObjectID& id)
 {
-    if (id != HUGO::INVALID_RB_ID){
+    if (id != HUGO::INVALID_COL_OBJ_ID){
         
         std::size_t index = rbIdToIndex[id];
         std::size_t lastIndex = rigidBodies.size() - 1;
@@ -235,13 +235,13 @@ void BulletSimulation::removeRigidBodyObject(HUGO::RigidBodyID& id)
         if (index != lastIndex) {
             // mover último objeto al hueco
             rigidBodies[index] = std::move(rigidBodies[lastIndex]);
-            HUGO::RigidBodyID movedID = rigidBodies[index].id;
+            HUGO::CollisionObjectID movedID = rigidBodies[index].id;
             rbIdToIndex[movedID] = index;
         }
 
         rigidBodies.remove(lastIndex);
         freeBulletRBObjectId.push_back(id);
-        id = HUGO::INVALID_RB_ID;
+        id = HUGO::INVALID_COL_OBJ_ID;
     }
 }
     
@@ -336,7 +336,7 @@ void BulletSimulation::syncBodiesToBullet() {
         RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
         TransformComponent& transform = pack.get<TransformComponent&>();
 
-        if (rb.objectID == HUGO::INVALID_RB_ID) {
+        if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
             //create a new RigidBodyObject
             rb.objectID = createRigidBodyObject(rb, transform, HUGO::BodyType::STATIC);
         }
@@ -350,7 +350,7 @@ void BulletSimulation::syncBodiesToBullet() {
         RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
         TransformComponent& transform = pack.get<TransformComponent&>();
         
-        if (rb.objectID == HUGO::INVALID_RB_ID) {
+        if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
             //create a new RigidBodyObject
             rb.objectID = createRigidBodyObject(rb, transform, HUGO::BodyType::KINEMATIC);
         }
@@ -367,7 +367,7 @@ void BulletSimulation::syncBodiesToBullet() {
         RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
         TransformComponent& transform = pack.get<TransformComponent&>();
         
-        if (rb.objectID == HUGO::INVALID_RB_ID) {
+        if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
             //create a new RigidBodyObject
             rb.objectID = createRigidBodyObject(rb, transform, HUGO::BodyType::DYNAMIC);
         }
