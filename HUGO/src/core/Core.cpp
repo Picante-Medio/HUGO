@@ -55,10 +55,9 @@ void Core::init(){
     scenePtr->addSystem(audioSystem);
     audioSystem->createTestEntity();
     
-    std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr, m_renderWindow);
+    std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr, m_renderWindow, m_ogreOverlaySystem);
     scenePtr->addSystem(renderSystem);
 
-    renderSystem->getSM()->addRenderQueueListener(m_ogreOverlaySystem.get());
     std::shared_ptr<UISystem> uiSystem = std::make_shared<UISystem>(scenePtr, m_renderWindow);
     scenePtr->addSystem(uiSystem);
     uiSystem->createTestCanvas();

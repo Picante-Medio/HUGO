@@ -209,9 +209,6 @@ void UISystem::createTestCanvas()
         Ogre::OverlayManager& om = Ogre::OverlayManager::getSingleton();
 
        // 1. first: load the .overlay script
-        Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton().
-            openResource("testCanvas.overlay", "General"); // Ajusta nombre y grupo
-        om.parseScript(stream, "General");
         Ogre::Overlay* overlay = om.getByName("testCanvas/SimpleTest");
         
         // 3. read values from .overlay script
@@ -221,7 +218,7 @@ void UISystem::createTestCanvas()
         auto containerResult = getContainer(canvas.containerName);
         if (!containerResult.isError()) {
             Ogre::OverlayContainer* container = containerResult.getValue();
-    
+
             // metrics mode
             canvas.metricsMode = container->getMetricsMode();
 
@@ -232,10 +229,7 @@ void UISystem::createTestCanvas()
             canvas.height = container->getHeight();
             
             // material
-            container->setMaterialName("UI/Red");
-            //container->setColour(Ogre::ColourValue(1.0f, 1.0f, 0.0f, 1.0f));
             canvas.backgroundMaterial = container->getMaterialName();
-            container->initialise();
         }
         
         // 5. override visibility

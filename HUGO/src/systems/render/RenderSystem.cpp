@@ -14,7 +14,8 @@
 #include "HugoError.h"
 #include "OgreUtils.h"
 
-RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* window)
+RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* window,
+    std::shared_ptr<Ogre::OverlaySystem> overlay)
     :System(scene), renderWindow(window), idToIndex(), freeOgreObjectId()
 {
     ogreRoot = Ogre::Root::getSingletonPtr();
@@ -24,7 +25,7 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* win
     catch (const Ogre::Exception& e) {
         throw std::runtime_error("[RenderSystem] SceneManager creation failed: " + std::string(e.getDescription()));
     }
-   
+    sceneManager->addRenderQueueListener(overlay.get());
     //sceneManager->setDisplaySceneNodes(true);
 
     // Basic light

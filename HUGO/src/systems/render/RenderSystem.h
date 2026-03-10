@@ -5,6 +5,7 @@
 #include "System.h"
 #include "Ecs.h"
 #include "Ogre.h"
+#include "OgreOverlaySystem.h"
 #include "PagedArray.h"
 #include "HugoTypes.h"
 #include "HugoMath.h"
@@ -39,7 +40,7 @@ class RenderSystem : public System{
     
     Ogre::Root* ogreRoot;
     Ogre::SceneManager* sceneManager = nullptr;
-    Ogre::RenderWindow* renderWindow = nullptr; 
+    Ogre::RenderWindow* renderWindow = nullptr;
 
     std::unordered_map<EntityID, CameraInfo> cameraMap; // Provisional
     std::unordered_map<EntityID, ViewportInfo> viewportMap; // Provisional
@@ -51,7 +52,6 @@ class RenderSystem : public System{
 
     EntityID mainCameraEntity = 0;
     EntityID mainViewportEntity = 0;
-
 
     void updateViewportDimensions();
 
@@ -101,7 +101,7 @@ class RenderSystem : public System{
     void setMainViewport(EntityID viewportEntity);
       
 public:
-    RenderSystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* window);
+    RenderSystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* window,  std::shared_ptr<Ogre::OverlaySystem> overlay);
     ~RenderSystem() override;
     
     void fixedUpdate(double dt) override;
