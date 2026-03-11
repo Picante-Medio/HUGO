@@ -1,6 +1,4 @@
 #pragma once
-
-#include "Component.h"
 #include "HugoMath.h"
 #include "HugoComponentMacros.h"
 

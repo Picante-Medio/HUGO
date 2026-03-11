@@ -17,6 +17,7 @@ namespace HUGO {
     class ResourceManager;
 
     class Core {
+        const int FRAME_RATE = 10;
         void initModules();
 
         //Ogre

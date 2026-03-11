@@ -5,6 +5,7 @@
 #include "RenderSystem.h"
 #include "Scene.h"
 #include "RenderComponent.h"
+#include "AnimationComponent.h"
 #include "TransformComponent.h"
 #include "CameraComponent.h"
 #include "ViewportComponent.h"
@@ -26,10 +27,9 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* win
         throw std::runtime_error("[RenderSystem] SceneManager creation failed: " + std::string(e.getDescription()));
     }
     sceneManager->addRenderQueueListener(overlay.get());
-    //sceneManager->setDisplaySceneNodes(true);
 
     // Basic light
-    setAmbientLight(0.15f, 0.15f, 0.15f);
+    setAmbientLight(0.2f, 0.2f, 0.2f);
 
     // Camera and viewport creation for testing
     EntityID defaultCamera = createCameraEntity(HUGO::Vector3(0, 0, 200));
@@ -38,19 +38,30 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* win
     EntityID defaultViewport = createViewportEntity();    
     setMainViewport(defaultViewport);
 
-    createLightEntity( HUGO::Vector3(-50, 300, 800), HUGO::Vector4(0.4f, 0.2f, 0.4f, 0.2f)
-        , HUGO::Vector4(0.0f, 0.0f, 0.0f, 0.0f), HUGO::LightType::LT_POINT, HUGO::Radian(0), HUGO::Radian(0), 0, 0.1f, 0.1f, 300); 
-        
+    createLightEntity( HUGO::Vector3(0, 20, 20), //light position
+                        HUGO::Vector4(0.4f, 0.2f, 0.4f, 0.2f), //diffuse
+                        HUGO::Vector4(0.0f, 0.0f, 0.0f, 0.0f), //specular
+                        HUGO::LightType::LT_POINT, 
+                        HUGO::Radian(0), 
+                        HUGO::Radian(0), 
+                        0, 
+                        0.1f, 
+                        0.1f, 
+                        100); 
         
 
     //testing
     EntityID e1 = scene->createEntity();
     TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(e1);
-    transform.position = HUGO::Vector3(20, -30, -50);
-    transform.scale = HUGO::Vector3(1, 0.05f, 0.5f);
+    transform.position = HUGO::Vector3(0, 0,0);;
+    transform.scale = HUGO::Vector3(4.0f, 4.0f, 4.0f);
     RenderComponent& rc = scene->addAndGetComponent<RenderComponent>(e1);
-    rc.meshName = "cube.mesh";
-    rc.materialName = "prueba/ColorRosa";
+    rc.meshName = "Sinbad.mesh";
+
+    AnimationComponent& anim = scene->addAndGetComponent<AnimationComponent>(e1);
+    anim.setEnabled(true);
+    anim.setLoop(true);
+    anim.setAnimation("Dance");   
     
 }
 
@@ -301,6 +312,32 @@ void RenderSystem::destroyOgreObject(OgreObject &obj)
 #pragma endregion
 
 #pragma region Updates
+void RenderSystem::updateAnimations(double dt)
+{
+    for(auto& pack : scene->query<RenderComponent, AnimationComponent>()) {
+        AnimationComponent& anim = pack.get<AnimationComponent&>();
+        RenderComponent& rc = pack.get<RenderComponent&>();
+
+        if(rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) continue;
+        if(!anim.getEnabled()) continue;
+
+        Ogre::Entity* ogre_ent = getOgreObject(rc.objectID).ogreEntity;
+        const HUGO::String& animName= anim.getAnimation();
+        if(animName != "" )
+        {
+            if(!ogre_ent->hasAnimationState(animName)) std::cerr<<"[RenderSystem] Animation "+ animName + " does not exist in entity " + std::to_string(rc.entity) + "\n";
+            
+            Ogre::AnimationState* animState = ogre_ent->getAnimationState(animName);
+            if(!animState->getEnabled())
+            {
+                animState->setEnabled(true);
+                animState->setLoop(anim.getLoop());
+            }
+            animState->addTime(static_cast<Ogre::Real>(dt));
+        }
+    }
+}
+
 void RenderSystem::fixedUpdate(double dt)
 {
 
@@ -332,6 +369,8 @@ void RenderSystem::update(double dt)
         obj.ogreSceneNode->setOrientation(OgreUtils::quaternionToOgre(tr.rotation));
         obj.ogreSceneNode->setScale(OgreUtils::vector3ToOgre(tr.scale));
     }
+
+    updateAnimations(dt);
 }
 
 #pragma endregion

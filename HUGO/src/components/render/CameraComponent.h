@@ -1,9 +1,6 @@
 #pragma once
-
-#include "Component.h"
 #include "HugoMath.h"
 #include "HugoTypes.h"
-
 #include "HugoComponentMacros.h"
 
 // Camera component that holds all necessary information for rendering a camera in the scene

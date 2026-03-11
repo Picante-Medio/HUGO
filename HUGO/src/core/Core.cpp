@@ -170,7 +170,7 @@ void Core::run(){
 	while (!exit) {
         vt.update();
     
-        double startTime = vt.getDeltaTime();
+        double startTime = vt.getDeltaTime()/1000.0; //ms->s
 
         input.handleInput();
         if(input.isQuitPressed()) {
@@ -183,9 +183,8 @@ void Core::run(){
         m_ogreRoot->renderOneFrame();
 
         double frameTime = vt.getDeltaTime() - startTime;
-
-        if (frameTime < 0.016) {
-            SDL_Delay(static_cast<Uint32>((0.016 - frameTime) * 1000.0));
+        if (frameTime < FRAME_RATE) {
+            SDL_Delay(static_cast<Uint32>(FRAME_RATE-frameTime));
         }
 	}
 }

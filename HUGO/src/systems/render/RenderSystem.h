@@ -33,9 +33,10 @@ class RenderSystem : public System{
 
     // OgreObject Information
     struct OgreObject{
-        HUGO::OgreObjectID id;
+        HUGO::OgreObjectID id = HUGO::INVALID_OGRE_OBJECT_ID;
         Ogre::Entity* ogreEntity = nullptr;
         Ogre::SceneNode* ogreSceneNode = nullptr;
+        Ogre::AnimationState* animState = nullptr;
     };
     
     Ogre::Root* ogreRoot;
@@ -62,6 +63,7 @@ class RenderSystem : public System{
     // void destroyOgreViewport(EntityID entity);
 
     void handleTag();
+    void updateAnimations(double dt);
 
     // Materials
     void setMaterial(EntityID entity,const std::string& materialName);   

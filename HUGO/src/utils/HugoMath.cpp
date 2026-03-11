@@ -173,7 +173,7 @@ namespace HUGO {
 		: rad(rhs.rad) {}
 
     float Radian::valueDegrees() const {
-        return rad * (180.0f / M_PI);
+        return static_cast<float>(rad * (180.0f / M_PI));
     }
 
     float Radian::valueRadians() const {
@@ -273,7 +273,7 @@ namespace HUGO {
 	}
 	
 	float Degree::valueRadians() const {
-		return deg * (M_PI / 180.0f);
+		return static_cast<float>(deg * (M_PI / 180.0f));
 	}
 
 	const Degree&  Degree::operator + () const 
