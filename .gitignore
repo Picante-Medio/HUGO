@@ -9,9 +9,6 @@ HUGO/[Bb]uild/*
 #Dependencias compiladas
 HUGO/[Dd]ependencies/*
 
-#Presets duplicados
-HUGO/CMakePresets.json
-
 # Ficheros
 *.dll
 *.so
