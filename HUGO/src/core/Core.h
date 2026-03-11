@@ -8,6 +8,7 @@
 #include "HugoVirtualTimer.h"
 #include "miniaudio.h"
 #include "BulletModule.h"
+#include "OgreModule.h"
 
 class Scene;
 class VirtualTimer;
@@ -21,15 +22,7 @@ namespace HUGO {
         void initModules();
 
         //Ogre
-        void initOgre();
-        void destroyOgre();
-
-        std::shared_ptr<Ogre::Root> m_ogreRoot;
-        Ogre::RenderWindow* m_renderWindow;
-        SDL_Window* sdlWindow;
-
-        //Ogre Overlay
-        std::shared_ptr<Ogre::OverlaySystem> m_ogreOverlaySystem;
+        std::shared_ptr<OgreModule> m_ogreModule;
 
         //Miniaudio
         void initMiniaudio();
@@ -43,9 +36,6 @@ namespace HUGO {
 
         VirtualTimer vt;
         std::shared_ptr<Scene> scenePtr;
-        
-        void locateResources();
-        void loadResources();
 
         //Resource Manager
         std::shared_ptr<ResourceManager> m_resourceManager;

@@ -55,10 +55,10 @@ void Core::init(){
     scenePtr->addSystem(audioSystem);
     audioSystem->createTestEntity();
     
-    std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr, m_renderWindow, m_ogreOverlaySystem);
+    std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr, m_ogreModule);
     scenePtr->addSystem(renderSystem);
 
-    std::shared_ptr<UISystem> uiSystem = std::make_shared<UISystem>(scenePtr, m_renderWindow);
+    std::shared_ptr<UISystem> uiSystem = std::make_shared<UISystem>(scenePtr, m_ogreModule->getOgreRenderWindow());
     scenePtr->addSystem(uiSystem);
     uiSystem->createTestCanvas();
 
@@ -73,7 +73,7 @@ void Core::init(){
 
 //Destruction of HUGO modules. End of HUGO
 void Core::destroy(){
-    destroyOgre();
+    m_ogreModule->destroy();
     destroyMiniaudio();
     destroyPhysicsModule();
 }
@@ -83,84 +83,13 @@ void Core::destroy(){
 void HUGO::Core::initModules()
 {
     initMiniaudio();
-    initOgre();
+
+    //OgreModule init
+    m_ogreModule = std::make_shared<OgreModule>();
+    m_ogreModule->init();
+
     initPhysicsModule();
     initLua();
-}
-
-void Core::initOgre()
-{
-    m_ogreRoot = std::make_shared<Ogre::Root>("plugins.cfg", "ogre.cfg");
-    if (!m_ogreRoot->restoreConfig()) {
-        Ogre::LogManager::getSingleton().logMessage("Initialize::configure_ogre => " +
-        std::string("ERROR: unable to configure Ogre"));
-    }
-    //If there is another rendering system available, we could choose between one or another
-    for(Ogre::RenderSystem* renderSys: m_ogreRoot->getAvailableRenderers()){
-        if(renderSys->getName() == "OpenGL Rendering Subsystem"){
-            m_ogreRoot->setRenderSystem(renderSys);
-            break;
-        }
-    }
-
-    m_ogreRoot->getRenderSystem()->setConfigOption("Full Screen", "No");
-
-    m_ogreRoot->initialise(false);
-
-    m_ogreOverlaySystem = std::make_shared<Ogre::OverlaySystem>();
-    locateResources();
-    loadResources();
-
-    #ifdef __linux__
-        SDL_setenv("SDL_VIDEODRIVER", "x11", 1);
-    #endif
-
-    if (SDL_Init(SDL_INIT_EVENTS) != 0) {
-        throw std::runtime_error("SDL_Init failed");
-    }
-    
-    sdlWindow = SDL_CreateWindow("Ogre Test Window",SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                    1000, 800, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE);
-    SDL_SysWMinfo wmInfo;
-    SDL_VERSION(&wmInfo.version);
-    if (!SDL_GetWindowWMInfo(sdlWindow, &wmInfo)) {
-        throw std::runtime_error("SDL_GetWindowWMInfo failed");
-    }
-    SDL_Log("Video driver: %s", SDL_GetCurrentVideoDriver());
-    //SDL_SetWindowFullscreen(sdlWindow,SDL_WINDOW_FULLSCREEN_DESKTOP);
-
-    Ogre::NameValuePairList params;
-    #ifdef __linux__
-    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.x11.window);
-    #elif _WIN32
-    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.win.window);
-    #endif
-    
-    params["externalWindowHandle"] = Ogre::StringConverter::toString(windowHandle);
-    m_renderWindow = m_ogreRoot->createRenderWindow("Ogre Test Window", 1000, 800, false, &params);
-}
-
-void HUGO::Core::locateResources()
-{
-  Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
-    Ogre::ConfigFile cf;
-    cf.load("resources.cfg");
-
-  Ogre::ConfigFile::SettingsBySection_ seci = cf.getSettingsBySection();
-    Ogre::String sec, type, arch;
-    for(auto& s : cf.getSettingsBySection()) {
-        sec = s.first;
-        for (auto& t : s.second)
-        {
-            type = t.first;
-            arch = t.second;
-            rgm.addResourceLocation(arch,type,sec);
-        }
-    }
-}
-void HUGO::Core::loadResources()
-{
-    Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
 //HUGO main loop
 void Core::run(){
@@ -180,23 +109,13 @@ void Core::run(){
         physicsModule->performSimulations(startTime);
         scenePtr->update(startTime);
 
-        m_ogreRoot->renderOneFrame();
+        m_ogreModule->renderOneFrame();
 
         double frameTime = vt.getDeltaTime() - startTime;
         if (frameTime < FRAME_RATE) {
             SDL_Delay(static_cast<Uint32>(FRAME_RATE-frameTime));
         }
 	}
-}
-
-
-void Core::destroyOgre(){
-    m_renderWindow->destroy();
-
-    m_ogreRoot->shutdown();
-
-    SDL_DestroyWindow(sdlWindow);
-    SDL_Quit();
 }
 
 void HUGO::Core::initMiniaudio()

@@ -15,9 +15,10 @@
 #include "HugoError.h"
 #include "OgreUtils.h"
 
-RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* window,
-    std::shared_ptr<Ogre::OverlaySystem> overlay)
-    :System(scene), renderWindow(window), idToIndex(), freeOgreObjectId()
+#include "OgreModule.h"
+
+RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<OgreModule> ogreMod)
+    :System(scene), idToIndex(), freeOgreObjectId(), m_ogreModule(ogreMod)
 {
     ogreRoot = Ogre::Root::getSingletonPtr();
     try {
@@ -26,7 +27,7 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* win
     catch (const Ogre::Exception& e) {
         throw std::runtime_error("[RenderSystem] SceneManager creation failed: " + std::string(e.getDescription()));
     }
-    sceneManager->addRenderQueueListener(overlay.get());
+    sceneManager->addRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
 
     // Basic light
     setAmbientLight(0.2f, 0.2f, 0.2f);
@@ -69,7 +70,7 @@ RenderSystem::~RenderSystem()
 {
     for(auto& v: viewportMap){
         if(v.second.ogreViewport){
-            renderWindow->removeViewport(v.second.ogreViewport->getZOrder());
+            m_ogreModule->getOgreRenderWindow()->removeViewport(v.second.ogreViewport->getZOrder());
             v.second.ogreViewport = nullptr;
         }
     }
@@ -664,7 +665,7 @@ void RenderSystem::createOgreViewport(EntityID entity)
     }
 
     // create ogre viewport
-    res.ogreViewport = renderWindow->addViewport(
+    res.ogreViewport = m_ogreModule->getOgreRenderWindow()->addViewport(
         cam,
         viewportComp->getZOrder(),
         viewportComp->getLeft(),
