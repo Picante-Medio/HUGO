@@ -5,10 +5,10 @@
 #include "IPhysicsSimulation.h"
 #include "HugoTypes.h"
 
-class TransformComponent;
-class RigidBodyComponent;
-class ColliderComponent;
-class Shape;
+struct TransformComponent;
+struct RigidBodyComponent;
+struct ColliderComponent;
+struct Shape;
 
 struct CollisionObject{
     HUGO::CollisionObjectID id;
