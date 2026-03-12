@@ -32,13 +32,17 @@ FetchContent_Declare(
     GIT_SHALLOW TRUE
 )
 
-FetchContent_Declare(
-    sdl2
-    GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
-    GIT_TAG "release-2.30.7"
-    GIT_SHALLOW TRUE
-    OVERRIDE_FIND_PACKAGE 
-)
+if(WIN32)
+    FetchContent_Declare(
+        sdl2
+        GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
+        GIT_TAG "release-2.30.7"
+        GIT_SHALLOW TRUE
+        OVERRIDE_FIND_PACKAGE 
+    )
+elseif(LINUX)
+    find_package(SDL2 CONFIG REQUIRED)
+endif()
 
 FetchContent_Declare(
     ogre
@@ -136,7 +140,11 @@ set(OGRE_ENABLE_PRECOMPILED_HEADERS ON CACHE BOOL "" FORCE)
 set(OGRE_INSTALL_PDB ON CACHE BOOL "" FORCE)
 set(OGRE_PROJECT_FOLDERS ON CACHE BOOL "" FORCE)
 
-FetchContent_MakeAvailable(miniaudio bullet3 lua sdl2)
+FetchContent_MakeAvailable(miniaudio bullet3 lua)
+
+if(WIN32)
+    FetchContent_MakeAvailable(sdl2)
+endif()
 # despues
 FetchContent_MakeAvailable(ogre)
 
