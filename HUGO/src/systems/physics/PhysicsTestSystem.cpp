@@ -63,19 +63,4 @@ void PhysicsTestSystem::fixedUpdate(double dt) {
 
 void PhysicsTestSystem::update(double dt) {
 
-    for(auto pack : scene->query<ColliderComponent, TransformComponent, RigidBodyComponent, DynamicRBTag>()) {
-        TransformComponent& tf = pack.get<TransformComponent&>();
-        ColliderComponent& col = pack.get<ColliderComponent&>();
-
-        if(col.getCollisionInfo().empty()){
-            std::cout << "Posicion: " << tf.position.x << " " << tf.position.y << " " << tf.position.z << " No choca\n";
-        }
-        else if(col.getCollisionInfo().size() > 1){
-            std::cout << "La colisiones no se estan borrando bien";
-        }
-        else
-        {
-            std::cout << "Posicion: " << tf.position.x << " " << tf.position.y << " " << tf.position.z << " " << col.entity << " choca con " << col.getCollisionInfo().at(0) << "\n";
-        }
-    }
 }
