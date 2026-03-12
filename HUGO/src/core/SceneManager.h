@@ -11,6 +11,9 @@ class SceneManager{
     //Scene map that stores created game scenes.
     std::unordered_map<HUGO::String, Scene> m_sceneMap;
 
+    //Pointer to a scene inside m_sceneMap. It is the scene that will be updated in the main loop.
+    Scene* m_currentScene = nullptr;
+
     //Reads chatParser, creates a scene based on the SceneData, and indexes it in m_sceneMap.
     ErrorOrVoid loadScene(const HUGO::String& sceneName);
     //Removes a scene from m_sceneMap, to free space that is not used.
@@ -26,5 +29,7 @@ public:
     Starts scene named sceneName.
     If a scene were currently running, it will stop running and will be kept in memory for future use.
     */
-    void setCurrentScene(HUGO::String sceneName);
+    void setCurrentScene(const HUGO::String& sceneName);
+
+    void updateCurrentScene(double dt);
 };

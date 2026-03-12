@@ -226,7 +226,7 @@ ErrorOrType<EntityData> ChatParser::getPrefabData(const HUGO::String& prefabName
 ErrorOrType<SceneData> ChatParser::getSceneData(const HUGO::String & sceneName){
     std::unordered_map<HUGO::String, SceneData>::iterator res = m_sceneData.find(sceneName);
     if(res == m_sceneData.end()) 
-        return ErrorOrType<SceneData>(StringError{HUGO::String("Queried scene doesn't exist")});
+        return ErrorOrType<SceneData>(StringError{HUGO::String("Queried scene named " + sceneName + " doesn't exist")});
 
     return ErrorOrType<SceneData>(res->second);
 }
