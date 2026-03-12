@@ -15,6 +15,5 @@ int main(int argc, char* argv[]) {
     HUGO::Core core = HUGO::Core();
     core.init();
     core.run();
-    core.destroy();
     return 0;
 }

@@ -72,11 +72,6 @@ void Core::init(){
     scenePtr->addSystem(testSystem);
 }
 
-//Destruction of HUGO modules. End of HUGO
-void Core::destroy(){
-    destroyPhysicsModule();
-}
-
 //--------------------------- IMODULES INITIALIZATION --------------------
 
 void HUGO::Core::initModules()
@@ -87,8 +82,12 @@ void HUGO::Core::initModules()
     //OgreModule init
     m_ogreModule = std::make_shared<OgreModule>();
 
-    initPhysicsModule();
-    initLua();
+    //BulletoModule init
+    physicsModule = std::make_shared<BulletModule>();
+
+    //LuaBinder init
+    LuaBinder& luaBinder = LuaBinder::Instance();
+    luaBinder.Init();
 }
 //HUGO main loop
 void Core::run(){
@@ -115,17 +114,4 @@ void Core::run(){
             SDL_Delay(static_cast<Uint32>(FRAME_RATE-frameTime));
         }
 	}
-}
-
-void HUGO::Core::initPhysicsModule() {
-    physicsModule = std::make_shared<BulletModule>();
-}
-
-void HUGO::Core::destroyPhysicsModule() {
-    // ...
-}
-
-void HUGO::Core::initLua() {
-    LuaBinder& luaBinder = LuaBinder::Instance();
-    luaBinder.Init();
 }

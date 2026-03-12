@@ -28,11 +28,7 @@ namespace HUGO {
         //Miniaudio
         std::shared_ptr<MiniaudioModule> m_miniaudioModule;
 
-        
-
         // Physics
-        void initPhysicsModule();
-        void destroyPhysicsModule();
         std::shared_ptr<IPhysicsModule> physicsModule;
 
         VirtualTimer vt;
@@ -40,14 +36,10 @@ namespace HUGO {
 
         //Resource Manager
         std::shared_ptr<ResourceManager> m_resourceManager;
-
-        // Lua
-        void initLua();
     
     public:
         Core();
         void init();
-        void destroy();
 
         void run();
     };
