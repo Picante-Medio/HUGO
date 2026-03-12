@@ -232,3 +232,14 @@ if (WIN32)
         COMMAND_EXPAND_LISTS
     )
 endif ()
+
+
+################## Juego de prueba
+
+add_library(HTestGame MODULE ${CMAKE_SOURCE_DIR}/TestGame/GameEntryPoint.cpp)
+
+set_target_properties(HTestGame PROPERTIES
+    DEBUG_POSTFIX "d"
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
+    LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin
+    LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin)
