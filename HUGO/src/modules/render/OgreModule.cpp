@@ -37,11 +37,7 @@ void loadResources()
 #pragma endregion
 
 OgreModule::OgreModule(){
-    
-}
-
-void OgreModule::init(){
-    m_ogreRoot = std::make_shared<Ogre::Root>("plugins.cfg", "ogre.cfg");
+        m_ogreRoot = std::make_shared<Ogre::Root>("plugins.cfg", "ogre.cfg");
     if (!m_ogreRoot->restoreConfig()) {
         Ogre::LogManager::getSingleton().logMessage("Initialize::configure_ogre => " +
         std::string("ERROR: unable to configure Ogre"));
@@ -93,7 +89,7 @@ void OgreModule::init(){
     m_ogreRenderWindow = m_ogreRoot->createRenderWindow(OGRE_WINDOW_NAME, 1000, 800, false, &params);
 }
 
-void OgreModule::destroy(){
+OgreModule::~OgreModule(){
 
     m_ogreRenderWindow->destroy();
 

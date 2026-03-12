@@ -21,11 +21,11 @@ class OgreModule{
     Ogre::RenderWindow* m_ogreRenderWindow = nullptr;
     SDL_Window* m_sdlWindow = nullptr;
 public:
-    OgreModule();
     //Initializes Ogre Singletons and SDL window
-    void init();
+    OgreModule();
+
     //Destroys Ogre Singletons and removes SDL window
-    void destroy();
+    ~OgreModule();
 
     void renderOneFrame();
 

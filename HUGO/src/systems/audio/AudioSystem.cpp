@@ -9,12 +9,14 @@
 #include "TransformComponent.h"
 #include "LuaBinder.h"
 
+#include "MiniaudioModule.h"
+
 #include <fstream>
 #include <sstream>
 
-AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, std::shared_ptr<ma_engine> maEngine, 
+AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, std::shared_ptr<MiniaudioModule> miniaudioModule, 
     const std::string& path, int queueSize)
-    : System(scene), engine(maEngine), path(path), audios(), nameToID(), pools(), nextID(0), queueSize(queueSize)
+    : System(scene), engine(miniaudioModule->getMiniaudioEngine()), path(path), audios(), nameToID(), pools(), nextID(0), queueSize(queueSize)
 {   
     LuaBinder::Instance().registerMethod<AudioSystem, void, int>(*this, &AudioSystem::playAudioLUA, "playAudio");
 }

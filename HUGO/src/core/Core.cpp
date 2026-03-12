@@ -50,7 +50,8 @@ void Core::init(){
     ChatParser chatParser = ChatParser();
     ErrorOrVoid err = chatParser.readChatFolder("../chats");
 
-    std::shared_ptr<AudioSystem> audioSystem = std::make_shared<AudioSystem>(scenePtr, maEngine);
+    std::shared_ptr<AudioSystem> audioSystem = std::make_shared<AudioSystem>(scenePtr, m_miniaudioModule);
+
     audioSystem->loadAudiosFromFile("AudioList.txt");
     scenePtr->addSystem(audioSystem);
     audioSystem->createTestEntity();
@@ -73,8 +74,6 @@ void Core::init(){
 
 //Destruction of HUGO modules. End of HUGO
 void Core::destroy(){
-    m_ogreModule->destroy();
-    destroyMiniaudio();
     destroyPhysicsModule();
 }
 
@@ -82,11 +81,11 @@ void Core::destroy(){
 
 void HUGO::Core::initModules()
 {
-    initMiniaudio();
+    //MiniaudioModule init
+    m_miniaudioModule = std::make_shared<MiniaudioModule>();
 
     //OgreModule init
     m_ogreModule = std::make_shared<OgreModule>();
-    m_ogreModule->init();
 
     initPhysicsModule();
     initLua();
@@ -116,21 +115,6 @@ void Core::run(){
             SDL_Delay(static_cast<Uint32>(FRAME_RATE-frameTime));
         }
 	}
-}
-
-void HUGO::Core::initMiniaudio()
-{
-    maEngine = std::make_shared<ma_engine>();
-    ma_result result = ma_engine_init(nullptr, maEngine.get());
-    if (result != MA_SUCCESS) {
-        throw std::runtime_error("Failed to initialize ma_engine");
-    }
-    else std::cout << "ma_engine initialized correctly\n";
-}
-
-void HUGO::Core::destroyMiniaudio()
-{
-    ma_engine_uninit(maEngine.get());
 }
 
 void HUGO::Core::initPhysicsModule() {
