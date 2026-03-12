@@ -20,16 +20,17 @@ void HUGODispatcher::dispatchAllCollisionPairs(btOverlappingPairCache *pairCache
         btCollisionObject* co0 = static_cast<btCollisionObject*>(pair.m_pProxy0->m_clientObject);
         btCollisionObject* co1 = static_cast<btCollisionObject*>(pair.m_pProxy1->m_clientObject);
 
+        ColliderComponent* hgCol0 = static_cast<ColliderComponent*>(co0->getUserPointer());
+        ColliderComponent* hgCol1 = static_cast<ColliderComponent*>(co1->getUserPointer());
+        
         if(dispatcher->needsCollision(co0, co1)){
-            ColliderComponent* hgCol0 = static_cast<ColliderComponent*>(co0->getUserPointer());
-            ColliderComponent* hgCol1 = static_cast<ColliderComponent*>(co1->getUserPointer());
             
             // Activations to not let the objects sleep if they are colliding
             co0->activate(true);
             co1->activate(true);
     
-            hgCol0->collisionInfo.push_back(hgCol1->entity);
-            hgCol1->collisionInfo.push_back(hgCol0->entity);
+            hgCol0->collisionBuffer.push_back(hgCol1->entity);
+            hgCol1->collisionBuffer.push_back(hgCol0->entity);
         }
     }
 

@@ -49,6 +49,7 @@ HCOMPONENT(ColliderComponent)
     bool active = true;
 
     std::vector<unsigned long int> collisionInfo;
+    std::vector<unsigned long int> collisionBuffer;
 
     std::variant<BoxColliderInfo, SphereColliderInfo, CapsuleColliderInfo, CylinderColliderInfo, ConeColliderInfo> info = BoxColliderInfo{HUGO::Vector3(-1.f, -1.f, -1.f)};
     HUGO::CollisionShapeID shapeID = HUGO::INVALID_SHAPE_ID;

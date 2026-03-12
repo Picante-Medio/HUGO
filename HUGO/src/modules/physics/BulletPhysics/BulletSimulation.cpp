@@ -26,6 +26,9 @@ BulletSimulation::BulletSimulation(std::shared_ptr<Scene> scene)
     btWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfig);
     btWorld->setGravity(btVector3(0, -9.8f, 0));
 
+    // The number of substeps start being 0
+    numSubSteps = 0;
+
     // Set visual debugging if enabled
     // ...
 }
@@ -73,7 +76,7 @@ void BulletSimulation::performSimulation(double dt) {
 }
 
 void BulletSimulation::stepSimulation(double dt) {
-    btWorld->stepSimulation(static_cast<btScalar>(dt));
+    numSubSteps = btWorld->stepSimulation(static_cast<btScalar>(dt));
 }
 
 #pragma region ShapeObject
@@ -471,7 +474,6 @@ void BulletSimulation::syncBodiesToBullet() {
              col.objectID = createColliderObject(col, tf);
          }
     
-         col.collisionInfo.clear();
          checkColliderFlags(col);
     }
 }
@@ -492,7 +494,18 @@ void BulletSimulation::syncBodiesToGame() {
         rb.angularVelocity = BulletUtils::btVector3ToVector3(btRb->getAngularVelocity());
 
         // Clear forces applied this frame
-        //btRb->clearForces();
+        // NOT neccessary, is done by bullet in the stepSimulation
+        // btRb->clearForces();
+    }
+
+    if (numSubSteps != 0){
+        for(auto& pack: scene->query<ColliderComponent, TransformComponent>()) {
+            ColliderComponent& col = pack.get<ColliderComponent&>();
+        
+            col.collisionInfo.clear();
+            col.collisionInfo = col.collisionBuffer;
+            col.collisionBuffer.clear();
+        }
     }
 }
 #pragma endregion

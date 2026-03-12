@@ -30,6 +30,7 @@ class BulletSimulation : public IPhysicsSimulation {
     btSequentialImpulseConstraintSolver* solver;
 
     btDynamicsWorld* btWorld;
+    int numSubSteps;
 
 
     // ------ Rigidbody & collision shapes management ------
