@@ -25,6 +25,9 @@ BulletSimulation::BulletSimulation(std::shared_ptr<Scene> scene)
     // Finally we create the world and set its gravity
     btWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfig);
     btWorld->setGravity(btVector3(0, -9.8f, 0));
+
+    // Set visual debugging if enabled
+    // ...
 }
 
 BulletSimulation::~BulletSimulation() {
@@ -493,3 +496,7 @@ void BulletSimulation::syncBodiesToGame() {
     }
 }
 #pragma endregion
+
+void BulletSimulation::debugDraw() {
+    btWorld->debugDrawWorld();
+}

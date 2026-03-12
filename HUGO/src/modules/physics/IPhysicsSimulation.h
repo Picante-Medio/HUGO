@@ -16,4 +16,7 @@ public:
 
     // sync info and step the simulation
     virtual void performSimulation(double dt) = 0;
+
+    // physics visual debugger
+    virtual void debugDraw() = 0;
 };

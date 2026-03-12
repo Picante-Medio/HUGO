@@ -77,4 +77,6 @@ public:
 
     // Sync bodies to bullet, step simulation, sync bodies back to game
     void performSimulation(double dt) override;
+
+    void debugDraw() override;
 };
