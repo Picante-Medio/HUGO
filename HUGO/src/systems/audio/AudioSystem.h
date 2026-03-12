@@ -164,7 +164,7 @@ public:
 
 
    // load assets
-   ErrorOrVoid loadAudiosFromFile(const char* fileName);
+   ErrorOrVoid loadAudiosFromFile(HUGO::String fileName);
    ErrorOrVoid addAudio(const char* name, HUGO::AudioTypes type);
 
    // updates

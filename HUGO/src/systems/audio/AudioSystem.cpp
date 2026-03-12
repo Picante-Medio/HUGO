@@ -4,6 +4,7 @@
 #include "AudioListenerComponent.h"
 #include "Audio3DInfoComponent.h"
 
+#include "HugoError.h"
 #include "HugoTypes.h"
 #include "Scene.h"
 #include "TransformComponent.h"
@@ -18,7 +19,9 @@ AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, std::shared_ptr<Miniaudio
     const std::string& path, int queueSize)
     : System(scene), engine(miniaudioModule->getMiniaudioEngine()), path(path), audios(), nameToID(), pools(), nextID(0), queueSize(queueSize)
 {   
-    LuaBinder::Instance().registerMethod<AudioSystem, void, int>(*this, &AudioSystem::playAudioLUA, "playAudio");
+    LuaBinder& luaBinder = LuaBinder::Instance();
+    luaBinder.registerMethod<AudioSystem, void, int>(*this, &AudioSystem::playAudioLUA, "playAudio");
+    luaBinder.registerMethod<AudioSystem, ErrorOrVoid, HUGO::String>(*this, &AudioSystem::loadAudiosFromFile, "loadAudiosFromFile");
 }
 
 ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id)
@@ -339,10 +342,10 @@ void AudioSystem::process3DChanges(AudioComponent& a, const Audio3DInfoComponent
 #pragma endregion
 
 #pragma region HELPERS
-ErrorOrVoid AudioSystem::loadAudiosFromFile(const char* fileName)
+ErrorOrVoid AudioSystem::loadAudiosFromFile(HUGO::String fileName)
 {
     // build full path using the system audio directory
-    std::string fullPath = path + fileName;
+    HUGO::String fullPath = path + fileName;
     std::ifstream file(fullPath);
 
     if (!file.is_open())

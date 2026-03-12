@@ -63,7 +63,7 @@ class LuaBinder {
 
     template<typename ReturnType, typename ...ArgTypes, std::size_t... I>
     static int callLuaFunc(lua_State* lua, ReturnType(*func)(ArgTypes...), std::index_sequence<I...>) {
-        if constexpr (std::is_same_v<ReturnType, void>) {
+        if constexpr (std::is_same_v<ReturnType, void> || std::is_same_v<ReturnType, ErrorOrVoid>) {
             func(lua_get<ArgTypes>(lua, I + 1)...);
             return 0; 
         }
@@ -76,7 +76,7 @@ class LuaBinder {
 
     template<typename ClassType, typename ReturnType, typename... ArgTypes, std::size_t... I>
     static int callLuaMethod(lua_State* lua, ClassType* obj, ReturnType(ClassType::*fn)(ArgTypes...), std::index_sequence<I...>) {
-        if constexpr (std::is_same_v<ReturnType, void>) {
+        if constexpr (std::is_same_v<ReturnType, void> || std::is_same_v<ReturnType, ErrorOrVoid>) {
             (obj->*fn)(lua_get<ArgTypes>(lua, I + 1)...);
             return 0;
         } else {

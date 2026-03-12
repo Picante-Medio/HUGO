@@ -1,17 +1,14 @@
 #pragma once
 
-#include <memory>
+#include <cstddef>
 #include <utility>
 #include <vector>
-#include <any>
 
 #include "ComponentDenseTable.h"
 #include "Ecs.h"
 #include "EntityTable.h"
 #include "ComponentRegistry.h"
 #include "HQuery.h"
-#include "HugoTypes.h"
-#include "HugoError.h"
 
 class IScene {
 protected:
@@ -85,7 +82,7 @@ public:
 		// Get the smallest list of possible entities
 		int smallestListIndex = 0;
 		DenseListIndex smallestSize = componentTable.getCount(ids[0]);
-		for (int i = 1; i < ids.size(); ++i) {
+		for (size_t i = 1; i < ids.size(); ++i) {
 			DenseListIndex size = componentTable.getCount(ids[i]);
 			if (size < smallestSize) {
 				smallestSize = size;
