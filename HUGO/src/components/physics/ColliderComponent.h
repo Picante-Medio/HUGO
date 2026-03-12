@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Component.h"
 #include "HugoMath.h"
 #include "HugoTypes.h"
 #include <variant>

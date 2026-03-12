@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Component.h"
 #include "HugoComponentMacros.h"
 
 HCOMPONENT(StaticRBTag)

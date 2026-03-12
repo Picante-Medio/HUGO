@@ -40,7 +40,7 @@ class RenderSystem : public System{
         Ogre::SceneNode* ogreSceneNode = nullptr;
         Ogre::AnimationState* animState = nullptr;
     };
-    
+
     Ogre::Root* ogreRoot;
     Ogre::SceneManager* sceneManager = nullptr;
 

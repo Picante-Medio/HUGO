@@ -1,10 +1,7 @@
 #pragma once
 
-#include "Scene.h"
-#include "Ecs.h"
 #include <any>
 #include <vector>
-#include <memory>
 #include <HugoMath.h>
 #include "HugoError.h"
 

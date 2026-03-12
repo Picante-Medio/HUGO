@@ -2,14 +2,11 @@
 
 #include <memory>
 
-#include "OgreRenderWindow.h"
-#include "OgreRoot.h"
-#include "OgreOverlaySystem.h"
 #include "HugoVirtualTimer.h"
 #include "miniaudio.h"
-#include "BulletModule.h"
 #include "OgreModule.h"
 #include "MiniaudioModule.h"
+#include "IPhysicsModule.h"
 
 class Scene;
 class VirtualTimer;
@@ -36,7 +33,7 @@ namespace HUGO {
 
         //Resource Manager
         std::shared_ptr<ResourceManager> m_resourceManager;
-    
+
     public:
         Core();
         void init();

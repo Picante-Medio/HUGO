@@ -1,5 +1,4 @@
 #pragma once
-#include "HugoMath.h"
 #include "HugoTypes.h"
 #include "HugoComponentMacros.h"
 
