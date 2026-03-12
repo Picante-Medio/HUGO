@@ -1,13 +1,19 @@
 #pragma once
 #include <memory>
 
+// Ogre tambien predeclara ogre root, pero en debug añade un namespace intermedio
+// Ese namespace intermedio se añade mediante una macro y mete un using de dicho namespace,
+// por eso podemos usar Ogre::Root sin tener que hacer Ogre::NamespaceDebug::Root, pero en 
+// las predeclaraciones los usings no aplican y hay que poner todo el namespace, se podría hacer
+// metiendo la macro pero me parece poco cómodo. Meted el include y palante
+#include "OgreRoot.h"
+
 namespace Ogre{
-    class Root;
     class OverlaySystem;
     class RenderWindow;
 };
 
-class SDL_Window;
+struct SDL_Window;
 
 class OgreModule{
 

@@ -2,7 +2,7 @@
 #include "OgreModule.h"
 
 #include <Ogre.h>
-#include "OgreRoot.h"
+#include <OgreRoot.h>
 #include "OgreRenderWindow.h"
 #include "OgreOverlaySystem.h"
 
@@ -43,7 +43,7 @@ OgreModule::OgreModule(){
         std::string("ERROR: unable to configure Ogre"));
     }
     //If there is another rendering system available, we could choose between one or another
-    for(Ogre::RenderSystem* renderSys: m_ogreRoot->getAvailableRenderers()){
+    for(Ogre::RenderSystem* renderSys : m_ogreRoot->getAvailableRenderers()){
         if(renderSys->getName() == "OpenGL Rendering Subsystem"){
             m_ogreRoot->setRenderSystem(renderSys);
             break;
