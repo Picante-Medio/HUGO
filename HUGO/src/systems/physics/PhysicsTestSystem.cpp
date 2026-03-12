@@ -32,7 +32,8 @@ PhysicsTestSystem::PhysicsTestSystem(std::shared_ptr<Scene> scene)
     transform2.scale = HUGO::Vector3(0.15f, 0.25f, 0.15f);
     ColliderComponent& collider2 = scene->addAndGetComponent<ColliderComponent>(e2);
     collider2.info = BoxColliderInfo{HUGO::Vector3(1.f, 1.f, 1.f)};
-    scene->addComponent<RigidBodyComponent>(e2);
+    RigidBodyComponent& rb2 = scene->addAndGetComponent<RigidBodyComponent>(e2);
+    rb2.setMass(5.f);
     // rb->setShape()
     scene->addComponent<DynamicRBTag>(e2);
     RenderComponent& rc2 = scene->addAndGetComponent<RenderComponent>(e2);
@@ -61,25 +62,20 @@ void PhysicsTestSystem::fixedUpdate(double dt) {
 }
 
 void PhysicsTestSystem::update(double dt) {
-    for(auto pack : scene->query<ColliderComponent, TransformComponent>()){
+
+    for(auto pack : scene->query<ColliderComponent, TransformComponent, RigidBodyComponent, DynamicRBTag>()) {
         TransformComponent& tf = pack.get<TransformComponent&>();
+        ColliderComponent& col = pack.get<ColliderComponent&>();
 
-        std::cout << "Position: " << tf.position.x << " " << tf.position.y << " " << tf.position.z << "\n";
+        if(col.getCollisionInfo().empty()){
+            std::cout << "Posicion: " << tf.position.x << " " << tf.position.y << " " << tf.position.z << " No choca\n";
+        }
+        else if(col.getCollisionInfo().size() > 1){
+            std::cout << "La colisiones no se estan borrando bien";
+        }
+        else
+        {
+            std::cout << "Posicion: " << tf.position.x << " " << tf.position.y << " " << tf.position.z << " " << col.entity << " choca con " << col.getCollisionInfo().at(0) << "\n";
+        }
     }
-
-    // for(auto pack : scene->query<ColliderComponent, TransformComponent, RigidBodyComponent, DynamicRBTag>()) {
-    //     TransformComponent& tf = pack.get<TransformComponent&>();
-    //     ColliderComponent& col = pack.get<ColliderComponent&>();
-
-    //     if(col.getCollisionInfo().empty()){
-    //         std::cout << "Posicion: " << tf.position.x << " " << tf.position.y << " " << tf.position.z << " No choca\n";
-    //     }
-    //     else if(col.getCollisionInfo().size() > 1){
-    //         std::cout << "La colisiones no se estan borrando bien";
-    //     }
-    //     else
-    //     {
-    //         std::cout << "Posicion: " << tf.position.x << " " << tf.position.y << " " << tf.position.z << " " << col.entity << " choca con " << col.getCollisionInfo().at(0) << "\n";
-    //     }
-    // }
 }

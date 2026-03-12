@@ -463,17 +463,17 @@ void BulletSimulation::syncBodiesToBullet() {
     }
 
     // Add colliders to simulation
-    // for(auto& pack: scene->query<ColliderComponent, TransformComponent>()){
-    //     ColliderComponent& col = pack.get<ColliderComponent&>();
-    //     TransformComponent& tf = pack.get<TransformComponent&>();
+     for(auto& pack: scene->query<ColliderComponent, TransformComponent>()){
+         ColliderComponent& col = pack.get<ColliderComponent&>();
+         TransformComponent& tf = pack.get<TransformComponent&>();
     
-    //     if(col.objectID == HUGO::INVALID_COL_OBJ_ID){
-    //         col.objectID = createColliderObject(col, tf);
-    //     }
+         if(col.objectID == HUGO::INVALID_COL_OBJ_ID){
+             col.objectID = createColliderObject(col, tf);
+         }
     
-    //     col.collisionInfo.clear();
-    //     checkColliderFlags(col);
-    // }
+         col.collisionInfo.clear();
+         checkColliderFlags(col);
+    }
 }
 
 void BulletSimulation::syncBodiesToGame() {
@@ -492,7 +492,7 @@ void BulletSimulation::syncBodiesToGame() {
         rb.angularVelocity = BulletUtils::btVector3ToVector3(btRb->getAngularVelocity());
 
         // Clear forces applied this frame
-        btRb->clearForces();
+        //btRb->clearForces();
     }
 }
 #pragma endregion
