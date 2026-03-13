@@ -1,7 +1,9 @@
 #include "SceneManager.h"
+#include "LuaBinder.h"
 
 SceneManager::SceneManager(): m_chatParser(), m_sceneMap(){
-
+    LuaBinder& luaBinder = LuaBinder::Instance();
+    luaBinder.registerMethod<SceneManager, void, HUGO::String>(*this, &SceneManager::setCurrentSceneLUA, "SetCurrentScene");
 }
 
 ErrorOrVoid SceneManager::initializeParser(const HUGO::String& chatFolder){
@@ -30,6 +32,10 @@ ErrorOrVoid SceneManager::unloadScene(const HUGO::String& sceneName){
     m_sceneMap.erase(sceneName);
 
     return ErrorOrVoid();
+}
+
+void SceneManager::setCurrentSceneLUA(const HUGO::String sceneName){
+    setCurrentScene(sceneName);
 }
 
 void SceneManager::setCurrentScene(const HUGO::String& sceneName){

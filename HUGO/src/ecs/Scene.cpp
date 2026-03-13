@@ -5,8 +5,12 @@
 #include <vector>
 #include "Ecs.h"
 
-Scene::Scene() {
+#include "LuaBinder.h"
 
+Scene::Scene() {
+  LuaBinder& luaBinder = LuaBinder::Instance();
+  luaBinder.registerMethod<Scene, void, EntityID>(*this, &Scene::removeEntity, "RemoveEntity");
+  luaBinder.registerMethod<Scene, EntityID>(*this, &Scene::createEntity, "CreateEntity");
 }
 
 void 

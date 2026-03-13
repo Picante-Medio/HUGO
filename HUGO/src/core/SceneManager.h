@@ -30,6 +30,7 @@ public:
     If a scene were currently running, it will stop running and will be kept in memory for future use.
     */
     void setCurrentScene(const HUGO::String& sceneName);
+    void setCurrentSceneLUA(const HUGO::String sceneName);
 
     void updateCurrentScene(double dt);
 };

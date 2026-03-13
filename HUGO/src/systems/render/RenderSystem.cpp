@@ -16,6 +16,7 @@
 #include "OgreUtils.h"
 
 #include "OgreModule.h"
+#include "LuaBinder.h"
 
 RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<OgreModule> ogreMod)
     :System(scene), idToIndex(), freeOgreObjectId(), m_ogreModule(ogreMod)
@@ -31,6 +32,7 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<OgreMod
 
     // Basic light
     setAmbientLight(0.2f, 0.2f, 0.2f);
+
 
     // Camera and viewport creation for testing
     EntityID defaultCamera = createCameraEntity(HUGO::Vector3(0, 0, 200));
@@ -64,6 +66,8 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<OgreMod
     anim.setLoop(true);
     anim.setAnimation("Dance");   
     
+    LuaBinder& luaBinder = LuaBinder::Instance();
+    luaBinder.registerMethod<RenderSystem, void, float, float, float>(*this, &RenderSystem:setAmbientLight, "SetAmbientLight");
 }
 
 RenderSystem::~RenderSystem()
