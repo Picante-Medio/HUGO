@@ -23,19 +23,15 @@ overlay testCanvas/SimpleTest
         top 0.2
         width 0.3
         height 0.1
-        metrics_mode relative
 
         overlay_element testCanvas/SimpleTest/Container/Text TextArea
         {
             font_name Roboto 
-            metrics_mode relative
             char_height 0.04 
             caption Animo chiquis
             space_width 0.025
             colour_top 1.0 0.0 1.0 1.0
             colour_bottom 0.0 1.0 1.0 1.0
-            alignment center 
-            vertical_alignment center  
         }
     }
 }

@@ -11,8 +11,8 @@
 HCOMPONENT(TextComponent)
     // names
     HUGO::String overlayName = "";      // overlay in Ogre
-    HUGO::String containerName = "container";        // parent panel/container name
-    HUGO::String textAreaName = "";     // text area element name
+    HUGO::String containerName = "";
+    HUGO::String textAreaName = "textArea";     // text area element name
 
     // state
     bool isVisible = true;
@@ -43,6 +43,4 @@ HCOMPONENT(TextComponent)
     // OPTIONALS
     // space width
     HUGO::Float spaceWidth = 0.03f;  
-    // panel material
-    HUGO::String panelMaterial = "";
 END_HCOMPONENT()

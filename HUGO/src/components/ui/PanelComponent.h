@@ -23,7 +23,7 @@ HCOMPONENT(PanelComponent)
     HUGO::Float height= 1.0f;
 
     // appearance
-    HUGO::String backgroundMaterial = "";
+    HUGO::String material = "";
 
     // alignment and positioning
     Ogre::GuiHorizontalAlignment alignmentX = 

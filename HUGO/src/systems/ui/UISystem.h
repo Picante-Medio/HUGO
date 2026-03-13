@@ -60,4 +60,5 @@ public:
     void fixedUpdate(double dt) override;
     
     void createTestCanvas();
+    void createTestText();
 };

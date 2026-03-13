@@ -86,18 +86,8 @@ std::shared_ptr<PanelCache> UISystem::createPanelCache(const PanelComponent& p)
     
     ErrorOrType<Ogre::OverlayContainer*> containerResult = getContainer(p.containerName);
     if (!containerResult.isError()) {
-        cache->container = containerResult.getValue();
+        cache->panel = containerResult.getValue();
     }
-    
-    // store current state from component
-    cache->lastVisibleState = p.isVisible;
-    cache->lastZOrder = p.zOrder;
-    cache->lastLeft = p.left;
-    cache->lastTop = p.top;
-    cache->lastWidth = p.width;
-    cache->lastHeight = p.height;
-    cache->lastMaterial = p.backgroundMaterial;
-    
     return cache;
 }
 
@@ -109,13 +99,11 @@ std::shared_ptr<TextCache> UISystem::createTextCache(const TextComponent &t)
     ErrorOrType<Ogre::Overlay*> overlayResult = getOverlay(t.overlayName);
     if (!overlayResult.isError()) {
         cache->overlay = overlayResult.getValue();
-        cache->lastZOrder = cache->overlay->getZOrder();
     }
     
     ErrorOrType<Ogre::OverlayContainer*> containerResult = getContainer(t.containerName);
     if (!containerResult.isError()) {
         cache->container = containerResult.getValue();
-        cache->lastPanelMaterial = cache->container->getMaterialName();
     }
     
     // get text area using getElement + dynamic_cast
@@ -125,32 +113,9 @@ std::shared_ptr<TextCache> UISystem::createTextCache(const TextComponent &t)
         Ogre::TextAreaOverlayElement* textArea = dynamic_cast<Ogre::TextAreaOverlayElement*>(element);
         
         // store current state from component
-        if (textArea != nullptr) {
+        if (textArea != nullptr)
             cache->textArea = textArea;
-            
-            cache->lastText = textArea->getCaption();
-            cache->lastFontName = textArea->getFontName();
-            cache->lastCharHeight = textArea->getCharHeight();
-            
-            Ogre::ColourValue c = textArea->getColour();
-            Ogre::ColourValue ct = textArea->getColourTop();
-            Ogre::ColourValue cb = textArea->getColourBottom();
-
-            cache->lastColour = {c.r, c.g, c.b, c.a};
-            cache->lastColourTop = {ct.r, ct.g, ct.b, ct.a};
-            cache->lastColourBottom = {cb.r, cb.g, cb.b, cb.a};
-
-            cache->lastAlignment = textArea->getAlignment();
-            cache->lastLeft = textArea->getLeft();
-            cache->lastTop = textArea->getTop();
-            cache->lastWidth = textArea->getWidth();
-            cache->lastHeight = textArea->getHeight();
-            cache->lastMetricsMode = textArea->getMetricsMode();
-            cache->lastSpaceWidth = textArea->getSpaceWidth();
-        }
     }
-    
-    cache->lastVisibleState = t.isVisible;
     
     return cache;
 }
@@ -166,7 +131,7 @@ void UISystem::syncPanel(const PanelComponent& p, const PanelDirtyTag& t)
         it->second = createPanelCache(p);
     
     std::shared_ptr<PanelCache>& cache = it->second;
-    if (cache == nullptr || cache->overlay == nullptr || cache->container == nullptr) return;
+    if (cache == nullptr || cache->overlay == nullptr || cache->panel == nullptr) return;
     
     //sync according to the fields
 
@@ -271,24 +236,17 @@ void UISystem::processVisibility()
         
         // get cache for this entity
         auto it = panelCache.find(entity);
-        if (it != panelCache.end() && it->second && it->second->overlay) {
+        if (it != panelCache.end() && it->second && it->second->overlay && it->second->panel) {
             std::shared_ptr<PanelCache> cache = it->second;
             
             // apply visibility to Ogre
             if (panel.isVisible) {
                 cache->overlay->show();
-                if (cache->container) {
-                    cache->container->show();
-                }
+                cache->panel->show();
             } else {
                 cache->overlay->hide();
-                if (cache->container) {
-                    cache->container->hide();
-                }
+                cache->panel->hide();
             }
-            
-            // update cache
-            cache->lastVisibleState = panel.isVisible;
         }
         
         // remove the dirty tag
@@ -301,30 +259,19 @@ void UISystem::processVisibility()
         
         // get cache for this entity
         auto it = textCache.find(entity);
-        if (it != textCache.end() && it->second && it->second->overlay) {
+        if (it != textCache.end() && it->second && it->second->overlay && it->second->container && it->second->textArea) {
             std::shared_ptr<TextCache> cache = it->second;
             
             // apply visibility to Ogre
             if (text.isVisible) {
                 cache->overlay->show();
-                if (cache->container) {
-                    cache->container->show();
-                    if (cache->textArea){
-                        cache->textArea->show();
-                    }
-                }
+                cache->container->show();
+                cache->textArea->show();
             } else {
                 cache->overlay->hide();
-                if (cache->container) {
-                    cache->container->hide();
-                    if (cache->textArea){
-                        cache->textArea->hide();
-                    }
-                }
+                cache->container->hide();
+                cache->textArea->hide();
             }
-            
-            // update cache
-            cache->lastVisibleState = text.isVisible;
         }
         
         // remove the dirty tag
@@ -380,6 +327,44 @@ void UISystem::createTestCanvas()
     Ogre::OverlayManager& om = Ogre::OverlayManager::getSingleton();
 
     EntityID ent = scene->createEntity();
+    PanelComponent& panel = scene->addAndGetComponent<PanelComponent>(ent);
+
+    panel.overlayName = "testCanvas/SimpleTest";
+    panel.containerName = panel.overlayName + "/Container"; 
+
+    // 1. get overlay
+    Ogre::Overlay* overlay = om.getByName(panel.overlayName);
+    if (!overlay) return;
+
+    panel.zOrder = overlay->getZOrder();
+
+    // 2. get container
+    ErrorOrType<Ogre::OverlayContainer*> containerResult = getContainer(panel.containerName);
+    if (containerResult.isError()) return;
+
+    Ogre::OverlayContainer* container = containerResult.getValue();
+    container->setMaterialName("UI/Test");
+    panel.material = container->getMaterialName();
+    panel.metricsMode = container->getMetricsMode();
+    panel.left = container->getLeft();
+    panel.top = container->getTop();
+    panel.width = container->getWidth();
+    panel.height = container->getHeight();
+    panel.alignmentX = container->getHorizontalAlignment();
+    panel.alignmentY = container->getVerticalAlignment();
+    
+    // visibility
+    panel.isVisible = true;
+    scene->addComponent<VisibilityDirtyTag>(ent);
+
+    panelCache[ent] = createPanelCache(panel);
+}
+
+void UISystem::createTestText()
+{
+    Ogre::OverlayManager& om = Ogre::OverlayManager::getSingleton();
+
+    EntityID ent = scene->createEntity();
     TextComponent& text = scene->addAndGetComponent<TextComponent>(ent);
 
     text.overlayName = "testCanvas/SimpleTest";
@@ -398,12 +383,7 @@ void UISystem::createTestCanvas()
 
     Ogre::OverlayContainer* container = containerResult.getValue();
     container->setMaterialName("UI/Test");
-    text.panelMaterial = container->getMaterialName();
-    text.metricsMode = container->getMetricsMode();
-    text.left = container->getLeft();
-    text.top = container->getTop();
-    text.width = container->getWidth();
-    text.height = container->getHeight();
+    
 
     // 3. get text area
     ErrorOrType<Ogre::OverlayElement*> elementResult = getElement(text.textAreaName);
@@ -415,22 +395,23 @@ void UISystem::createTestCanvas()
         if (area) {
             text.text = area->getCaption();
             text.characterHeight = area->getCharHeight();
+            
+            text.metricsMode = area->getMetricsMode();
+            text.left = area->getLeft();
+            text.top = area->getTop();
+            text.width = area->getWidth();
+            text.height = area->getHeight();
+
 
             Ogre::ColourValue c = area->getColour();
+            Ogre::ColourValue ct = area->getColourTop();
+            Ogre::ColourValue cb = area->getColourBottom();
             text.colour = {c.r, c.g, c.b, c.a};
-
+            text.colourTop = {ct.r, ct.g, ct.b, ct.a};
+            text.colourBottom = {cb.r, cb.g, cb.b, cb.a};
             text.spaceWidth = area->getSpaceWidth();
-            area->setAlignment(Ogre::TextAreaOverlayElement::Center);
             text.alignmentX = area->getHorizontalAlignment();
             text.alignmentY = area->getVerticalAlignment();
-
-            area->setAlignment(Ogre::TextAreaOverlayElement::Center);
-            area->setLeft(0);
-            area->setTop(0);
-            area->setWidth(container->getWidth());
-            area->setVerticalAlignment(Ogre::GuiVerticalAlignment::GVA_CENTER);
-            area->setHorizontalAlignment(Ogre::GuiHorizontalAlignment::GHA_CENTER);
-            area->setHeight(container->getHeight());
         }
     }
 
