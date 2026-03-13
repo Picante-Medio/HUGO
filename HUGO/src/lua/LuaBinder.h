@@ -11,6 +11,7 @@
 #include <luaconf.h>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 //Functions to use the right lua types for arguments and return types
 #pragma region HelperFunctions
@@ -173,5 +174,22 @@ public:
         T result = lua_get<T>(lua, -1);
         lua_pop(lua, 1);
         return ErrorOrType<T, StringError>(result);
+    }
+
+    template<typename T>
+    void sendTable(std::vector<T> array) {
+        // Create the "array"
+        lua_newtable(lua);
+
+        for (int i = 0; i < array.size(); i++) {
+            // Push index
+            lua_pushnumber(lua, i+1); // push the index
+
+            // Push value
+            lua_pushvalue(lua, array[i]);
+
+            // Fix the table stack offset
+            lua_settable(lua, -3);
+        }
     }
 };
