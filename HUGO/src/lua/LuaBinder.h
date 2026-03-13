@@ -178,7 +178,7 @@ public:
     }
 
     template<typename T>
-    void sendTable(std::vector<T> array) {
+    void sendTable(std::vector<T> array, HUGO::String luaGlobalName = "arrayTable") {
         // Create the "array"
         lua_newtable(lua);
 
@@ -192,5 +192,7 @@ public:
             // Fix the table stack offset
             lua_settable(lua, -3);
         }
+
+        lua_setglobal(lua, luaGlobalName);
     }
 };
