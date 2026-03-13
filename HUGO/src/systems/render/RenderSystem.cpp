@@ -53,9 +53,6 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<OgreMod
                         100); 
         
 
-    LuaBinder& luaBinder = LuaBinder::Instance();
-    luaBinder.registerMethod<RenderSystem, void, float, float, float>(*this, &RenderSystem::setAmbientLight, "SetAmbientLight");
-    
     //DEPRECATED: this will be in load method
     LuaBinder& luaBinder = LuaBinder::Instance();
     luaBinder.registerMethod<RenderSystem, void, float, float, float>(*this, &RenderSystem::setAmbientLight, "SetAmbientLight");
