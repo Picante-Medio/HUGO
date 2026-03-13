@@ -176,24 +176,6 @@ foreach(path ${BULLET_SRC_DIRS})
     endif()
 endforeach()
 
-# ver si sigue haciendo falta
-if(LINUX)
-    set(CMAKE_EXE_LINKER_FLAGS "-lpng -lbz2 -lbrotlidec -lpthread -lm")
-    
-    # find_package(Threads REQUIRED)
-    # find_library(BROTLIDEC_LIB brotlidec REQUIRED)
-    # find_library(PNG_LIB png REQUIRED)
-    # find_library(BZ2_LIB bz2 REQUIRED)
-    # find_library(M_LIB m REQUIRED)
-
-    # list(APPEND HUGO_LINKED_LIBRARIES
-    #     Threads::Threads
-    #     ${BROTLIDEC_LIB}
-    #     ${PNG_LIB}
-    #     ${BZ2_LIB}
-    #     ${M_LIB})
-endif()
-
 ################################## Aquí empieza el proyecto principal
 
 file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cpp)
