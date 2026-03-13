@@ -53,21 +53,21 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<OgreMod
                         100); 
         
 
-    //testing
-    EntityID e1 = scene->createEntity();
-    TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(e1);
-    transform.position = HUGO::Vector3(0, 0,0);;
-    transform.scale = HUGO::Vector3(4.0f, 4.0f, 4.0f);
-    RenderComponent& rc = scene->addAndGetComponent<RenderComponent>(e1);
-    rc.meshName = "Sinbad.mesh";
-
-    AnimationComponent& anim = scene->addAndGetComponent<AnimationComponent>(e1);
-    anim.setEnabled(true);
-    anim.setLoop(true);
-    anim.setAnimation("Dance");   
-    
     LuaBinder& luaBinder = LuaBinder::Instance();
     luaBinder.registerMethod<RenderSystem, void, float, float, float>(*this, &RenderSystem::setAmbientLight, "SetAmbientLight");
+
+    //--------------------testing-------------------------------
+    // EntityID e1 = scene->createEntity();
+    // TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(e1);
+    // transform.position = HUGO::Vector3(0, 0,0);;
+    // transform.scale = HUGO::Vector3(4.0f, 4.0f, 4.0f);
+    // RenderComponent& rc = scene->addAndGetComponent<RenderComponent>(e1);
+    // rc.meshName = "Sinbad.mesh";
+
+    // AnimationComponent& anim = scene->addAndGetComponent<AnimationComponent>(e1);
+    // anim.addAnimation("RunTop", true, true);   
+    // anim.addAnimation("RunBase", true, true);   
+    //-----------------------------------------------------------------
 }
 
 RenderSystem::~RenderSystem()
@@ -92,6 +92,19 @@ RenderSystem::~RenderSystem()
         }
     }
     cameraMap.clear();
+
+    for(auto& l: lightMap){
+        if(l.second.node){
+            l.second.node->detachAllObjects();
+            sceneManager->destroySceneNode(l.second.node);
+            l.second.node = nullptr;
+        }
+        if(l.second.ogreLight){
+            sceneManager->destroyLight(l.second.ogreLight);
+            l.second.ogreLight = nullptr;
+        }
+    }
+    lightMap.clear();
 
     for(std::size_t i =0; i<ogreObjects.size(); ++i){
         destroyOgreObject(ogreObjects[i]);
@@ -234,7 +247,7 @@ ErrorOrType<HUGO::OgreObjectID> RenderSystem::createOgreObject(const std::string
     Ogre::Entity* ent = nullptr;
     Ogre::SceneNode* node = nullptr;
 
-     try {
+    try {
         //create ogre entity
         ent = sceneManager->createEntity(meshName);
         if (!materialName.empty()) {
@@ -250,7 +263,7 @@ ErrorOrType<HUGO::OgreObjectID> RenderSystem::createOgreObject(const std::string
         err.errorMessage = "[RenderSystem] Failed to create OgreObject: "+ std::string(e.getDescription());
         if (ent) sceneManager->destroyEntity(ent);
         if (node) sceneManager->destroySceneNode(node);
-
+        
         return ErrorOrType<HUGO::OgreObjectID>(err);
     }
     
@@ -272,7 +285,7 @@ ErrorOrType<HUGO::OgreObjectID> RenderSystem::createOgreObject(const std::string
     //store object
     std::size_t index = ogreObjects.push_back(std::move(obj));
     idToIndex[id] = index;
-
+    
     return ErrorOrType<HUGO::OgreObjectID>(id);
 }
 
@@ -306,6 +319,7 @@ void RenderSystem::removeOgreObject(HUGO::OgreObjectID& id)
 void RenderSystem::destroyOgreObject(OgreObject &obj)
 {
     if(obj.ogreSceneNode){
+        
         sceneManager->destroySceneNode(obj.ogreSceneNode);
         obj.ogreSceneNode = nullptr;
     }
@@ -320,25 +334,30 @@ void RenderSystem::destroyOgreObject(OgreObject &obj)
 void RenderSystem::updateAnimations(double dt)
 {
     for(auto& pack : scene->query<RenderComponent, AnimationComponent>()) {
-        AnimationComponent& anim = pack.get<AnimationComponent&>();
+        AnimationComponent& animComp = pack.get<AnimationComponent&>();
         RenderComponent& rc = pack.get<RenderComponent&>();
 
         if(rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) continue;
-        if(!anim.getEnabled()) continue;
-
+        
         Ogre::Entity* ogre_ent = getOgreObject(rc.objectID).ogreEntity;
-        const HUGO::String& animName= anim.getAnimation();
-        if(animName != "" )
-        {
-            if(!ogre_ent->hasAnimationState(animName)) std::cerr<<"[RenderSystem] Animation "+ animName + " does not exist in entity " + std::to_string(rc.entity) + "\n";
+
+        for(auto& a: animComp.anims){
+            const HUGO::String& animName = a.first;
+            AnimationInfo animInfo = a.second;
+
+            if(!ogre_ent->hasAnimationState(animName)) 
+                std::cerr<<"[RenderSystem] Animation "+ animName + " does not exist in entity " + std::to_string(rc.entity) + "\n";
             
             Ogre::AnimationState* animState = ogre_ent->getAnimationState(animName);
-            if(!animState->getEnabled())
-            {
-                animState->setEnabled(true);
-                animState->setLoop(anim.getLoop());
-            }
-            animState->addTime(static_cast<Ogre::Real>(dt));
+            
+            if(animInfo.enable != animState->getEnabled()) 
+                animState->setEnabled(animInfo.enable);
+                
+            if(animInfo.loop!= animState->getLoop()) 
+                animState->setLoop(animInfo.loop);
+
+            if(animInfo.enable)
+                animState->addTime(static_cast<Ogre::Real>(dt));
         }
     }
 }
@@ -379,12 +398,6 @@ void RenderSystem::update(double dt)
 }
 
 #pragma endregion
-
-void RenderSystem::setMaterial(EntityID entity, const std::string &materialName)
-{
-    MaterialDirtyTag& m = scene->addAndGetComponent<MaterialDirtyTag>(entity);
-    m.materialName = materialName;
-}
 
 // Helper function for Camera creation
 EntityID RenderSystem::createCameraEntity(const HUGO::Vector3& position)

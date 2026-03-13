@@ -10,11 +10,11 @@ private:
     HUGO::String materialName="";
 public:
     // Setter
-    void setMeshName(const HUGO::String& newMeshName) { meshName = newMeshName; }
-    void setMaterialName(const HUGO::String& newMaterialName) { materialName = newMaterialName; }
+    inline void setMeshName(const HUGO::String& newMeshName) { meshName = newMeshName; }
+    inline void setMaterialName(const HUGO::String& newMaterialName) { materialName = newMaterialName; }
     // Getters
-    HUGO::String getMeshName() const { return meshName; }
-    HUGO::String getMaterialName() const { return materialName; }
+    inline HUGO::String getMeshName() const { return meshName; }
+    inline HUGO::String getMaterialName() const { return materialName; }
     
     friend class RenderSystem;
 

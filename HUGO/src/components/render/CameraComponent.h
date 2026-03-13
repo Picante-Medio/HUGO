@@ -29,26 +29,26 @@ private:
   
 public:
     // Setters
-    void setProjectionType(HUGO::ProjectionType type) { projectionType = type; }
-    void setFOVY(float fov) { fovY = fov; }
-    void setNearClip(float nearClip) { this->nearClip = nearClip; }
-    void setFarClip(float farClip) { this->farClip = farClip; }
-    void setOrthographicDimensions(float width, float height) { orthoWidth = width; orthoHeight = height; }
-    void setAspectRatio(float aspectRatio) { this->aspectRatio = aspectRatio; }
-    void setAutoAspectRatio(bool autoAspectRatio) { this->autoAspectRatio = autoAspectRatio; }
-    void setActive(bool active) { this->active = active; }
-    void setPriority(int priority) { this->priority = priority; }
-    void setPolygonMode(HUGO::PolygonMode mode) { polygonMode = mode; }
+    inline void setProjectionType(HUGO::ProjectionType type) { projectionType = type; }
+    inline void setFOVY(float fov) { fovY = fov; }
+    inline void setNearClip(float nearClip) { this->nearClip = nearClip; }
+    inline void setFarClip(float farClip) { this->farClip = farClip; }
+    inline void setOrthographicDimensions(float width, float height) { orthoWidth = width; orthoHeight = height; }
+    inline void setAspectRatio(float aspectRatio) { this->aspectRatio = aspectRatio; }
+    inline void setAutoAspectRatio(bool autoAspectRatio) { this->autoAspectRatio = autoAspectRatio; }
+    inline void setActive(bool active) { this->active = active; }
+    inline void setPriority(int priority) { this->priority = priority; }
+    inline void setPolygonMode(HUGO::PolygonMode mode) { polygonMode = mode; }
     // Getters
-    HUGO::ProjectionType getProjectionType() const { return projectionType; }
-    float getFOVY() const { return fovY; }
-    float getNearClip() const { return nearClip; }
-    float getFarClip() const { return farClip; }
-    std::pair<float, float> getOrthographicDimensions() const { return {orthoWidth, orthoHeight}; }
-    float getAspectRatio() const { return aspectRatio; }
-    bool getAutoAspectRatio() const { return autoAspectRatio; }
-    bool isActive() const { return active; }
-    int getPriority() const { return priority; }
-    HUGO::PolygonMode getPolygonMode() const { return polygonMode; }
+    inline HUGO::ProjectionType getProjectionType() const { return projectionType; }
+    inline float getFOVY() const { return fovY; }
+    inline float getNearClip() const { return nearClip; }
+    inline float getFarClip() const { return farClip; }
+    inline std::pair<float, float> getOrthographicDimensions() const { return {orthoWidth, orthoHeight}; }
+    inline float getAspectRatio() const { return aspectRatio; }
+    inline bool getAutoAspectRatio() const { return autoAspectRatio; }
+    inline bool isActive() const { return active; }
+    inline int getPriority() const { return priority; }
+    inline HUGO::PolygonMode getPolygonMode() const { return polygonMode; }
 
 END_HCOMPONENT()

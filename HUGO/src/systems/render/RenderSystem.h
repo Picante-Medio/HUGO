@@ -38,7 +38,6 @@ class RenderSystem : public System{
         HUGO::OgreObjectID id = HUGO::INVALID_OGRE_OBJECT_ID;
         Ogre::Entity* ogreEntity = nullptr;
         Ogre::SceneNode* ogreSceneNode = nullptr;
-        Ogre::AnimationState* animState = nullptr;
     };
 
     Ogre::Root* ogreRoot;
@@ -65,9 +64,6 @@ class RenderSystem : public System{
 
     void handleTag();
     void updateAnimations(double dt);
-
-    // Materials
-    void setMaterial(EntityID entity,const std::string& materialName);   
 
     // Register and unregister for cameras and viewports created outside the RenderSystem
     void registerCameraEntity(EntityID entity);

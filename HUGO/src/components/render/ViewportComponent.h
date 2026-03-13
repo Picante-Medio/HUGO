@@ -27,26 +27,26 @@ private:
 
 public:
     // Setters
-    void setLeft(float l) { left = l; }
-    void setTop(float t) { top = t; }
-    void setWidth(float w) { width = w; }
-    void setHeight(float h) { height = h; }
-    void setZOrder(int z) { zOrder = z; }
-    void setClearColor(const HUGO::Vector4& color) { clearColor = color; }
-    void setClearDepth(bool clear) { clearDepth = clear; }
-    void setClearStencil(bool clear) { clearStencil = clear; }
-    void setCameraEntity(EntityID camera) { cameraEntity = camera; }
-    void setActive(bool active) { this->active = active; }
+    inline void setLeft(float l) { left = l; }
+    inline void setTop(float t) { top = t; }
+    inline void setWidth(float w) { width = w; }
+    inline void setHeight(float h) { height = h; }
+    inline void setZOrder(int z) { zOrder = z; }
+    inline void setClearColor(const HUGO::Vector4& color) { clearColor = color; }
+    inline void setClearDepth(bool clear) { clearDepth = clear; }
+    inline void setClearStencil(bool clear) { clearStencil = clear; }
+    inline void setCameraEntity(EntityID camera) { cameraEntity = camera; }
+    inline void setActive(bool active) { this->active = active; }
     // Getters
-    float getLeft() const { return left; }
-    float getTop() const { return top; }
-    float getWidth() const { return width; }
-    float getHeight() const { return height; }
-    int getZOrder() const { return zOrder; }
-    HUGO::Vector4 getClearColor() const { return clearColor; }
-    bool getClearDepth() const { return clearDepth; }
-    bool getClearStencil() const { return clearStencil; }
-    EntityID getCameraEntity() const { return cameraEntity; }
-    bool isActive() const { return active; }
+    inline float getLeft() const { return left; }
+    inline float getTop() const { return top; }
+    inline float getWidth() const { return width; }
+    inline float getHeight() const { return height; }
+    inline int getZOrder() const { return zOrder; }
+    inline HUGO::Vector4 getClearColor() const { return clearColor; }
+    inline bool getClearDepth() const { return clearDepth; }
+    inline bool getClearStencil() const { return clearStencil; }
+    inline EntityID getCameraEntity() const { return cameraEntity; }
+    inline bool isActive() const { return active; }
 
 END_HCOMPONENT()
