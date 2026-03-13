@@ -88,6 +88,7 @@ class LuaBinder {
     }
 public:
     static LuaBinder &Instance();
+    int setLuaPath(HUGO::String path );
     ~LuaBinder();
 
     //Init must be called before using lua
