@@ -26,12 +26,15 @@ overlay testCanvas/SimpleTest
 
         overlay_element testCanvas/SimpleTest/Container/Text TextArea
         {
+            left 0.075
+            top -0.02
             font_name Roboto 
             char_height 0.04 
             caption Animo chiquis
             space_width 0.025
             colour_top 1.0 0.0 1.0 1.0
             colour_bottom 0.0 1.0 1.0 1.0
+            vert_align center
         }
     }
 }
