@@ -25,4 +25,10 @@ HCOMPONENT(PanelComponent)
     // appearance
     HUGO::String backgroundMaterial = "";
 
+    // alignment and positioning
+    Ogre::GuiHorizontalAlignment alignmentX = 
+        Ogre::GuiHorizontalAlignment::GHA_LEFT;
+    Ogre::GuiVerticalAlignment alignmentY = 
+        Ogre::GuiVerticalAlignment::GVA_CENTER;
+
 END_HCOMPONENT()

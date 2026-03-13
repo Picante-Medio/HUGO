@@ -19,8 +19,8 @@ overlay testCanvas/SimpleTest
 
     overlay_element testCanvas/SimpleTest/Container Panel
     {
-        left 0.05
-        top 0.05
+        left 0.5
+        top 0.2
         width 0.3
         height 0.1
         metrics_mode relative
