@@ -16,13 +16,6 @@ protected:
 	EntityTable entityTable;
   	ComponentDenseTable componentTable;
 
-	template<typename T> 
-	T &getComponent(EntityID entity) {
-	ComponentID componentID = ComponentRegistry::getComponentId<T>();
-		return componentTable.getComponent<T>(
-			entityTable.getDenseListIndex(entity, componentID));
-	}
-
 public:
 	// Entity handling
 	virtual EntityID createEntity() = 0;
@@ -40,6 +33,7 @@ public:
 		entityTable.registerComponent(entity, id, index);
 	}
 
+		return componentTable.getComponent<T>(
 	template <typename T>
 	T& addAndGetComponent(EntityID entity) {
 		// Creating the component

@@ -55,19 +55,10 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<OgreMod
 
     LuaBinder& luaBinder = LuaBinder::Instance();
     luaBinder.registerMethod<RenderSystem, void, float, float, float>(*this, &RenderSystem::setAmbientLight, "SetAmbientLight");
-
-    //--------------------testing-------------------------------
-    // EntityID e1 = scene->createEntity();
-    // TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(e1);
-    // transform.position = HUGO::Vector3(0, 0,0);;
-    // transform.scale = HUGO::Vector3(4.0f, 4.0f, 4.0f);
-    // RenderComponent& rc = scene->addAndGetComponent<RenderComponent>(e1);
-    // rc.meshName = "Sinbad.mesh";
-
-    // AnimationComponent& anim = scene->addAndGetComponent<AnimationComponent>(e1);
-    // anim.addAnimation("RunTop", true, true);   
-    // anim.addAnimation("RunBase", true, true);   
-    //-----------------------------------------------------------------
+    
+    //DEPRECATED: this will be in load method
+    LuaBinder& luaBinder = LuaBinder::Instance();
+    luaBinder.registerMethod<RenderSystem, void, float, float, float>(*this, &RenderSystem::setAmbientLight, "SetAmbientLight");
 }
 
 RenderSystem::~RenderSystem()

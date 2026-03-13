@@ -17,7 +17,7 @@
 class Scene : public IScene, public std::enable_shared_from_this<Scene> {
   
   std::vector<std::shared_ptr<System>> systems;
-  std::unique_ptr<System> console;
+  std::shared_ptr<LuaConsole> console;
 
 public:
   Scene();
@@ -32,10 +32,13 @@ public:
 
   // Entity handling
   EntityID createEntity();
+
+  // LUA console stuff
   int createEntityLUA();
 
   void removeEntity(EntityID entity);
   void removeEntityLUA(int entity);
 
+  void printEntity(int id);
   void printEntities();
 };

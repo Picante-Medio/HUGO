@@ -87,4 +87,10 @@ public:
   * @return a list of ComponentID and indexes of said components in the dense table
   */
   std::vector<std::pair<ComponentID, DenseListIndex>> getAllDenseListIndexes(EntityID entity);
+
+  /** 
+  * Used to read all entities components for debugging
+  * @return the vector of bitsets
+  */
+  std::vector<std::bitset<MAX_COMPONENTS>> getComponentMask() {return componentMask;}
 };
