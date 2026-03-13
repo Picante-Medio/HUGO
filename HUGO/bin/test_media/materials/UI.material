@@ -1,6 +1,6 @@
 // material for Overlays
 // WE HAVE TO add texture_unit!!!!!
-material UI/Red
+material UI/Test
 {
     technique
     {

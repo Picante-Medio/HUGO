@@ -54,7 +54,6 @@ void Core::init(){
 
     audioSystem->loadAudiosFromFile("AudioList.txt");
     scenePtr->addSystem(audioSystem);
-    audioSystem->createTestEntity();
     
     std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr, m_ogreModule);
     scenePtr->addSystem(renderSystem);

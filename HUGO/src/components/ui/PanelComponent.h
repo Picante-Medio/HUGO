@@ -5,8 +5,6 @@
 #include "HugoComponentMacros.h"
 
 #include <OgreOverlay.h>
-#include <OgreOverlayManager.h>
-#include <OgreOverlayContainer.h>
 
 HCOMPONENT(PanelComponent)
     // names

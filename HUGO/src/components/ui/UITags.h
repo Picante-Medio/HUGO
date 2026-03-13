@@ -7,6 +7,10 @@
 HCOMPONENT(VisibilityDirtyTag)
 END_HCOMPONENT()
 
-HCOMPONENT(CanvasDirtyTag)
-    HUGO::CanvasDirtyFlags flags = HUGO::CanvasDirtyFlags::NONE_CANVAS;
+HCOMPONENT(PanelDirtyTag)
+    //HUGO::UInt flags = HUGO::PanelDirtyTags::NONE; 
 END_HCOMPONENT()
+
+HCOMPONENT(TextDirtyTag) 
+    //HUGO::UInt flags = HUGO::TextDirtyTags::NONE;  
+END_HCOMPONENT() 

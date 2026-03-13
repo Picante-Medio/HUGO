@@ -98,15 +98,4 @@ namespace HUGO{
         STATIC,
         KINEMATIC
     };
-
-    // UI Types
-    enum CanvasDirtyFlags
-    {
-        Z_ORDER = 0,
-        METRICS_MODE = 1 << 0,
-        POSITION = 1 << 1,
-        SIZE = 1 << 2,
-        MATERIAL = 1 << 3,
-        NONE_CANVAS = 1 << 4
-    };
 }

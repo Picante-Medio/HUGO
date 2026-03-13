@@ -1,8 +1,5 @@
 #include "SDL.h"
 #include "Ogre.h"
-#include <OgreOverlaySystem.h>
-#include <OgreOverlayManager.h>
-#include <OgreTextAreaOverlayElement.h>
 
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"

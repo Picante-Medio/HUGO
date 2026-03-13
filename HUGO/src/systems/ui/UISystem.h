@@ -1,44 +1,23 @@
 #pragma once
 #include "HugoError.h"
-#include "HugoMath.h"
-#include "HugoTypes.h"
 #include "System.h"
-
-#include <OgreOverlay.h>
-#include <OgreOverlayManager.h>
-#include <OgreOverlayContainer.h>
-#include <OgreOverlayElement.h>
-#include <OgreTextAreaOverlayElement.h>
-#include <OgreRenderWindow.h>
+#include "UIStructs.h"
+#include "UITags.h"
 
 #include <string>
 #include <unordered_map>
 
 struct PanelComponent;
-struct CanvasDirtyTag;
+struct TextComponent;
 class UISystem : public System
 {
 private:
-
-#pragma region auxiliar TADS for each UI element
-    struct PanelCache {
-        Ogre::Overlay* overlay = nullptr;
-        Ogre::OverlayContainer* container = nullptr;
-        bool lastVisibleState = false;
-        HUGO::Int lastZOrder = 0;
-        HUGO::Float lastLeft = 0.0f;
-        HUGO::Float lastTop = 0.0f;
-        HUGO::Float lastWidth = 0.0f;
-        HUGO::Float lastHeight = 0.0f;
-        HUGO::String lastMaterial = "";
-    };
-#pragma endregion
-
 #pragma region attributes
     Ogre::RenderWindow* renderWindow;
 
     // one unordered_map per component type
     std::unordered_map<EntityID, std::shared_ptr<PanelCache>> panelCache;
+    std::unordered_map<EntityID, std::shared_ptr<TextCache>> textCache;
 #pragma endregion
     
 #pragma region private methods
@@ -58,14 +37,16 @@ private:
     ErrorOrType<Ogre::OverlayContainer*> getContainer(const HUGO::String& name); // get a specific ui element
     
     // Cache helpers
-    std::shared_ptr<UISystem::PanelCache> createPanelCache(const PanelComponent& p);
+    std::shared_ptr<PanelCache> createPanelCache(const PanelComponent& p);
+    std::shared_ptr<TextCache> createTextCache(const TextComponent& t);
 
     // Synchronization
-    void syncCanvas(const PanelComponent& p, const CanvasDirtyTag& t);
-
+    void syncPanel(const PanelComponent& p, const PanelDirtyTag& t);
+    void syncText(const TextComponent& c, const TextDirtyTag& t);
     // show/hide
     void processVisibility();
-    
+    void processPanelChanges();
+    void processTextChanges();
     // Utility
     void clearEntityCache(EntityID entity);
     void clearAllCaches();
