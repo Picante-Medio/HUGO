@@ -193,6 +193,6 @@ public:
             lua_settable(lua, -3);
         }
 
-        lua_setglobal(lua, luaGlobalName);
+        lua_setglobal(lua, luaGlobalName.c_str());
     }
 };
