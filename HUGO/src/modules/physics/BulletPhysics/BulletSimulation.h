@@ -10,6 +10,8 @@ struct RigidBodyComponent;
 struct ColliderComponent;
 struct Shape;
 
+class OgreBulletDebugger;
+
 struct CollisionObject{
     HUGO::CollisionObjectID id;
     btCollisionObject* bulletRB = nullptr;
@@ -32,6 +34,7 @@ class BulletSimulation : public IPhysicsSimulation {
     btDynamicsWorld* btWorld;
     int numSubSteps;
 
+    btIDebugDraw* debugDrawer;
 
     // ------ Rigidbody & collision shapes management ------
     

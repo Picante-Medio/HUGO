@@ -16,4 +16,7 @@ public:
 
     // sync info and step the simulation of active scenes
     void performSimulations(double dt) override;
+
+    // physics visual debugger fro active scenes
+    void debugDraw() override;
 };

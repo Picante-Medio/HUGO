@@ -106,6 +106,8 @@ void Core::run(){
         physicsModule->performSimulations(startTime);
         scenePtr->update(startTime);
 
+        physicsModule->debugDraw();
+        
         m_ogreModule->renderOneFrame();
 
         double frameTime = vt.getDeltaTime() - startTime;

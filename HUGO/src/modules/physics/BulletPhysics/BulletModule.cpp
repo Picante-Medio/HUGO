@@ -46,3 +46,8 @@ void BulletModule::performSimulations(double dt) {
     for(std::shared_ptr<IPhysicsSimulation> simulation : activeSimulations)
         simulation->performSimulation(dt);
 }
+
+void BulletModule::debugDraw() {
+    for(std::shared_ptr<IPhysicsSimulation> simulation : activeSimulations)
+        simulation->debugDraw();
+}

@@ -7,6 +7,8 @@
 #include "BulletUtils.h"
 #include "HugoDispatcher.h"
 
+#include "OgreBulletDebugger.h"
+
 BulletSimulation::BulletSimulation(std::shared_ptr<Scene> scene)
 : IPhysicsSimulation(scene)
 {
@@ -29,8 +31,9 @@ BulletSimulation::BulletSimulation(std::shared_ptr<Scene> scene)
     // The number of substeps start being 0
     numSubSteps = 0;
 
-    // Set visual debugging if enabled
-    // ...
+    // Set visual debugging if enabled 
+    debugDrawer = new OgreBulletDebugger();
+    btWorld->setDebugDrawer(debugDrawer);
 }
 
 BulletSimulation::~BulletSimulation() {
@@ -61,12 +64,12 @@ void BulletSimulation::destroySimulation() {
 		delete shape;
 	}
 
-
     delete btWorld;
     delete solver;
     delete overlappingPairCache;
     delete dispatcher;
     delete collisionConfig;
+    delete debugDrawer;
 }
 
 void BulletSimulation::performSimulation(double dt) {
@@ -511,5 +514,9 @@ void BulletSimulation::syncBodiesToGame() {
 #pragma endregion
 
 void BulletSimulation::debugDraw() {
+    // if using Ogre
+    OgreBulletDebugger* ogreDebugDrawer = static_cast<OgreBulletDebugger*>(debugDrawer);
+    ogreDebugDrawer->begin();
     btWorld->debugDrawWorld();
+    ogreDebugDrawer->end();
 }
