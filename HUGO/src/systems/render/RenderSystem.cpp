@@ -67,7 +67,7 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<OgreMod
     anim.setAnimation("Dance");   
     
     LuaBinder& luaBinder = LuaBinder::Instance();
-    luaBinder.registerMethod<RenderSystem, void, float, float, float>(*this, &RenderSystem:setAmbientLight, "SetAmbientLight");
+    luaBinder.registerMethod<RenderSystem, void, float, float, float>(*this, &RenderSystem::setAmbientLight, "SetAmbientLight");
 }
 
 RenderSystem::~RenderSystem()
