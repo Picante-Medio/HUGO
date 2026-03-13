@@ -9,8 +9,8 @@
 
 Scene::Scene() {
   LuaBinder& luaBinder = LuaBinder::Instance();
-  luaBinder.registerMethod<Scene, void, EntityID>(*this, &Scene::removeEntity, "RemoveEntity");
-  luaBinder.registerMethod<Scene, EntityID>(*this, &Scene::createEntity, "CreateEntity");
+  luaBinder.registerMethod<Scene, void, int>(*this, &Scene::removeEntityLUA, "RemoveEntity");
+  luaBinder.registerMethod<Scene, int>(*this, &Scene::createEntityLUA, "CreateEntity");
 }
 
 void 
@@ -27,7 +27,12 @@ Scene::fixedUpdate(double dt) {
 
 EntityID 
 Scene::createEntity() {
-  return entityTable.createEntity();
+  return static_cast<EntityID>(entityTable.createEntity());
+}
+
+int 
+Scene::createEntityLUA() {
+  return createEntity();
 }
 
 void
@@ -39,4 +44,13 @@ Scene::removeEntity(EntityID entity) {
 
   // Deleting the entity
   entityTable.removeEntity(entity);
+}
+
+void
+Scene::removeEntityLUA(int entity) {
+  removeEntity(static_cast<EntityID>(entity));
+}
+
+
+void Scene::printEntities() {
 }

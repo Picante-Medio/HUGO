@@ -10,12 +10,14 @@
 #include "HQuery.h"
 #include "System.h"
 #include "HugoTypes.h"
+#include "LuaConsole.h"
 
 #include "IScene.h"
 
 class Scene : public IScene, public std::enable_shared_from_this<Scene> {
   
   std::vector<std::shared_ptr<System>> systems;
+  std::unique_ptr<System> console;
 
 public:
   Scene();
@@ -30,5 +32,10 @@ public:
 
   // Entity handling
   EntityID createEntity();
+  int createEntityLUA();
+
   void removeEntity(EntityID entity);
+  void removeEntityLUA(int entity);
+
+  void printEntities();
 };
