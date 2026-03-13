@@ -33,7 +33,13 @@ public:
 		entityTable.registerComponent(entity, id, index);
 	}
 
+	template<typename T> 
+	T &getComponent(EntityID entity) {
+	ComponentID componentID = ComponentRegistry::getComponentId<T>();
 		return componentTable.getComponent<T>(
+			entityTable.getDenseListIndex(entity, componentID));
+	}
+
 	template <typename T>
 	T& addAndGetComponent(EntityID entity) {
 		// Creating the component
