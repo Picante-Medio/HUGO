@@ -34,7 +34,8 @@ overlay testCanvas/SimpleTest
             space_width 0.025
             colour_top 1.0 0.0 1.0 1.0
             colour_bottom 0.0 1.0 1.0 1.0
-            vert_align center
+            alignment center 
+            vert_align center  
         }
     }
 }

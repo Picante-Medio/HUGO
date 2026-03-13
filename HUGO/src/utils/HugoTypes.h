@@ -65,7 +65,6 @@ namespace HUGO{
     };
 
     // -------- Light Types --------
-    
     enum LightType
     {
         LT_POINT,
@@ -73,8 +72,28 @@ namespace HUGO{
         LT_SPOTLIGHT,
         LT_RECTLIGHT
     };
-    
+    // -------- Button State Types --------
+    enum ButtonStateTypes   /// enumerator values for button states
+    {
+        BS_UP,
+        BS_OVER,
+        BS_DOWN
+    };
 
+    enum TrayLocationTypes  /// enumerator values for widget tray anchoring locations
+    {
+        TL_TOPLEFT,
+        TL_TOP,
+        TL_TOPRIGHT,
+        TL_LEFT,
+        TL_CENTER,
+        TL_RIGHT,
+        TL_BOTTOMLEFT,
+        TL_BOTTOM,
+        TL_BOTTOMRIGHT,
+        TL_NONE
+    };
+    
     // -------- PHYSICS TYPES --------
 
     using CollisionObjectID = int;

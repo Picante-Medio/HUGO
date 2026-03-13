@@ -2,8 +2,10 @@
 #include "UISystem.h"
 #include "PanelComponent.h"
 #include "TextComponent.h"
+#include "ButtonComponent.h"
 
 #include <Ogre.h>
+#include <OgreBorderPanelOverlayElement.h>
 #include <OgreOverlayManager.h>
 #include <OgreTextAreaOverlayElement.h>
 
@@ -117,6 +119,36 @@ std::shared_ptr<TextCache> UISystem::createTextCache(const TextComponent &t)
             cache->textArea = textArea;
     }
     
+    return cache;
+}
+
+std::shared_ptr<ButtonCache> UISystem::createButtonCache(const ButtonComponent &b)
+{
+    std::shared_ptr<ButtonCache> cache = std::make_shared<ButtonCache>();
+    
+    ErrorOrType<Ogre::OverlayContainer*> containerResult = getContainer(b.containerName);
+    if (!containerResult.isError()) {
+        cache->container = containerResult.getValue();
+    }
+    
+    ErrorOrType<Ogre::OverlayElement*> elementResult = getElement(b.textAreaName);
+    if (!elementResult.isError()) {
+        Ogre::OverlayElement* element = elementResult.getValue();
+        Ogre::TextAreaOverlayElement* textArea = dynamic_cast<Ogre::TextAreaOverlayElement*>(element);
+        cache->element = element;
+        // store current state from component
+        if (textArea != nullptr) {
+            cache->textArea = textArea;
+            if(b.width > 0){
+                element->setWidth(b.width);
+            }
+            textArea->setCaption(b.text);
+        }
+
+        Ogre::BorderPanelOverlayElement* mBP = (Ogre::BorderPanelOverlayElement*)element; 
+        mBP->setBorderMaterialName("SdkTrays/Button/Up");
+        mBP->setMaterialName("SdkTrays/Button/Up");
+    }
     return cache;
 }
 
@@ -414,6 +446,13 @@ void UISystem::createTestText()
             text.alignmentY = area->getVerticalAlignment();
         }
     }
+    
+    // EntityID buto = scene->createEntity();
+    // ButtonComponent& button = scene->addAndGetComponent<ButtonComponent>(buto);
+    // button.overlayName = "testCanvas/SimpleTest";
+    // button.containerName = button.overlayName + "/Container";
+    // button.textAreaName = button.containerName + "/Button";
+    // buttonCache[buto] = createButtonCache(button);
 
     // visibility
     text.isVisible = true;

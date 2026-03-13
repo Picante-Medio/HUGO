@@ -20,3 +20,10 @@ struct TextCache {
     Ogre::OverlayContainer* container = nullptr; 
     Ogre::TextAreaOverlayElement* textArea = nullptr;
 };
+
+struct ButtonCache {
+    Ogre::Overlay* overlay = nullptr;
+    Ogre::OverlayContainer* container = nullptr; 
+    Ogre::TextAreaOverlayElement* textArea = nullptr;
+    Ogre::OverlayElement* element;
+};

@@ -9,6 +9,7 @@
 
 struct PanelComponent;
 struct TextComponent;
+struct ButtonComponent;
 class UISystem : public System
 {
 private:
@@ -18,6 +19,7 @@ private:
     // one unordered_map per component type
     std::unordered_map<EntityID, std::shared_ptr<PanelCache>> panelCache;
     std::unordered_map<EntityID, std::shared_ptr<TextCache>> textCache;
+    std::unordered_map<EntityID, std::shared_ptr<ButtonCache>> buttonCache;
 #pragma endregion
     
 #pragma region private methods
@@ -39,6 +41,7 @@ private:
     // Cache helpers
     std::shared_ptr<PanelCache> createPanelCache(const PanelComponent& p);
     std::shared_ptr<TextCache> createTextCache(const TextComponent& t);
+    std::shared_ptr<ButtonCache>createButtonCache(const ButtonComponent& b);
 
     // Synchronization
     void syncPanel(const PanelComponent& p, const PanelDirtyTag& t);
