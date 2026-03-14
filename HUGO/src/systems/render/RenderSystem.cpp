@@ -36,14 +36,14 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<OgreMod
 
 
     // Camera and viewport creation for testing
-    EntityID defaultCamera = createCameraEntity(HUGO::Vector3(0, 0, 200));
+    EntityID defaultCamera = createCameraEntity(HUGO::Vector3(0, 0, 50));
     setMainCamera(defaultCamera);
 
     EntityID defaultViewport = createViewportEntity();    
     setMainViewport(defaultViewport);
 
     createLightEntity( HUGO::Vector3(0, 20, 20), //light position
-                        HUGO::Vector4(0.4f, 0.2f, 0.4f, 0.2f), //diffuse
+                        HUGO::Vector4(0.9f, 0.9f, 0.8f, 0.2f), //diffuse
                         HUGO::Vector4(0.0f, 0.0f, 0.0f, 0.0f), //specular
                         HUGO::LightType::LT_POINT, 
                         HUGO::Radian(0), 

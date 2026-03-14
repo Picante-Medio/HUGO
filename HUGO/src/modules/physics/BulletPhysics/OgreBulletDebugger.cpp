@@ -5,7 +5,7 @@ OgreBulletDebugger::OgreBulletDebugger()
 ,mDebugMode(DBG_DrawWireframe)
 {
     // Change render queue of mLines so it renders last
-    mLines.setRenderQueueGroup( Ogre::RENDER_QUEUE_TRANSPARENTS);
+    // mLines.setRenderQueueGroup( Ogre::RENDER_QUEUE_TRANSPARENTS);
 
     Ogre::Root* ogreRoot = Ogre::Root::getSingletonPtr();
     Ogre::SceneManager* sceneManager = ogreRoot->_getCurrentSceneManager();
@@ -48,7 +48,7 @@ void OgreBulletDebugger::begin() {
 
     if(mLines.getSections().empty()) {
         mLines.setBufferUsage(Ogre::HBU_CPU_TO_GPU);
-        mLines.begin(material);
+        mLines.begin(material, Ogre::RenderOperation::OT_LINE_LIST);
     }
     else if (mLines.getCurrentVertexCount() == 0) {
         mLines.beginUpdate(0);
