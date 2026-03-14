@@ -4,9 +4,10 @@
 
 #define HSYSTEM(SYSTEM_NAME) \
 class SYSTEM_NAME : System { \
+public:\
     SYSTEM_NAME(std::shared_ptr<Scene> scene): System(scene) {} \
     static inline const std::string name = #SYSTEM_NAME; \
-    \
+private:\
     struct Reflection{ \
         Reflection(){\
             SystemFactory::add(#SYSTEM_NAME, \
