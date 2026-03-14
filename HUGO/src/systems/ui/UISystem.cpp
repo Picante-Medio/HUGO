@@ -347,6 +347,14 @@ void UISystem::clearAllCaches() {
 // UPDATE
 //=============================================================================
 
+void UISystem::init(){
+
+}
+
+void UISystem::onLoad(){
+    
+}
+
 void UISystem::update(double dt)
 {
     processPanelChanges();

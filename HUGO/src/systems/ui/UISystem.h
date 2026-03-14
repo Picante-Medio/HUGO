@@ -59,6 +59,9 @@ public:
     UISystem(std::shared_ptr<Scene> scene);
     virtual ~UISystem();
 
+    void init();
+    void onLoad();
+
     void update(double dt) override;
     void fixedUpdate(double dt) override;
     

@@ -100,6 +100,9 @@ class RenderSystem : public System{
 public:
     RenderSystem(std::shared_ptr<Scene> scene);
     ~RenderSystem() override;
+
+    void init() override;
+    void onLoad() override;
     
     void fixedUpdate(double dt) override;
     void update(double dt) override;

@@ -51,6 +51,14 @@ PhysicsTestSystem::~PhysicsTestSystem() {
 
 }
 
+void PhysicsTestSystem::init(){
+
+}
+
+void PhysicsTestSystem::onLoad(){
+    
+}
+
 void PhysicsTestSystem::fixedUpdate(double dt) {
     for(auto pack : scene->query<TransformComponent, StaticRBTag>()) {
         TransformComponent& body = pack.get<TransformComponent&>();

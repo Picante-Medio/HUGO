@@ -535,6 +535,14 @@ void AudioSystem::update(double dt)
 void AudioSystem::fixedUpdate(double dt)
 {
 }
+
+void AudioSystem::onLoad(){
+
+}
+
+void AudioSystem::init(){
+    
+}
 #pragma endregion
 
 void AudioSystem::createTestEntity()

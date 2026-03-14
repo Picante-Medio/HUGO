@@ -170,6 +170,9 @@ public:
    void update(double dt) override;
    void fixedUpdate(double dt) override;
 
+   void onLoad() override;
+   void init() override;
+
    /* ====================================
       ONLY FOR TESTING! IT WILL BE DELETED
       ==================================== */

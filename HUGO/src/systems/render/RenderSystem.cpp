@@ -351,6 +351,14 @@ void RenderSystem::updateAnimations(double dt)
     }
 }
 
+void RenderSystem::init(){
+
+}
+
+void RenderSystem::onLoad(){
+    
+}
+
 void RenderSystem::fixedUpdate(double dt)
 {
 

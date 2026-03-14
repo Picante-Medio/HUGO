@@ -8,6 +8,9 @@ public:
     PhysicsTestSystem(std::shared_ptr<Scene> scene);
     ~PhysicsTestSystem();
 
+    void init();
+    void onLoad();
+
     void fixedUpdate(double dt);
     void update(double dt);
 };
