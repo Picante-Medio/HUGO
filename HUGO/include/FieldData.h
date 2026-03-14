@@ -1,10 +1,11 @@
 #pragma once
 
 #include "HugoError.h"
+#include "HugoParsingVariant.h"
 
 template<typename Cmp>
 struct IFieldData {
-    virtual ErrorOrVoid Set(Cmp& obj, const Variant& value) const = 0;
+    virtual ErrorOrVoid Set(Cmp& obj, const HVariant& value) const = 0;
     virtual ~IFieldData() = default;
 };
 
@@ -14,7 +15,7 @@ struct FieldData: IFieldData<Cmp> {
 
     FieldData(T Cmp::*ptr) : member_ptr(ptr) {}
 
-    ErrorOrVoid Set(Cmp& component, const Variant& value) const override
+    ErrorOrVoid Set(Cmp& component, const HVariant& value) const override
     {
         if (auto val = std::get_if<T>(&value)) {
             component.*member_ptr = *val;
