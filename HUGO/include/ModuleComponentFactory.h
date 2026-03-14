@@ -6,11 +6,11 @@
 
 #include "IScene.h"
 #include "HugoError.h"
-#include "ParsingVariant.h"
+#include "HugoParsingVariant.h"
 
 struct ModuleComponentFactory {
     
-    using ComponentGenerator = std::function<ErrorOrVoid(IScene&, EntityID, std::unordered_map<std::string, Variant>)>; 
+    using ComponentGenerator = std::function<ErrorOrVoid(IScene&, EntityID, std::unordered_map<std::string, HVariant>)>; 
 
     static std::unordered_map<std::string, ComponentGenerator>& generators() {
         static std::unordered_map<std::string, ComponentGenerator> generatorsInstance;
@@ -22,7 +22,7 @@ struct ModuleComponentFactory {
     }
 
     static ErrorOrVoid makeComponent(IScene& scene, EntityID ent,
-        const std::string& name, std::unordered_map<std::string, Variant> args) {
+        const std::string& name, std::unordered_map<std::string, HVariant> args) {
 
         if (generators().count(name)) {
             return generators()[name](scene, ent, args);
