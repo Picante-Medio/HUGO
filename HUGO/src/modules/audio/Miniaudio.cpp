@@ -2,6 +2,12 @@
 #include "miniaudio.h"
 #include <iostream>
 
+MiniaudioModule& MiniaudioModule::Instance(){
+    static MiniaudioModule instance;
+
+    return instance;
+}
+
 MiniaudioModule::MiniaudioModule(){
     m_maEngine = std::make_shared<ma_engine>();
     ma_result result = ma_engine_init(nullptr, m_maEngine.get());

@@ -18,8 +18,8 @@
 #include "OgreModule.h"
 #include "LuaBinder.h"
 
-RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<OgreModule> ogreMod)
-    :System(scene), idToIndex(), freeOgreObjectId(), m_ogreModule(ogreMod)
+RenderSystem::RenderSystem(std::shared_ptr<Scene> scene)
+    :System(scene), idToIndex(), freeOgreObjectId()
 {
     ogreRoot = Ogre::Root::getSingletonPtr();
     try {
@@ -63,7 +63,7 @@ RenderSystem::~RenderSystem()
 {
     for(auto& v: viewportMap){
         if(v.second.ogreViewport){
-            m_ogreModule->getOgreRenderWindow()->removeViewport(v.second.ogreViewport->getZOrder());
+            OgreModule::Instance().getOgreRenderWindow()->removeViewport(v.second.ogreViewport->getZOrder());
             v.second.ogreViewport = nullptr;
         }
     }
@@ -671,7 +671,7 @@ void RenderSystem::createOgreViewport(EntityID entity)
     }
 
     // create ogre viewport
-    res.ogreViewport = m_ogreModule->getOgreRenderWindow()->addViewport(
+    res.ogreViewport = OgreModule::Instance().getOgreRenderWindow()->addViewport(
         cam,
         viewportComp->getZOrder(),
         viewportComp->getLeft(),

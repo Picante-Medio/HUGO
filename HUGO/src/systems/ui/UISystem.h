@@ -56,7 +56,7 @@ private:
 #pragma endregion
 
 public:
-    UISystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* window);
+    UISystem(std::shared_ptr<Scene> scene);
     virtual ~UISystem();
 
     void update(double dt) override;

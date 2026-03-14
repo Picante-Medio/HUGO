@@ -15,9 +15,8 @@
 #include <fstream>
 #include <sstream>
 
-AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, std::shared_ptr<MiniaudioModule> miniaudioModule, 
-    const std::string& path, int queueSize)
-    : System(scene), engine(miniaudioModule->getMiniaudioEngine()), path(path), audios(), nameToID(), pools(), nextID(0), queueSize(queueSize)
+AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, const std::string& path, int queueSize)
+    : System(scene), engine(MiniaudioModule::Instance().getMiniaudioEngine()), path(path), audios(), nameToID(), pools(), nextID(0), queueSize(queueSize)
 {   
     //DEPRECATED: this will be in load method
     LuaBinder& luaBinder = LuaBinder::Instance();

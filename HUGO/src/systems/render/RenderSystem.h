@@ -11,8 +11,6 @@
 #include "HugoMath.h"
 #include "HugoError.h"
 
-class OgreModule;
-
 struct RenderComponent;
 class RenderSystem : public System{
     // Ogre Camera Information
@@ -98,11 +96,9 @@ class RenderSystem : public System{
     void setMainCamera(EntityID cameraEntity);
     
     void setMainViewport(EntityID viewportEntity);
-
-    std::shared_ptr<OgreModule> m_ogreModule;
       
 public:
-    RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<OgreModule> ogreMod);
+    RenderSystem(std::shared_ptr<Scene> scene);
     ~RenderSystem() override;
     
     void fixedUpdate(double dt) override;

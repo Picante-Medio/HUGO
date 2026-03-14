@@ -50,15 +50,15 @@ void Core::init(){
     ChatParser chatParser = ChatParser();
     ErrorOrVoid err = chatParser.readChatFolder("../chats");
 
-    std::shared_ptr<AudioSystem> audioSystem = std::make_shared<AudioSystem>(scenePtr, m_miniaudioModule);
+    std::shared_ptr<AudioSystem> audioSystem = std::make_shared<AudioSystem>(scenePtr);
 
     audioSystem->loadAudiosFromFile("AudioList.txt");
     scenePtr->addSystem(audioSystem);
     
-    std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr, m_ogreModule);
+    std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr);
     scenePtr->addSystem(renderSystem);
 
-    std::shared_ptr<UISystem> uiSystem = std::make_shared<UISystem>(scenePtr, m_ogreModule->getOgreRenderWindow());
+    std::shared_ptr<UISystem> uiSystem = std::make_shared<UISystem>(scenePtr);
     scenePtr->addSystem(uiSystem);
     uiSystem->createTestCanvas();
 
@@ -76,10 +76,10 @@ void Core::init(){
 void HUGO::Core::initModules()
 {
     //MiniaudioModule init
-    m_miniaudioModule = std::make_shared<MiniaudioModule>();
+    MiniaudioModule::Instance();
 
     //OgreModule init
-    m_ogreModule = std::make_shared<OgreModule>();
+    OgreModule::Instance();
 
     //BulletoModule init
     physicsModule = std::make_shared<BulletModule>();
@@ -108,7 +108,8 @@ void Core::run(){
 
         physicsModule->debugDraw();
         
-        m_ogreModule->renderOneFrame();
+        //m_ogreModule->renderOneFrame();
+        OgreModule::Instance().renderOneFrame();
 
         double frameTime = vt.getDeltaTime() - startTime;
         if (frameTime < FRAME_RATE) {

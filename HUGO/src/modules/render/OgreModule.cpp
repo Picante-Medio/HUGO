@@ -36,6 +36,11 @@ void loadResources()
 
 #pragma endregion
 
+OgreModule& OgreModule::Instance(){
+    static OgreModule instance;
+    return instance;
+}
+
 OgreModule::OgreModule(){
         m_ogreRoot = std::make_shared<Ogre::Root>("plugins.cfg", "ogre.cfg");
     if (!m_ogreRoot->restoreConfig()) {

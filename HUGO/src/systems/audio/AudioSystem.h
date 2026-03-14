@@ -156,7 +156,6 @@ private:
 public:
 
    AudioSystem(std::shared_ptr<Scene> scene,
-               std::shared_ptr<MiniaudioModule> miniaudioModule,
                const std::string& path = "test_media/",
                int queueSize = 10);
 

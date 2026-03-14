@@ -9,8 +9,10 @@
 #include <OgreOverlayManager.h>
 #include <OgreTextAreaOverlayElement.h>
 
-UISystem::UISystem(std::shared_ptr<Scene> scene, Ogre::RenderWindow* window)
-    : System(scene), renderWindow(window)
+#include "OgreModule.h"
+
+UISystem::UISystem(std::shared_ptr<Scene> scene)
+    : System(scene), renderWindow(OgreModule::Instance().getOgreRenderWindow())
 {
 }
 

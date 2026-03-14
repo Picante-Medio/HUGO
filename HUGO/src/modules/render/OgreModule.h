@@ -23,12 +23,15 @@ class OgreModule{
     //Ogre Singletons. Can be obtained using ::getInstance() of the class.
     std::shared_ptr<Ogre::Root> m_ogreRoot;
     std::shared_ptr<Ogre::OverlaySystem> m_ogreOverlaySystem;
-
+    
     Ogre::RenderWindow* m_ogreRenderWindow = nullptr;
     SDL_Window* m_sdlWindow = nullptr;
-public:
+    
     //Initializes Ogre Singletons and SDL window
     OgreModule();
+public:
+
+    static OgreModule& Instance();
 
     //Destroys Ogre Singletons and removes SDL window
     ~OgreModule();
