@@ -7,9 +7,10 @@ OgreBulletDebugger::OgreBulletDebugger()
     // Change render queue of mLines so it renders last
     mLines.setRenderQueueGroup( Ogre::RENDER_QUEUE_TRANSPARENTS);
 
-    // Ogre::Root::getSingletonPtr()->get
-    // Ogre::SceneNode* node = sceneManager->getRootSceneNode()->createChildSceneNode();
-    // node->attachObject(&mLines);
+    Ogre::Root* ogreRoot = Ogre::Root::getSingletonPtr();
+    Ogre::SceneManager* sceneManager = ogreRoot->_getCurrentSceneManager();
+    Ogre::SceneNode* node = sceneManager->getRootSceneNode()->createChildSceneNode();
+    node->attachObject(&mLines);
 }
 
 // OgreBulletDebugger::~OgreBulletDebugger() {

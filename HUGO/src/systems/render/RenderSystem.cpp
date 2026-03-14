@@ -28,6 +28,7 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene, std::shared_ptr<OgreMod
     catch (const Ogre::Exception& e) {
         throw std::runtime_error("[RenderSystem] SceneManager creation failed: " + std::string(e.getDescription()));
     }
+    ogreRoot->_setCurrentSceneManager(sceneManager);
     sceneManager->addRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
 
     // Basic light
