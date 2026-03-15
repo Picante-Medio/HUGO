@@ -54,9 +54,6 @@ RenderSystem::RenderSystem(std::shared_ptr<Scene> scene)
                         100); 
         
 
-    //DEPRECATED: this will be in load method
-    LuaBinder& luaBinder = LuaBinder::Instance();
-    luaBinder.registerMethod<RenderSystem, void, float, float, float>(*this, &RenderSystem::setAmbientLight, "SetAmbientLight");
 }
 
 RenderSystem::~RenderSystem()
@@ -356,7 +353,8 @@ void RenderSystem::init(){
 }
 
 void RenderSystem::onLoad(){
-    
+    LuaBinder& luaBinder = LuaBinder::Instance();
+    luaBinder.registerMethod<RenderSystem, void, float, float, float>(*this, &RenderSystem::setAmbientLight, "SetAmbientLight");
 }
 
 void RenderSystem::fixedUpdate(double dt)
