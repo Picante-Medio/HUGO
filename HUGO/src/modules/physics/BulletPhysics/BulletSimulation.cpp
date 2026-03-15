@@ -6,6 +6,7 @@
 #include "PhysicsTags.h"
 #include "BulletUtils.h"
 #include "HugoDispatcher.h"
+#include "TransformComponent.h"
 
 #include "OgreBulletDebugger.h"
 
@@ -222,7 +223,7 @@ HUGO::CollisionObjectID BulletSimulation::createColliderObject(ColliderComponent
     return id;
 }
 
-HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderComponent& hgCol, RigidBodyComponent& hgRb, TransformComponent& tf, HUGO::BodyType type)
+HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderComponent& hgCol, RigidBodyComponent& hgRb, HUGO::BodyType type)
 {
     // If the collider doesn't exist return invalid ID
     if(hgCol.objectID != HUGO::INVALID_COL_OBJ_ID){
@@ -230,7 +231,7 @@ HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderCompo
     }
 
     // Create state
-    HUGOMotionState* state = new HUGOMotionState(btTransform(), tf);
+    HUGOMotionState* state = new HUGOMotionState(btTransform(), scene, hgRb.entity);
     state->updateBulletTransform();
 
     // Get Shape
@@ -432,7 +433,7 @@ void BulletSimulation::syncBodiesToBullet() {
         
         if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
             //create a new CollisionObject
-            rb.objectID = upgradeToRigidBodyObject(col, rb, transform, HUGO::BodyType::STATIC);
+            rb.objectID = upgradeToRigidBodyObject(col, rb, HUGO::BodyType::STATIC);
         }
         
         checkRigidBodyFlags(rb);
@@ -446,7 +447,7 @@ void BulletSimulation::syncBodiesToBullet() {
         
         if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
             //create a new CollisionObject
-            rb.objectID = upgradeToRigidBodyObject(col, rb, transform, HUGO::BodyType::KINEMATIC);
+            rb.objectID = upgradeToRigidBodyObject(col, rb, HUGO::BodyType::KINEMATIC);
         }
         
         HUGOMotionState* motionState = static_cast<HUGOMotionState*>(btRigidBody::upcast(getCollisionObject(rb.objectID).bulletRB)->getMotionState());
@@ -463,7 +464,7 @@ void BulletSimulation::syncBodiesToBullet() {
         
         if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
             //create a new CollisionObject
-            rb.objectID = upgradeToRigidBodyObject(col, rb, transform, HUGO::BodyType::DYNAMIC);
+            rb.objectID = upgradeToRigidBodyObject(col, rb, HUGO::BodyType::DYNAMIC);
         }
         
         checkRigidBodyFlags(rb);

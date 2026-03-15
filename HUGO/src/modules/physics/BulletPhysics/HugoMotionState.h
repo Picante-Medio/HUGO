@@ -5,7 +5,8 @@
 
 class HUGOMotionState : public btMotionState{
 
-    Scene& hugoScene;
+    unsigned long int entityID;
+    std::shared_ptr<Scene> hugoScene;
     btTransform btTransformRegister;
 
     // The center offset multiplies the bulletTransform to adjust the center of mass. By default it's the Identity
@@ -14,7 +15,7 @@ class HUGOMotionState : public btMotionState{
 
 public:
 
-    HUGOMotionState(const btTransform initialPos, Scene& scene, btTransform offset = btTransform::getIdentity());
+    HUGOMotionState(const btTransform initialPos, std::shared_ptr<Scene> scene, unsigned long int id, btTransform offset = btTransform::getIdentity());
 
     // void setHugoTransform(TransformComponent& transform);
     void updateBulletTransform();

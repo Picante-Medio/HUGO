@@ -16,7 +16,7 @@ void PhysicsTestSystem::init(){
     // Entidad 1: Cuerpo estático
     EntityID e1 = scene->createEntity();
     TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(e1);
-    transform.position = HUGO::Vector3(0, -20, 0);
+    transform.position = HUGO::Vector3(0, -20, -1000);
     transform.scale = HUGO::Vector3(1, 0.5f, 0.5f);
     ColliderComponent& collider = scene->addAndGetComponent<ColliderComponent>(e1);
     collider.info = BoxColliderInfo{HUGO::Vector3(2.f, 1.f, 1.f)};
@@ -65,4 +65,8 @@ void PhysicsTestSystem::fixedUpdate(double dt) {
 }
 
 void PhysicsTestSystem::update(double dt) {
+    EntityID e1 = scene->createEntity();
+    TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(e1);
+    transform.position = HUGO::Vector3(0, -20, 0);
+    transform.scale = HUGO::Vector3(1, 0.5f, 0.5f);
 }

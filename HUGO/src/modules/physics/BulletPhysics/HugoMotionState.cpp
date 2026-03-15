@@ -1,10 +1,11 @@
 #include "HugoMotionState.h"
 #include "BulletUtils.h"
+#include "TransformComponent.h"
 
-
-HUGOMotionState::HUGOMotionState(const btTransform initialPos, Scene& scene, btTransform offset)
+HUGOMotionState::HUGOMotionState(const btTransform initialPos, std::shared_ptr<Scene> scene, unsigned long int id, btTransform offset)
 : btTransformRegister(initialPos)
 , hugoScene(scene)
+, entityID(id)
 , centerOfMassOffset(offset)
 {
 
@@ -17,6 +18,8 @@ HUGOMotionState::HUGOMotionState(const btTransform initialPos, Scene& scene, btT
     
 void HUGOMotionState::updateBulletTransform()
 {
+
+    TransformComponent& hugoTransform = hugoScene->getComponent<TransformComponent>(entityID);
 
     // Uses associated HUGO::TransformComponent to update itself
     btTransform auxTransform = btTransform(
@@ -37,7 +40,9 @@ void HUGOMotionState::setWorldTransform(const btTransform& worldTrans)
     // if(hugoTransform.use_count() == 0){
     //     return;
     // }
-
+    
+    TransformComponent& hugoTransform = hugoScene->getComponent<TransformComponent>(entityID);
+        
     btQuaternion rot = btTransformRegister.getRotation();
     hugoTransform.rotation = HUGO::Quaternion(rot.w(), rot.x(), rot.y(), rot.z());
     btVector3 pos = btTransformRegister.getOrigin();
