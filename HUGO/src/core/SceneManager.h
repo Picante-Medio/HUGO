@@ -7,6 +7,7 @@
 #include "HugoError.h"
 
 class Scene;
+class IPhysicsModule;
 class SceneManager{
     HUGO::ChatParser m_chatParser;
     //Scene map that stores created game scenes.
@@ -19,12 +20,15 @@ class SceneManager{
     ErrorOrVoid loadScene(const HUGO::String& sceneName);
     //Removes a scene from m_sceneMap, to free space that is not used.
     ErrorOrVoid unloadScene(const HUGO::String& sceneName);
+
+    //Physics module
+    std::shared_ptr<IPhysicsModule> m_physicsModule;
 public:
     //initializeParser() must be called after this.
     SceneManager();
 
-    //Initializes the parser with chat folder
-    ErrorOrVoid initializeParser(const HUGO::String& chatFolder);
+    //Initializes the parser with chat folder and sets physicsModule
+    ErrorOrVoid initializeParser(const HUGO::String& chatFolder, std::shared_ptr<IPhysicsModule> physicsModule);
 
     /*
     Starts scene named sceneName.
@@ -34,4 +38,5 @@ public:
     void setCurrentSceneLUA(const HUGO::String sceneName);
 
     void updateCurrentScene(double dt);
+    void fixedUpdateCurrentScene(double dt);
 };

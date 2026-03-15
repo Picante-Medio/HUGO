@@ -8,6 +8,8 @@
 #include "MiniaudioModule.h"
 #include "IPhysicsModule.h"
 
+#include "SceneManager.h"
+
 class Scene;
 class VirtualTimer;
 struct SDL_Window;
@@ -29,10 +31,8 @@ namespace HUGO {
         std::shared_ptr<IPhysicsModule> physicsModule;
 
         VirtualTimer vt;
-        std::shared_ptr<Scene> scenePtr;
 
-        //Resource Manager
-        std::shared_ptr<ResourceManager> m_resourceManager;
+        SceneManager sceneManager;
 
     public:
         Core();

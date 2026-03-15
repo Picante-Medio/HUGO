@@ -1,0 +1,6 @@
+SCENE TestScene
+
+SYSTEM AudioSystem
+SYSTEM RenderSystem
+SYSTEM UISystem
+SYSTEM PhysicsTestSystem

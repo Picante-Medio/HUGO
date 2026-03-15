@@ -123,8 +123,7 @@ ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData& comp
         }
 
         if(input == "STRING"){
-            char emptySpace;
-            std::cin >> emptySpace;
+            std::cin.get();
             ErrorOrType<HUGO::String> s = readString();
 
             if(s.isError()) return ErrorOrVoid(s.getError());
@@ -138,8 +137,8 @@ ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData& comp
 #pragma endregion
 
 ErrorOrVoid ChatParser::handleSceneType(){
-    char emptySpaceChar;
-    std::cin >> emptySpaceChar;
+    std::cin.get();
+
     HUGO::String sceneName;
     getline(std::cin, sceneName);
 
@@ -152,6 +151,13 @@ ErrorOrVoid ChatParser::handleSceneType(){
     std::cin >> input;
 
     while(std::cin){
+
+        if(input == "SYSTEM"){
+            HUGO::String systemName;
+            std::cin >> systemName;
+
+            m_sceneData[sceneName].systems.push_back(systemName);
+        }
 
         if(input == "RESOURCE"){
             HUGO::String resourcePath;

@@ -31,8 +31,9 @@
 
 // se podría hacer clase singleton¿? -Marco
 using namespace HUGO;
-Core::Core()
+Core::Core(): sceneManager()
 {
+
 }
 
 //Initialization of HUGO modules and loading of games dynamic lib
@@ -44,8 +45,12 @@ void Core::init(){
 
     vt.reset();
     initModules();
+
+    ErrorOrVoid err = sceneManager.initializeParser("../chats", physicsModule);
     
-    scenePtr = std::make_shared<Scene>();
+    sceneManager.setCurrentScene("TestScene");
+    
+    /*scenePtr = std::make_shared<Scene>();
 
     ChatParser chatParser = ChatParser();
     ErrorOrVoid err = chatParser.readChatFolder("../chats");
@@ -73,6 +78,9 @@ void Core::init(){
     std::shared_ptr<PhysicsTestSystem> testSystem = std::make_shared<PhysicsTestSystem>(scenePtr);
     testSystem->init();
     scenePtr->addSystem(testSystem);
+    */
+
+
 }
 
 //--------------------------- IMODULES INITIALIZATION --------------------
@@ -106,9 +114,9 @@ void Core::run(){
         if(input.isQuitPressed()) {
             exit = true;
         }
-        scenePtr->fixedUpdate(startTime);
+        sceneManager.fixedUpdateCurrentScene(startTime);
         physicsModule->performSimulations(startTime);
-        scenePtr->update(startTime);
+        sceneManager.updateCurrentScene(startTime);
 
         physicsModule->debugDraw();
         

@@ -3,13 +3,19 @@
 #include "Scene.h"
 #include "SystemFactory.h"
 #include "ComponentRegistry.h"
+#include "IPhysicsModule.h"
 
 SceneManager::SceneManager(): m_chatParser(), m_sceneMap(){
-    LuaBinder& luaBinder = LuaBinder::Instance();
-    luaBinder.registerMethod<SceneManager, void, HUGO::String>(*this, &SceneManager::setCurrentSceneLUA, "SetCurrentScene");
 }
 
-ErrorOrVoid SceneManager::initializeParser(const HUGO::String& chatFolder){
+ErrorOrVoid SceneManager::initializeParser(const HUGO::String& chatFolder, std::shared_ptr<IPhysicsModule> physicsModule){
+
+    //Must be called after initialization of LuaBinder
+    LuaBinder& luaBinder = LuaBinder::Instance();
+    luaBinder.registerMethod<SceneManager, void, HUGO::String>(*this, &SceneManager::setCurrentSceneLUA, "SetCurrentScene");
+
+    m_physicsModule = physicsModule;
+
     return m_chatParser.readChatFolder(chatFolder);
 }
 
@@ -46,6 +52,9 @@ ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
     }
 */
 
+    //When no errors occurred, we add the scene to the physics simulation
+    m_physicsModule->createSceneSimulation(m_sceneMap[sceneName]);
+
     return ErrorOrVoid();
 }
 
@@ -78,4 +87,8 @@ void SceneManager::setCurrentScene(const HUGO::String& sceneName){
 
 void SceneManager::updateCurrentScene(double dt){
     m_currentScene->update(dt);
+}
+
+void SceneManager::fixedUpdateCurrentScene(double dt){
+    m_currentScene->fixedUpdate(dt);
 }
