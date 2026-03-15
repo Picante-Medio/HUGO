@@ -14,18 +14,18 @@ HCOMPONENT(PanelComponent)
     bool isVisible = true;
 
     HUGO::Int zOrder = 10;
-    Ogre::GuiMetricsMode metricsMode = Ogre::GuiMetricsMode::GMM_RELATIVE;
+    HUGO::UIMetricsMode metricsMode = HUGO::UIMetricsMode::GMM_RELATIVE;
 
     HUGO::Float left = 0;
     HUGO::Float top = 0;
     HUGO::Float width = 0;
     HUGO::Float height = 0;
 
-    Ogre::GuiHorizontalAlignment alignmentX =
-        Ogre::GuiHorizontalAlignment::GHA_LEFT;
+    HUGO::UIHorizontalAlignment alignmentX =
+        HUGO::UIHorizontalAlignment::UHA_LEFT;
 
-    Ogre::GuiVerticalAlignment alignmentY =
-        Ogre::GuiVerticalAlignment::GVA_CENTER;
+    HUGO::UIVerticalAlignment alignmentY =
+        HUGO::UIVerticalAlignment::UVA_CENTER;
         
     HUGO::String material = "";
 END_HCOMPONENT()

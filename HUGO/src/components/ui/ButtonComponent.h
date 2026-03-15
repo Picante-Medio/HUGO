@@ -19,7 +19,7 @@ HCOMPONENT(ButtonComponent)
     HUGO::Int zOrder = 20;
 
     // position and size
-    Ogre::GuiMetricsMode metricsMode = Ogre::GuiMetricsMode::GMM_RELATIVE;
+    HUGO::UIMetricsMode metricsMode = HUGO::UIMetricsMode::GMM_RELATIVE;
     HUGO::Float left = 0.0f;
     HUGO::Float top = 0.0f;
     HUGO::Float width = 60.0f;

@@ -80,9 +80,9 @@ void UISystem::syncPanel(const PanelComponent& p, const PanelDirtyTag& tag)
     cache->container->setTop(p.top);
     cache->container->setWidth(p.width);
     cache->container->setHeight(p.height);
-    cache->container->setHorizontalAlignment(p.alignmentX);
-    cache->container->setVerticalAlignment(p.alignmentY);
-    cache->container->setMetricsMode(p.metricsMode);
+    cache->container->setHorizontalAlignment(OgreUtils::toOgre(p.alignmentX));
+    cache->container->setVerticalAlignment(OgreUtils::toOgre(p.alignmentY));
+    cache->container->setMetricsMode(OgreUtils::toOgre(p.metricsMode));
 
     if (!p.material.empty())
         cache->container->setMaterialName(p.material);
@@ -226,9 +226,9 @@ const PanelComponent& UISystem::createTestCanvas()
     panel.top = container->getTop();
     panel.width = container->getWidth();
     panel.height = container->getHeight();
-    panel.metricsMode = container->getMetricsMode();
-    panel.alignmentX = container->getHorizontalAlignment();
-    panel.alignmentY = container->getVerticalAlignment();
+    panel.metricsMode = OgreUtils::toHugo(container->getMetricsMode());
+    panel.alignmentX = OgreUtils::toHugo(container->getHorizontalAlignment());
+    panel.alignmentY = OgreUtils::toHugo(container->getVerticalAlignment());
     panel.material = "UI/Test";
     container->setMaterialName(panel.material);
 
