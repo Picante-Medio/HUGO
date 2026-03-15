@@ -15,6 +15,7 @@
 
 //Functions to use the right lua types for arguments and return types
 #pragma region HelperFunctions
+//Auxiliar function to pop value from lua stack
 template<typename T>
 T lua_get(lua_State* lua, int idx) {
     if constexpr (std::is_same_v<T, HUGO::Int> || std::is_same_v<T, int> 
@@ -31,6 +32,7 @@ T lua_get(lua_State* lua, int idx) {
 }
 
 template<typename T>
+//Auxiliar function to push value to lua stack
 static void lua_push_result(lua_State* lua, T value) {
     if constexpr (std::is_same_v<T, HUGO::Int> || std::is_same_v<T, int>)
         lua_pushinteger(lua, value);
@@ -62,6 +64,7 @@ class LuaBinder {
     //pointer to the lua interpeter instance
     lua_State* lua;
 
+    // private functions that relates a given lua name to a function pointer call
     template<typename ReturnType, typename ...ArgTypes, std::size_t... I>
     static int callLuaFunc(lua_State* lua, ReturnType(*func)(ArgTypes...), std::index_sequence<I...>) {
         if constexpr (std::is_same_v<ReturnType, void> || std::is_same_v<ReturnType, ErrorOrVoid>) {
@@ -75,6 +78,7 @@ class LuaBinder {
         }
     }
 
+    // private functions that relates a given lua name to an object method call
     template<typename ClassType, typename ReturnType, typename... ArgTypes, std::size_t... I>
     static int callLuaMethod(lua_State* lua, ClassType* obj, ReturnType(ClassType::*fn)(ArgTypes...), std::index_sequence<I...>) {
         if constexpr (std::is_same_v<ReturnType, void> || std::is_same_v<ReturnType, ErrorOrVoid>) {
@@ -94,10 +98,7 @@ public:
     //Init must be called before using lua
     void Init();
 
-    /** 
-    * @param function function to call in lua
-    * @param luaName name of the lua call to the function
-    */
+    // Register a standalone cpp function to call it from lua
     template<typename ReturnType, typename ...ArgTypes>
     void registerFunc(ReturnType(*function)(ArgTypes...), HUGO::String luaName) {
          using Function = ReturnType(*)(ArgTypes...);
@@ -115,6 +116,7 @@ public:
         lua_setglobal(lua, luaName.c_str());
     }
 
+    // Register method of a cpp object to call it from lua
     template<typename ClassType, typename ReturnType, typename... ArgTypes>
     void registerMethod(ClassType& obj, ReturnType(ClassType::*fn)(ArgTypes...), HUGO::String name) {
         using Function = ReturnType(ClassType::*)(ArgTypes...);
@@ -134,9 +136,13 @@ public:
     }
 
     //Functions to call entire lua files
-    //
+    
+    // Call a lua script that returns nothing, or ignore its return value.
+    // it returns an error if the file is not found or lua rises an error
     ErrorOrVoid runFile(HUGO::String path); 
 
+    // Call a lua script and get its value as a T. If the value can't be converted to T.
+    // it returns an error if the file is not found, lua rises an error or the value is not a T
     template<typename T>
     ErrorOrType<T, StringError> getFromFile(HUGO::String path) {
         // If path is invalid
@@ -160,8 +166,13 @@ public:
     }
 
     //Functions to call strings as lua code
+
+    // Interpret a cpp string like its a standalone lua statement and ignore its return value if it exists.
+    // it returns an error if the string cannot be interpreted as valid lua or if lua rises an error
     ErrorOrVoid interpretString(HUGO::String command);
 
+    // Interpret a cpp string like its a standalone lua statement and get its return value as a T.
+    // it returns an error if the string cannot be interpreted as valid lua, if lua rises an error or if the value is not a T
     template<typename T>
     ErrorOrType<T> getFromString(HUGO::String command) {
         //if string is invalid
@@ -177,6 +188,7 @@ public:
         return ErrorOrType<T, StringError>(result);
     }
 
+    // Send a vector to lua as an ipair iterable table (table as an array).
     template<typename T>
     void sendTable(std::vector<T> array, HUGO::String luaGlobalName = "arrayTable") {
         // Create the "array"
