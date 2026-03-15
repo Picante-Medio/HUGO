@@ -22,22 +22,23 @@ void PhysicsTestSystem::init(){
     collider.info = BoxColliderInfo{HUGO::Vector3(2.f, 1.f, 1.f)};
     RigidBodyComponent& rb = scene->addAndGetComponent<RigidBodyComponent>(e1);
     // rb->setShape()
-    scene->addComponent<StaticRBTag>(e1);
-    // RenderComponent& rc = scene->addAndGetComponent<RenderComponent>(e1);
-    // rc.setMeshName("cube.mesh");
-    // rc.setMaterialName("prueba/ColorRosa");
-    
+    rb.setMass(5.f);
+    scene->addComponent<DynamicRBTag>(e1);
+    RenderComponent& rc = scene->addAndGetComponent<RenderComponent>(e1);
+    rc.setMeshName("cube.mesh");
+    rc.setMaterialName("prueba/ColorRosa");
+
     // Entidad 2: Cuerpo dinámico
-    EntityID e2 = scene->createEntity();
-    TransformComponent& transform2 = scene->addAndGetComponent<TransformComponent>(e2);
-    transform2.position = HUGO::Vector3(0, 10, 0);
-    transform2.scale = HUGO::Vector3(0.15f, 0.25f, 0.15f);
-    ColliderComponent& collider2 = scene->addAndGetComponent<ColliderComponent>(e2);
-    collider2.info = BoxColliderInfo{HUGO::Vector3(1.f, 1.f, 1.f)};
-    RigidBodyComponent& rb2 = scene->addAndGetComponent<RigidBodyComponent>(e2);
-    rb2.setMass(5.f);
-    // rb->setShape()
-    scene->addComponent<DynamicRBTag>(e2);
+    // EntityID e2 = scene->createEntity();
+    // TransformComponent& transform2 = scene->addAndGetComponent<TransformComponent>(e2);
+    // transform2.position = HUGO::Vector3(20, 10, -50);
+    // transform2.scale = HUGO::Vector3(0.15f, 0.25f, 0.15f);
+    // ColliderComponent& collider2 = scene->addAndGetComponent<ColliderComponent>(e2);
+    // collider2.info = BoxColliderInfo{HUGO::Vector3(1.f, 1.f, 1.f)};
+    // RigidBodyComponent& rb2 = scene->addAndGetComponent<RigidBodyComponent>(e2);
+    // rb2.setMass(5.f);
+    // // rb->setShape()
+    // scene->addComponent<DynamicRBTag>(e2);
     // RenderComponent& rc2 = scene->addAndGetComponent<RenderComponent>(e2);
     // rc2.setMeshName("cube.mesh");
     
@@ -64,5 +65,4 @@ void PhysicsTestSystem::fixedUpdate(double dt) {
 }
 
 void PhysicsTestSystem::update(double dt) {
-
 }

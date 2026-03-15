@@ -2,9 +2,9 @@
 #include "BulletUtils.h"
 
 
-HUGOMotionState::HUGOMotionState(const btTransform initialPos, TransformComponent& transform, btTransform offset)
+HUGOMotionState::HUGOMotionState(const btTransform initialPos, Scene& scene, btTransform offset)
 : btTransformRegister(initialPos)
-, hugoTransform(transform)
+, hugoScene(scene)
 , centerOfMassOffset(offset)
 {
 
@@ -17,6 +17,7 @@ HUGOMotionState::HUGOMotionState(const btTransform initialPos, TransformComponen
     
 void HUGOMotionState::updateBulletTransform()
 {
+
     // Uses associated HUGO::TransformComponent to update itself
     btTransform auxTransform = btTransform(
                                BulletUtils::quaternionToBullet(hugoTransform.rotation), 
