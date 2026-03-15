@@ -53,7 +53,7 @@ void Core::init(){
     std::shared_ptr<AudioSystem> audioSystem = std::make_shared<AudioSystem>(scenePtr);
     audioSystem->init();
 
-    audioSystem->loadAudiosFromFile("AudioList.txt");
+    //audioSystem->loadAudiosFromFile("AudioList.txt");
     scenePtr->addSystem(audioSystem);
     
     std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr);
@@ -63,7 +63,7 @@ void Core::init(){
     std::shared_ptr<UISystem> uiSystem = std::make_shared<UISystem>(scenePtr);
     uiSystem->init();
     scenePtr->addSystem(uiSystem);
-    uiSystem->createTestCanvas();
+    //uiSystem->createTestCanvas();
 
     
     //m_resourceManager = std::make_shared<HUGO::ResourceManager>(maEngine, m_ogreRoot);

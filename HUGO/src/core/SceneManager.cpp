@@ -1,5 +1,8 @@
 #include "SceneManager.h"
 #include "LuaBinder.h"
+#include "Scene.h"
+#include "SystemFactory.h"
+#include "ComponentRegistry.h"
 
 SceneManager::SceneManager(): m_chatParser(), m_sceneMap(){
     LuaBinder& luaBinder = LuaBinder::Instance();
@@ -22,6 +25,26 @@ ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
 
     -> Create entities with components
     */
+    m_sceneMap[sceneName] = std::make_shared<Scene>();
+
+    for(auto systemName : sceneData.getValue().systems){
+        ErrorOrType<std::shared_ptr<System>> value = SystemFactory::makeSystem(m_sceneMap[sceneName], systemName);
+
+        if(value.isError()) return ErrorOrVoid(value.getError());
+
+        m_sceneMap[sceneName]->addSystem(value.getValue());
+        value.getValue()->init();
+    }
+
+    /*
+    for(auto entityData: sceneData.getValue().entities){
+        EntityID currEntity = m_sceneMap[sceneName]->createEntity();
+
+        for(auto componentData : entityData){
+            
+        }
+    }
+*/
 
     return ErrorOrVoid();
 }
@@ -50,7 +73,7 @@ void SceneManager::setCurrentScene(const HUGO::String& sceneName){
         }
     }
 
-    m_currentScene = &m_sceneMap[sceneName];
+    m_currentScene = m_sceneMap[sceneName];
 }
 
 void SceneManager::updateCurrentScene(double dt){

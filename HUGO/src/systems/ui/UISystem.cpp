@@ -344,6 +344,8 @@ void UISystem::clearAllCaches() {
 
 void UISystem::init(){
     renderWindow = OgreModule::Instance().getOgreRenderWindow();
+
+    createTestCanvas();
 }
 
 void UISystem::onLoad(){

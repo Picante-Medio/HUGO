@@ -536,6 +536,9 @@ void AudioSystem::onLoad(){
 void AudioSystem::init(){
     engine = MiniaudioModule::Instance().getMiniaudioEngine();
     nextID = 0;
+    
+    //TEST
+    loadAudiosFromFile("AudioList.txt");
 }
 #pragma endregion
 
