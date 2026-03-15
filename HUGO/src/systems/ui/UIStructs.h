@@ -7,23 +7,18 @@
 #include <OgreOverlayContainer.h>
 #include <OgreOverlayElement.h>
 #include <OgreTextAreaOverlayElement.h>
-#include <OgreRenderWindow.h>
 
 // auxiliar TADS for each UI element
-struct PanelCache {
+
+struct UIElementCache
+{
     Ogre::Overlay* overlay = nullptr;
-    Ogre::OverlayContainer* panel = nullptr;
+    Ogre::OverlayContainer* container = nullptr;
+    Ogre::OverlayElement* element = nullptr;
 };
 
-struct TextCache {
-    Ogre::Overlay* overlay = nullptr;
-    Ogre::OverlayContainer* container = nullptr; 
+struct UIButtonCache : public UIElementCache
+{
+    //Ogre::BorderPanelOverlayElement* panel = nullptr;
     Ogre::TextAreaOverlayElement* textArea = nullptr;
-};
-
-struct ButtonCache {
-    Ogre::Overlay* overlay = nullptr;
-    Ogre::OverlayContainer* container = nullptr; 
-    Ogre::TextAreaOverlayElement* textArea = nullptr;
-    Ogre::OverlayElement* element;
 };

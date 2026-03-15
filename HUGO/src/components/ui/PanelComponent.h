@@ -4,31 +4,28 @@
 #include "HugoTypes.h"
 #include "HugoComponentMacros.h"
 
-#include <OgreOverlay.h>
+#include "OgreOverlay.h"
 
 HCOMPONENT(PanelComponent)
-    // names
-    HUGO::String overlayName=""; // overlay in Ogre
-    HUGO::String containerName="container"; // root container element
 
-    // state
-    bool isVisible = false;
+    HUGO::String overlayName = "";
+    HUGO::String containerName = "";
+
+    bool isVisible = true;
+
     HUGO::Int zOrder = 10;
-    Ogre::GuiMetricsMode metricsMode = Ogre::GuiMetricsMode::GMM_RELATIVE; // relative/pixels
+    Ogre::GuiMetricsMode metricsMode = Ogre::GuiMetricsMode::GMM_RELATIVE;
 
-    // position and size (default full screen)
-    HUGO::Float left = 0.0f;
-    HUGO::Float top = 0.0f;
-    HUGO::Float width = 1.0f;
-    HUGO::Float height= 1.0f;
+    HUGO::Float left = 0;
+    HUGO::Float top = 0;
+    HUGO::Float width = 0;
+    HUGO::Float height = 0;
 
-    // appearance
-    HUGO::String material = "";
-
-    // alignment and positioning
-    Ogre::GuiHorizontalAlignment alignmentX = 
+    Ogre::GuiHorizontalAlignment alignmentX =
         Ogre::GuiHorizontalAlignment::GHA_LEFT;
-    Ogre::GuiVerticalAlignment alignmentY = 
-        Ogre::GuiVerticalAlignment::GVA_CENTER;
 
+    Ogre::GuiVerticalAlignment alignmentY =
+        Ogre::GuiVerticalAlignment::GVA_CENTER;
+        
+    HUGO::String material = "";
 END_HCOMPONENT()

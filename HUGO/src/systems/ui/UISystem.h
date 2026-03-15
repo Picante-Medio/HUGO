@@ -1,70 +1,88 @@
 #pragma once
+
 #include "HugoError.h"
 #include "HugoSystemMacros.h"
 #include "UIStructs.h"
 #include "UITags.h"
 
-#include <string>
 #include <unordered_map>
+#include <memory>
+
+#include <Ogre.h>
+#include <OgreOverlay.h>
+#include <OgreOverlayManager.h>
+#include <OgreOverlayContainer.h>
+#include <OgreTextAreaOverlayElement.h>
+#include <OgreBorderPanelOverlayElement.h>
+
 
 struct PanelComponent;
 struct TextComponent;
 struct ButtonComponent;
 
 HSYSTEM(UISystem)
+
 private:
-#pragma region attributes
-    Ogre::RenderWindow* renderWindow;
 
-    // one unordered_map per component type
-    std::unordered_map<EntityID, std::shared_ptr<PanelCache>> panelCache;
-    std::unordered_map<EntityID, std::shared_ptr<TextCache>> textCache;
-    std::unordered_map<EntityID, std::shared_ptr<ButtonCache>> buttonCache;
-#pragma endregion
-    
-#pragma region private methods
-/*
-    // example .overlay:
-    overlay MyCanvas                     // overlay
-    {
-        overlay_element (MyPanel) Panel // overlayContainer
-        {
-        }
-    }
-*/
+//====================================================
+// ENGINE
+//====================================================
 
-    // Ogre helpers
-    ErrorOrType<Ogre::Overlay*> getOverlay(const HUGO::String& name); // gets the root overlay
-    ErrorOrType<Ogre::OverlayElement*> getElement(const HUGO::String& name); // get a panel (can have children)
-    ErrorOrType<Ogre::OverlayContainer*> getContainer(const HUGO::String& name); // get a specific ui element
-    
-    // Cache helpers
-    std::shared_ptr<PanelCache> createPanelCache(const PanelComponent& p);
-    std::shared_ptr<TextCache> createTextCache(const TextComponent& t);
-    std::shared_ptr<ButtonCache>createButtonCache(const ButtonComponent& b);
+Ogre::RenderWindow* renderWindow = nullptr;
 
-    // Synchronization
-    void syncPanel(const PanelComponent& p, const PanelDirtyTag& t);
-    void syncText(const TextComponent& c, const TextDirtyTag& t);
-    // show/hide
-    void processVisibility();
-    void processPanelChanges();
-    void processTextChanges();
-    // Utility
-    void clearEntityCache(EntityID entity);
-    void clearAllCaches();
-#pragma endregion
+
+//====================================================
+// UI CACHE
+//====================================================
+
+std::unordered_map<EntityID, std::shared_ptr<UIElementCache>> uiCache;
+
+//====================================================
+// CACHE CREATION
+//====================================================
+std::shared_ptr<UIElementCache> createElementCache(Ogre::Overlay* o, 
+    Ogre::OverlayContainer* c, Ogre::OverlayElement* e = nullptr);
+std::shared_ptr<UIElementCache> createElementCache(const HUGO::String& overlayName,
+    const HUGO::String& containerName, const HUGO::String& elementName = "");
+UIElementCache* getCache(EntityID entity);
+
+//====================================================
+// SYNCHRONIZATION
+//====================================================
+
+void syncPanel(const PanelComponent& p, const PanelDirtyTag& tag);
+void syncText(const PanelComponent& p, const TextComponent& t, const TextDirtyTag& tag);
+
+
+//====================================================
+// PROCESSING
+//====================================================
+
+void processVisibility();
+void processPanelChanges();
+void processTextChanges();
+
+
+//====================================================
+// CACHE
+//====================================================
+
+void clearEntityCache(EntityID entity);
+void clearAllCaches();
+
+//====================================================
+// TEST UI
+//====================================================
+const PanelComponent& createTestCanvas();
+void createTestText();
 
 public:
-    virtual ~UISystem();
 
-    void init();
-    void onLoad();
+virtual ~UISystem();
 
-    void update(double dt) override;
-    void fixedUpdate(double dt) override;
-    
-    void createTestCanvas();
-    void createTestText();
+void init();
+void onLoad();
 
+void update(double dt) override;
+void fixedUpdate(double dt) override;
 END_HSYSTEM()

@@ -5,19 +5,11 @@
 #include "HugoTypes.h"
 #include "HugoComponentMacros.h"
 
-#include <OgreOverlay.h>
-#include <OgreTextAreaOverlayElement.h>
+#include "OgreOverlay.h"
+#include "OgreTextAreaOverlayElement.h"
 
 HCOMPONENT(TextComponent)
-    // names
-    HUGO::String overlayName = "";      // overlay in Ogre
-    HUGO::String containerName = "";
     HUGO::String textAreaName = "textArea";     // text area element name
-
-    // state
-    bool isVisible = true;
-    HUGO::Int zOrder = 10;
-    Ogre::GuiMetricsMode metricsMode = Ogre::GuiMetricsMode::GMM_RELATIVE; // relative/pixels
 
     // text content
     HUGO::String text = "";              // text to display
@@ -27,20 +19,7 @@ HCOMPONENT(TextComponent)
     HUGO::Vector4 colour = {1.0f, 1.0f, 1.0f, 1.0f};
     HUGO::Vector4 colourTop = {0.0f, 0.0f, 0.0f, 0.0f}; 
     HUGO::Vector4 colourBottom = {0.0f, 0.0f, 0.0f, 0.0f};
-
-    // alignment and positioning
-    Ogre::GuiHorizontalAlignment alignmentX = 
-        Ogre::GuiHorizontalAlignment::GHA_LEFT;
-    Ogre::GuiVerticalAlignment alignmentY = 
-        Ogre::GuiVerticalAlignment::GVA_CENTER;
         
-    // position and size relative to parent panel
-    HUGO::Float left = 0.0f;
-    HUGO::Float top = 0.0f;
-    HUGO::Float width = 0.0f;
-    HUGO::Float height = 0.0f;
-
-    // OPTIONALS
     // space width
     HUGO::Float spaceWidth = 0.03f;  
 END_HCOMPONENT()
