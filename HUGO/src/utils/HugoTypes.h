@@ -80,7 +80,33 @@ namespace HUGO{
         BS_DOWN
     };
 
-    enum TrayLocationTypes  /// enumerator values for widget tray anchoring locations
+    // Relation to the parent in the horizontal dimension
+    enum UIHorizontalAlignment
+    {
+        UHA_LEFT,
+        UHA_CENTER,
+        UHA_RIGHT
+    };
+
+    // Relation to the parent in the vertical dimension
+    enum UIVerticalAlignment
+    {
+        UVA_TOP,
+        UVA_CENTER,
+        UVA_BOTTOM
+    };
+    
+    enum UIMetricsMode
+    {
+        // Left, top, height and width are parametrics from 0.0 to 1.0
+        GMM_RELATIVE,
+        // Positions and sizes are in absolute pixels
+        GMM_PIXELS,
+        // Positions and sizes are in virtual pixels
+        GMM_RELATIVE_ASPECT_ADJUSTED
+    };
+
+    enum TrayLocationTypes  // enumerator values for widget tray anchoring locations
     {
         TL_TOPLEFT,
         TL_TOP,
