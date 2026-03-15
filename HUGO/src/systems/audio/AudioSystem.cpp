@@ -16,13 +16,8 @@
 #include <sstream>
 
 AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, const std::string& path, int queueSize)
-    : System(scene), engine(MiniaudioModule::Instance().getMiniaudioEngine()), path(path), audios(), nameToID(), pools(), nextID(0), queueSize(queueSize)
-{   
-    //DEPRECATED: this will be in load method
-    LuaBinder& luaBinder = LuaBinder::Instance();
-    luaBinder.registerMethod<AudioSystem, void, int>(*this, &AudioSystem::playAudioLUA, "playAudio");
-    luaBinder.registerMethod<AudioSystem, ErrorOrVoid, HUGO::String>(*this, &AudioSystem::loadAudiosFromFile, "loadAudiosFromFile");
-}
+    : System(scene), engine(MiniaudioModule::Instance().getMiniaudioEngine()), path(path), queueSize(queueSize), audios(), nameToID(), pools(), nextID(0)
+{}
 
 ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id)
 {
@@ -537,7 +532,9 @@ void AudioSystem::fixedUpdate(double dt)
 }
 
 void AudioSystem::onLoad(){
-
+    LuaBinder& luaBinder = LuaBinder::Instance();
+    luaBinder.registerMethod<AudioSystem, void, int>(*this, &AudioSystem::playAudioLUA, "playAudio");
+    luaBinder.registerMethod<AudioSystem, ErrorOrVoid, HUGO::String>(*this, &AudioSystem::loadAudiosFromFile, "loadAudiosFromFile");
 }
 
 void AudioSystem::init(){
