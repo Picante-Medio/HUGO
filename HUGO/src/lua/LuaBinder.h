@@ -98,7 +98,10 @@ public:
     //Init must be called before using lua
     void Init();
 
-    // Register a standalone cpp function to call it from lua
+    /* Register a standalone cpp function to call it from lua.
+    Example for add function that returns int and receives two ints: 
+    LuaBinder::Instance().registerFunc<int, int, int>(add, "add");
+    */
     template<typename ReturnType, typename ...ArgTypes>
     void registerFunc(ReturnType(*function)(ArgTypes...), HUGO::String luaName) {
          using Function = ReturnType(*)(ArgTypes...);
@@ -116,7 +119,10 @@ public:
         lua_setglobal(lua, luaName.c_str());
     }
 
-    // Register method of a cpp object to call it from lua
+    /* Register method of a cpp object to call it from lua.
+    Example for add method in adder class that returns int and receives two ints: 
+        LuaBinder::Instance().registerMethod<Adder, int, int, int>(*adderPtr, &Adder::add, "add");
+    */
     template<typename ClassType, typename ReturnType, typename... ArgTypes>
     void registerMethod(ClassType& obj, ReturnType(ClassType::*fn)(ArgTypes...), HUGO::String name) {
         using Function = ReturnType(ClassType::*)(ArgTypes...);
@@ -189,6 +195,7 @@ public:
     }
 
     // Send a vector to lua as an ipair iterable table (table as an array).
+    // The name of the lua table will can be optionally set, if not it will allways be "arrayTable"
     template<typename T>
     void sendTable(std::vector<T> array, HUGO::String luaGlobalName = "arrayTable") {
         // Create the "array"
