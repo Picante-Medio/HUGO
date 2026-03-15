@@ -11,11 +11,6 @@
 
 #include "OgreModule.h"
 
-UISystem::UISystem(std::shared_ptr<Scene> scene)
-    : System(scene), renderWindow(OgreModule::Instance().getOgreRenderWindow())
-{
-}
-
 UISystem::~UISystem()
 {
     clearAllCaches();
@@ -348,7 +343,7 @@ void UISystem::clearAllCaches() {
 //=============================================================================
 
 void UISystem::init(){
-
+    renderWindow = OgreModule::Instance().getOgreRenderWindow();
 }
 
 void UISystem::onLoad(){

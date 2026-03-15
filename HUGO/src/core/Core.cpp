@@ -51,14 +51,17 @@ void Core::init(){
     ErrorOrVoid err = chatParser.readChatFolder("../chats");
 
     std::shared_ptr<AudioSystem> audioSystem = std::make_shared<AudioSystem>(scenePtr);
+    audioSystem->init();
 
     audioSystem->loadAudiosFromFile("AudioList.txt");
     scenePtr->addSystem(audioSystem);
     
     std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr);
+    renderSystem->init();
     scenePtr->addSystem(renderSystem);
 
     std::shared_ptr<UISystem> uiSystem = std::make_shared<UISystem>(scenePtr);
+    uiSystem->init();
     scenePtr->addSystem(uiSystem);
     uiSystem->createTestCanvas();
 
@@ -68,6 +71,7 @@ void Core::init(){
     // Physics testing
     physicsModule->createSceneSimulation(scenePtr);
     std::shared_ptr<PhysicsTestSystem> testSystem = std::make_shared<PhysicsTestSystem>(scenePtr);
+    testSystem->init();
     scenePtr->addSystem(testSystem);
 }
 

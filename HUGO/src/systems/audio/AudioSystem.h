@@ -5,7 +5,7 @@
 #include "HugoError.h"
 #include "HugoMath.h"
 #include "HugoTypes.h"
-#include "System.h"
+#include "HugoSystemMacros.h"
 
 #include <functional>
 #include <memory>
@@ -44,13 +44,12 @@ class MiniaudioModule;
 /* =============
    audio system
    ============*/
-class AudioSystem : public System
-{
+HSYSTEM(AudioSystem)
 private:
    std::shared_ptr<ma_engine> engine;
-   std::string path;
+   const std::string path = "test_media/";
 
-   int queueSize;
+   const int queueSize = 10;
 
    HUGO::AudioID nextID = 0;
 
@@ -155,10 +154,6 @@ private:
 
 public:
 
-   AudioSystem(std::shared_ptr<Scene> scene,
-               const std::string& path = "test_media/",
-               int queueSize = 10);
-
    virtual ~AudioSystem() = default;
 
 
@@ -177,4 +172,4 @@ public:
       ONLY FOR TESTING! IT WILL BE DELETED
       ==================================== */
    void createTestEntity();
-};
+END_HSYSTEM()

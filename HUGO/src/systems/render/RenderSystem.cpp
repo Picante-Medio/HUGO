@@ -18,44 +18,6 @@
 #include "OgreModule.h"
 #include "LuaBinder.h"
 
-RenderSystem::RenderSystem(std::shared_ptr<Scene> scene)
-    :System(scene), idToIndex(), freeOgreObjectId()
-{
-    ogreRoot = Ogre::Root::getSingletonPtr();
-    try {
-        sceneManager = ogreRoot->createSceneManager();
-    }
-    catch (const Ogre::Exception& e) {
-        throw std::runtime_error("[RenderSystem] SceneManager creation failed: " + std::string(e.getDescription()));
-    }
-    ogreRoot->_setCurrentSceneManager(sceneManager);
-    sceneManager->addRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
-
-    // Basic light
-    setAmbientLight(0.2f, 0.2f, 0.2f);
-
-
-    // Camera and viewport creation for testing
-    EntityID defaultCamera = createCameraEntity(HUGO::Vector3(0, 0, 50));
-    setMainCamera(defaultCamera);
-
-    EntityID defaultViewport = createViewportEntity();    
-    setMainViewport(defaultViewport);
-
-    createLightEntity( HUGO::Vector3(0, 20, 20), //light position
-                        HUGO::Vector4(0.9f, 0.9f, 0.8f, 0.2f), //diffuse
-                        HUGO::Vector4(0.0f, 0.0f, 0.0f, 0.0f), //specular
-                        HUGO::LightType::LT_POINT, 
-                        HUGO::Radian(0), 
-                        HUGO::Radian(0), 
-                        0, 
-                        0.1f, 
-                        0.1f, 
-                        100); 
-        
-
-}
-
 RenderSystem::~RenderSystem()
 {
     for(auto& v: viewportMap){
@@ -349,6 +311,39 @@ void RenderSystem::updateAnimations(double dt)
 }
 
 void RenderSystem::init(){
+
+        ogreRoot = Ogre::Root::getSingletonPtr();
+    try {
+        sceneManager = ogreRoot->createSceneManager();
+    }
+    catch (const Ogre::Exception& e) {
+        throw std::runtime_error("[RenderSystem] SceneManager creation failed: " + std::string(e.getDescription()));
+    }
+    ogreRoot->_setCurrentSceneManager(sceneManager);
+    sceneManager->addRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
+
+    // Basic light
+    setAmbientLight(0.2f, 0.2f, 0.2f);
+
+
+    // Camera and viewport creation for testing
+    EntityID defaultCamera = createCameraEntity(HUGO::Vector3(0, 0, 50));
+    setMainCamera(defaultCamera);
+
+    EntityID defaultViewport = createViewportEntity();    
+    setMainViewport(defaultViewport);
+
+    createLightEntity( HUGO::Vector3(0, 20, 20), //light position
+                        HUGO::Vector4(0.9f, 0.9f, 0.8f, 0.2f), //diffuse
+                        HUGO::Vector4(0.0f, 0.0f, 0.0f, 0.0f), //specular
+                        HUGO::LightType::LT_POINT, 
+                        HUGO::Radian(0), 
+                        HUGO::Radian(0), 
+                        0, 
+                        0.1f, 
+                        0.1f, 
+                        100); 
+        
 
 }
 

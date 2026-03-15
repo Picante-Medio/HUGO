@@ -1,6 +1,6 @@
 #pragma once
 #include "HugoError.h"
-#include "System.h"
+#include "HugoSystemMacros.h"
 #include "UIStructs.h"
 #include "UITags.h"
 
@@ -10,8 +10,8 @@
 struct PanelComponent;
 struct TextComponent;
 struct ButtonComponent;
-class UISystem : public System
-{
+
+HSYSTEM(UISystem)
 private:
 #pragma region attributes
     Ogre::RenderWindow* renderWindow;
@@ -56,7 +56,6 @@ private:
 #pragma endregion
 
 public:
-    UISystem(std::shared_ptr<Scene> scene);
     virtual ~UISystem();
 
     void init();
@@ -67,4 +66,5 @@ public:
     
     void createTestCanvas();
     void createTestText();
-};
+
+END_HSYSTEM()

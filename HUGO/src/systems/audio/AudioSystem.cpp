@@ -15,10 +15,6 @@
 #include <fstream>
 #include <sstream>
 
-AudioSystem::AudioSystem(std::shared_ptr<Scene> scene, const std::string& path, int queueSize)
-    : System(scene), engine(MiniaudioModule::Instance().getMiniaudioEngine()), path(path), queueSize(queueSize), audios(), nameToID(), pools(), nextID(0)
-{}
-
 ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id)
 {
     AudioInfo info;
@@ -538,7 +534,8 @@ void AudioSystem::onLoad(){
 }
 
 void AudioSystem::init(){
-    
+    engine = MiniaudioModule::Instance().getMiniaudioEngine();
+    nextID = 0;
 }
 #pragma endregion
 

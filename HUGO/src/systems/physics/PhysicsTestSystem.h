@@ -1,11 +1,10 @@
 #pragma once
 
-#include "System.h"
+#include "HugoSystemMacros.h"
 
-class PhysicsTestSystem : public System {
+HSYSTEM(PhysicsTestSystem)
 
 public:
-    PhysicsTestSystem(std::shared_ptr<Scene> scene);
     ~PhysicsTestSystem();
 
     void init();
@@ -13,4 +12,4 @@ public:
 
     void fixedUpdate(double dt);
     void update(double dt);
-};
+END_HSYSTEM()

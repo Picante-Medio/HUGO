@@ -7,10 +7,12 @@
 #include "TransformComponent.h"
 #include "RenderComponent.h"
 
-PhysicsTestSystem::PhysicsTestSystem(std::shared_ptr<Scene> scene)
-: System(scene)
-{
-    
+PhysicsTestSystem::~PhysicsTestSystem() {
+
+}
+
+void PhysicsTestSystem::init(){
+        
     // Entidad 1: Cuerpo estático
     EntityID e1 = scene->createEntity();
     TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(e1);
@@ -45,14 +47,6 @@ PhysicsTestSystem::PhysicsTestSystem(std::shared_ptr<Scene> scene)
     // scene->addComponent<RigidBodyComponent>(e3, shape, 5.f);
     // scene->addComponent<KinematicRBTag>(e3);
     // scene->addComponent<RenderComponent>(e3, "cube.mesh", "ColorVerde");
-}
-
-PhysicsTestSystem::~PhysicsTestSystem() {
-
-}
-
-void PhysicsTestSystem::init(){
-
 }
 
 void PhysicsTestSystem::onLoad(){

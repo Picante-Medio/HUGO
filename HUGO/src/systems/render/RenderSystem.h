@@ -2,7 +2,7 @@
 #include <vector>
 #include <unordered_map>
 
-#include "System.h"
+#include "HugoSystemMacros.h"
 #include "Ecs.h"
 #include "Ogre.h"
 #include "OgreOverlaySystem.h"
@@ -11,8 +11,10 @@
 #include "HugoMath.h"
 #include "HugoError.h"
 
+
+
 struct RenderComponent;
-class RenderSystem : public System{
+HSYSTEM(RenderSystem)
     // Ogre Camera Information
     struct CameraInfo {
         Ogre::Camera* ogreCamera = nullptr;
@@ -98,7 +100,6 @@ class RenderSystem : public System{
     void setMainViewport(EntityID viewportEntity);
       
 public:
-    RenderSystem(std::shared_ptr<Scene> scene);
     ~RenderSystem() override;
 
     void init() override;
@@ -108,4 +109,4 @@ public:
     void update(double dt) override;
 
     Ogre::SceneManager* getSM() const;
-};
+END_HSYSTEM()
