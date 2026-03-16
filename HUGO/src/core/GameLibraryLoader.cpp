@@ -45,7 +45,7 @@ HUGO::GameLibraryLoader::destroy() {
 }
 
 ErrorOrVoid 
-HUGO::GameLibraryLoader::GenerateComponent(std::shared_ptr<IScene> scene, const std::string& componentName, 
+HUGO::GameLibraryLoader::GenerateComponent(IScene& scene, const std::string& componentName, 
     const std::unordered_map<std::string, HVariant>& componentMembers) {
 
     if (generateComponentFnPointer(scene, componentName, componentMembers)) {

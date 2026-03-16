@@ -43,7 +43,7 @@ public:
 
     ~GameLibraryLoader();
 
-    ErrorOrVoid GenerateComponent(std::shared_ptr<IScene> scene, const std::string& component, 
+    ErrorOrVoid GenerateComponent(IScene& scene, const std::string& component, 
         const std::unordered_map<std::string, HVariant>& componentMembers);
 };
 
