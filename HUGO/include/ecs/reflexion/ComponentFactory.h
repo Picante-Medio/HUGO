@@ -10,21 +10,24 @@
 
 namespace HUGO {
 
-struct ComponentFactory {
-    
-    using ComponentGenerator = std::function<ErrorOrVoid(IScene&, EntityID, std::unordered_map<std::string, HVariant>)>; 
+class ComponentFactory {
+public:
+    using ComponentGenerator = std::function<ErrorOrVoid(IScene&, EntityID, 
+        const std::unordered_map<std::string, HVariant>&)>;
 
+private:
     static std::unordered_map<std::string, ComponentGenerator>& generators() {
         static std::unordered_map<std::string, ComponentGenerator> generatorsInstance;
         return generatorsInstance;
     }
 
+public:
     static void add(const std::string& name, ComponentGenerator generator) {
         generators()[name] = generator;
     }
 
     static ErrorOrVoid makeComponent(IScene& scene, EntityID ent,
-        const std::string& name, std::unordered_map<std::string, HVariant> args) {
+        const std::string& name, const std::unordered_map<std::string, HVariant>& args) {
 
         if (generators().count(name)) {
             return generators()[name](scene, ent, args);
