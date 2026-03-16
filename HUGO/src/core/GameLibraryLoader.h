@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 
+#include "HugoError.h"
 #include "IScene.h"
 #include "HugoParsingVariant.h"
 
@@ -20,30 +21,31 @@
     #define CLOSE_DYNAMIC_LIBRARY(handle) dlclose(handle)
 #endif
 
-typedef void (*GenerateComponentFn)(std::shared_ptr<IScene>, std::string, std::unordered_map<std::string, HVariant>);
+typedef bool (*GenerateComponentFn)(std::shared_ptr<IScene>, const std::string&, 
+    const std::unordered_map<std::string, HVariant>&);
 
 namespace HUGO {
 
 class GameLibraryLoader {
 
-    GameLibraryLoader(std::string gameLibraryName);
+    GameLibraryLoader(const std::string& gameLibraryName);
 
-    static inline std::shared_ptr<GameLibraryLoader> instance = nullptr;
+    static inline std::unique_ptr<GameLibraryLoader> loaderInstance = nullptr;
 
     LIBRARY_HANDLE gameHandle = nullptr;
-    GenerateComponentFn generateComponentPointer = nullptr;
+    GenerateComponentFn generateComponentFnPointer = nullptr;
     
 public:
 
-    ~GameLibraryLoader();
-
-    static void init(std::string gameLibraryName);
+    static void init(const std::string& gameLibraryName);
     static void destroy();
 
-    void GenerateComponent(std::shared_ptr<IScene>, std::string, std::unordered_map<std::string, HVariant>);
+    static GameLibraryLoader& instance();
 
+    ~GameLibraryLoader();
 
-
+    ErrorOrVoid GenerateComponent(std::shared_ptr<IScene> scene, const std::string& component, 
+        const std::unordered_map<std::string, HVariant>& componentMembers);
 };
 
 }

@@ -1,5 +1,10 @@
 #pragma once
 
+#include "IScene.h"
+#include <string>
+#include <HugoParsingVariant.h>
+#include <unordered_map>
+
 #ifdef _WIN32
   #define EXPORT extern "C" __declspec(dllexport)
 #else
@@ -8,4 +13,5 @@
 
 #include <memory>
 
-EXPORT void FabricateComponent();
+EXPORT bool GenerateComponent(std::shared_ptr<IScene> scene, const std::string& component, 
+        const std::unordered_map<std::string, HVariant>& componentMembers);
