@@ -8,7 +8,9 @@
 #include "HugoError.h"
 #include "HugoParsingVariant.h"
 
-struct ModuleComponentFactory {
+namespace HUGO {
+
+struct ComponentFactory {
     
     using ComponentGenerator = std::function<ErrorOrVoid(IScene&, EntityID, std::unordered_map<std::string, HVariant>)>; 
 
@@ -33,3 +35,5 @@ struct ModuleComponentFactory {
         return ErrorOrVoid(err);
     }
 };
+
+}
