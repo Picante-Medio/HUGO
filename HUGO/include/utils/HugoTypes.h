@@ -5,6 +5,9 @@
 
 namespace HUGO{
 
+    using OgreObjectID = int;
+    constexpr OgreObjectID INVALID_OGRE_OBJECT_ID = std::numeric_limits<int>::max();
+    
     using String = std::string;
 
     // Audio Types

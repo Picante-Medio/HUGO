@@ -13,11 +13,6 @@ namespace Ogre{
     class RenderWindow;
 };
 
-namespace HUGO {
-    using OgreObjectID = int;
-    constexpr OgreObjectID INVALID_OGRE_OBJECT_ID = std::numeric_limits<int>::max();
-}
-
 struct SDL_Window;
 
 class OgreModule{
