@@ -10,7 +10,7 @@
 #include "HugoTypes.h"
 #include "HugoMath.h"
 #include "HugoError.h"
-
+#include "OgreModule.h"
 
 
 struct RenderComponent;

@@ -17,7 +17,7 @@
                 return inst; \
             } \
             Reflection() { \
-                ComponentFactory::add(#COMPONENT_NAME, \
+                HUGO::ComponentFactory::add(#COMPONENT_NAME, \
                     [](IScene& scene, EntityID ent, std::unordered_map<std::string, HVariant> args) -> ErrorOrVoid { \
                         COMPONENT_NAME& c = scene.addAndGetComponent<COMPONENT_NAME>(ent); \
                         for(auto& [key,val] : args) { \
