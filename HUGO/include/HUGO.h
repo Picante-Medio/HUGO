@@ -11,7 +11,7 @@
 
 #include "IScene.h"
 #include "Component.h"
-#include "ModuleComponentFactory.h"
+#include "ComponentFactory.h"
 #include "HugoComponentMacros.h"
 
 // Declaración de prueba para ver si los componentes reflejan
