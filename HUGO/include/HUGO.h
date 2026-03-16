@@ -12,18 +12,6 @@
 #include "IScene.h"
 #include "Component.h"
 #include "ComponentFactory.h"
+#include "SystemFactory.h"
 #include "HugoComponentMacros.h"
-
-// Declaración de prueba para ver si los componentes reflejan
-
-// HCOMPONENT(MiComponent)
-//     std::string a;
-//     int b;
-
-//     float c = 0.;
-
-//     SERIALIZED_MEMBER(float, testVar)
-
-//     SERIALIZED_MEMBER(std::string, stringDePrueba)
-
-// END_HCOMPONENT()
+#include "HugoSystemMacros.h"
