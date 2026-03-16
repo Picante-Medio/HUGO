@@ -58,13 +58,7 @@ void Core::init(){
     #endif
 
     std::string gameLibraryName = "TestGame" + debugPostfix + extension;
-    
     GameLibraryLoader::init(gameLibraryName);
-
-    ErrorOrVoid testVal = GameLibraryLoader::instance().GenerateComponent(nullptr, "test", {});
-
-    if (testVal.isError()) 
-        std::cerr << testVal.getError().description() << "\n";
 
     //LuaBinder::Instance().Init();
 
