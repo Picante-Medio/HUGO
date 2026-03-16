@@ -14,3 +14,7 @@ END_HCOMPONENT()
 HCOMPONENT(TextDirtyTag) 
     //HUGO::UInt flags = HUGO::TextDirtyTags::NONE;  
 END_HCOMPONENT() 
+
+
+HCOMPONENT(ButtonDirtyTag) 
+END_HCOMPONENT() 

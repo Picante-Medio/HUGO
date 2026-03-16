@@ -36,5 +36,5 @@ HCOMPONENT(ButtonComponent)
     HUGO::String text = "Button";
     HUGO::String fontName = "SdkTrays/Value";
     HUGO::Float textSize = 0.03f;
-    Ogre::TextAreaOverlayElement::Alignment textAlignment = Ogre::TextAreaOverlayElement::Alignment::Center;
+    //HUGO::TextAlignment textAlignment = HUGO::TextAlignment::CENTER;
 END_HCOMPONENT()
