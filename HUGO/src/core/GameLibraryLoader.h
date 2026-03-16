@@ -21,8 +21,7 @@
     #define CLOSE_DYNAMIC_LIBRARY(handle) dlclose(handle)
 #endif
 
-typedef bool (*GenerateComponentFn)(std::shared_ptr<IScene>, const std::string&, 
-    const std::unordered_map<std::string, HVariant>&);
+typedef bool (*GenerateComponentFn)(IScene&, const std::string&, const std::unordered_map<std::string, HVariant>&);
 
 namespace HUGO {
 

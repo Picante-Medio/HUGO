@@ -1,8 +1,7 @@
 #pragma once
 
-#include "IScene.h"
+#include "HUGO.h"
 #include <string>
-#include <HugoParsingVariant.h>
 #include <unordered_map>
 
 #ifdef _WIN32
@@ -13,5 +12,5 @@
 
 #include <memory>
 
-EXPORT bool GenerateComponent(std::shared_ptr<IScene> scene, const std::string& component, 
+EXPORT bool GenerateComponent(IScene& scene, EntityID ent, const std::string& component, 
         const std::unordered_map<std::string, HVariant>& componentMembers);
