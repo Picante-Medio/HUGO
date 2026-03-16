@@ -18,7 +18,7 @@
             } \
             Reflection() { \
                 HUGO::ComponentFactory::add(#COMPONENT_NAME, \
-                    [](IScene& scene, EntityID ent, std::unordered_map<std::string, HVariant> args) -> ErrorOrVoid { \
+                    [](IScene& scene, EntityID ent, const std::unordered_map<std::string, HVariant>& args) -> ErrorOrVoid { \
                         COMPONENT_NAME& c = scene.addAndGetComponent<COMPONENT_NAME>(ent); \
                         for(auto& [key,val] : args) { \
                             auto it = members().find(key); \
@@ -38,7 +38,7 @@
     TYPE NAME; \
     inline static struct Register##NAME_ { \
         Register##NAME_() { \
-            ThisComponent::Reflection::members()[#NAME] = \
+            Reflection::members()[#NAME] = \
                 std::make_unique<FieldData<ThisComponent, TYPE>>(&ThisComponent::NAME); \
         } \
     } auto_register_##NAME_;
@@ -48,7 +48,7 @@
     TYPE NAME = INIT_VALUE; \
     inline static struct Register##NAME_ { \
         Register##NAME_() { \
-            ThisComponent::Reflection::members()[#NAME] = \
+            Reflection::members()[#NAME] = \
                 std::make_unique<FieldData<ThisComponent, TYPE>>(&ThisComponent::NAME); \
         } \
     } auto_register_##NAME_;
