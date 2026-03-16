@@ -3,7 +3,7 @@
 #include <unordered_map>
 
 #include "HugoSystemMacros.h"
-#include "Ecs.h"
+#include "EcsTypes.h"
 #include "Ogre.h"
 #include "OgreOverlaySystem.h"
 #include "PagedArray.h"

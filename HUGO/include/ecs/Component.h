@@ -1,6 +1,6 @@
 # pragma once
 
-#include "Ecs.h"
+#include "EcsTypes.h"
 
 // Components are just data
 struct Component {

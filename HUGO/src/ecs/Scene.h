@@ -1,13 +1,5 @@
 #pragma once
 
-#include <memory>
-#include <utility>
-#include <vector>
-
-#include "ComponentDenseTable.h"
-#include "Ecs.h"
-#include "EntityTable.h"
-#include "HQuery.h"
 #include "System.h"
 #include "HugoTypes.h"
 #include "LuaConsole.h"

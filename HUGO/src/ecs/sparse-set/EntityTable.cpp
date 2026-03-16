@@ -1,5 +1,5 @@
 #include "EntityTable.h"
-#include "Ecs.h"
+#include "EcsTypes.h"
 #include <vector>
 
 EntityTable::EntityTable() 
@@ -67,4 +67,9 @@ EntityTable::getAllDenseListIndexes(EntityID entity) {
       list.push_back({id, componentDirections[entity][id]});
 
   return list;
+}
+
+std::vector<std::bitset<MAX_COMPONENTS>> 
+EntityTable::getComponentMask() {
+  return componentMask;
 }

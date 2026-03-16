@@ -4,17 +4,17 @@
 #include <utility>
 #include <vector>
 
-#include "ComponentDenseTable.h"
-#include "Ecs.h"
-#include "EntityTable.h"
+#include "IEntityTable.h"
+#include "IComponentDenseTable.h"
+#include "EcsTypes.h"
 #include "ComponentRegistry.h"
-#include "HQuery.h"
+#include "HugoQuery.h"
 
 class IScene {
 protected:
 
-	EntityTable entityTable;
-  	ComponentDenseTable componentTable;
+	std::unique_ptr<IEntityTable> entityTable;
+  	std::unique_ptr<IComponentDenseTable> componentTable;
 
 public:
 	// Entity handling
@@ -29,15 +29,15 @@ public:
 		ComponentID id = ComponentRegistry::getComponentId<T>();
 
 		// Adding the component
-		DenseListIndex index = componentTable.addComponent(component, entity);
-		entityTable.registerComponent(entity, id, index);
+		DenseListIndex index = componentTable->addComponent(component, entity);
+		entityTable->registerComponent(entity, id, index);
 	}
 
 	template<typename T> 
 	T &getComponent(EntityID entity) {
 	ComponentID componentID = ComponentRegistry::getComponentId<T>();
-		return componentTable.getComponent<T>(
-			entityTable.getDenseListIndex(entity, componentID));
+		return componentTable->getComponent<T>(
+			entityTable->getDenseListIndex(entity, componentID));
 	}
 
 	template <typename T>
@@ -47,8 +47,8 @@ public:
 		ComponentID id = ComponentRegistry::getComponentId<T>();
 
 		// Adding the component
-		DenseListIndex index = componentTable.addComponent(component, entity);
-		entityTable.registerComponent(entity, id, index);
+		DenseListIndex index = componentTable->addComponent(component, entity);
+		entityTable->registerComponent(entity, id, index);
 
 		return getComponent<T>(entity);
 	}
@@ -57,14 +57,14 @@ public:
 	void removeComponent(EntityID entity) {
 		// Obtaining the index of the component to delete
 		ComponentID id = ComponentRegistry::getComponentId<T>();
-		DenseListIndex oldIndex = entityTable.getDenseListIndex(entity, id);
+		DenseListIndex oldIndex = entityTable->getDenseListIndex(entity, id);
 
 		// Deleting the component
-		entityTable.deRegisterComponent(entity, id);
-		auto [needsUpdate, toUpdate] = componentTable.removeComponent<T>(oldIndex);
+		entityTable->deRegisterComponent(entity, id);
+		auto [needsUpdate, toUpdate] = componentTable->removeComponent<T>(oldIndex);
 
 		// Updating the index of the moved component upon deletion
-		if(needsUpdate) entityTable.updateDenseListIndex(toUpdate, id, oldIndex);
+		if(needsUpdate) entityTable->updateDenseListIndex(toUpdate, id, oldIndex);
 	}
 
 	template <typename... Ts> 
@@ -81,9 +81,9 @@ public:
 
 		// Get the smallest list of possible entities
 		int smallestListIndex = 0;
-		DenseListIndex smallestSize = componentTable.getCount(ids[0]);
+		DenseListIndex smallestSize = componentTable->getCount(ids[0]);
 		for (size_t i = 1; i < ids.size(); ++i) {
-			DenseListIndex size = componentTable.getCount(ids[i]);
+			DenseListIndex size = componentTable->getCount(ids[i]);
 			if (size < smallestSize) {
 				smallestSize = size;
 				smallestListIndex = i;
@@ -91,11 +91,11 @@ public:
 		}
 
 		ComponentID componentID = ids[smallestListIndex];
-		std::vector<EntityID> potentialEntities = componentTable.affectedEntities(componentID);
+		std::vector<EntityID> potentialEntities = componentTable->affectedEntities(componentID);
 
 		// Add components of the right entities to the query
 		for (EntityID entity : potentialEntities)
-			if (entityTable.isInQuery(entity, queryMask))
+			if (entityTable->isInQuery(entity, queryMask))
 			returnedQuery.push_back(getComponent<Ts>(entity)...);
 
 		return returnedQuery;

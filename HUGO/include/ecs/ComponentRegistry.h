@@ -1,8 +1,7 @@
 #pragma once
 
-#include "HugoTypes.h"
-#include "HugoError.h"
-#include "Ecs.h"
+#include <unordered_map>
+#include "EcsTypes.h"
 
 class ComponentRegistry {
 protected:
@@ -21,9 +20,7 @@ public:
 
 	ComponentID getRegistryComponentID(std::string componentName) {
 		if (componentName.empty()) {
-			StringError err;
-			err.errorMessage = "El componente no tiene nombre";
-			return MAX_COMPONENTS;
+			throw std::invalid_argument("Component name is empty");
 		}
 		else {
 			if (registry.count(componentName)) {
@@ -31,7 +28,7 @@ public:
 			}
 			else {
 				if(currentId == MAX_COMPONENTS) {
-					return MAX_COMPONENTS;
+					throw std::overflow_error("MAX_COMPONENTS reached");
 				}
 				registry[componentName] = currentId++;
 				return registry[componentName];

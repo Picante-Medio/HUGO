@@ -183,9 +183,9 @@ file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cpp)
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 file(GLOB_RECURSE SRC_DIRS CONFIGURE_DEPENDS LIST_DIRECTORIES true ${CMAKE_SOURCE_DIR}/src/*)
+file(GLOB_RECURSE SDK_DIRS CONFIGURE_DEPENDS LIST_DIRECTORIES true ${CMAKE_SOURCE_DIR}/include/*)
 
-set(INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src
-    ${HUGO_DEPS_INCLUDE_DIRS})
+set(INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src)
 
 foreach(path ${SRC_DIRS})
     if(IS_DIRECTORY "${path}")
@@ -193,9 +193,18 @@ foreach(path ${SRC_DIRS})
     endif()
 endforeach()
 
+set(SDK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include)
+
+foreach(path ${SDK_DIRS})
+    if(IS_DIRECTORY "${path}")
+        list(APPEND SDK_INCLUDE_DIRS "${path}")
+    endif()
+endforeach()
+
 target_include_directories(${PROJECT_NAME} PRIVATE 
     ${INCLUDE_DIRS}
-    ${CMAKE_SOURCE_DIR}/include)
+    ${HUGO_DEPS_INCLUDE_DIRS}
+    ${SDK_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     ${HUGO_LINKED_LIBRARIES})
@@ -218,10 +227,14 @@ endif ()
 
 ################## Juego de prueba
 
-add_library(HTestGame MODULE ${CMAKE_SOURCE_DIR}/TestGame/GameEntryPoint.cpp)
+add_library(TestGame MODULE ${CMAKE_SOURCE_DIR}/TestGame/GameEntryPoint.cpp)
 
-set_target_properties(HTestGame PROPERTIES
+set_target_properties(TestGame PROPERTIES
     DEBUG_POSTFIX "d"
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
     LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin
     LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin)
+
+target_include_directories(TestGame PRIVATE 
+    ${CMAKE_SOURCE_DIR}/TestGame
+    ${SDK_INCLUDE_DIRS})
