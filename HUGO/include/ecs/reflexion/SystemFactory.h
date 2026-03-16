@@ -8,7 +8,7 @@
 struct SystemFactory{
 
     //Returns shared_ptr of the system because the Scene that holds it must reference it to update it.
-    using SystemGenerator = std::function<ErrorOrType<std::shared_ptr<System>>(std::shared_ptr<Scene>)>; 
+    using SystemGenerator = std::function<ErrorOrType<std::shared_ptr<System>>(std::shared_ptr<IScene>)>; 
 
     static std::unordered_map<std::string, SystemGenerator>& generators() {
         static std::unordered_map<std::string, SystemGenerator> generatorsInstance;
@@ -19,7 +19,7 @@ struct SystemFactory{
         generators()[name] = generator;
     }
 
-    static ErrorOrType<std::shared_ptr<System>> makeSystem(std::shared_ptr<Scene> scene,
+    static ErrorOrType<std::shared_ptr<System>> makeSystem(std::shared_ptr<IScene> scene,
         const std::string& name) {
 
         if (generators().count(name)) {

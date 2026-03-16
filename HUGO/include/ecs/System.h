@@ -2,15 +2,15 @@
 
 #include <memory>
 
-class Scene;
+class IScene;
 
 // Systems are only functionality
 class System {
 protected:
-  std::shared_ptr<Scene> scene = nullptr;
+  std::shared_ptr<IScene> scene = nullptr;
 
 public:
-  explicit System(std::shared_ptr<Scene> scene): scene(scene) {}
+  explicit System(std::shared_ptr<IScene> scene): scene(scene) {}
   virtual ~System() {}
 
   //Called when the System is created
