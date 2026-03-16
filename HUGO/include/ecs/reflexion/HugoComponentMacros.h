@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "ModuleComponentFactory.h"
+#include "ComponentFactory.h"
 #include "Component.h"
 #include "FieldData.h"
 
@@ -17,7 +17,7 @@
                 return inst; \
             } \
             Reflection() { \
-                ModuleComponentFactory::add(#COMPONENT_NAME, \
+                ComponentFactory::add(#COMPONENT_NAME, \
                     [](IScene& scene, EntityID ent, std::unordered_map<std::string, HVariant> args) -> ErrorOrVoid { \
                         COMPONENT_NAME& c = scene.addAndGetComponent<COMPONENT_NAME>(ent); \
                         for(auto& [key,val] : args) { \
