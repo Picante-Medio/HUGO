@@ -18,9 +18,11 @@
 //Auxiliar function to pop value from lua stack
 template<typename T>
 T lua_get(lua_State* lua, int idx) {
-    if constexpr (std::is_same_v<T, HUGO::Int> || std::is_same_v<T, int> 
-        || std::is_same_v<T, HUGO::Float> || std::is_same_v<T, double> || std::is_same_v<T, float>)
+    if constexpr (std::is_same_v<T, HUGO::Int> || std::is_same_v<T, int>)
         return (HUGO::Int)luaL_checknumber(lua, idx);
+
+    else if constexpr(std::is_same_v<T, HUGO::Float> || std::is_same_v<T, double> || std::is_same_v<T, float>)
+        return (HUGO::Float)luaL_checknumber(lua, idx);
 
     else if constexpr (std::is_same_v<T, bool>)
         return lua_toboolean(lua, idx);
