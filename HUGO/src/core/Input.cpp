@@ -1,5 +1,6 @@
 #include "Input.h"
 #include <SDL_events.h>
+#include <SDL_mouse.h>
 
 namespace HUGO {
 Input::Input() : keysOfAction(), keyPressed(), previousKeyPressed(), quit(false) {}
@@ -93,6 +94,13 @@ bool Input::wasActionJustReleased(std::string action) {
       return true;
 
   return false;
+}
+
+
+Input::MousePosition Input::getMousePosition() {
+  MousePosition mp;
+  SDL_GetMouseState(&mp.x, &mp.y);
+  return mp;
 }
 
 } // namespace HUGO

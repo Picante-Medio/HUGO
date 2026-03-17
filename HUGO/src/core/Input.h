@@ -39,5 +39,12 @@ public:
 
   bool wasKeyJustReleased(SDL_Keycode key);
   bool wasActionJustReleased(std::string action);
+
+  struct MousePosition {
+      int x; 
+      int y;
+  };
+
+  MousePosition getMousePosition();
 };
 }; // namespace HUGO
