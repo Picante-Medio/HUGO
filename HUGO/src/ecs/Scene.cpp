@@ -11,17 +11,24 @@
 #include "EntityTable.h"
 #include "ComponentDenseTable.h"
 
+#include "ComponentFactory.h"
+#include "ComponentRegistry.h"
 
 Scene::Scene() {
-	//DEPRECATED: this will be in load method
+	console = std::make_shared<LuaConsole>();
+	entityTable = std::make_unique<EntityTable>();
+	componentTable = std::make_unique<ComponentDenseTable>();
+}
+
+//Load method is called when the scene is loaded so LUA methods are overwritten
+void Scene::load() {
 	LuaBinder& luaBinder = LuaBinder::Instance();
 	luaBinder.registerMethod<Scene, void, int>(*this, &Scene::removeEntityLUA, "RemoveEntity");
 	luaBinder.registerMethod<Scene, int>(*this, &Scene::createEntityLUA, "CreateEntity");
 
-	console = std::make_shared<LuaConsole>();
-
-	entityTable = std::make_unique<EntityTable>();
-	componentTable = std::make_unique<ComponentDenseTable>();
+	for(std::shared_ptr<System> system : systems) {
+		system->onLoad();
+	}
 }
 
 void 
@@ -47,8 +54,13 @@ Scene::createEntityLUA() {
 }
 
 void
-Scene::addComponentLUA(int entityID, std::string componentName) {
+Scene::addComponentLUA(int entityID, std::string& componentName) {
+	//TO_CHAT problema con el uso de addComponent por las funciones templatizadas, hablar con Marco
+}
 
+void
+Scene::removeComponentLUA(int entityID, std::string& componentName) {
+	//TO_CHAT problema con el uso de removeComponent por las funciones templatizadas, hablar con Marco
 }
 
 void
@@ -72,7 +84,7 @@ Scene::printEntity(int id) {
 	std::vector<std::bitset<MAX_COMPONENTS>> masks = entityTable->getComponentMask();
 
 	//Imprime la bitmask de todas las entidad de forma provisional
-	//TODO: Imprimir el nombre de la entidaa y sus componentes
+	//TO_CHAT: Imprimir el nombre de la entidaa y sus componentes
 
 	console->Print("ENTITY WITH ID: " + std::to_string(id) + " has components " + masks[id].to_string() + "\n");
 }
@@ -82,7 +94,7 @@ Scene::printEntities() {
 	std::vector<std::bitset<MAX_COMPONENTS>> masks = entityTable->getComponentMask();
 
 	//Imprime la bitmask de todas las entidades de forma provisional
-	//TODO: Imprimir los nombres de las entidades y sus componentes
+	//TO_CHAT: Imprimir los nombres de las entidades y sus componentes
 
 	int index = 0;
 	for(std::bitset mask : masks) {

@@ -13,6 +13,8 @@ class Scene : public IScene, public std::enable_shared_from_this<Scene> {
 
 public:
   Scene();
+  
+  void load();
 
   inline void addSystem(std::shared_ptr<System> system) { systems.push_back(system); }
 
@@ -28,7 +30,8 @@ public:
   // LUA console stuff
   int createEntityLUA();
 
-  void addComponentLUA(int entityID, std::string componentName);
+  void addComponentLUA(int entityID, std::string& componentName);
+  void removeComponentLUA(int entityID, std::string& componentName);
 
   void removeEntity(EntityID entity);
   void removeEntityLUA(int entity);

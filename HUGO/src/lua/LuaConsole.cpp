@@ -3,5 +3,5 @@
 
 void LuaConsole::Print(std::string msg) {
     std::cout << msg;
-    //TODO: Print on game's console which is not created yet
+    //TO_CHAT: Print on game's console which is not created yet
 }
