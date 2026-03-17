@@ -22,7 +22,6 @@ HUGO::GameLibraryLoader::GameLibraryLoader(const std::string& gameLibraryName) {
 
     gameHandle = LOAD_DYNAMIC_LIBRARY(completeGameLibraryName);
     if (!gameHandle) {
-        std::cerr << dlerror() << "\n";
         throw std::runtime_error("[GameLibraryLoader] Error loading " + gameLibraryName);
     }
     initializeGameFnPointer = reinterpret_cast<InitializeGameFn>(GET_FUNC(gameHandle, "InitializeGame"));
