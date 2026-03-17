@@ -7,4 +7,8 @@
 
 HCOMPONENT(InputFieldComponent)
     bool isActive = false;
+    std::string originalText;
+
+    std::function<void(const std::string&)> onChangeCallback;
+
 END_HCOMPONENT()

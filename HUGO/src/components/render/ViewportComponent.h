@@ -36,7 +36,7 @@ public:
     inline void setClearDepth(bool clear) { clearDepth = clear; }
     inline void setClearStencil(bool clear) { clearStencil = clear; }
     inline void setCameraEntity(EntityID camera) { cameraEntity = camera; }
-    inline void setActive(bool active) { this->active = active; }
+    inline void setActive(bool act) { active = act; }
     // Getters
     inline float getLeft() const { return left; }
     inline float getTop() const { return top; }

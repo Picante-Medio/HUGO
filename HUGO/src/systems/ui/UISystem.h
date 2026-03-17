@@ -51,10 +51,15 @@ UIElementCache* getCache(EntityID entity);
 // SYNCHRONIZATION
 //====================================================
 
-void syncPanel(const PanelComponent& p, const PanelDirtyTag& tag);
-void syncText(const PanelComponent& p, const TextComponent& t, const TextDirtyTag& tag);
-void syncButton(const ButtonComponent& b, const ButtonDirtyTag& tag);
-void syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr, const TextDirtyTag& tag);
+void syncPanel(const PanelComponent& p);
+void syncText(const PanelComponent& p, const TextComponent& t);
+void syncButton(const ButtonComponent& b);
+void syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr);
+
+// void syncPanel(const PanelComponent& p, const PanelDirtyTag& tag);
+// void syncText(const PanelComponent& p, const TextComponent& t, const TextDirtyTag& tag);
+// void syncButton(const ButtonComponent& b, const ButtonDirtyTag& tag);
+// void syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr, const TextDirtyTag& tag);
 
 //====================================================
 // PROCESSING
@@ -78,9 +83,12 @@ void clearAllCaches();
 //====================================================
 const PanelComponent& createTestCanvas();
 EntityID createTestText();
-EntityID createButton(const HUGO::String& overlayName, const HUGO::String& text = "Button", float left = 0.4f, float top = 0.4f, float width = 0.2f, float height = 0.1f);
+EntityID createButton();
 
 EntityID createConsole();
+
+void saveConsoleToFile(const std::string& input);
+const std::string CONSOLE_HISTORY_FILE = "console_history.txt";
 
 public:
 

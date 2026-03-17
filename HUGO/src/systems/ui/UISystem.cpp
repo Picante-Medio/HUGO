@@ -8,6 +8,9 @@
 #include "Input.h"
 #include <SDL.h>
 
+#include <fstream>
+#include <iostream>
+
 #include "OgreModule.h"
 #include "OgreUtils.h"
 
@@ -74,13 +77,13 @@ UIElementCache *UISystem::getCache(EntityID entity)
 // SYNCHRONIZATION
 //====================================================
 
-void UISystem::syncPanel(const PanelComponent &p, const PanelDirtyTag &tag)
+void UISystem::syncPanel(const PanelComponent &p)
 {
     UIElementCache *cache = getCache(p.entity);
     if (!cache)
         return;
 
-    cache->overlay->setZOrder(p.zOrder);
+    cache->overlay->setZOrder(static_cast<Ogre::ushort>(p.zOrder));
     cache->container->setLeft(p.left);
     cache->container->setTop(p.top);
     cache->container->setWidth(p.width);
@@ -93,7 +96,7 @@ void UISystem::syncPanel(const PanelComponent &p, const PanelDirtyTag &tag)
         cache->container->setMaterialName(p.material);
 }
 
-void UISystem::syncText(const PanelComponent &p, const TextComponent &t, const TextDirtyTag &tag)
+void UISystem::syncText(const PanelComponent &p, const TextComponent &t)
 {
     UIElementCache *cache = getCache(p.entity);
     if (!cache)
@@ -122,10 +125,10 @@ void UISystem::syncText(const PanelComponent &p, const TextComponent &t, const T
         t.colourBottom.w));
 }
 
-void UISystem::syncButton(const ButtonComponent &b, const ButtonDirtyTag &tag)
+void UISystem::syncButton(const ButtonComponent &b)
 {
-    // UIElementCache* cache = getCache(b.entity);
-    // if (!cache || !cache->container) return;
+    UIElementCache* cache = getCache(b.entity);
+    if (!cache || !cache->container) return;
 
     // cache->container->setLeft(b.left);
     // cache->container->setTop(b.top);
@@ -134,24 +137,24 @@ void UISystem::syncButton(const ButtonComponent &b, const ButtonDirtyTag &tag)
     // cache->overlay->setZOrder(b.zOrder);
     // cache->container->setMetricsMode(OgreUtils::toOgre(b.metricsMode));
 
-    // switch (b.state) {
-    //     case HUGO::ButtonStateTypes::BS_UP:
-    //         if (!b.normalMaterial.empty())
-    //             cache->container->setMaterialName(b.normalMaterial);
-    //         break;
-    //     case HUGO::ButtonStateTypes::BS_OVER:
-    //         if (!b.hoverMaterial.empty())
-    //             cache->container->setMaterialName(b.hoverMaterial);
-    //         break;
-    //     case HUGO::ButtonStateTypes::BS_DOWN:
-    //         if (!b.pressedMaterial.empty())
-    //             cache->container->setMaterialName(b.pressedMaterial);
-    //         break;
-    //     default:
-    //         if (!b.normalMaterial.empty())
-    //             cache->container->setMaterialName(b.normalMaterial);
-    //         break;
-    // }
+    switch (b.state) {
+        case HUGO::ButtonStateTypes::BS_UP:
+            if (!b.normalMaterial.empty())
+                cache->container->setMaterialName(b.normalMaterial);
+            break;
+        case HUGO::ButtonStateTypes::BS_OVER:
+            if (!b.hoverMaterial.empty())
+                cache->container->setMaterialName(b.hoverMaterial);
+            break;
+        case HUGO::ButtonStateTypes::BS_DOWN:
+            if (!b.pressedMaterial.empty())
+                cache->container->setMaterialName(b.pressedMaterial);
+            break;
+        default:
+            if (!b.normalMaterial.empty())
+                cache->container->setMaterialName(b.normalMaterial);
+            break;
+    }
 
     // if (cache->element) {
     //     Ogre::TextAreaOverlayElement* textArea =
@@ -203,7 +206,8 @@ void UISystem::processPanelChanges()
     {
         PanelComponent &panel = pack.get<PanelComponent &>();
         PanelDirtyTag &tag = pack.get<PanelDirtyTag &>();
-        syncPanel(panel, tag);
+        //syncPanel(panel, tag);
+        syncPanel(panel);
         scene->removeComponent<PanelDirtyTag>(tag.entity);
     }
 }
@@ -215,7 +219,8 @@ void UISystem::processTextChanges()
         PanelComponent &panel = pack.get<PanelComponent &>();
         TextComponent &text = pack.get<TextComponent &>();
         TextDirtyTag &tag = pack.get<TextDirtyTag &>();
-        syncText(panel, text, tag);
+        //syncText(panel, text, tag);
+        syncText(panel, text);
         scene->removeComponent<TextDirtyTag>(tag.entity);
     }
 }
@@ -223,72 +228,96 @@ void UISystem::processTextChanges()
 void UISystem::processInput()
 {
     HUGO::Input &input = HUGO::Input::Instance();
+    SDL_Keycode key;
 
     if (input.isActionPressed("ToggleConsole"))
     {
         for(auto& pack : scene->query<ConsoleComponent, InputFieldComponent>()){
             InputFieldComponent &inputField = pack.get<InputFieldComponent &>();
             inputField.isActive = !inputField.isActive;
+
+            if (inputField.isActive) {
+                SDL_StartTextInput();
+            } else {
+                SDL_StopTextInput();
+            }
         }
     }
 
-    if (input.isActionPressed("SubmitInput"))
-    {
-        // Guardado del texto
+    if(input.wasMouseButtonJustPressed(SDL_BUTTON_LEFT)){
+        int x, y;
+        x = input.getMousePosition().x;
+        y = input.getMousePosition().y;
+
+    //     for(auto& pack :scene->query<PanelComponent, InputFieldComponent>()){
+    //         PanelComponent& panel = pack.get<PanelComponent&>();
+    //         // mirar a cual panel le corresponde el input field
+    //         // si esta el raton arriba y le ha hecho clic   
+    //         float mouseX = x / renderWindow->getWidth();
+    //         float mouseY = y / renderWindow->getHeight();
+    //         bool isOver = (mouseX >= panel.left && mouseX <= panel.left + panel.width && mouseY >= panel.top && mouseY <= panel.top + panel.height);
+    //         if(isOver){
+    //             InputFieldComponent& in = pack.get<InputFieldComponent>();
+    //             in.isActive = true;
+    //             SDL_StartTextInput();
+    //         }else{
+    //             InputFieldComponent& in = pack.get<InputFieldComponent>();
+    //             in.isActive = false;
+    //         }
+    //     }
     }
 
-    // // si esta el raton arriba y le ha hecho clic
-    // for(auto& pack : scene->query<InputFieldComponent, TextComponent, PanelComponent>()){
-    //     // mirar a cual panel le corresponde el input field
-    //     InputFieldComponent &inputField = pack.get<InputFieldComponent &>();
-    //     inputField.isActive = !inputField.isActive;
-    
-    //     TextComponent &text = pack.get<TextComponent &>();
-    //     //Keep a copy of the current version of the string
-    //     std::string str = text.text;
-        
-    //     //If the string less than maximum size
-    //     if( str.length() <= 16 )
-    //     {
-    //         SDL_Keycode key;
-    //         //If the key is a space
-    //         if( key == (Uint16)' ' )
-    //         {
-    //             //Append the character
-    //             str += (char)key;    
-    //         }
-    //         //If the key is a number
-    //         else if( ( key >= (Uint16)'0' ) && ( key <= (Uint16)'9' ) )
-    //         {
-    //             //Append the character
-    //             str += (char)key;
-    //         }
-    //         //If the key is a uppercase letter
-    //         else if( ( key >= (Uint16)'A' ) && ( key <= (Uint16)'Z' ) )
-    //         {
-    //             //Append the character
-    //             str += (char)key;
-    //         }
-    //         //If the key is a lowercase letter
-    //         else if( ( key >= (Uint16)'a' ) && ( key <= (Uint16)'z' ) )
-    //         {
-    //             //Append the character
-    //             str += (char)key;
-    //         }
-    //     }
-    //     //If backspace was pressed and the string isn't blank
-    //     if( ( key == SDLK_BACKSPACE ) && ( str.length() != 0 ) )
-    //     {
-    //         //Remove a character from the end
-    //         str.erase( str.length() - 1 );
-    //     }
+    for(auto& pack : scene->query<InputFieldComponent, TextComponent>()){ // For generic InputField
+        InputFieldComponent &inputField = pack.get<InputFieldComponent&>();
+        if(inputField.isActive){
+            TextComponent &text = pack.get<TextComponent &>();
+            //Keep a copy of the current version of the string
+            std::string str = text.text;
+            
+            bool changed = false;
+            SDL_Event event;
+            while (SDL_PollEvent(&event)) {
+                if (event.type == SDL_TEXTINPUT) {
+                    // Only english letters
+                    for (char c : event.text.text) {
+                        if (c >= 32 && c <= 126 && c != 'ñ' && c != 'Ñ') {
+                            str += c;
+                            changed = true;
+                        }
+                    }
+                }
+            }
 
-    //      //If the string was changed
-    //     if( str != temp )
-    //     {
-    //     }
-    // }
+            //If backspace was pressed and the string is not empty
+            if((key == SDLK_BACKSPACE) && !str.empty())
+            {
+                //Remove a character from the end
+                str.pop_back();
+                changed = true;
+            }
+
+            if (input.wasActionJustPressed("SubmitInput")) {
+                inputField.isActive = false;
+                // Save the command
+                saveConsoleToFile(str);
+                SDL_StopTextInput();
+            }
+
+            if (str != text.text) {
+                text.text = str;
+            } 
+
+            if (changed) {
+                text.text = str;
+                scene->addComponent<TextDirtyTag>(text.entity);
+                if (inputField.onChangeCallback) {
+                    inputField.onChangeCallback(str);
+                }
+            }
+        }
+    }
 }
+
 
 
 //====================================================
@@ -374,28 +403,19 @@ EntityID UISystem::createConsole()
 
     InputFieldComponent &inputField = scene->addAndGetComponent<InputFieldComponent>(entity);
     inputField.isActive = false;
-
+    inputField.onChangeCallback = [this](const std::string& input) { saveConsoleToFile(input);};
     HUGO::Input &input = HUGO::Input::Instance();
-    input.registerAction("ToggleConsole", SDL_KeyCode::SDLK_a);    // for activating the console
+    input.registerAction("ToggleConsole", SDL_KeyCode::SDLK_LCTRL && SDL_KeyCode::SDLK_RETURN);    // for activating the console
     input.registerAction("SubmitInput", SDL_KeyCode::SDLK_RETURN); // for submitting input
 
     return entity;
 }
 
-EntityID UISystem::createButton(const HUGO::String &overlayName, const HUGO::String &text, float left, float top, float width, float height)
+EntityID UISystem::createButton()
 {
-    EntityID entity = scene->createEntity();
-
-    // ButtonComponent& button = scene->addAndGetComponent<ButtonComponent>(entity);
-    // button.overlayName = overlayName;
-    // button.containerName = overlayName + "/Container";
-    // button.textAreaName = overlayName + "/Container/Text";
-    // button.text = text;
-    // button.left = left;
-    // button.top = top;
-    // button.width = width;
-    // button.height = height;
-    // button.state = HUGO::ButtonStateTypes::BS_UP;
+    EntityID entity = createTestText();
+    ButtonComponent& button = scene->addAndGetComponent<ButtonComponent>(entity);
+    button.state = HUGO::ButtonStateTypes::BS_UP;
 
     // ErrorOrType<Ogre::Overlay*> overlayResult = OgreOverlayUtils::getOverlay(overlayName);
     // ErrorOrType<Ogre::OverlayContainer*> containerResult = OgreOverlayUtils::getContainer(button.containerName);
@@ -467,3 +487,13 @@ EntityID UISystem::createTestText()
     return ent;
 }
 
+void UISystem::saveConsoleToFile(const std::string& input)
+{
+    std::ofstream file(CONSOLE_HISTORY_FILE, std::ios::app);
+    if (file.is_open()) {
+        file << input << std::endl;
+        file.close();
+    }else{
+        std::cout << "No se pudo abrir el txt de la consola\n";
+    }
+}

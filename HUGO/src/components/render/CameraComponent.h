@@ -32,12 +32,12 @@ public:
     inline void setProjectionType(HUGO::ProjectionType type) { projectionType = type; }
     inline void setFOVY(float fov) { fovY = fov; }
     inline void setNearClip(float nearC) { nearClip = nearC; }
-    inline void setFarClip(float farClip) { this->farClip = farClip; }
+    inline void setFarClip(float farC) { farClip = farC; }
     inline void setOrthographicDimensions(float w, float h) { orthoWidth = w; orthoHeight = h; }
     inline void setAspectRatio(float aspectR) { aspectRatio = aspectR; }
     inline void setAutoAspectRatio(bool autoAspR) { autoAspectRatio = autoAspR; }
-    inline void setActive(bool active) { this->active = active; }
-    inline void setPriority(int priority) { this->priority = priority; }
+    inline void setActive(bool act) { active = act; }
+    inline void setPriority(int prio) { priority = prio; }
     inline void setPolygonMode(HUGO::PolygonMode mode) { polygonMode = mode; }
     // Getters
     inline HUGO::ProjectionType getProjectionType() const { return projectionType; }
