@@ -9,6 +9,11 @@
 #include "TransformComponent.h"
 
 #include "OgreBulletDebugger.h"
+#define PRINTER(name) printer(#name)
+
+void printer(char* name){
+    std::cout << name << "\n";
+}
 
 BulletSimulation::BulletSimulation(std::shared_ptr<Scene> scene)
 : IPhysicsSimulation(scene)
@@ -36,6 +41,8 @@ BulletSimulation::BulletSimulation(std::shared_ptr<Scene> scene)
     debugDrawer = new OgreBulletDebugger();
     debugDrawer->setDebugMode(debugDrawer->getDebugMode() | btIDebugDraw::DebugDrawModes::DBG_DrawNormals);
     btWorld->setDebugDrawer(debugDrawer);
+
+    PRINTER(btWorld);
 }
 
 BulletSimulation::~BulletSimulation() {
