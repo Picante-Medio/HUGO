@@ -11,6 +11,7 @@
 #include "EntityTable.h"
 #include "ComponentDenseTable.h"
 
+
 Scene::Scene() {
 	//DEPRECATED: this will be in load method
 	LuaBinder& luaBinder = LuaBinder::Instance();
@@ -43,6 +44,11 @@ Scene::createEntity() {
 int 
 Scene::createEntityLUA() {
   return createEntity();
+}
+
+void
+Scene::addComponentLUA(int entityID, std::string componentName) {
+
 }
 
 void

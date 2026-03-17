@@ -28,6 +28,8 @@ public:
   // LUA console stuff
   int createEntityLUA();
 
+  void addComponentLUA(int entityID, std::string componentName);
+
   void removeEntity(EntityID entity);
   void removeEntityLUA(int entity);
 

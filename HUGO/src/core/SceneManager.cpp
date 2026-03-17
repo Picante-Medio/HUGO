@@ -53,7 +53,7 @@ ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
 */
 
     //When no errors occurred, we add the scene to the physics simulation
-    m_physicsModule->createSceneSimulation(m_sceneMap[sceneName]);
+    m_physicsModule->createSceneSimulation(sceneName, m_sceneMap[sceneName]);
 
     return ErrorOrVoid();
 }
