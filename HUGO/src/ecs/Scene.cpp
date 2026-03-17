@@ -26,9 +26,14 @@ void Scene::load() {
 	luaBinder.registerMethod<Scene, void, int>(*this, &Scene::removeEntityLUA, "RemoveEntity");
 	luaBinder.registerMethod<Scene, int>(*this, &Scene::createEntityLUA, "CreateEntity");
 
+<<<<<<< HEAD
 	for(std::shared_ptr<System> system : systems) {
 		system->onLoad();
 	}
+=======
+	entityTable = std::make_unique<EntityTable>();
+	componentTable = std::make_unique<ComponentDenseTable>();
+>>>>>>> 0261d4c (declaracion de lua system)
 }
 
 void 
@@ -86,7 +91,7 @@ Scene::printEntity(int id) {
 	//Imprime la bitmask de todas las entidad de forma provisional
 	//TO_CHAT: Imprimir el nombre de la entidaa y sus componentes
 
-	console->Print("ENTITY WITH ID: " + std::to_string(id) + " has components " + masks[id].to_string() + "\n");
+	//console->Print("ENTITY WITH ID: " + std::to_string(id) + " has components " + masks[id].to_string() + "\n");
 }
 
 void 
@@ -98,7 +103,7 @@ Scene::printEntities() {
 
 	int index = 0;
 	for(std::bitset mask : masks) {
-		console->Print("ENTITY WITH ID: " + std::to_string(index) + " has components " + mask.to_string() + "\n");
+		//console->Print("ENTITY WITH ID: " + std::to_string(index) + " has components " + mask.to_string() + "\n");
 		index += 1;
 	}
 }

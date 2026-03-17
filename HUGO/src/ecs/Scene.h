@@ -2,14 +2,12 @@
 
 #include "System.h"
 #include "HugoTypes.h"
-#include "LuaConsole.h"
 
 #include "IScene.h"
 
 class Scene : public IScene, public std::enable_shared_from_this<Scene> {
   
   std::vector<std::shared_ptr<System>> systems;
-  std::shared_ptr<LuaConsole> console;
 
 public:
   Scene();
