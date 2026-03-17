@@ -20,11 +20,10 @@
 struct PanelComponent;
 struct TextComponent;
 struct ButtonComponent;
+struct ProgressBarComponent;
 
 HSYSTEM(UISystem)
-
 private:
-
 //====================================================
 // ENGINE
 //====================================================
@@ -54,6 +53,7 @@ UIElementCache* getCache(EntityID entity);
 void syncPanel(const PanelComponent& p, const PanelDirtyTag& tag);
 void syncText(const PanelComponent& p, const TextComponent& t, const TextDirtyTag& tag);
 void syncButton(const ButtonComponent& b, const ButtonDirtyTag& tag);
+void syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr, const TextDirtyTag& tag);
 
 //====================================================
 // PROCESSING
@@ -63,6 +63,7 @@ void processVisibility();
 void processPanelChanges();
 void processTextChanges();
 void processButtonChanges();
+void processProgressBarChanges();
 
 //====================================================
 // CACHE
