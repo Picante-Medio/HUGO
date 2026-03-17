@@ -238,12 +238,17 @@ target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     ${HUGO_LINKED_LIBRARIES})
 
+set(CMAKE_SKIP_RPATH FALSE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     DEBUG_POSTFIX "d"
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
     RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin
     RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin
-    VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+    VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
+    INSTALL_RPATH "$ORIGIN"
+    BUILD_WITH_INSTALL_RPATH TRUE)
 
 if (WIN32)
     add_custom_command(TARGET ${PROJECT_NAME}  POST_BUILD
@@ -252,7 +257,16 @@ if (WIN32)
             $<TARGET_FILE_DIR:${PROJECT_NAME}>
         COMMAND_EXPAND_LISTS
     )
+else()
+    foreach(lib OgreMain OgreOverlay RenderSystem_GL3Plus RenderSystem_GL Codec_STBI)
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:${lib}>
+            $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        COMMAND_EXPAND_LISTS)
+    endforeach()
 endif ()
+
 
 
 ################## Juego de prueba
