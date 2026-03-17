@@ -1,16 +1,25 @@
 #include "GameLibraryLoader.h"
 
+#include "ComponentRegistryInitializer.h"
+
 HUGO::GameLibraryLoader::GameLibraryLoader(const std::string& gameLibraryName) {
 
     gameHandle = LOAD_DYNAMIC_LIBRARY(gameLibraryName);
     if (!gameHandle) {
         throw std::runtime_error("[GameLibraryLoader] Error loading " + gameLibraryName);
     }
+    initializeGameFnPointer = reinterpret_cast<InitializeGameFn>(GET_FUNC(gameHandle, "InitializeGame"));
+    if (!initializeGameFnPointer) {
+        throw std::runtime_error("[GameLibraryLoader] void InitializeGame(std::shared_ptr<ComponentRegistry> " 
+            "not found in " + gameLibraryName);
+    }
     generateComponentFnPointer = reinterpret_cast<GenerateComponentFn>(GET_FUNC(gameHandle, "GenerateComponent"));
     if (!generateComponentFnPointer) {
-        throw std::runtime_error("[GameLibraryLoader] void get_game(std::shared_ptr<IScene>, " 
-            "std::string, std::unordered_map<std::string, HVariant>) not found in " + gameLibraryName);
+        throw std::runtime_error("[GameLibraryLoader] bool GenerateComponent(std::shared_ptr<IScene>, EntityID, " 
+            "const std::string&, const std::unordered_map<std::string, HVariant>&) not found in " + gameLibraryName);
     }
+
+    initializeGameFnPointer(ComponentRegistryInitializer::getInstance());
 }
 
 HUGO::GameLibraryLoader::~GameLibraryLoader() {
@@ -45,10 +54,10 @@ HUGO::GameLibraryLoader::destroy() {
 }
 
 ErrorOrVoid 
-HUGO::GameLibraryLoader::GenerateComponent(IScene& scene, const std::string& componentName, 
+HUGO::GameLibraryLoader::GenerateComponent(std::shared_ptr<IScene> scene, EntityID ent, const std::string& componentName, 
     const std::unordered_map<std::string, HVariant>& componentMembers) {
 
-    if (generateComponentFnPointer(scene, componentName, componentMembers)) {
+    if (generateComponentFnPointer(scene, ent, componentName, componentMembers)) {
         return ErrorOrVoid();
     }
     

@@ -21,7 +21,10 @@
     #define CLOSE_DYNAMIC_LIBRARY(handle) dlclose(handle)
 #endif
 
-typedef bool (*GenerateComponentFn)(IScene&, const std::string&, const std::unordered_map<std::string, HVariant>&);
+typedef void (*InitializeGameFn)(std::shared_ptr<ComponentRegistry>);
+
+typedef bool (*GenerateComponentFn)(std::shared_ptr<IScene>, EntityID, const std::string&,
+    const std::unordered_map<std::string, HVariant>&);
 
 namespace HUGO {
 
@@ -33,6 +36,7 @@ class GameLibraryLoader {
 
     LIBRARY_HANDLE gameHandle = nullptr;
     GenerateComponentFn generateComponentFnPointer = nullptr;
+    InitializeGameFn initializeGameFnPointer = nullptr;
     
 public:
 
@@ -43,7 +47,7 @@ public:
 
     ~GameLibraryLoader();
 
-    ErrorOrVoid GenerateComponent(IScene& scene, const std::string& component, 
+    ErrorOrVoid GenerateComponent(std::shared_ptr<IScene> scene, EntityID ent, const std::string& component, 
         const std::unordered_map<std::string, HVariant>& componentMembers);
 };
 

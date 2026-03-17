@@ -12,5 +12,9 @@
 
 #include <memory>
 
-EXPORT bool GenerateComponent(IScene& scene, EntityID ent, const std::string& component, 
-        const std::unordered_map<std::string, HVariant>& componentMembers);
+EXPORT void InitializeGame(std::shared_ptr<ComponentRegistry> registry);
+
+EXPORT bool GenerateComponent(std::shared_ptr<IScene>, EntityID ent, const std::string& component, 
+    const std::unordered_map<std::string, HVariant>& componentMembers);
+
+EXPORT bool GenerateAndGetSystem(std::shared_ptr<IScene> scene, const std::string& systemName);
