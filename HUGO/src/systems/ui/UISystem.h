@@ -48,6 +48,11 @@ std::shared_ptr<UIElementCache> createElementCache(const HUGO::String& overlayNa
 UIElementCache* getCache(EntityID entity);
 
 //====================================================
+// HELPERS
+//====================================================
+//helper to calculate if the mouse cursor is above a panel
+bool isMouseOverPanel(const PanelComponent& panel, HUGO::Int mouseX, HUGO::Int mouseY);
+//====================================================
 // SYNCHRONIZATION
 //====================================================
 
@@ -64,7 +69,6 @@ void syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr);
 //====================================================
 // PROCESSING
 //====================================================
-
 void processVisibility();
 void processPanelChanges();
 void processTextChanges();

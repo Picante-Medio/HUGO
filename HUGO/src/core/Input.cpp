@@ -2,8 +2,12 @@
 #include <SDL_events.h>
 #include <SDL_mouse.h>
 
+#include "OgreModule.h"
+#include <OgreRenderWindow.h>
+
+#include "HugoMath.h"
 namespace HUGO {
-Input::Input() :  keyState(), toChange(), keysOfAction(), quit(false) 
+Input::Input() :  keyState(), toChange(), keysOfAction(), textInputBuffer(), textInputActive(false), quit(false) 
 {}
 
 Input &Input::Instance() {
@@ -35,6 +39,9 @@ void Input::handleInput() {
       case SDL_MOUSEBUTTONDOWN:
         mouseState[event.button.button] = JUST_RELEASED;
         break;
+      case SDL_TEXTINPUT:
+          textInputBuffer += event.text.text;
+          break;
     }
   }
 }
@@ -116,6 +123,47 @@ Input::MousePosition Input::getMousePosition() {
   MousePosition mp;
   SDL_GetMouseState(&mp.x, &mp.y);
   return mp;
+}
+HUGO::Vector2 Input::getMouseNormalized()
+{
+  int x, y;
+  SDL_GetMouseState(&x, &y);
+
+  int w = 0, h = 0;
+  
+  // Obtener SDL_Window desde Ogre
+  SDL_Window* sdlWindow = nullptr;
+  Ogre::RenderWindow* rw = OgreModule::Instance().getOgreRenderWindow();
+  rw->getCustomAttribute("WINDOW", &sdlWindow);
+
+  if (sdlWindow)
+      SDL_GetWindowSize(sdlWindow, &w, &h);
+
+  if (w == 0 || h == 0)
+      return HUGO::Vector2(0, 0);
+
+  return HUGO::Vector2(
+      static_cast<float>(x) / w,
+      static_cast<float>(y) / h
+  );
+}
+const std::string &Input::getTextInput() const
+{
+    return textInputBuffer;
+}
+
+void Input::clearTextInput()
+{
+  textInputBuffer.clear();
+}
+
+void Input::toggleTextInput(bool state)
+{
+  // avoid repeat calls
+  if (textInputActive != state){
+    textInputActive = state;
+    textInputActive ? SDL_StartTextInput(): SDL_StopTextInput();
+  }
 }
 
 void 

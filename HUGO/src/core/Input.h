@@ -8,6 +8,7 @@
 #include <vector>
 
 namespace HUGO {
+class Vector2;
 class Input {
   enum KeyState {
     NOT_PRESSED,
@@ -22,6 +23,10 @@ class Input {
   std::queue<int> mouseToChange;
 
   std::unordered_map<std::string, std::vector<SDL_Keycode>> keysOfAction;
+
+  std::string textInputBuffer;
+  bool textInputActive;
+
   bool quit;
 
   void processKeyQueue();
@@ -63,5 +68,14 @@ public:
       int y;
   };
   MousePosition getMousePosition();
+  HUGO::Vector2 getMouseNormalized();
+
+  // Accessor for text input buffer
+  const std::string& getTextInput() const;
+  // Flush text input buffer once we sent an input
+  void clearTextInput();
+
+  // Activate/desactivate Text input support of SDL
+  void toggleTextInput(bool state);
 };
 }; // namespace HUGO

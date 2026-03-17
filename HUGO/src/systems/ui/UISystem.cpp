@@ -73,6 +73,17 @@ UIElementCache *UISystem::getCache(EntityID entity)
     return it->second.get();
 }
 
+bool isMouseOverPanel(const PanelComponent &panel, HUGO::Int mouseX, HUGO::Int mouseY)
+{
+    HUGO::Float left   = panel.left;
+    HUGO::Float top    = panel.top;
+    HUGO::Float right  = panel.left + panel.width;
+    HUGO::Float bottom = panel.top + panel.height;
+
+    return (mouseX >= left && mouseX <= right &&
+            mouseY >= top  && mouseY <= bottom);
+}
+
 //====================================================
 // SYNCHRONIZATION
 //====================================================
@@ -242,6 +253,7 @@ void UISystem::processInput()
                 SDL_StopTextInput();
             }
         }
+
     }
 
     if(input.wasMouseButtonJustPressed(SDL_BUTTON_LEFT)){

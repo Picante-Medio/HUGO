@@ -2,7 +2,32 @@
 namespace HUGO {
 	struct Degree;
     struct Radian;
+	struct Vector2
+	{
+		float x, y;
 
+		// Constructors
+		Vector2();
+		Vector2(float n);
+		Vector2(float x, float y);
+
+		// Operators
+		Vector2 operator+(const Vector2& other) const;
+		void operator+=(const Vector2& other);
+
+		Vector2 operator-(const Vector2& other) const;
+		void operator-=(const Vector2& other);
+
+		Vector2 operator*(float scalar) const;
+
+		float dot(const Vector2& other) const;
+
+		float length() const;
+		Vector2 normalized() const;
+	};
+
+// Scalar multiplication from left
+Vector2 operator*(float scalar, const Vector2& v);
 	struct Vector3
 	{
 		float x, y, z;

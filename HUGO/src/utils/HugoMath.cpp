@@ -4,8 +4,54 @@
 
 namespace HUGO {
 
-	Vector3::Vector3()
-		: x(0), y(0), z(0) {}
+	// Constructors
+	Vector2::Vector2() : x(0), y(0) {}
+	Vector2::Vector2(float n) : x(n), y(n) {}
+	Vector2::Vector2(float x, float y) : x(x), y(y) {}
+
+	// Operators
+	Vector2 Vector2::operator+(const Vector2& other) const {
+		return Vector2(x + other.x, y + other.y);
+	}
+
+	void Vector2::operator+=(const Vector2& other) {
+		x += other.x;
+		y += other.y;
+	}
+
+	Vector2 Vector2::operator-(const Vector2& other) const {
+		return Vector2(x - other.x, y - other.y);
+	}
+
+	void Vector2::operator-=(const Vector2& other) {
+		x -= other.x;
+		y -= other.y;
+	}
+
+	Vector2 Vector2::operator*(float scalar) const {
+		return Vector2(x * scalar, y * scalar);
+	}
+
+	float Vector2::dot(const Vector2& other) const {
+		return x * other.x + y * other.y;
+	}
+
+	float Vector2::length() const {
+		return std::sqrt(x*x + y*y);
+	}
+
+	Vector2 Vector2::normalized() const {
+		float len = length();
+		if (len == 0) return Vector2(0,0);
+		return Vector2(x / len, y / len);
+	}
+
+	// Scalar multiplication from left
+	Vector2 operator*(float scalar, const Vector2& v) {
+		return Vector2(v.x * scalar, v.y * scalar);
+	}
+    Vector3::Vector3()
+		: x(0.0f), y(0.0f), z(0.0f) {}
     Vector3::Vector3(float n)
 		: x(n), y(n), z(n) {}
     Vector3::Vector3(float x, float y, float z)
