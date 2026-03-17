@@ -24,13 +24,14 @@ struct ProgressBarComponent;
 
 HSYSTEM(UISystem)
 private:
+EntityID consoleID;
+
 //====================================================
 // ENGINE
 //====================================================
 
 Ogre::RenderWindow* renderWindow = nullptr;
-
-
+ 
 //====================================================
 // UI CACHE
 //====================================================
@@ -64,7 +65,7 @@ void processPanelChanges();
 void processTextChanges();
 void processButtonChanges();
 void processProgressBarChanges();
-
+void processInput();
 //====================================================
 // CACHE
 //====================================================
@@ -76,8 +77,10 @@ void clearAllCaches();
 // TEST UI
 //====================================================
 const PanelComponent& createTestCanvas();
-void createTestText();
+EntityID createTestText();
 EntityID createButton(const HUGO::String& overlayName, const HUGO::String& text = "Button", float left = 0.4f, float top = 0.4f, float width = 0.2f, float height = 0.1f);
+
+EntityID createConsole();
 
 public:
 

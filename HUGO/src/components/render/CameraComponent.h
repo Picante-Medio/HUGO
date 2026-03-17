@@ -31,11 +31,11 @@ public:
     // Setters
     inline void setProjectionType(HUGO::ProjectionType type) { projectionType = type; }
     inline void setFOVY(float fov) { fovY = fov; }
-    inline void setNearClip(float nearClip) { this->nearClip = nearClip; }
+    inline void setNearClip(float nearC) { nearClip = nearC; }
     inline void setFarClip(float farClip) { this->farClip = farClip; }
-    inline void setOrthographicDimensions(float width, float height) { orthoWidth = width; orthoHeight = height; }
-    inline void setAspectRatio(float aspectRatio) { this->aspectRatio = aspectRatio; }
-    inline void setAutoAspectRatio(bool autoAspectRatio) { this->autoAspectRatio = autoAspectRatio; }
+    inline void setOrthographicDimensions(float w, float h) { orthoWidth = w; orthoHeight = h; }
+    inline void setAspectRatio(float aspectR) { aspectRatio = aspectR; }
+    inline void setAutoAspectRatio(bool autoAspR) { autoAspectRatio = autoAspR; }
     inline void setActive(bool active) { this->active = active; }
     inline void setPriority(int priority) { this->priority = priority; }
     inline void setPolygonMode(HUGO::PolygonMode mode) { polygonMode = mode; }

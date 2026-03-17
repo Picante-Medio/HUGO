@@ -19,7 +19,7 @@ class Input {
   std::queue<SDL_KeyCode> toChange;
 
   std::unordered_map<int, KeyState> mouseState;
-  std::queue<int> mouseToChange();
+  std::queue<int> mouseToChange;
 
   std::unordered_map<std::string, std::vector<SDL_Keycode>> keysOfAction;
   bool quit;

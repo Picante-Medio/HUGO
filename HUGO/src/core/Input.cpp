@@ -128,5 +128,13 @@ Input::processKeyQueue() {
     }
 }
 
-
+void Input::processMouseQueue()
+{
+  while(!mouseToChange.empty()) {
+      int button = mouseToChange.front();
+      mouseToChange.pop();
+      if(mouseState[button] == JUST_PRESSED)  mouseState[button] = PRESSED;
+      else if(mouseState[button] == JUST_RELEASED) mouseState[button] = NOT_PRESSED;
+  }
+}
 }
