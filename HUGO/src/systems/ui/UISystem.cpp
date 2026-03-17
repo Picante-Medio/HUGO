@@ -115,6 +115,48 @@ void UISystem::syncText(const PanelComponent& p, const TextComponent& t, const T
         t.colourBottom.w));
 }
 
+void UISystem::syncButton(const ButtonComponent& b, const ButtonDirtyTag& tag)
+{
+    // UIElementCache* cache = getCache(b.entity);
+    // if (!cache || !cache->container) return;
+
+    // cache->container->setLeft(b.left);
+    // cache->container->setTop(b.top);
+    // cache->container->setWidth(b.width);
+    // cache->container->setHeight(b.height);
+    // cache->overlay->setZOrder(b.zOrder);
+    // cache->container->setMetricsMode(OgreUtils::toOgre(b.metricsMode));
+
+    // switch (b.state) {
+    //     case HUGO::ButtonStateTypes::BS_UP:
+    //         if (!b.normalMaterial.empty())
+    //             cache->container->setMaterialName(b.normalMaterial);
+    //         break;
+    //     case HUGO::ButtonStateTypes::BS_OVER:
+    //         if (!b.hoverMaterial.empty())
+    //             cache->container->setMaterialName(b.hoverMaterial);
+    //         break;
+    //     case HUGO::ButtonStateTypes::BS_DOWN:
+    //         if (!b.pressedMaterial.empty())
+    //             cache->container->setMaterialName(b.pressedMaterial);
+    //         break;
+    //     default:
+    //         if (!b.normalMaterial.empty())
+    //             cache->container->setMaterialName(b.normalMaterial);
+    //         break;
+    // }
+    
+    // if (cache->element) {
+    //     Ogre::TextAreaOverlayElement* textArea = 
+    //         dynamic_cast<Ogre::TextAreaOverlayElement*>(cache->element);
+    //     if (textArea) {
+    //         textArea->setCaption(b.text);
+    //         textArea->setCharHeight(b.textSize);
+    //         textArea->setFontName(b.fontName);
+    //     }
+    // }
+}
+
 //====================================================
 // PROCESSING
 //====================================================
@@ -241,6 +283,52 @@ const PanelComponent& UISystem::createTestCanvas()
     return panel;
 }
 
+EntityID UISystem::createButton(const HUGO::String& overlayName, const HUGO::String& text, float left, float top, float width, float height)
+{
+    EntityID entity = scene->createEntity();
+    
+    // ButtonComponent& button = scene->addAndGetComponent<ButtonComponent>(entity);
+    // button.overlayName = overlayName;
+    // button.containerName = overlayName + "/Container";
+    // button.textAreaName = overlayName + "/Container/Text";
+    // button.text = text;
+    // button.left = left;
+    // button.top = top;
+    // button.width = width;
+    // button.height = height;
+    // button.state = HUGO::ButtonStateTypes::BS_UP;
+    
+    // ErrorOrType<Ogre::Overlay*> overlayResult = OgreOverlayUtils::getOverlay(overlayName);
+    // ErrorOrType<Ogre::OverlayContainer*> containerResult = OgreOverlayUtils::getContainer(button.containerName);
+    // ErrorOrType<Ogre::OverlayElement*> elementResult = OgreOverlayUtils::getElement(button.textAreaName);
+    
+    // if (!overlayResult.isError() && !containerResult.isError()) {
+    //     Ogre::Overlay* overlay = overlayResult.getValue();
+    //     Ogre::OverlayContainer* container = containerResult.getValue();
+    //     Ogre::OverlayElement* element = elementResult.isError() ? nullptr : elementResult.getValue();
+        
+    //     button.zOrder = overlay->getZOrder();
+    //     button.metricsMode = OgreUtils::toHugo(container->getMetricsMode());
+        
+    //     uiCache[entity] = createElementCache(overlay, container, element);
+        
+    //     container->setMaterialName(button.normalMaterial);
+        
+    //     if (element) {
+    //         Ogre::TextAreaOverlayElement* textArea = dynamic_cast<Ogre::TextAreaOverlayElement*>(element);
+    //         if (textArea) {
+    //             textArea->setCaption(text);
+    //             textArea->setCharHeight(button.textSize);
+    //             if (!button.fontName.empty())textArea->setFontName(button.fontName);
+    //         }
+    //     }
+        
+    //     scene->addComponent<VisibilityDirtyTag>(entity);
+    // }
+    
+    return entity;
+}
+
 void UISystem::createTestText()
 {
     const PanelComponent& p = createTestCanvas();
@@ -266,4 +354,12 @@ void UISystem::createTestText()
 
     UIElementCache* cache = getCache(ent);
     if (cache) cache->element = area;
+
+
+    // EntityID buttonEntity = createButton(
+    //     "testCanvas/TestButton",  // nombre del overlay
+    //     "Click Me!",              // texto del botón
+    //     0.4f, 0.4f,               // left, top
+    //     0.2f, 0.1f                // width, height
+    // );
 }

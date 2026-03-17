@@ -2,6 +2,7 @@
 
 #include "HugoError.h"
 #include "HugoSystemMacros.h"
+#include "HugoTypes.h"
 #include "UIStructs.h"
 #include "UITags.h"
 
@@ -52,7 +53,7 @@ UIElementCache* getCache(EntityID entity);
 
 void syncPanel(const PanelComponent& p, const PanelDirtyTag& tag);
 void syncText(const PanelComponent& p, const TextComponent& t, const TextDirtyTag& tag);
-
+void syncButton(const ButtonComponent& b, const ButtonDirtyTag& tag);
 
 //====================================================
 // PROCESSING
@@ -61,7 +62,7 @@ void syncText(const PanelComponent& p, const TextComponent& t, const TextDirtyTa
 void processVisibility();
 void processPanelChanges();
 void processTextChanges();
-
+void processButtonChanges();
 
 //====================================================
 // CACHE
@@ -75,6 +76,7 @@ void clearAllCaches();
 //====================================================
 const PanelComponent& createTestCanvas();
 void createTestText();
+EntityID createButton(const HUGO::String& overlayName, const HUGO::String& text = "Button", float left = 0.4f, float top = 0.4f, float width = 0.2f, float height = 0.1f);
 
 public:
 
