@@ -10,6 +10,7 @@ include(FetchContent)
 set(FETCHCONTENT_QUIET ON)
 set(CMAKE_MESSAGE_LOG_LEVEL WARNING)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "" FORCE)
+set(CMAKE_WARN_DEPRECATED OFF)
 
 FetchContent_Declare(
     miniaudio
@@ -178,9 +179,21 @@ endforeach()
 
 ################################## Aquí empieza el proyecto principal
 
+function(enable_warnings target)
+    if(MSVC)
+        target_compile_options(${target} PRIVATE /W4 /permissive-)
+    else()
+        target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic
+        )
+    endif()
+endfunction()
+
 file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
 add_executable(${PROJECT_NAME} ${SRC_FILES})
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
+
+enable_warnings(${PROJECT_NAME})
 
 file(GLOB_RECURSE SRC_DIRS CONFIGURE_DEPENDS LIST_DIRECTORIES true ${CMAKE_SOURCE_DIR}/src/*)
 file(GLOB_RECURSE SDK_DIRS CONFIGURE_DEPENDS LIST_DIRECTORIES true ${CMAKE_SOURCE_DIR}/include/*)
@@ -201,10 +214,26 @@ foreach(path ${SDK_DIRS})
     endif()
 endforeach()
 
+set(SYSTEM_INCLUDE_DIRS ${HUGO_DEPS_INCLUDE_DIRS})  # ya contiene bullet3
+
+foreach(lib IN LISTS HUGO_LINKED_LIBRARIES)
+    if(TARGET ${lib})
+        get_target_property(inc_dirs ${lib} INTERFACE_INCLUDE_DIRECTORIES)
+        if(inc_dirs)
+            list(APPEND SYSTEM_INCLUDE_DIRS ${inc_dirs})
+        endif()
+    endif()
+endforeach()
+
+list(REMOVE_DUPLICATES SYSTEM_INCLUDE_DIRS)
+
+
 target_include_directories(${PROJECT_NAME} PRIVATE 
     ${INCLUDE_DIRS}
-    ${HUGO_DEPS_INCLUDE_DIRS}
     ${SDK_INCLUDE_DIRS})
+
+target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE
+    ${SYSTEM_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     ${HUGO_LINKED_LIBRARIES})
@@ -213,7 +242,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     DEBUG_POSTFIX "d"
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
     RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin)
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin
+    VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 if (WIN32)
     add_custom_command(TARGET ${PROJECT_NAME}  POST_BUILD
@@ -228,6 +258,7 @@ endif ()
 ################## Juego de prueba
 
 add_library(TestGame MODULE ${CMAKE_SOURCE_DIR}/TestGame/GameEntryPoint.cpp)
+enable_warnings(TestGame)
 
 set_target_properties(TestGame PROPERTIES
     DEBUG_POSTFIX "d"

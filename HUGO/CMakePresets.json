@@ -9,11 +9,14 @@
             "toolset": "host=x64",
             "architecture": "x64",
             "binaryDir": "${sourceDir}/build/${presetName}",
+            "warnings": {
+                "dev": false
+            },
             "cacheVariables": {
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/install/${presetName}",
                 "CMAKE_C_COMPILER": "cl.exe",
                 "CMAKE_CXX_COMPILER": "cl.exe",
-                "CMAKE_CXX_FLAGS_DEBUG": "/Od /Zi /permissive- /W3",
+                "CMAKE_CXX_FLAGS_DEBUG": "/Od /Zi",
                 "CMAKE_CXX_FLAGS_RELEASE": "/O2",
                 "OGRE_BUILD_MSVC_MP": "ON",
                 "OGRE_BUILD_MSVC_ZM": "ON",
@@ -24,9 +27,12 @@
             "name": "Linux",
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/build/linux",
+            "warnings": {
+                "dev": false
+            },
             "cacheVariables": {
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/install/${presetName}",
-                "CMAKE_CXX_FLAGS_DEBUG": "-O0 -g -Wall -Wextra -Wpedantic",
+                "CMAKE_CXX_FLAGS_DEBUG": "-O0 -g",
                 "CMAKE_CXX_FLAGS_RELEASE": "-O3",
                 "HUGO_BUILD_ENGINE": "OFF"
             }
