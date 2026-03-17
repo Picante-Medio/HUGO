@@ -11,7 +11,7 @@
 #include "OgreBulletDebugger.h"
 #define PRINTER(name) printer(#name)
 
-void printer(char* name){
+void printer(const char* name){
     std::cout << name << "\n";
 }
 
