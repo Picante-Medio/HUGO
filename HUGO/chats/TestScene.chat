@@ -4,3 +4,4 @@ SYSTEM AudioSystem
 SYSTEM RenderSystem
 SYSTEM UISystem
 SYSTEM PhysicsTestSystem
+SYSTEM TestSystem

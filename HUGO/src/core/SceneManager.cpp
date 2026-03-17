@@ -5,6 +5,8 @@
 #include "ComponentRegistry.h"
 #include "IPhysicsModule.h"
 
+#include "GameLibraryLoader.h"
+
 SceneManager::SceneManager(): m_chatParser(), m_sceneMap(){
 }
 
@@ -34,9 +36,14 @@ ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
     m_sceneMap[sceneName] = std::make_shared<Scene>();
 
     for(auto systemName : sceneData.getValue().systems){
-        ErrorOrType<std::shared_ptr<System>> value = SystemFactory::makeSystem(m_sceneMap[sceneName], systemName);
+        ErrorOrType<std::shared_ptr<System>> value = HUGO::SystemFactory::makeSystem(m_sceneMap[sceneName], systemName);
 
-        if(value.isError()) return ErrorOrVoid(value.getError());
+        if(value.isError()) {
+            value = HUGO::GameLibraryLoader::instance().GenerateAndGetSystem(m_sceneMap[sceneName], systemName);
+            if (value.isError()) {
+                return ErrorOrVoid(value.getError());
+            }
+        }
 
         m_sceneMap[sceneName]->addSystem(value.getValue());
         value.getValue()->init();

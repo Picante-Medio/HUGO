@@ -6,6 +6,7 @@
 #include "HugoError.h"
 #include "IScene.h"
 #include "HugoParsingVariant.h"
+#include "System.h"
 
 #if defined(_WIN32) || defined(_WIN64)
     #include <windows.h>
@@ -21,23 +22,28 @@
     #define CLOSE_DYNAMIC_LIBRARY(handle) dlclose(handle)
 #endif
 
-typedef void (*InitializeGameFn)(std::shared_ptr<ComponentRegistry>);
-
-typedef bool (*GenerateComponentFn)(std::shared_ptr<IScene>, EntityID, const std::string&,
-    const std::unordered_map<std::string, HVariant>&);
-
 namespace HUGO {
 
 class GameLibraryLoader {
+
+    typedef void (*InitializeGameFn)(std::shared_ptr<ComponentRegistry>);
+
+    typedef bool (*GenerateComponentFn)(std::shared_ptr<IScene>, EntityID, const std::string&,
+        const std::unordered_map<std::string, HVariant>&);
+
+    typedef bool (*GenerateAndGetSystemFn)(std::shared_ptr<IScene>, const std::string&,
+        std::shared_ptr<System>&);
+
 
     GameLibraryLoader(const std::string& gameLibraryName);
 
     static inline std::unique_ptr<GameLibraryLoader> loaderInstance = nullptr;
 
     LIBRARY_HANDLE gameHandle = nullptr;
-    GenerateComponentFn generateComponentFnPointer = nullptr;
     InitializeGameFn initializeGameFnPointer = nullptr;
-    
+    GenerateComponentFn generateComponentFnPointer = nullptr;    
+    GenerateAndGetSystemFn generateAndGetSystemFnPointer = nullptr;
+
 public:
 
     static void init(const std::string& gameLibraryName);
@@ -49,6 +55,9 @@ public:
 
     ErrorOrVoid GenerateComponent(std::shared_ptr<IScene> scene, EntityID ent, const std::string& component, 
         const std::unordered_map<std::string, HVariant>& componentMembers);
+
+    ErrorOrType<std::shared_ptr<System>>GenerateAndGetSystem(std::shared_ptr<IScene> scene, 
+        const std::string& systemName);
 };
 
 }

@@ -5,15 +5,21 @@
 #include "IScene.h"
 #include "System.h"
 
-struct SystemFactory{
+namespace HUGO {
 
+class SystemFactory{
+
+public:
     //Returns shared_ptr of the system because the Scene that holds it must reference it to update it.
     using SystemGenerator = std::function<ErrorOrType<std::shared_ptr<System>>(std::shared_ptr<IScene>)>; 
 
+private:
     static std::unordered_map<std::string, SystemGenerator>& generators() {
         static std::unordered_map<std::string, SystemGenerator> generatorsInstance;
         return generatorsInstance;
     }
+
+public:
 
     static void add(const std::string& name, SystemGenerator generator) {
         generators()[name] = generator;
@@ -32,3 +38,5 @@ struct SystemFactory{
     }
 
 };
+
+}

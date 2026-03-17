@@ -1,6 +1,7 @@
 #include "GameEntryPoint.h"
 
 #include "TestComponent.h"
+#include "TestSystem.h"
 
 #include <iostream>
 
@@ -25,6 +26,20 @@ bool GenerateComponent(std::shared_ptr<IScene> scene, EntityID ent, const std::s
     return true;
 }
 
-bool GenerateAndGetSystem(std::shared_ptr<IScene> scene, const std::string& systemName) {
-    return false;
+bool GenerateAndGetSystem(std::shared_ptr<IScene> scene, const std::string& systemName, 
+    std::shared_ptr<System>& returnSystem) {
+
+    ErrorOrType<std::shared_ptr<System>> makeSystemResult = HUGO::SystemFactory::makeSystem(scene, systemName);
+
+    if (makeSystemResult.isError()) {
+        #ifndef NDEBUG
+        std::cerr << makeSystemResult.getError().description() << "\n";
+        #endif
+
+        return false;
+    }
+
+    returnSystem = makeSystemResult.getValue();
+
+    return true;
 }

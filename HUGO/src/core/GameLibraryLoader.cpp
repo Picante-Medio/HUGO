@@ -34,6 +34,11 @@ HUGO::GameLibraryLoader::GameLibraryLoader(const std::string& gameLibraryName) {
         throw std::runtime_error("[GameLibraryLoader] bool GenerateComponent(std::shared_ptr<IScene>, EntityID, " 
             "const std::string&, const std::unordered_map<std::string, HVariant>&) not found in " + gameLibraryName);
     }
+    generateAndGetSystemFnPointer = reinterpret_cast<GenerateAndGetSystemFn>(GET_FUNC(gameHandle, "GenerateAndGetSystem"));
+    if (!generateAndGetSystemFnPointer) {
+        throw std::runtime_error("[GameLibraryLoader] bool GenerateAndGetSystemFn(std::shared_ptr<IScene>, "
+            "EntityID, const std::string&, std::shared_ptr<System>&)  not found in " + gameLibraryName);
+    }
 
     initializeGameFnPointer(ComponentRegistryInitializer::getInstance());
 }
@@ -79,4 +84,17 @@ HUGO::GameLibraryLoader::GenerateComponent(std::shared_ptr<IScene> scene, Entity
     }
     
     return ErrorOrVoid(StringError{"No se ha podido generar el componente de tipo: " + componentName});
+}
+
+ErrorOrType<std::shared_ptr<System>>
+HUGO::GameLibraryLoader::GenerateAndGetSystem(std::shared_ptr<IScene> scene, const std::string& systemName) {
+
+    std::shared_ptr<System> returnedSystem = nullptr;
+
+    if (generateAndGetSystemFnPointer(scene, systemName, returnedSystem)) {
+        return ErrorOrType(returnedSystem);
+    }
+    
+    return ErrorOrType<std::shared_ptr<System>>(
+        StringError{"No se ha podido generar el sistema de tipo: " + systemName});
 }

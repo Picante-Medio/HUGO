@@ -10,7 +10,7 @@ public:\
 private:\
     struct Reflection{ \
         Reflection(){\
-            SystemFactory::add(#SYSTEM_NAME, \
+            HUGO::SystemFactory::add(#SYSTEM_NAME, \
             [](std::shared_ptr<IScene> p_scene) -> ErrorOrType<std::shared_ptr<System>> { \
                 return ErrorOrType<std::shared_ptr<System>>(std::make_shared<SYSTEM_NAME>(SYSTEM_NAME(p_scene)));\
             });\
