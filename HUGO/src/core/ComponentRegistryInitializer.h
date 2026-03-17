@@ -8,8 +8,8 @@ public:
 
     static std::shared_ptr<ComponentRegistry> getInstance() {
 
-		if (instance == nullptr) {
-			instance = std::make_shared<ComponentRegistryInitializer>();
+		if (ComponentRegistry::instance == nullptr) {
+			ComponentRegistry::instance = std::make_shared<ComponentRegistryInitializer>();
 		}
 
 		return instance;

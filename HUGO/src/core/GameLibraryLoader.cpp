@@ -4,8 +4,25 @@
 
 HUGO::GameLibraryLoader::GameLibraryLoader(const std::string& gameLibraryName) {
 
-    gameHandle = LOAD_DYNAMIC_LIBRARY(gameLibraryName);
+    #ifdef NDEBUG
+        std::string debugPostfix = "";
+    #else
+        std::string debugPostfix = "d"; // this should be a macro or smthing like that
+    #endif
+
+    #ifdef _WIN32
+        std::string prefix = "";
+        std::string extension = ".dll";
+    #else
+        std::string prefix = "lib";
+        std::string extension = ".so";
+    #endif
+
+    std::string completeGameLibraryName = prefix + gameLibraryName + debugPostfix + extension;
+
+    gameHandle = LOAD_DYNAMIC_LIBRARY(completeGameLibraryName);
     if (!gameHandle) {
+        std::cerr << dlerror() << "\n";
         throw std::runtime_error("[GameLibraryLoader] Error loading " + gameLibraryName);
     }
     initializeGameFnPointer = reinterpret_cast<InitializeGameFn>(GET_FUNC(gameHandle, "InitializeGame"));
@@ -28,6 +45,7 @@ HUGO::GameLibraryLoader::~GameLibraryLoader() {
 
 void
 HUGO::GameLibraryLoader::init(const std::string& gameLibraryName) {
+
     if (loaderInstance == nullptr) {
         loaderInstance = std::unique_ptr<GameLibraryLoader>(new GameLibraryLoader(gameLibraryName));
     }

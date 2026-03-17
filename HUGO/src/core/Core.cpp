@@ -41,24 +41,11 @@ Core::Core(): sceneManager()
 //Initialization of HUGO modules and loading of games dynamic lib
 void Core::init(){
 
+    // Inicializar registro de componentes
+    ComponentRegistry::setInstance(std::make_shared<ComponentRegistryInitializer>());
+
     // Carga del juego como biblioteca dinamica
-
-    #ifdef NDEBUG
-        std::string debugPostfix = "";
-    #else
-        std::string debugPostfix = "d";
-    #endif
-
-    #ifdef _WIN32
-        std::string prefix = "";
-        std::string extension = ".dll";
-    #else
-        std::string extension = ".so";
-        std::string prefix = "lib";
-    #endif
-
-    std::string gameLibraryName = "TestGame" + debugPostfix + extension;
-    GameLibraryLoader::init(gameLibraryName);
+    GameLibraryLoader::init("TestGame");
 
     //LuaBinder::Instance().Init();
 
