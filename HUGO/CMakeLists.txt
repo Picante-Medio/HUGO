@@ -271,7 +271,9 @@ endif ()
 
 ################## Juego de prueba
 
-add_library(TestGame MODULE ${CMAKE_SOURCE_DIR}/TestGame/GameEntryPoint.cpp)
+add_library(TestGame MODULE 
+    ${CMAKE_SOURCE_DIR}/TestGame/GameEntryPoint.cpp
+    ${CMAKE_SOURCE_DIR}/TestGame/TestSystem.cpp)
 enable_warnings(TestGame)
 
 set_target_properties(TestGame PROPERTIES
