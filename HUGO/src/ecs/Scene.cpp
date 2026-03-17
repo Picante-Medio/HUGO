@@ -15,7 +15,6 @@
 #include "ComponentRegistry.h"
 
 Scene::Scene() {
-	console = std::make_shared<LuaConsole>();
 	entityTable = std::make_unique<EntityTable>();
 	componentTable = std::make_unique<ComponentDenseTable>();
 }
@@ -26,14 +25,9 @@ void Scene::load() {
 	luaBinder.registerMethod<Scene, void, int>(*this, &Scene::removeEntityLUA, "RemoveEntity");
 	luaBinder.registerMethod<Scene, int>(*this, &Scene::createEntityLUA, "CreateEntity");
 
-<<<<<<< HEAD
 	for(std::shared_ptr<System> system : systems) {
 		system->onLoad();
 	}
-=======
-	entityTable = std::make_unique<EntityTable>();
-	componentTable = std::make_unique<ComponentDenseTable>();
->>>>>>> 0261d4c (declaracion de lua system)
 }
 
 void 
