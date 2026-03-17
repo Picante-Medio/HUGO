@@ -2,16 +2,30 @@
 
 #include <SDL.h>
 
+#include <queue>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 namespace HUGO {
 class Input {
-  std::unordered_map<SDL_Keycode, bool> keyPressed;
-  std::unordered_map<SDL_Keycode, bool> previousKeyPressed;
+  enum KeyState {
+    NOT_PRESSED,
+    JUST_PRESSED,
+    PRESSED,
+    JUST_RELEASED
+  };
+  std::unordered_map<SDL_Keycode, KeyState> keyState;
+  std::queue<SDL_KeyCode> toChange;
+
+  std::unordered_map<int, KeyState> mouseState;
+  std::queue<int> mouseToChange();
+
   std::unordered_map<std::string, std::vector<SDL_Keycode>> keysOfAction;
   bool quit;
+
+  void processKeyQueue();
+  void processMouseQueue();
 public:
   Input();
 
@@ -31,20 +45,23 @@ public:
 
   // Accessors for input state
   bool isKeyPressed(SDL_Keycode key);
+  bool isMouseButtonPressed(int button);
+
   bool isActionPressed(std::string action);
   bool isQuitPressed();
 
   bool wasKeyJustPressed(SDL_Keycode key);
+  bool wasMouseButtonJustPressed(int button);
   bool wasActionJustPressed(std::string action);
 
   bool wasKeyJustReleased(SDL_Keycode key);
+  bool wasMouseButtonJustReleased(int button);
   bool wasActionJustReleased(std::string action);
 
   struct MousePosition {
       int x; 
       int y;
   };
-
   MousePosition getMousePosition();
 };
 }; // namespace HUGO
