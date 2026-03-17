@@ -2,8 +2,11 @@
 #include <cmath>
 #include <iostream>
 
+#include "OgreOverlaySystem.h"
+
 #include "RenderSystem.h"
 #include "Scene.h"
+
 #include "RenderComponent.h"
 #include "AnimationComponent.h"
 #include "TransformComponent.h"
@@ -11,17 +14,14 @@
 #include "ViewportComponent.h"
 #include "LightComponent.h"
 #include "RenderTags.h"
-#include "HugoTypes.h"
-#include "HugoError.h"
-#include "OgreUtils.h"
 
+#include "OgreUtils.h"
 #include "OgreModule.h"
 #include "LuaBinder.h"
 
-#include "Input.h"
-
 RenderSystem::~RenderSystem()
 {
+    //detroy all viewports
     for(auto& v: viewportMap){
         if(v.second.ogreViewport){
             OgreModule::Instance().getOgreRenderWindow()->removeViewport(v.second.ogreViewport->getZOrder());
@@ -30,6 +30,7 @@ RenderSystem::~RenderSystem()
     }
     viewportMap.clear();
 
+    //destroy all cameras
     for(auto& c: cameraMap){
         if(c.second.node){
             c.second.node->detachAllObjects();
@@ -43,6 +44,7 @@ RenderSystem::~RenderSystem()
     }
     cameraMap.clear();
 
+    //destroy all lights
     for(auto& l: lightMap){
         if(l.second.node){
             l.second.node->detachAllObjects();
@@ -56,6 +58,7 @@ RenderSystem::~RenderSystem()
     }
     lightMap.clear();
 
+    // Destroy all renderable Ogre objects
     for(std::size_t i =0; i<ogreObjects.size(); ++i){
         destroyOgreObject(ogreObjects[i]);
     }
@@ -86,7 +89,7 @@ void RenderSystem::init(){
 
 
     // Camera and viewport creation for testing
-    EntityID defaultCamera = createCameraEntity(HUGO::Vector3(0, 0, 50));
+    EntityID defaultCamera = createCameraEntity(HUGO::Vector3(0, 0, 100));
     setMainCamera(defaultCamera);
 
     EntityID defaultViewport = createViewportEntity();    
@@ -102,7 +105,6 @@ void RenderSystem::init(){
                         0.1f, 
                         0.1f, 
                         100); 
-        
 }
 
 void RenderSystem::onLoad(){
@@ -306,8 +308,9 @@ void RenderSystem::updateAnimations(double dt)
         
         OgreObject& ogreObj = getOgreObject(rc.objectID);
         Ogre::Real time = static_cast<Ogre::Real>(dt);
-        for(auto& a: animComp.anims){
 
+        //updates all enable animations
+        for(auto& a: animComp.anims){
             const HUGO::String& animName = a.first;
             const AnimationInfo& animInfo = a.second;
 
@@ -418,7 +421,7 @@ void RenderSystem::removeOgreObject(HUGO::OgreObjectID& id)
         std::size_t lastIndex = ogreObjects.size() - 1;
 
         destroyOgreObject(ogreObjects[index]);
-
+        
         if (index != lastIndex) {
             ogreObjects[index] = std::move(ogreObjects[lastIndex]);
             HUGO::OgreObjectID movedID = ogreObjects[index].id;

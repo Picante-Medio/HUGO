@@ -5,52 +5,52 @@
 #include "HugoSystemMacros.h"
 #include "EcsTypes.h"
 #include "Ogre.h"
-#include "OgreOverlaySystem.h"
 #include "PagedArray.h"
 #include "HugoTypes.h"
 #include "HugoMath.h"
 #include "HugoError.h"
-#include "OgreModule.h"
-
 
 struct RenderComponent;
 HSYSTEM(RenderSystem)
-    // Ogre Camera Information
+    // Ogre Camera Data
     struct CameraInfo {
-        Ogre::Camera* ogreCamera = nullptr;
-        Ogre::SceneNode* node = nullptr;
+        Ogre::Camera* ogreCamera = nullptr; // Pointer to the Ogre camera object
+        Ogre::SceneNode* node = nullptr;    // Scene node that controls camera transform
     };
 
-    // Ogre Viewport Information
+    // Ogre Viewport Data
     struct ViewportInfo {
         EntityID lastCameraEntity = 0;
-        Ogre::Viewport* ogreViewport = nullptr;
+        Ogre::Viewport* ogreViewport = nullptr;  // Pointer to the Ogre viewport
     };
 
-    // Ogre Light Information
+    // Ogre Light Data
     struct LightInfo {
-        Ogre::Light* ogreLight = nullptr;
-        Ogre::SceneNode* node = nullptr;
+        Ogre::Light* ogreLight = nullptr;  // Pointer to the Ogre light
+        Ogre::SceneNode* node = nullptr;   // Scene node that controls light transform
     };
 
-    // OgreObject Information
+    // OgreObject Data
+    // Represents an Ogre renderable entity.
     struct OgreObject{
-        HUGO::OgreObjectID id = HUGO::INVALID_OGRE_OBJECT_ID;
+        HUGO::OgreObjectID id = HUGO::INVALID_OGRE_OBJECT_ID; 
         Ogre::Entity* ogreEntity = nullptr;
-        Ogre::SceneNode* ogreSceneNode = nullptr;
-        std::unordered_map<HUGO::String, Ogre::AnimationState*> animationStates;
+        Ogre::SceneNode* ogreSceneNode = nullptr;   // Scene node for transform
+        std::unordered_map<HUGO::String, Ogre::AnimationState*> animationStates; //Stored animation states
     };
 
+    //Ogre References
     Ogre::Root* ogreRoot;
     Ogre::SceneManager* sceneManager = nullptr;
 
-    std::unordered_map<EntityID, CameraInfo> cameraMap; // Provisional
-    std::unordered_map<EntityID, ViewportInfo> viewportMap; // Provisional
-    std::unordered_map<EntityID, LightInfo> lightMap; // Provisional
+    //Mapping ECS entities with their corresponding Ogre data
+    std::unordered_map<EntityID, CameraInfo> cameraMap; 
+    std::unordered_map<EntityID, ViewportInfo> viewportMap; 
+    std::unordered_map<EntityID, LightInfo> lightMap;
 
-    std::vector<HUGO::OgreObjectID> freeOgreObjectId;
-    std::vector<std::size_t> idToIndex;
-    PagedArray<OgreObject, 128> ogreObjects;
+    std::vector<HUGO::OgreObjectID> freeOgreObjectId; // List of reusable IDs
+    std::vector<std::size_t> idToIndex; // Mapping OgreObjectID to the PagedArray Index
+    PagedArray<OgreObject, 128> ogreObjects; //Storage for renderable objects
 
     EntityID mainCameraEntity = 0;
     EntityID mainViewportEntity = 0;
