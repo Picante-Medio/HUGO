@@ -48,6 +48,8 @@ public:
 	}
 
 	static void setInstance(std::shared_ptr<ComponentRegistry> registry) {
-		instance = registry;
+		if (instance == nullptr) {
+			instance = registry;
+		}
 	}
 };

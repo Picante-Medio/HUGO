@@ -12,7 +12,7 @@ namespace HUGO {
 
 class ComponentFactory {
 public:
-    using ComponentGenerator = std::function<ErrorOrVoid(IScene&, EntityID, 
+    using ComponentGenerator = std::function<ErrorOrVoid(std::shared_ptr<IScene>, EntityID, 
         const std::unordered_map<std::string, HVariant>&)>;
 
 private:
@@ -26,11 +26,12 @@ public:
         generators()[name] = generator;
     }
 
-    static ErrorOrVoid makeComponent(IScene& scene, EntityID ent,
+    static ErrorOrVoid makeComponent(std::shared_ptr<IScene> scene, EntityID ent,
         const std::string& name, const std::unordered_map<std::string, HVariant>& args) {
 
         if (generators().count(name)) {
-            return generators()[name](scene, ent, args);
+            generators()[name](scene, ent, args);
+            return ErrorOrVoid();
         }
 
         StringError err;

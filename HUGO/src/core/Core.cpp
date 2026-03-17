@@ -62,9 +62,6 @@ void Core::init(){
 
     //LuaBinder::Instance().Init();
 
-    // Inicializacion de regristro central de componentes
-    ComponentRegistry::setInstance(std::make_shared<ComponentRegistryInitializer>());
-
     vt.reset();
     initModules();
 

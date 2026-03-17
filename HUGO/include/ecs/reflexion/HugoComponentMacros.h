@@ -18,8 +18,9 @@
             } \
             Reflection() { \
                 HUGO::ComponentFactory::add(#COMPONENT_NAME, \
-                    [](IScene& scene, EntityID ent, const std::unordered_map<std::string, HVariant>& args) -> ErrorOrVoid { \
-                        COMPONENT_NAME& c = scene.addAndGetComponent<COMPONENT_NAME>(ent); \
+                    [](std::shared_ptr<IScene> scene, EntityID ent, const std::unordered_map<std::string, HVariant>& args) -> \
+                    ErrorOrVoid { \
+                        COMPONENT_NAME& c = scene->addAndGetComponent<COMPONENT_NAME>(ent); \
                         for(auto& [key,val] : args) { \
                             auto it = members().find(key); \
                             if(it != members().end()) it->second->Set(c,val); \
@@ -36,23 +37,23 @@
 
 #define SERIALIZED_MEMBER(TYPE, NAME) \
     TYPE NAME; \
-    inline static struct Register##NAME_ { \
-        Register##NAME_() { \
+    inline static struct Register_##NAME { \
+        Register_##NAME() { \
             Reflection::members()[#NAME] = \
                 std::make_unique<FieldData<ThisComponent, TYPE>>(&ThisComponent::NAME); \
         } \
-    } auto_register_##NAME_;
+    } auto_register_##NAME;
 
 
 #define DEFAULT_SERIALIZED_MEMBER(TYPE, NAME, INIT_VALUE) \
     TYPE NAME = INIT_VALUE; \
-    inline static struct Register##NAME_ { \
-        Register##NAME_() { \
+    inline static struct Register_##NAME { \
+        Register_##NAME() { \
             Reflection::members()[#NAME] = \
                 std::make_unique<FieldData<ThisComponent, TYPE>>(&ThisComponent::NAME); \
         } \
-    } auto_register_##NAME_;
+    } auto_register_##NAME;
 
 #define END_HCOMPONENT() \
-    inline static Reflection reflection_instance_; \
+    inline static Reflection reflection_instance_ = Reflection(); \
 };
