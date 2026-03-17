@@ -38,6 +38,7 @@ HSYSTEM(RenderSystem)
         HUGO::OgreObjectID id = HUGO::INVALID_OGRE_OBJECT_ID;
         Ogre::Entity* ogreEntity = nullptr;
         Ogre::SceneNode* ogreSceneNode = nullptr;
+        std::unordered_map<HUGO::String, Ogre::AnimationState*> animationStates;
     };
 
     Ogre::Root* ogreRoot;
@@ -58,7 +59,7 @@ HSYSTEM(RenderSystem)
 
     ErrorOrVoid createOgreCamera(EntityID entity);
     ErrorOrVoid createOgreLight(EntityID entity);
-    void createOgreViewport(EntityID entity);
+    ErrorOrVoid createOgreViewport(EntityID entity);
     // void destroyOgreCamera(EntityID entity);
     // void destroyOgreViewport(EntityID entity);
 

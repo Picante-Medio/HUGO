@@ -18,6 +18,8 @@
 #include "OgreModule.h"
 #include "LuaBinder.h"
 
+#include "Input.h"
+
 RenderSystem::~RenderSystem()
 {
     for(auto& v: viewportMap){
@@ -65,6 +67,47 @@ RenderSystem::~RenderSystem()
         ogreRoot->destroySceneManager(sceneManager);
         sceneManager = nullptr;
     }
+}
+
+void RenderSystem::init(){
+
+    ogreRoot = Ogre::Root::getSingletonPtr();
+    try {
+        sceneManager = ogreRoot->createSceneManager();
+    }
+    catch (const Ogre::Exception& e) {
+        throw std::runtime_error("[RenderSystem] SceneManager creation failed: " + std::string(e.getDescription()));
+    }
+    ogreRoot->_setCurrentSceneManager(sceneManager);
+    sceneManager->addRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
+
+    // Basic light
+    setAmbientLight(0.2f, 0.2f, 0.2f);
+
+
+    // Camera and viewport creation for testing
+    EntityID defaultCamera = createCameraEntity(HUGO::Vector3(0, 0, 50));
+    setMainCamera(defaultCamera);
+
+    EntityID defaultViewport = createViewportEntity();    
+    setMainViewport(defaultViewport);
+
+    createLightEntity( HUGO::Vector3(0, 20, 20), //light position
+                        HUGO::Vector4(0.9f, 0.9f, 0.8f, 0.2f), //diffuse
+                        HUGO::Vector4(0.0f, 0.0f, 0.0f, 0.0f), //specular
+                        HUGO::LightType::LT_POINT, 
+                        HUGO::Radian(0), 
+                        HUGO::Radian(0), 
+                        0, 
+                        0.1f, 
+                        0.1f, 
+                        100); 
+        
+}
+
+void RenderSystem::onLoad(){
+    LuaBinder& luaBinder = LuaBinder::Instance();
+    luaBinder.registerMethod<RenderSystem, void, float, float, float>(*this, &RenderSystem::setAmbientLight, "SetAmbientLight");
 }
 
 #pragma region Tags
@@ -185,6 +228,130 @@ void RenderSystem::handleTag()
             scene->removeComponent<MaterialDirtyTag>(rc.entity);
         }  
     }
+
+    //Animation Update
+    for(auto& pack : scene->query<AnimationComponent,AnimationDirtyTag,RenderComponent>())
+    {
+        AnimationComponent& animComp = pack.get<AnimationComponent&>();
+        RenderComponent& rc = pack.get<RenderComponent&>();
+
+        if(rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) continue;
+        
+        OgreObject& ogreObj = getOgreObject(rc.objectID);
+        Ogre::Entity* ogre_ent = ogreObj.ogreEntity;
+
+        //remove animations that does exist in the Component
+        for(auto it = ogreObj.animationStates.begin(); it != ogreObj.animationStates.end(); )
+        {
+            //If does not exist animation, remove it
+            if(animComp.anims.find(it->first) == animComp.anims.end())
+                it = ogreObj.animationStates.erase(it);
+            else
+                ++it;
+        }
+
+        //Update or create animations that are in the component
+        for(auto& anim : animComp.anims){
+            const HUGO::String& animName = anim.first;
+            const AnimationInfo& animInfo = anim.second;
+
+            Ogre::AnimationState* animState = nullptr;
+
+            auto it = ogreObj.animationStates.find(animName);
+
+            //if animation does not exist in the current AnimationStates
+            if(it == ogreObj.animationStates.end())
+            {
+                if(!ogre_ent->hasAnimationState(animName))
+                {
+                    std::cerr << "[RenderSystem] Animation " << animName << " does not exist in entity " << rc.entity << "\n";
+                    continue;
+                }
+                //get a new AnimationSate from ogre
+                animState = ogre_ent->getAnimationState(animName);
+                ogreObj.animationStates[animName] = animState;
+            }
+            else
+            {
+                //get the AnimationSate
+                animState = it->second;
+            }
+
+            //Update animation status with AnimationComponent information
+            if(animInfo.enable != animState->getEnabled()) 
+                animState->setEnabled(animInfo.enable);
+
+            if(animInfo.loop != animState->getLoop()) 
+                animState->setLoop(animInfo.loop);
+                        
+            if(animInfo.weight != animState->getWeight()) 
+                animState->setWeight(animInfo.weight);
+            }
+
+        scene->removeComponent<AnimationDirtyTag>(animComp.entity);
+    }
+
+}
+
+#pragma endregion
+
+#pragma region Updates
+void RenderSystem::updateAnimations(double dt)
+{
+    for(auto& pack : scene->query<RenderComponent, AnimationComponent>()) {
+        AnimationComponent& animComp = pack.get<AnimationComponent&>();
+        RenderComponent& rc = pack.get<RenderComponent&>();
+
+        if(rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) continue;
+        
+        OgreObject& ogreObj = getOgreObject(rc.objectID);
+        Ogre::Real time = static_cast<Ogre::Real>(dt);
+        for(auto& a: animComp.anims){
+
+            const HUGO::String& animName = a.first;
+            const AnimationInfo& animInfo = a.second;
+
+            if(!animInfo.enable) continue;
+
+            auto it = ogreObj.animationStates.find(animName);
+            if(it == ogreObj.animationStates.end()) continue;
+            it->second->addTime(time);
+        }
+    }
+}
+
+void RenderSystem::fixedUpdate(double)
+{
+
+}
+
+void RenderSystem::update(double dt)
+{ 
+    handleTag();
+    updateAnimations(dt);
+
+    //Update transform of entity with renderComponent
+    for(auto& pack : scene->query<TransformComponent,RenderComponent>()) {
+        RenderComponent& rc = pack.get<RenderComponent&>();
+        TransformComponent& tr=pack.get<TransformComponent&>();
+
+        if (rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) {
+            //create a new ogreObject
+            ErrorOrType<HUGO::OgreObjectID> e = createOgreObject(rc.meshName,rc.materialName);
+            if (e.isError()) {
+                rc.objectID=HUGO::INVALID_OGRE_OBJECT_ID;
+                std::cerr<< e.getError().errorMessage;
+                continue;
+            }
+            rc.objectID = e.getValue();
+        } 
+        OgreObject& obj = getOgreObject(rc.objectID);
+
+        //update transform
+        obj.ogreSceneNode->setPosition(OgreUtils::vector3ToOgre(tr.position));
+        obj.ogreSceneNode->setOrientation(OgreUtils::quaternionToOgre(tr.rotation));
+        obj.ogreSceneNode->setScale(OgreUtils::vector3ToOgre(tr.scale));
+    }
 }
 
 #pragma endregion
@@ -278,117 +445,6 @@ void RenderSystem::destroyOgreObject(OgreObject &obj)
 }
 #pragma endregion
 
-#pragma region Updates
-void RenderSystem::updateAnimations(double dt)
-{
-    for(auto& pack : scene->query<RenderComponent, AnimationComponent>()) {
-        AnimationComponent& animComp = pack.get<AnimationComponent&>();
-        RenderComponent& rc = pack.get<RenderComponent&>();
-
-        if(rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) continue;
-        
-        Ogre::Entity* ogre_ent = getOgreObject(rc.objectID).ogreEntity;
-
-        for(auto& a: animComp.anims){
-            const HUGO::String& animName = a.first;
-            AnimationInfo animInfo = a.second;
-
-            if(!ogre_ent->hasAnimationState(animName)) 
-                std::cerr<<"[RenderSystem] Animation "+ animName + " does not exist in entity " + std::to_string(rc.entity) + "\n";
-            
-            Ogre::AnimationState* animState = ogre_ent->getAnimationState(animName);
-            
-            if(animInfo.enable != animState->getEnabled()) 
-                animState->setEnabled(animInfo.enable);
-                
-            if(animInfo.loop!= animState->getLoop()) 
-                animState->setLoop(animInfo.loop);
-
-            if(animInfo.enable)
-                animState->addTime(static_cast<Ogre::Real>(dt));
-        }
-    }
-}
-
-void RenderSystem::init(){
-
-        ogreRoot = Ogre::Root::getSingletonPtr();
-    try {
-        sceneManager = ogreRoot->createSceneManager();
-    }
-    catch (const Ogre::Exception& e) {
-        throw std::runtime_error("[RenderSystem] SceneManager creation failed: " + std::string(e.getDescription()));
-    }
-    ogreRoot->_setCurrentSceneManager(sceneManager);
-    sceneManager->addRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
-
-    // Basic light
-    setAmbientLight(0.2f, 0.2f, 0.2f);
-
-
-    // Camera and viewport creation for testing
-    EntityID defaultCamera = createCameraEntity(HUGO::Vector3(0, 0, 50));
-    setMainCamera(defaultCamera);
-
-    EntityID defaultViewport = createViewportEntity();    
-    setMainViewport(defaultViewport);
-
-    createLightEntity( HUGO::Vector3(0, 20, 20), //light position
-                        HUGO::Vector4(0.9f, 0.9f, 0.8f, 0.2f), //diffuse
-                        HUGO::Vector4(0.0f, 0.0f, 0.0f, 0.0f), //specular
-                        HUGO::LightType::LT_POINT, 
-                        HUGO::Radian(0), 
-                        HUGO::Radian(0), 
-                        0, 
-                        0.1f, 
-                        0.1f, 
-                        100); 
-        
-
-}
-
-void RenderSystem::onLoad(){
-    LuaBinder& luaBinder = LuaBinder::Instance();
-    luaBinder.registerMethod<RenderSystem, void, float, float, float>(*this, &RenderSystem::setAmbientLight, "SetAmbientLight");
-}
-
-void RenderSystem::fixedUpdate(double dt)
-{
-
-}
-
-void RenderSystem::update(double dt)
-{ 
-    handleTag();
-
-    //Update transform of entity with renderComponent
-    for(auto& pack : scene->query<TransformComponent,RenderComponent>()) {
-        RenderComponent& rc = pack.get<RenderComponent&>();
-        TransformComponent& tr=pack.get<TransformComponent&>();
-
-        if (rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) {
-            //create a new ogreObject
-            ErrorOrType<HUGO::OgreObjectID> e = createOgreObject(rc.meshName,rc.materialName);
-            if (e.isError()) {
-                rc.objectID=HUGO::INVALID_OGRE_OBJECT_ID;
-                std::cerr<< e.getError().errorMessage;
-                continue;
-            }
-            rc.objectID = e.getValue();
-        } 
-        OgreObject& obj = getOgreObject(rc.objectID);
-
-        //update transform
-        obj.ogreSceneNode->setPosition(OgreUtils::vector3ToOgre(tr.position));
-        obj.ogreSceneNode->setOrientation(OgreUtils::quaternionToOgre(tr.rotation));
-        obj.ogreSceneNode->setScale(OgreUtils::vector3ToOgre(tr.scale));
-    }
-
-    updateAnimations(dt);
-}
-
-#pragma endregion
-
 // Helper function for Camera creation
 EntityID RenderSystem::createCameraEntity(const HUGO::Vector3& position)
 {
@@ -459,7 +515,10 @@ void RenderSystem::registerViewportEntity(EntityID entity)
         return;
     }
     
-    createOgreViewport(entity);
+    ErrorOrVoid e = createOgreViewport(entity);
+    if(e.isError()){
+        std::cerr<<e.getError().errorMessage;
+    }
 }
 
 void RenderSystem::registerLightEntity(EntityID entity)
@@ -504,19 +563,13 @@ ErrorOrVoid RenderSystem::createOgreCamera(EntityID entity)
     // Get the transformComponent and CameraComponent of the camera to set the initial configuration
     const TransformComponent* transformComp = nullptr;
     const CameraComponent* cameraComp = nullptr;
-    for(auto& pack : scene->query<TransformComponent, CameraComponent>()) {
-        const TransformComponent& tr = pack.get<TransformComponent&>();
-        const CameraComponent& cam = pack.get<CameraComponent&>();
-        if (tr.entity == entity && cam.entity == entity) {
-            transformComp = &tr;
-            cameraComp = &cam;
-            break;
-        }
-    }
 
-    if (!transformComp || !cameraComp) {
-        // gestion de errores
-        return ErrorOrVoid("[RenderSystem] Camera entity "+ std::to_string(entity) + "missing required components");
+    try{
+        transformComp = &scene->getComponent<TransformComponent>(entity);
+        cameraComp = &scene->getComponent<CameraComponent>(entity);
+    }
+    catch(...){
+        return ErrorOrVoid("[RenderSystem] Camera entity " + std::to_string(entity) + " missing required components");
     }
 
     // Unique name for the camera
@@ -558,18 +611,12 @@ ErrorOrVoid RenderSystem::createOgreLight(EntityID entity)
     // Get the transformComponent and LightComponentof the light to set the initial configuration
     const TransformComponent* transformComp = nullptr;
     const LightComponent* lightComp = nullptr;
-    for(auto& pack : scene->query<TransformComponent, LightComponent>()) {
-        const TransformComponent& tr = pack.get<TransformComponent&>();
-        const LightComponent& light = pack.get<LightComponent&>();
-        if (tr.entity == entity && light.entity == entity) {
-            transformComp = &tr;
-            lightComp = &light;
-            break;
-        }
-    }
 
-    if (!transformComp || !lightComp) {
-        // gestion de errores
+    try{
+        transformComp = &scene->getComponent<TransformComponent>(entity);
+        lightComp = &scene->getComponent<LightComponent>(entity);
+    }
+    catch(...){
         return ErrorOrVoid("[RenderSystem] Light entity "+ std::to_string(entity) + "missing required components");
     }
 
@@ -634,19 +681,17 @@ ErrorOrVoid RenderSystem::createOgreLight(EntityID entity)
     return ErrorOrVoid();
 }
 
-void RenderSystem::createOgreViewport(EntityID entity)
+ErrorOrVoid RenderSystem::createOgreViewport(EntityID entity)
 {
-    ViewportInfo res;
-    
+    ViewportInfo res;    
     const ViewportComponent* viewportComp = nullptr;
-    for(auto& pack : scene->query<ViewportComponent>()) {
-        const ViewportComponent& vp = pack.get<ViewportComponent&>();
-        if (vp.entity == entity) {
-            viewportComp = &vp;
-            break;
-        }
+    try{
+        viewportComp = &scene->getComponent<ViewportComponent>(entity);
     }
-    
+    catch(...){
+        return ErrorOrVoid("[RenderSystem] Viewport entity "+ std::to_string(entity) + "missing required components");
+    }
+
     Ogre::Camera* cam = nullptr;
     
     if (viewportComp->getCameraEntity() != 0) {
@@ -694,6 +739,7 @@ void RenderSystem::createOgreViewport(EntityID entity)
     viewportMap[entity] = res;
 
     scene->addComponent<ViewportDirtyTag>(entity);
+    return ErrorOrVoid();
 }
 #pragma endregion
 
