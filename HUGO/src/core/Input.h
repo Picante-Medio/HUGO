@@ -8,7 +8,7 @@
 #include <vector>
 
 namespace HUGO {
-class Vector2;
+struct Vector2;
 class Input {
   enum KeyState {
     NOT_PRESSED,

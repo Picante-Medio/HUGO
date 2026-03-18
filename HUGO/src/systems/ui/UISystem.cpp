@@ -64,7 +64,7 @@ std::shared_ptr<UIElementCache> UISystem::createElementCache(
     return cache;
 }
 
-UIElementCache *UISystem::getCache(EntityID entity)
+UIElementCache* UISystem::getCache(EntityID entity)
 {
     auto it = uiCache.find(entity);
     if (it == uiCache.end())
@@ -73,7 +73,7 @@ UIElementCache *UISystem::getCache(EntityID entity)
     return it->second.get();
 }
 
-bool isMouseOverPanel(const PanelComponent &panel, HUGO::Int mouseX, HUGO::Int mouseY)
+bool UISystem::isMouseOverPanel(const PanelComponent &panel, HUGO::Int mouseX, HUGO::Int mouseY)
 {
     HUGO::Float left   = panel.left;
     HUGO::Float top    = panel.top;
@@ -238,99 +238,84 @@ void UISystem::processTextChanges()
 
 void UISystem::processInput()
 {
-    HUGO::Input &input = HUGO::Input::Instance();
-    SDL_Keycode key;
+    HUGO::Input& input = HUGO::Input::Instance();
 
-    if (input.isActionPressed("ToggleConsole"))
-    {
-        for(auto& pack : scene->query<ConsoleComponent, InputFieldComponent>()){
-            InputFieldComponent &inputField = pack.get<InputFieldComponent &>();
-            inputField.isActive = !inputField.isActive;
+    // get normalized mouse position
+    const HUGO::Vector2& mp = input.getMouseNormalized();
 
-            if (inputField.isActive) {
-                SDL_StartTextInput();
-            } else {
-                SDL_StopTextInput();
+    bool anyFieldActive = false; // flag to control SDL text input
+
+    // handle mouse click: activate/deactivate input fields
+    if (input.wasMouseButtonJustPressed(SDL_BUTTON_LEFT)) {
+        InputFieldComponent* activeField = nullptr;
+
+        for (auto& pack : scene->query<PanelComponent, InputFieldComponent>()) {
+            PanelComponent& panel = pack.get<PanelComponent&>();
+            InputFieldComponent& field = pack.get<InputFieldComponent&>();
+
+            if (isMouseOverPanel(panel, mp.x, mp.y)) {
+                // activate this field
+                field.isActive = true;
+                activeField = &field;
+            }
+            else {
+                field.isActive = false;
             }
         }
-
+        anyFieldActive = (activeField != nullptr);
+        input.toggleTextInput(anyFieldActive);
     }
 
-    if(input.wasMouseButtonJustPressed(SDL_BUTTON_LEFT)){
-        int x, y;
-        x = input.getMousePosition().x;
-        y = input.getMousePosition().y;
+    // process text for the active input field using SDL text buffer
+    const HUGO::String& textInput = input.getTextInput();
+    for (auto &pack : scene->query<InputFieldComponent, TextComponent>()) {
+        InputFieldComponent& field = pack.get<InputFieldComponent&>();
+        if (!field.isActive) continue;
 
-    //     for(auto& pack :scene->query<PanelComponent, InputFieldComponent>()){
-    //         PanelComponent& panel = pack.get<PanelComponent&>();
-    //         // mirar a cual panel le corresponde el input field
-    //         // si esta el raton arriba y le ha hecho clic   
-    //         float mouseX = x / renderWindow->getWidth();
-    //         float mouseY = y / renderWindow->getHeight();
-    //         bool isOver = (mouseX >= panel.left && mouseX <= panel.left + panel.width && mouseY >= panel.top && mouseY <= panel.top + panel.height);
-    //         if(isOver){
-    //             InputFieldComponent& in = pack.get<InputFieldComponent>();
-    //             in.isActive = true;
-    //             SDL_StartTextInput();
-    //         }else{
-    //             InputFieldComponent& in = pack.get<InputFieldComponent>();
-    //             in.isActive = false;
-    //         }
-    //     }
-    }
+        TextComponent&text = pack.get<TextComponent&>();
+        std::string str = text.text;
+        bool changed = false;
 
-    for(auto& pack : scene->query<InputFieldComponent, TextComponent>()){ // For generic InputField
-        InputFieldComponent &inputField = pack.get<InputFieldComponent&>();
-        if(inputField.isActive){
-            TextComponent &text = pack.get<TextComponent &>();
-            //Keep a copy of the current version of the string
-            std::string str = text.text;
-            
-            bool changed = false;
-            SDL_Event event;
-            while (SDL_PollEvent(&event)) {
-                if (event.type == SDL_TEXTINPUT) {
-                    // Only english letters
-                    for (char c : event.text.text) {
-                        if (c >= 32 && c <= 126 && c != 'ñ' && c != 'Ñ') {
-                            str += c;
-                            changed = true;
-                        }
-                    }
-                }
-            }
+        // append new text input from SDL
+        if (!textInput.empty()) {
+            str += textInput;
+            changed = true;
+        }
 
-            //If backspace was pressed and the string is not empty
-            if((key == SDLK_BACKSPACE) && !str.empty())
-            {
-                //Remove a character from the end
-                str.pop_back();
-                changed = true;
-            }
+        // backspace -> remove last character
+        if (input.wasKeyJustPressed(SDLK_BACKSPACE) && !str.empty()) {
+            str.pop_back();
+            changed = true;
+        }
 
-            if (input.wasActionJustPressed("SubmitInput")) {
-                inputField.isActive = false;
-                // Save the command
-                saveConsoleToFile(str);
-                SDL_StopTextInput();
-            }
+        // enter -> save result and deactivate
+        if (input.wasActionJustPressed("SubmitInput")) {
+            field.isActive = false;
+            field.result = str;
+            changed = true;
+            if (field.onChangeCallback)
+                field.onChangeCallback(str);
+        }
 
-            if (str != text.text) {
-                text.text = str;
-            } 
-
-            if (changed) {
-                text.text = str;
-                scene->addComponent<TextDirtyTag>(text.entity);
-                if (inputField.onChangeCallback) {
-                    inputField.onChangeCallback(str);
-                }
-            }
+        // update the text component if changed
+        if (changed && str != text.text) {
+            text.text = str;
         }
     }
+
+    // clear the SDL text input buffer after processing
+    input.clearTextInput();
+
+    // check if any input field is still active and toggle SDL text input
+    anyFieldActive = false;
+    for (auto &pack : scene->query<InputFieldComponent>()) {
+        if (pack.get<InputFieldComponent&>().isActive) {
+            anyFieldActive = true;
+            break;
+        }
+    }
+    input.toggleTextInput(anyFieldActive);
 }
-
-
 
 //====================================================
 // CACHE MANAGEMENT
@@ -367,7 +352,7 @@ void UISystem::fixedUpdate(double) {}
 // TEST UI
 //====================================================
 
-const PanelComponent &UISystem::createTestCanvas()
+const PanelComponent& UISystem::createTestCanvas()
 {
     EntityID ent = scene->createEntity();
     PanelComponent &panel = scene->addAndGetComponent<PanelComponent>(ent);
@@ -411,15 +396,12 @@ EntityID UISystem::createConsole()
 {
     EntityID entity = createTestText();
 
-    scene->addComponent<ConsoleComponent>(entity);
-
-    InputFieldComponent &inputField = scene->addAndGetComponent<InputFieldComponent>(entity);
+    InputFieldComponent& inputField = scene->addAndGetComponent<InputFieldComponent>(entity);
     inputField.isActive = false;
-    inputField.onChangeCallback = [this](const std::string& input) { saveConsoleToFile(input);};
+    //inputField.onChangeCallback = [this](const std::string& input) { };
     HUGO::Input &input = HUGO::Input::Instance();
-    input.registerAction("ToggleConsole", SDL_KeyCode::SDLK_LCTRL && SDL_KeyCode::SDLK_RETURN);    // for activating the console
     input.registerAction("SubmitInput", SDL_KeyCode::SDLK_RETURN); // for submitting input
-
+    input.registerAction("EraseInput", SDL_KeyCode::SDLK_BACKSPACE); // for erasing input
     return entity;
 }
 

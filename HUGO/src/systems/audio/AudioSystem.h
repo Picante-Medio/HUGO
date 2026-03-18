@@ -140,7 +140,7 @@ private:
 
 
    // internal callback
-   static void endCallback(void* data, ma_sound* pSound);
+   static void endCallback(void* data, ma_sound*);
 
 
    /* ====================================
@@ -163,7 +163,7 @@ public:
 
    // updates
    void update(double dt) override;
-   void fixedUpdate(double dt) override;
+   void fixedUpdate(double) override;
 
    void onLoad() override;
    void init() override;

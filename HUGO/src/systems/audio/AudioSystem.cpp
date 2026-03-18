@@ -118,7 +118,7 @@ ma_sound *AudioSystem::acquireVoice(AudioComponent &c)
 }
 
 // CALLBACK
-void AudioSystem::endCallback(void* data, ma_sound* sound)
+void AudioSystem::endCallback(void* data, ma_sound*)
 {
     if (!data) return;
 
@@ -172,6 +172,29 @@ void AudioSystem::setVolume(ma_sound* s, float vol)
 
 void AudioSystem::setGroupVolume(HUGO::AudioTypes type, float volume)
 {
+    // store the group volume
+    if (type == HUGO::AudioTypes::MUSIC)
+        musicsGroupVolume = volume;
+    else   
+        soundsGroupVolume = volume;
+
+    // iterate over all audio pools
+    for (size_t id = 0; id < audios.size(); ++id)
+    {
+        if (audios[id].type != type)
+            continue;
+
+        AudioPool& pool = pools[id];
+        for (auto& voice : pool.voices)
+        {
+            if (voice.ptr)
+            {
+                // apply group volume multiplied by individual volume
+                float vol = ma_sound_get_volume(voice.ptr->get());
+                ma_sound_set_volume(voice.ptr->get(), vol * volume);
+            }
+        }
+    }
 }
 
 void AudioSystem::setPitch(ma_sound* s, float pitch)
@@ -355,11 +378,11 @@ ErrorOrVoid AudioSystem::loadAudiosFromFile(HUGO::String fileName)
 
         std::stringstream ss(line);
 
-        std::string name;
+        std::string audioName;
         std::string filename;
         std::string typeStr;
 
-        std::getline(ss, name, ';');
+        std::getline(ss, audioName, ';');
         std::getline(ss, filename, ';');
         std::getline(ss, typeStr, ';');
 
@@ -368,8 +391,8 @@ ErrorOrVoid AudioSystem::loadAudiosFromFile(HUGO::String fileName)
 
         HUGO::AudioID id = nextID++;
 
-        audios.push_back({name, filename, type});
-        nameToID[name] = id;
+        audios.push_back({audioName, filename, type});
+        nameToID[audioName] = id;
 
         pools.emplace_back();
     }
@@ -523,7 +546,7 @@ void AudioSystem::update(double dt)
     }
 }
 
-void AudioSystem::fixedUpdate(double dt)
+void AudioSystem::fixedUpdate(double)
 {
 }
 
