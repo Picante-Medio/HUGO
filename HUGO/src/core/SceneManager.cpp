@@ -2,6 +2,7 @@
 #include "LuaBinder.h"
 #include "Scene.h"
 #include "SystemFactory.h"
+#include "ComponentFactory.h"
 #include "ComponentRegistry.h"
 #include "IPhysicsModule.h"
 
@@ -49,15 +50,24 @@ ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
         value.getValue()->init();
     }
 
-    /*
+    
     for(auto entityData: sceneData.getValue().entities){
         EntityID currEntity = m_sceneMap[sceneName]->createEntity();
 
         for(auto componentData : entityData){
-            
+            ErrorOrVoid compResult = HUGO::ComponentFactory::makeComponent(m_sceneMap[sceneName], currEntity, 
+                componentData.componentName, componentData.parameters);
+
+            if (compResult.isError()) {
+                compResult = HUGO::GameLibraryLoader::instance().GenerateComponent(m_sceneMap[sceneName], currEntity, 
+                    componentData.componentName, componentData.parameters);
+                if (compResult.isError()) {
+                    return ErrorOrVoid(compResult.getError());
+                }
+            }
         }
     }
-*/
+
 
     //When no errors occurred, we add the scene to the physics simulation
     m_physicsModule->createSceneSimulation(sceneName, m_sceneMap[sceneName]);

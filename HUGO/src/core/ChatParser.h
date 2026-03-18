@@ -1,15 +1,16 @@
 #pragma once
 
-#include <any>
+#include <unordered_map>
 #include <vector>
 #include <HugoMath.h>
 #include "HugoError.h"
+#include "HugoParsingVariant.h"
 
 
 namespace HUGO{
 	struct ComponentData {
 		HUGO::String componentName;
-		std::vector<std::any> parameters;
+		std::unordered_map<HUGO::String, HVariant> parameters;
 	};
 
 	using EntityData = std::vector<ComponentData>;

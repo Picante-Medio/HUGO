@@ -97,38 +97,51 @@ ErrorOrType<HUGO::String> readString(){
 //Checks if input is VEC3, FLOAT, INT, or STRING and adds it to the parameters of compData. If an error occurred, returns the error.
 ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData& compData){
     if(input == "VECTOR_3"){
+
+        HUGO::String parameterName;
+        std::cin >> parameterName;
+
             ErrorOrType<HUGO::Vector3> vec3 = readVector3();
 
             if(vec3.isError()) return ErrorOrVoid(vec3.getError());
 
             //Might be terrorism
             //Adds it to the parameters of the last component added to the last entity of the scene
-            compData.parameters.push_back(vec3.getValue());
+            compData.parameters[parameterName] = {vec3.getValue()};
         }
 
         if(input == "FLOAT"){
+            HUGO::String parameterName;
+            std::cin >> parameterName;
+
             ErrorOrType<HUGO::Float> f = readFloat();
 
             if(f.isError()) return ErrorOrVoid(f.getError());
 
-            compData.parameters.push_back(f.getValue());
+            compData.parameters[parameterName] = {f.getValue()};
         }
 
         if(input == "INT"){
+            HUGO::String parameterName;
+            std::cin >> parameterName;
+
             ErrorOrType<HUGO::Int> i = readInt();
 
             if(i.isError()) return ErrorOrVoid(i.getError());
 
-            compData.parameters.push_back(i.getValue());
+            compData.parameters[parameterName] = {i.getValue()};
         }
 
         if(input == "STRING"){
+            HUGO::String parameterName;
+            std::cin >> parameterName;
+
             std::cin.get();
             ErrorOrType<HUGO::String> s = readString();
 
             if(s.isError()) return ErrorOrVoid(s.getError());
 
-           compData.parameters.push_back(s.getValue());
+           compData.parameters[parameterName] = {s.getValue()};
         }
 
     return ErrorOrVoid();

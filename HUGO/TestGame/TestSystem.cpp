@@ -10,7 +10,7 @@ TestSystem::onLoad() {}
 
 void
 TestSystem::update(double dt) {
-    //std::cout << "Este sistema se esta ejecutando desde una biblioteca dinámica (dt: "<< dt <<  ")\n";
+    std::cout << "Este sistema se esta ejecutando desde una biblioteca dinámica (dt: "<< dt <<  ")\n";
 }
 
 void
