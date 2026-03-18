@@ -3,16 +3,32 @@
 #include <iostream>
 
 void ConsoleSystem::PrintLogs(){
-    // Print logs from scene
+    ErrorOrType log = scene->getNextLog();
+
+    while (!log.isError())
+    {
+        // Imprimir
+        log = scene->getNextLog();
+    }
+    
 }
 
 void ConsoleSystem::PrintErrors(){
-    // Print errors from scene
+    ErrorOrType error = scene->getNextError();
+
+    while (!error.isError())
+    {
+        // Imprimir
+        error = scene->getNextError();
+    }
 }
 
 void ConsoleSystem::update(double dt){
 
+    // Letras color rojo
     PrintErrors();
+
+    // Letras color blanco
     PrintLogs();
 
 }
