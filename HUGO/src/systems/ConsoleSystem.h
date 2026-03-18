@@ -2,10 +2,13 @@
 
 #include "HugoSystemMacros.h"
 
-HSYSTEM(LuaSystem)
+HSYSTEM(ConsoleSystem)
 
-    void Print(std::string msg);
+    std::deque<HUGO::String> history;
 
+    void PrintLogs();
+    void PrintErrors();
+    
 public:
 
    void update(double dt) override;
