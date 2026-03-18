@@ -8,7 +8,6 @@
 #include <vector>
 
 namespace HUGO {
-struct Vector2;
 class Input {
   enum KeyState {
     NOT_PRESSED,
@@ -67,9 +66,12 @@ public:
       int x; 
       int y;
   };
+  struct MouseRelativePosition {
+      float x; 
+      float y;
+  };
   MousePosition getMousePosition();
-  HUGO::Vector2 getMouseNormalized();
-
+  MouseRelativePosition getMouseRelativePosition();
   // Accessor for text input buffer
   const std::string& getTextInput() const;
   // Flush text input buffer once we sent an input

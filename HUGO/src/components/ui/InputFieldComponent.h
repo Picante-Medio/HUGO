@@ -9,7 +9,7 @@ HCOMPONENT(InputFieldComponent)
     bool isActive = false;
     std::string originalText;
 
-    std::function<void(const std::string&)> onChangeCallback;
+    std::function<void(const HUGO::String&)> onChangeCallback;
 
     HUGO::String result = "";
 END_HCOMPONENT()

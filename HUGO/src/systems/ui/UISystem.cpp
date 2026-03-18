@@ -241,8 +241,8 @@ void UISystem::processInput()
     HUGO::Input& input = HUGO::Input::Instance();
 
     // get normalized mouse position
-    const HUGO::Vector2& mp = input.getMouseNormalized();
 
+    HUGO::Input::MouseRelativePosition mp = input.getMouseRelativePosition();
     bool anyFieldActive = false; // flag to control SDL text input
 
     // handle mouse click: activate/deactivate input fields

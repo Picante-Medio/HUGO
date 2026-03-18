@@ -124,28 +124,14 @@ Input::MousePosition Input::getMousePosition() {
   SDL_GetMouseState(&mp.x, &mp.y);
   return mp;
 }
-HUGO::Vector2 Input::getMouseNormalized()
+Input::MouseRelativePosition Input::getMouseRelativePosition()
 {
-  int x, y;
-  SDL_GetMouseState(&x, &y);
-
-  int w = 0, h = 0;
-  
-  // Obtener SDL_Window desde Ogre
-  SDL_Window* sdlWindow = nullptr;
-  Ogre::RenderWindow* rw = OgreModule::Instance().getOgreRenderWindow();
-  rw->getCustomAttribute("WINDOW", &sdlWindow);
-
-  if (sdlWindow)
-      SDL_GetWindowSize(sdlWindow, &w, &h);
-
-  if (w == 0 || h == 0)
-      return HUGO::Vector2(0, 0);
-
-  return HUGO::Vector2(
-      static_cast<float>(x) / w,
-      static_cast<float>(y) / h
-  );
+  MouseRelativePosition mp;
+  MousePosition mpABS = getMousePosition();
+  Ogre::RenderWindow* window = OgreModule::Instance().getOgreRenderWindow();
+  mp.x = static_cast<HUGO::Float>(mp.x / window->getWidth());
+  mp.y = static_cast<HUGO::Float>(mp.y / window->getHeight());
+  return mp;
 }
 const std::string &Input::getTextInput() const
 {
