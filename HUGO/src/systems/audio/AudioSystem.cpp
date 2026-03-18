@@ -400,10 +400,10 @@ ErrorOrVoid AudioSystem::loadAudiosFromFile(HUGO::String fileName)
     return ErrorOrVoid();
 }
 
-ErrorOrVoid AudioSystem::addAudio(const char* name,
+ErrorOrVoid AudioSystem::addAudio(const char* n,
                                   HUGO::AudioTypes type)
 {
-    std::string audioName = name;
+    HUGO::String audioName = n;
 
     if (nameToID.find(audioName) != nameToID.end())
     {

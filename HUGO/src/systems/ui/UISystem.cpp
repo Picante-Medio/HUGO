@@ -73,7 +73,7 @@ UIElementCache* UISystem::getCache(EntityID entity)
     return it->second.get();
 }
 
-bool UISystem::isMouseOverPanel(const PanelComponent &panel, HUGO::Int mouseX, HUGO::Int mouseY)
+bool UISystem::isMouseOverPanel(const PanelComponent &panel, HUGO::Float mouseX, HUGO::Float mouseY)
 {
     HUGO::Float left   = panel.left;
     HUGO::Float top    = panel.top;

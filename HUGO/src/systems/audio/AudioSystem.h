@@ -61,7 +61,7 @@ private:
       ===========*/
 
    std::vector<AudioEntry> audios; // metadata
-   std::unordered_map<std::string, HUGO::AudioID> nameToID;
+   std::unordered_map<HUGO::String, HUGO::AudioID> nameToID;
    std::vector<AudioPool> pools; // runtime voices
 
    /* =================
@@ -159,7 +159,7 @@ public:
 
    // load assets
    ErrorOrVoid loadAudiosFromFile(HUGO::String fileName);
-   ErrorOrVoid addAudio(const char* name, HUGO::AudioTypes type);
+   ErrorOrVoid addAudio(const char* n, HUGO::AudioTypes type);
 
    // updates
    void update(double dt) override;
