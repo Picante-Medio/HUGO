@@ -4,6 +4,7 @@
 #include "HugoTypes.h"
 #include "HugoComponentMacros.h"
 
+// Estos includes no pueden estar aquí
 #include <OgreOverlay.h>
 #include <OgreOverlayManager.h>
 #include <OgreOverlayContainer.h>
