@@ -1,11 +1,14 @@
 #include "Scene.h"
 
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 #include "EcsTypes.h"
 #include <bitset>
 
+#include "HugoError.h"
+#include "HugoTypes.h"
 #include "LuaBinder.h"
 
 #include "EntityTable.h"
@@ -100,4 +103,32 @@ Scene::printEntities() {
 		//console->Print("ENTITY WITH ID: " + std::to_string(index) + " has components " + mask.to_string() + "\n");
 		index += 1;
 	}
+}
+
+void 
+Scene::log(std::shared_ptr<Error> error) {
+    errorsToLog.push(error);
+}
+
+void 
+Scene::log(HUGO::String log) {
+    stringsToLog.push(log);
+}
+
+ErrorOrType<HUGO::String> 
+Scene::getNextError() {
+    if(errorsToLog.empty()) return ErrorOrType<HUGO::String>(StringError{"La cola está vacía"});
+
+    HUGO::String ret = errorsToLog.front()->description();
+    errorsToLog.pop();
+    return ErrorOrType<HUGO::String>(ret);
+}
+
+ErrorOrType<HUGO::String> 
+Scene::getNextLog() {
+    if(stringsToLog.empty()) return ErrorOrType<HUGO::String>(StringError{"La cola está vacía"});
+
+    HUGO::String ret = stringsToLog.front();
+    stringsToLog.pop();
+    return ErrorOrType<HUGO::String>(ret);
 }

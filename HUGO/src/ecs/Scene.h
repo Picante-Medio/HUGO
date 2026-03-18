@@ -2,12 +2,16 @@
 
 #include "System.h"
 #include "HugoTypes.h"
+#include "HugoError.h"
 
 #include "IScene.h"
+#include <memory>
+#include <queue>
 
 class Scene : public IScene, public std::enable_shared_from_this<Scene> {
-  
   std::vector<std::shared_ptr<System>> systems;
+  std::queue<std::shared_ptr<Error>> errorsToLog;
+  std::queue<HUGO::String> stringsToLog;
 
 public:
   Scene();
@@ -36,4 +40,10 @@ public:
 
   void printEntity(int id);
   void printEntities();
+
+  void log(std::shared_ptr<Error> error) override;
+  void log(HUGO::String log) override;
+
+  ErrorOrType<HUGO::String> getNextError();
+  ErrorOrType<HUGO::String> getNextLog();
 };

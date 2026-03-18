@@ -1,9 +1,12 @@
 #pragma once
 
 #include <cstddef>
+#include <memory>
 #include <utility>
 #include <vector>
 
+#include "HugoTypes.h"
+#include "HugoError.h"
 #include "IEntityTable.h"
 #include "IComponentDenseTable.h"
 #include "EcsTypes.h"
@@ -100,4 +103,7 @@ public:
 
 		return returnedQuery;
 	}
+
+    virtual void log(HUGO::String message) = 0; 
+    virtual void log(std::shared_ptr<Error>) = 0;
 };
