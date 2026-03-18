@@ -9,7 +9,6 @@ overlay testCanvas/SimpleTest1
         top 0.2
         width 0.3
         height 0.1
-        //material UI/Red
     }
 }
 
@@ -34,7 +33,7 @@ overlay testCanvas/SimpleTest
             space_width 0.025
             colour_top 1.0 0.0 1.0 1.0
             colour_bottom 0.0 1.0 1.0 1.0
-            alignment center 
+            horz_align left 
             vert_align center  
         }
     }

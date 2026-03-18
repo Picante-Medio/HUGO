@@ -33,10 +33,10 @@ void Input::handleInput() {
       case SDL_KEYUP:
         keyState[event.key.keysym.sym] = JUST_RELEASED;
         break;
-      case SDL_MOUSEBUTTONUP:
+      case SDL_MOUSEBUTTONDOWN:
         mouseState[event.button.button] = JUST_PRESSED;
         break;
-      case SDL_MOUSEBUTTONDOWN:
+      case SDL_MOUSEBUTTONUP:
         mouseState[event.button.button] = JUST_RELEASED;
         break;
       case SDL_TEXTINPUT:
