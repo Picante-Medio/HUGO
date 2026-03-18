@@ -106,4 +106,7 @@ public:
 
     virtual void log(HUGO::String message) = 0; 
     virtual void log(std::shared_ptr<Error>) = 0;
+
+    virtual ErrorOrType<HUGO::String> getNextError() = 0;
+    virtual ErrorOrType<HUGO::String> getNextLog() = 0;
 };

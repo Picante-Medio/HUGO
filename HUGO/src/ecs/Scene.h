@@ -44,6 +44,6 @@ public:
   void log(std::shared_ptr<Error> error) override;
   void log(HUGO::String log) override;
 
-  ErrorOrType<HUGO::String> getNextError();
-  ErrorOrType<HUGO::String> getNextLog();
+  ErrorOrType<HUGO::String> getNextError() override;
+  ErrorOrType<HUGO::String> getNextLog() override;
 };
