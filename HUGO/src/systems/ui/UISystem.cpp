@@ -240,29 +240,27 @@ void UISystem::processInput()
 {
     HUGO::Input& input = HUGO::Input::Instance();
 
-    // get normalized mouse position
-
-    HUGO::Input::MouseRelativePosition mp = input.getMouseRelativePosition();
     bool anyFieldActive = false; // flag to control SDL text input
 
     // handle mouse click: activate/deactivate input fields
     if (input.wasMouseButtonJustPressed(SDL_BUTTON_LEFT)) {
-        InputFieldComponent* activeField = nullptr;
 
         for (auto& pack : scene->query<PanelComponent, InputFieldComponent>()) {
             PanelComponent& panel = pack.get<PanelComponent&>();
             InputFieldComponent& field = pack.get<InputFieldComponent&>();
 
+            // get normalized mouse position
+            HUGO::Input::MouseRelativePosition mp = input.getMouseRelativePosition();
+
             if (isMouseOverPanel(panel, mp.x, mp.y)) {
                 // activate this field
                 field.isActive = true;
-                activeField = &field;
+                anyFieldActive = true;
             }
             else {
                 field.isActive = false;
             }
         }
-        anyFieldActive = (activeField != nullptr);
         input.toggleTextInput(anyFieldActive);
     }
 
@@ -272,8 +270,8 @@ void UISystem::processInput()
         InputFieldComponent& field = pack.get<InputFieldComponent&>();
         if (!field.isActive) continue;
 
-        TextComponent&text = pack.get<TextComponent&>();
-        std::string str = text.text;
+        TextComponent& text = pack.get<TextComponent&>();
+        HUGO::String str = text.text; 
         bool changed = false;
 
         // append new text input from SDL
@@ -300,6 +298,7 @@ void UISystem::processInput()
         // update the text component if changed
         if (changed && str != text.text) {
             text.text = str;
+            scene->addComponent<TextDirtyTag>(text.entity);
         }
     }
 
@@ -333,7 +332,7 @@ void UISystem::clearAllCaches()
 void UISystem::init()
 {
     renderWindow = OgreModule::Instance().getOgreRenderWindow();
-    createTestText();
+    createConsole();
 }
 
 void UISystem::onLoad() {}

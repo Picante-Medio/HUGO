@@ -129,8 +129,8 @@ Input::MouseRelativePosition Input::getMouseRelativePosition()
   MouseRelativePosition mp;
   MousePosition mpABS = getMousePosition();
   Ogre::RenderWindow* window = OgreModule::Instance().getOgreRenderWindow();
-  mp.x = static_cast<HUGO::Float>(mp.x / window->getWidth());
-  mp.y = static_cast<HUGO::Float>(mp.y / window->getHeight());
+  mp.x = static_cast<HUGO::Float>(mpABS.x) / static_cast<HUGO::Float>(window->getWidth());
+  mp.y = static_cast<HUGO::Float>(mpABS.y) / static_cast<HUGO::Float>(window->getHeight());
   return mp;
 }
 const std::string &Input::getTextInput() const
