@@ -85,17 +85,17 @@ void RenderSystem::init(){
     sceneManager->addRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
 
     // Basic light
-    setAmbientLight(0.2f, 0.2f, 0.2f);
+    setAmbientLight(0.6f, 0.6f, 0.6f);
 
 
     // Camera and viewport creation for testing
-    EntityID defaultCamera = createCameraEntity(HUGO::Vector3(0, 0, 100));
+    EntityID defaultCamera = createCameraEntity(HUGO::Vector3(0, 0, 150));
     setMainCamera(defaultCamera);
 
     EntityID defaultViewport = createViewportEntity();    
     setMainViewport(defaultViewport);
 
-    createLightEntity( HUGO::Vector3(0, 20, 20), //light position
+    createLightEntity( HUGO::Vector3(0, 20, 50), //light position
                         HUGO::Vector4(0.9f, 0.9f, 0.8f, 0.2f), //diffuse
                         HUGO::Vector4(0.0f, 0.0f, 0.0f, 0.0f), //specular
                         HUGO::LightType::LT_POINT, 
