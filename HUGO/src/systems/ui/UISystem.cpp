@@ -244,7 +244,6 @@ void UISystem::processInput()
 
     // handle mouse click: activate/deactivate input fields
     if (input.wasMouseButtonJustPressed(SDL_BUTTON_LEFT)) {
-
         for (auto& pack : scene->query<PanelComponent, TextComponent, InputFieldComponent>()) {
             PanelComponent& panel = pack.get<PanelComponent&>();
             TextComponent& text = pack.get<TextComponent&>();
@@ -252,16 +251,16 @@ void UISystem::processInput()
 
             // get normalized mouse position
             HUGO::Input::MouseRelativePosition mp = input.getMouseRelativePosition();
-
             if (isMouseOverPanel(panel, mp.x, mp.y)) {
                 if (!field.isActive){
                     // activate this field
                     field.isActive = true;
                     anyFieldActive = true;
-                    if (!field.originalText.empty()) continue;
-                    field.originalText = text.text;
-                    text.text.clear();
-                    scene->addComponent<TextDirtyTag>(text.entity);
+                    if (field.originalText.empty()){
+                        field.originalText = text.text;
+                        text.text.clear();
+                        scene->addComponent<TextDirtyTag>(text.entity);
+                    }
                 }
             }
             else {
@@ -283,8 +282,12 @@ void UISystem::processInput()
 
         // append new text input from SDL
         if (!textInput.empty()) {
-            str += textInput;
-            changed = true;
+            int c = static_cast<int>(textInput[0]);
+            //only english printable ascii codes are accepted
+            if (c > 32 && c < 127){
+                str += textInput;
+                changed = true;
+            }
         }
 
         // backspace -> remove last character
