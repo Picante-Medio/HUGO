@@ -177,8 +177,6 @@ foreach(path ${BULLET_SRC_DIRS})
     endif()
 endforeach()
 
-################################## Aquí empieza el proyecto principal
-
 function(enable_warnings target)
     if(MSVC)
         target_compile_options(${target} PRIVATE /W4 /permissive-)
@@ -187,6 +185,24 @@ function(enable_warnings target)
         )
     endif()
 endfunction()
+
+################################## Hugo Math
+
+
+add_library(HugoMath STATIC
+    ${CMAKE_SOURCE_DIR}/include/HugoMath/HugoMath.cpp)
+enable_warnings(HugoMath)
+
+set_target_properties(HugoMath PROPERTIES
+    DEBUG_POSTFIX "d"
+    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
+    ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/lib
+    ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/lib)
+
+target_include_directories(HugoMath PUBLIC 
+    ${CMAKE_SOURCE_DIR}/include/HugoMath)
+
+################################## Aquí empieza el proyecto principal
 
 file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
@@ -236,7 +252,8 @@ target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE
     ${SYSTEM_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE 
-    ${HUGO_LINKED_LIBRARIES})
+    ${HUGO_LINKED_LIBRARIES}
+    HugoMath)
 
 set(CMAKE_SKIP_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
@@ -273,7 +290,8 @@ endif ()
 
 add_library(TestGame MODULE 
     ${CMAKE_SOURCE_DIR}/TestGame/GameEntryPoint.cpp
-    ${CMAKE_SOURCE_DIR}/TestGame/TestSystem.cpp)
+    ${CMAKE_SOURCE_DIR}/TestGame/TestSystem.cpp
+    ${CMAKE_SOURCE_DIR}/TestGame/PhysicsTestSystem.cpp)
 enable_warnings(TestGame)
 
 set_target_properties(TestGame PROPERTIES
@@ -285,3 +303,6 @@ set_target_properties(TestGame PROPERTIES
 target_include_directories(TestGame PRIVATE 
     ${CMAKE_SOURCE_DIR}/TestGame
     ${SDK_INCLUDE_DIRS})
+
+target_link_libraries(TestGame PRIVATE
+    HugoMath)

@@ -1,7 +1,6 @@
 #pragma once
 #include "HugoTypes.h"
 #include "HugoComponentMacros.h"
-#include "OgreModule.h"
 
 HCOMPONENT(RenderComponent)
 

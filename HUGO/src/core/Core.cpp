@@ -22,8 +22,6 @@
 #include "BulletModule.h"
 //#include "ResourceManager.h"
 
-#include "PhysicsTestSystem.h"
-
 #include "ChatParser.h"
 #include "ComponentRegistryInitializer.h"
 
