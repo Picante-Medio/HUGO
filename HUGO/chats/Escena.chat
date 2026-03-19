@@ -1,4 +1,8 @@
-SCENE Escena1
+MAIN SCENE Escena1
+
+SYSTEM AudioSystem
+SYSTEM RenderSystem
+SYSTEM UISystem
 
 ENTITY Juan 0
 	COMPONENT TransformComponent
