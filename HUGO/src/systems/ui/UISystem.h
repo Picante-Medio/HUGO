@@ -41,10 +41,14 @@ std::unordered_map<EntityID, std::shared_ptr<UIElementCache>> uiCache;
 //====================================================
 // CACHE CREATION
 //====================================================
-std::shared_ptr<UIElementCache> createElementCache(Ogre::Overlay* o, 
+std::shared_ptr<UIElementCache> createElementCache(EntityID entity, Ogre::Overlay* o, 
     Ogre::OverlayContainer* c, Ogre::OverlayElement* e = nullptr);
-std::shared_ptr<UIElementCache> createElementCache(const HUGO::String& overlayName,
+std::shared_ptr<UIElementCache> createElementCache(EntityID entity, const HUGO::String& overlayName,
     const HUGO::String& containerName, const HUGO::String& elementName = "");
+
+std::shared_ptr<UIProgressBarCache> createProgressBarCache(EntityID entity,
+    const HUGO::String& overlayName, const HUGO::String& containerName, 
+    const HUGO::String& descriptionName); 
 UIElementCache* getCache(EntityID entity);
 
 //====================================================

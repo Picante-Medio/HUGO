@@ -22,3 +22,9 @@ struct UIButtonCache : public UIElementCache
     //Ogre::BorderPanelOverlayElement* panel = nullptr;
     Ogre::TextAreaOverlayElement* textArea = nullptr;
 };
+
+struct UIProgressBarCache : public UIElementCache
+{
+    Ogre::OverlayContainer* background = nullptr;
+    Ogre::OverlayContainer* fill = nullptr;
+};

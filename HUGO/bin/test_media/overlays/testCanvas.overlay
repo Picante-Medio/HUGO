@@ -1,17 +1,3 @@
-overlay testCanvas/SimpleTest1
-{
-    zorder 10
-
-    overlay_element testCanvas/SimpleTest1/Container Panel
-    {
-        // Center it horizontally, put it at the top
-        left 0.1
-        top 0.2
-        width 0.3
-        height 0.1
-    }
-}
-
 overlay testCanvas/SimpleTest
 {
     zorder 500
@@ -29,12 +15,42 @@ overlay testCanvas/SimpleTest
             top -0.02
             font_name Roboto 
             char_height 0.04 
-            caption Animo chiquis
+            caption Write something
             space_width 0.025
             colour_top 1.0 0.0 1.0 1.0
             colour_bottom 0.0 1.0 1.0 1.0
             horz_align left 
             vert_align center  
+        }
+    }
+}
+
+overlay testCanvas/PBTest
+{
+    zorder 500
+
+    overlay_element testCanvas/PBTest/Container Panel
+    {
+        metrics_mode relative
+        left 0.2
+        top 0.2
+        width 0.3
+        height 0.05
+        overlay_element testCanvas/PBTest/Container/Background Panel
+        {
+            metrics_mode relative
+            left 0
+            top 0
+            width 1
+            height 1
+        }
+        overlay_element testCanvas/PBTest/Container/Fill Panel
+        {
+            metrics_mode relative
+            left 0
+            top 0
+            width 1
+            height 1
         }
     }
 }

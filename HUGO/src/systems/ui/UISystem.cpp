@@ -29,37 +29,68 @@ UISystem::~UISystem()
 // CACHE CREATION
 //====================================================
 
-std::shared_ptr<UIElementCache> UISystem::createElementCache(
+std::shared_ptr<UIElementCache> UISystem::createElementCache(EntityID entity,
     Ogre::Overlay *o, Ogre::OverlayContainer *c, Ogre::OverlayElement *e)
 {
     std::shared_ptr<UIElementCache> cache = std::make_shared<UIElementCache>();
     cache->overlay = o;
     cache->container = c;
     cache->element = e;
+
+    uiCache[entity] =cache;
+
     return cache;
 }
 
-std::shared_ptr<UIElementCache> UISystem::createElementCache(
-    const HUGO::String &overlayName,
-    const HUGO::String &containerName,
-    const HUGO::String &elementName)
+std::shared_ptr<UIElementCache> UISystem::createElementCache(EntityID entity, const HUGO::String &overlayName, const HUGO::String &containerName, const HUGO::String &elementName)
 {
     std::shared_ptr<UIElementCache> cache = std::make_shared<UIElementCache>();
-
-    ErrorOrType<Ogre::Overlay *> overlayResult = OgreOverlayUtils::getOverlay(overlayName);
+    
+    ErrorOrType<Ogre::Overlay*> overlayResult = OgreOverlayUtils::getOverlay(overlayName);
     if (!overlayResult.isError())
         cache->overlay = overlayResult.getValue();
-
-    ErrorOrType<Ogre::OverlayContainer *> containerResult = OgreOverlayUtils::getContainer(containerName);
+    
+    ErrorOrType<Ogre::OverlayContainer*> containerResult = OgreOverlayUtils::getContainer(containerName);
     if (!containerResult.isError())
         cache->container = containerResult.getValue();
-
-    if (!elementName.empty())
-    {
-        ErrorOrType<Ogre::OverlayElement *> elementResult = OgreOverlayUtils::getElement(elementName);
+    
+    if (elementName != ""){
+        ErrorOrType<Ogre::OverlayElement*> elementResult = OgreOverlayUtils::getElement(elementName);
         if (!elementResult.isError())
             cache->element = elementResult.getValue();
     }
+
+    uiCache[entity] = cache;
+    return cache;
+}
+
+std::shared_ptr<UIProgressBarCache> UISystem::createProgressBarCache(
+    EntityID entity,
+    const HUGO::String& overlayName,
+    const HUGO::String& containerName,
+    const HUGO::String& descriptionName) // opcional
+{
+    // create base cache
+    std::shared_ptr<UIElementCache> baseCache = createElementCache(entity, overlayName, containerName, descriptionName);
+    std::shared_ptr<UIProgressBarCache> cache = std::make_shared<UIProgressBarCache>();
+
+    // copy from base cache to cache
+    cache->overlay = baseCache->overlay;
+    cache->container = baseCache->container;
+
+    // set specific elements of progress bar
+    HUGO::String backgroundName = containerName + "/Background";
+    ErrorOrType<Ogre::OverlayElement*> bgResult = OgreOverlayUtils::getElement(backgroundName);
+    if (!bgResult.isError())
+        cache->background = static_cast<Ogre::OverlayContainer*>(bgResult.getValue());
+
+    HUGO::String fillName = containerName + "/Fill";
+    ErrorOrType<Ogre::OverlayElement*> fillResult = OgreOverlayUtils::getElement(fillName);
+    if (!fillResult.isError())
+        cache->fill = static_cast<Ogre::OverlayContainer*>(fillResult.getValue());
+
+    // registry in the map
+    uiCache[entity] = cache;
 
     return cache;
 }
@@ -438,7 +469,7 @@ void UISystem::fixedUpdate(double) {}
 // TEST UI
 //====================================================
 
-const PanelComponent& UISystem::createTestCanvas()
+EntityID UISystem::createTestCanvas()
 {
     EntityID ent = scene->createEntity();
     PanelComponent &panel = scene->addAndGetComponent<PanelComponent>(ent);
@@ -446,18 +477,8 @@ const PanelComponent& UISystem::createTestCanvas()
     panel.overlayName = "testCanvas/SimpleTest";
     panel.containerName = panel.overlayName + "/Container";
 
-    ErrorOrType<Ogre::Overlay *> overlayResult = OgreOverlayUtils::getOverlay(panel.overlayName);
-    if (overlayResult.isError())
-        return panel;
-
-    Ogre::Overlay *overlay = overlayResult.getValue();
-    panel.zOrder = overlay->getZOrder();
-
-    ErrorOrType<Ogre::OverlayContainer *> containerResult = OgreOverlayUtils::getContainer(panel.containerName);
-    if (containerResult.isError())
-        return panel;
-
-    Ogre::OverlayContainer *container = containerResult.getValue();
+    std::shared_ptr<UIElementCache> cache = createElementCache(ent, panel.overlayName, panel.containerName);
+    Ogre::OverlayContainer* container = cache->container;
 
     panel.left = container->getLeft();
     panel.top = container->getTop();
@@ -471,11 +492,8 @@ const PanelComponent& UISystem::createTestCanvas()
 
     panel.isVisible = true;
     scene->addComponent<VisibilityDirtyTag>(ent);
-
-    // insert shared_ptr directly
-    uiCache[ent] = createElementCache(overlay, container);
-
-    return panel;
+    scene->addComponent<PanelDirtyTag>(ent);
+    return ent;
 }
 
 EntityID UISystem::createButton()
@@ -517,15 +535,17 @@ EntityID UISystem::createButton()
 
 EntityID UISystem::createTestText()
 {
-    const PanelComponent &p = createTestCanvas();
-    EntityID ent = p.entity;
+    EntityID ent = scene->createEntity();
+    PanelComponent &panel = scene->addAndGetComponent<PanelComponent>(ent);
     TextComponent &text = scene->addAndGetComponent<TextComponent>(ent);
-    text.textAreaName = p.containerName + "/Text";
-    ErrorOrType<Ogre::OverlayElement *> elementResult = OgreOverlayUtils::getElement(text.textAreaName);
-    if (elementResult.isError())
-        return 0;
+    panel.overlayName = "testCanvas/SimpleTest";
+    panel.containerName = panel.overlayName + "/Container";
+    text.textAreaName = panel.containerName + "/Text";
 
-    Ogre::TextAreaOverlayElement *area = dynamic_cast<Ogre::TextAreaOverlayElement *>(elementResult.getValue());
+    std::shared_ptr<UIElementCache> cache = createElementCache(ent, 
+        panel.overlayName, panel.containerName, text.textAreaName);
+
+    Ogre::TextAreaOverlayElement* area = dynamic_cast<Ogre::TextAreaOverlayElement *>(cache->element);
     if (!area)
         return 0;
 
@@ -540,16 +560,32 @@ EntityID UISystem::createTestText()
     text.colourTop = {ct.r, ct.g, ct.b, ct.a};
     text.colourBottom = {cb.r, cb.g, cb.b, cb.a};
 
-    UIElementCache *cache = getCache(ent);
-    if (cache)
-        cache->element = area;
-
-    // EntityID buttonEntity = createButton(
-    //     "testCanvas/TestButton",  // nombre del overlay
-    //     "Click Me!",              // texto del botón
-    //     0.4f, 0.4f,               // left, top
-    //     0.2f, 0.1f                // width, height
-    // );
-
     return ent;
 }
+<<<<<<< HEAD
+=======
+
+EntityID UISystem::createConsole()
+{
+    EntityID entity = createTestText();
+
+    InputFieldComponent& inputField = scene->addAndGetComponent<InputFieldComponent>(entity);
+    inputField.isActive = false;
+    //inputField.onChangeCallback = [this](const std::string& input) { };
+    HUGO::Input &input = HUGO::Input::Instance();
+    input.registerAction("SubmitInput", SDL_KeyCode::SDLK_RETURN); // for submitting input
+    input.registerAction("EraseInput", SDL_KeyCode::SDLK_BACKSPACE); // for erasing input
+    return entity;
+}
+
+void UISystem::saveConsoleToFile(const std::string& input)
+{
+    std::ofstream file(CONSOLE_HISTORY_FILE, std::ios::app);
+    if (file.is_open()) {
+        file << input << std::endl;
+        file.close();
+    }else{
+        std::cout << "No se pudo abrir el txt de la consola\n";
+    }
+}
+>>>>>>> e9f6947 (crear barra de progreso)
