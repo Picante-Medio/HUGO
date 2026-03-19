@@ -31,6 +31,7 @@ void ConsoleSystem::update(double dt){
     // Letras color blanco
     PrintLogs();
 
+    std::cout << "Consola\n";
 }
 
 void ConsoleSystem::fixedUpdate(double dt){
