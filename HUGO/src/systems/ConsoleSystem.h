@@ -2,12 +2,17 @@
 
 #include "HugoSystemMacros.h"
 
+class TextComponent;
+
 HSYSTEM(ConsoleSystem)
 
     std::deque<HUGO::String> history;
+    EntityID console;
 
-    void PrintLogs();
-    void PrintErrors();
+    void printLogs(TextComponent& consoleText);
+    void printErrors(TextComponent& consoleText);
+
+    void receiveInput(const HUGO::String& input);
     
 public:
 

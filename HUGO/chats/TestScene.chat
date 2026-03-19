@@ -5,3 +5,4 @@ SYSTEM RenderSystem
 SYSTEM UISystem
 SYSTEM PhysicsTestSystem
 SYSTEM TestSystem
+SYSTEM ConsoleSystem
