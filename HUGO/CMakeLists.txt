@@ -288,10 +288,9 @@ endif ()
 
 ################## Juego de prueba
 
-add_library(TestGame MODULE 
-    ${CMAKE_SOURCE_DIR}/TestGame/GameEntryPoint.cpp
-    ${CMAKE_SOURCE_DIR}/TestGame/TestSystem.cpp
-    ${CMAKE_SOURCE_DIR}/TestGame/PhysicsTestSystem.cpp)
+file(GLOB_RECURSE TestGame_SRC_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/TestGame/*.cpp)
+
+add_library(TestGame MODULE ${TestGame_SRC_FILES})
 enable_warnings(TestGame)
 
 set_target_properties(TestGame PROPERTIES
