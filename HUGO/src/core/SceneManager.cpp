@@ -102,6 +102,17 @@ void SceneManager::setCurrentScene(const HUGO::String& sceneName){
     m_currentScene = m_sceneMap[sceneName];
 }
 
+ErrorOrVoid SceneManager::setMainScene(){
+    ErrorOrType<HUGO::String> err = m_chatParser.getMainSceneName();
+
+    if (err.isError()) return ErrorOrVoid(err.getError());
+
+    setCurrentScene(err.getValue());
+
+    return ErrorOrVoid();
+
+}
+
 void SceneManager::updateCurrentScene(double dt){
     m_currentScene->update(dt);
 }

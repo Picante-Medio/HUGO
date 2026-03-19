@@ -2,4 +2,4 @@ PREFAB
 
 Alfonso 0
 	COMPONENT MeshRendererComponent
-		[mesh] STRING res://sphere.tres
+		STRING mesh res://sphere.tres

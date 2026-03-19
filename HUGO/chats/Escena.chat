@@ -2,29 +2,29 @@ SCENE Escena1
 
 ENTITY Juan 0
 	COMPONENT TransformComponent
-		[position] VECTOR_3 0.56475341320038 0.0 0.0
-		[rotation] VECTOR_3 0.0 0.0 0.0
-		[scale] VECTOR_3 1.0 1.0 1.0
+		VECTOR_3 position 0.56475341320038 0.0 0.0
+		VECTOR_3 rotation 0.0 0.0 0.0
+		VECTOR_3 scale 1.0 1.0 1.0
 
 ENTITY Guille 1
 	COMPONENT ParentComponent
-		[value] INT 0
+		INT value 0
 	COMPONENT MeshRendererComponent
-		[mesh] STRING res://sphere.tres
+		STRING mesh res://sphere.tres
 	COMPONENT AudioComponent
-		[audioId] INT 0
-		[volume] FLOAT 0.0
-		[pitch] FLOAT 0.0
+		INT audioId 0
+		FLOAT volume 0.0
+		FLOAT pitch 0.0
 
 ENTITY Entity 2
 
 ENTITY Alfonso 3
 	COMPONENT ParentComponent
-		[value] INT 2
+		INT value 2
 	COMPONENT MeshRendererComponent
-		[mesh] STRING res://sphere.tres
+		STRING mesh res://sphere.tres
 
 ENTITY David 4
 	COMPONENT ParentComponent
-		[value] INT 3
+		INT value 3
 

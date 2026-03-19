@@ -6,11 +6,16 @@
 
 #include "Core.h"
 #include "Scene.h"
+#include <iostream>
 
 int main(int argc, char* argv[]) {
 
     HUGO::Core core = HUGO::Core();
-    core.init();
-    core.run();
+    ErrorOrVoid err = core.init();
+    
+    if(err.isError()) std::cerr << "[ERROR] Initializing HUGO::Core: {" << err.getError().errorMessage << "}. HUGO Engine will be closing now." << '\n';
+    else{
+        core.run();
+    }
     return 0;
 }

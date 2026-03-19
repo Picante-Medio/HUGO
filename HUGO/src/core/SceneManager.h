@@ -9,6 +9,7 @@
 class Scene;
 class IPhysicsModule;
 class SceneManager{
+
     HUGO::ChatParser m_chatParser;
     //Scene map that stores created game scenes.
     std::unordered_map<HUGO::String, std::shared_ptr<Scene>> m_sceneMap;
@@ -37,6 +38,10 @@ public:
     void setCurrentScene(const HUGO::String& sceneName);
     void setCurrentSceneLUA(const HUGO::String sceneName);
 
+    //When SceneManager is initialized, this is called to load and set the main scene of the game. It should be declared through HUGODOT.
+    ErrorOrVoid setMainScene();
+
+    //---Updates and fixedUpdates of current Scene
     void updateCurrentScene(double dt);
     void fixedUpdateCurrentScene(double dt);
 };

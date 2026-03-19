@@ -7,6 +7,7 @@
 #include "OgreModule.h"
 #include "MiniaudioModule.h"
 #include "IPhysicsModule.h"
+#include "HugoError.h"
 
 #include "SceneManager.h"
 
@@ -36,7 +37,7 @@ namespace HUGO {
 
     public:
         Core();
-        void init();
+        ErrorOrVoid init();
 
         void run();
     };

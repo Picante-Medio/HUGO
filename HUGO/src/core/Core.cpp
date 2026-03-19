@@ -37,7 +37,7 @@ Core::Core(): sceneManager()
 }
 
 //Initialization of HUGO modules and loading of games dynamic lib
-void Core::init(){
+ErrorOrVoid Core::init(){
 
     // Inicializar registro de componentes
     ComponentRegistry::setInstance(std::make_shared<ComponentRegistryInitializer>());
@@ -51,40 +51,19 @@ void Core::init(){
     initModules();
 
     ErrorOrVoid err = sceneManager.initializeParser("../chats", physicsModule);
+
+    if(err.isError()) return err;
     
-    sceneManager.setCurrentScene("TestScene");
-    
-    /*scenePtr = std::make_shared<Scene>();
 
-    ChatParser chatParser = ChatParser();
-    ErrorOrVoid err = chatParser.readChatFolder("../chats");
-
-    std::shared_ptr<AudioSystem> audioSystem = std::make_shared<AudioSystem>(scenePtr);
-    audioSystem->init();
-
-    //audioSystem->loadAudiosFromFile("AudioList.txt");
-    scenePtr->addSystem(audioSystem);
-    
-    std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(scenePtr);
-    renderSystem->init();
-    scenePtr->addSystem(renderSystem);
-
-    std::shared_ptr<UISystem> uiSystem = std::make_shared<UISystem>(scenePtr);
-    uiSystem->init();
-    scenePtr->addSystem(uiSystem);
-    //uiSystem->createTestCanvas();
-
-    
-    //m_resourceManager = std::make_shared<HUGO::ResourceManager>(maEngine, m_ogreRoot);
-
-    // Physics testing
-    physicsModule->createSceneSimulation(scenePtr);
-    std::shared_ptr<PhysicsTestSystem> testSystem = std::make_shared<PhysicsTestSystem>(scenePtr);
-    testSystem->init();
-    scenePtr->addSystem(testSystem);
+    /*
+        Should be changed when implemented in GODOT to:
+        
+        err = sceneManager.setMainScene();
+        if(err.isError()) return err;
     */
+    sceneManager.setCurrentScene("TestScene");
 
-
+    return ErrorOrVoid();
 }
 
 //--------------------------- IMODULES INITIALIZATION --------------------

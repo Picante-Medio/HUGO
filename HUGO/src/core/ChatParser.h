@@ -32,12 +32,14 @@ namespace HUGO{
 		//Data that can be queried
 		std::unordered_map<HUGO::String, SceneData> m_sceneData;
 		std::unordered_map<HUGO::String, EntityData> m_prefabData;
+		//Game's starting scene
+		HUGO::String m_mainScene;
 
 		//Open .chat file and read it
 		ErrorOrVoid readChat(const HUGO::String& chatPath);
 
-		//Read previously opened file as Scene
-		ErrorOrVoid handleSceneType();
+		//Read previously opened file as Scene. If it is the main Scene it will store its name in m_mainScene
+		ErrorOrVoid handleSceneType(bool isMainScene);
 		//Read previously opened file as Prefab
 		ErrorOrVoid handlePrefabType();
 	public:
@@ -54,6 +56,8 @@ namespace HUGO{
 
 		//Returns scene data associated with sceneName
 		ErrorOrType<SceneData> getSceneData(const HUGO::String& sceneName);
+
+		ErrorOrType<HUGO::String> getMainSceneName();
 	};
 
 }

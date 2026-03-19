@@ -52,10 +52,16 @@ ErrorOrVoid ChatParser::readChat(const HUGO::String& chatPath){
 
     ErrorOrVoid err = ErrorOrVoid();
     if(chatType == "SCENE"){
-        err = handleSceneType();
+        err = handleSceneType(false);
     }
     else if(chatType == "PREFAB"){
         err = handlePrefabType();
+    }
+    else if(chatType == "MAIN"){
+        //It must be "SCENE", otherwise we are doing it wrong. 
+        std::cin >> chatType;
+
+        err = handleSceneType(true);
     }
 
     std::cin.rdbuf(cinbuf);
@@ -149,11 +155,14 @@ ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData& comp
 
 #pragma endregion
 
-ErrorOrVoid ChatParser::handleSceneType(){
+ErrorOrVoid ChatParser::handleSceneType(bool isMainScene){
     std::cin.get();
 
     HUGO::String sceneName;
     getline(std::cin, sceneName);
+
+    //Stores name in m_mainScene for future first loading.
+    if(isMainScene) m_mainScene = sceneName;
 
     //Initialize scene data of name sceneName
     m_sceneData[sceneName].entities = std::vector<EntityData>();
@@ -248,4 +257,10 @@ ErrorOrType<SceneData> ChatParser::getSceneData(const HUGO::String & sceneName){
         return ErrorOrType<SceneData>(StringError{HUGO::String("Queried scene named " + sceneName + " doesn't exist")});
 
     return ErrorOrType<SceneData>(res->second);
+}
+
+ErrorOrType<HUGO::String> ChatParser::getMainSceneName(){
+    if(m_mainScene.empty()) return ErrorOrType<HUGO::String>(StringError{"MainScene is not set"});
+
+    return ErrorOrType<HUGO::String>(m_mainScene);
 }
