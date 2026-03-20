@@ -30,7 +30,7 @@ T lua_get(lua_State* lua, int idx) {
     else if constexpr (std::is_same_v<T, HUGO::String> || std::is_same_v<T, std::string>)
         return HUGO::String(luaL_checkstring(lua, idx));
     else
-        static_assert(sizeof(T) == 0, "Lua: You should only declare functions with parameters of basic types that lua can read");
+        throw "Lua: You should only declare functions with parameters of basic types that lua can read";
 }
 
 template<typename T>
