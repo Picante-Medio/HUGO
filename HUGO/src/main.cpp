@@ -4,7 +4,8 @@
 #include "Core.h"
 #include <iostream>
 
-int main() {
+// Aunque de warning esto no puede borrarse, en windows no compila porque SDL busca esta implementacion
+int main(int argc, char* argv[]) {
 
     HUGO::Core core = HUGO::Core();
     ErrorOrVoid err = core.init();
