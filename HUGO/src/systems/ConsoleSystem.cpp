@@ -4,6 +4,8 @@
 #include "PanelComponent.h"
 #include "TextComponent.h"
 #include "InputFieldComponent.h"
+#include "LuaBinder.h"
+
 #include <iostream>
 
 void ConsoleSystem::printLogs(TextComponent& consoleText){
@@ -45,10 +47,17 @@ void ConsoleSystem::receiveInput(const HUGO::String& input){
     }
     else command = input;
 
-    // TODO Hacer que ejecute el comando y devuelva valores si es necesario
+    if(expectsReturn){
+        if(type == "int");
+        else if(type == "float");
+        else if (type == "bool");
+        else if (type == "string");
+        else scene->log(std::shared_ptr<Error>(new StringError("LUA: Invalid return type")));
+    }
+    else LuaBinder::Instance().interpretString(command);
 }
 
-void ConsoleSystem::update(double dt){
+void ConsoleSystem::update(double){
 
     TextComponent& consoleText = scene->getComponent<TextComponent>(console);
 
@@ -61,7 +70,7 @@ void ConsoleSystem::update(double dt){
     printErrors(consoleText);
 }
 
-void ConsoleSystem::fixedUpdate(double dt){
+void ConsoleSystem::fixedUpdate(double){
 
 }
 
