@@ -45,10 +45,6 @@ std::shared_ptr<UIElementCache> createElementCache(EntityID entity, Ogre::Overla
     Ogre::OverlayContainer* c, Ogre::OverlayElement* e = nullptr);
 std::shared_ptr<UIElementCache> createElementCache(EntityID entity, const HUGO::String& overlayName,
     const HUGO::String& containerName, const HUGO::String& elementName = "");
-
-std::shared_ptr<UIProgressBarCache> createProgressBarCache(EntityID entity,
-    const HUGO::String& overlayName, const HUGO::String& containerName, 
-    const HUGO::String& descriptionName); 
 UIElementCache* getCache(EntityID entity);
 
 //====================================================
@@ -90,10 +86,10 @@ void clearAllCaches();
 //====================================================
 // TEST UI
 //====================================================
-const PanelComponent& createTestCanvas();
-EntityID createTestText();
+EntityID createPanel(const HUGO::String& overlayName);
+EntityID createText(const HUGO::String& overlayName);
 EntityID createButton();
-
+EntityID createProgressBar(const HUGO::String& overlayName);
 public:
 
 virtual ~UISystem();

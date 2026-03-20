@@ -8,6 +8,7 @@
 #include <OgreOverlayElement.h>
 #include <OgreTextAreaOverlayElement.h>
 
+#include <vector>
 // auxiliar TADS for each UI element
 
 struct UIElementCache
@@ -15,16 +16,11 @@ struct UIElementCache
     Ogre::Overlay* overlay = nullptr;
     Ogre::OverlayContainer* container = nullptr;
     Ogre::OverlayElement* element = nullptr;
+    virtual ~UIElementCache() = default;
 };
 
 struct UIButtonCache : public UIElementCache
 {
     //Ogre::BorderPanelOverlayElement* panel = nullptr;
     Ogre::TextAreaOverlayElement* textArea = nullptr;
-};
-
-struct UIProgressBarCache : public UIElementCache
-{
-    Ogre::OverlayContainer* background = nullptr;
-    Ogre::OverlayContainer* fill = nullptr;
 };

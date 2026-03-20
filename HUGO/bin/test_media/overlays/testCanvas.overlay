@@ -29,28 +29,16 @@ overlay testCanvas/PBTest
 {
     zorder 500
 
-    overlay_element testCanvas/PBTest/Container Panel
+    overlay_element testCanvas/PBTest/Background Panel
     {
         metrics_mode relative
         left 0.2
         top 0.2
         width 0.3
         height 0.05
-        overlay_element testCanvas/PBTest/Container/Background Panel
+        overlay_element testCanvas/PBTest/Fill Panel
         {
             metrics_mode relative
-            left 0
-            top 0
-            width 1
-            height 1
-        }
-        overlay_element testCanvas/PBTest/Container/Fill Panel
-        {
-            metrics_mode relative
-            left 0
-            top 0
-            width 1
-            height 1
         }
     }
 }

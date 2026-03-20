@@ -5,9 +5,11 @@
 #include "ButtonComponent.h"
 #include "ConsoleComponent.h"
 #include "InputFieldComponent.h"
+#include "ProgressBarComponent.h"
 #include "Input.h"
 #include <SDL.h>
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 
@@ -61,37 +63,6 @@ std::shared_ptr<UIElementCache> UISystem::createElementCache(EntityID entity, co
     }
 
     uiCache[entity] = cache;
-    return cache;
-}
-
-std::shared_ptr<UIProgressBarCache> UISystem::createProgressBarCache(
-    EntityID entity,
-    const HUGO::String& overlayName,
-    const HUGO::String& containerName,
-    const HUGO::String& descriptionName) // opcional
-{
-    // create base cache
-    std::shared_ptr<UIElementCache> baseCache = createElementCache(entity, overlayName, containerName, descriptionName);
-    std::shared_ptr<UIProgressBarCache> cache = std::make_shared<UIProgressBarCache>();
-
-    // copy from base cache to cache
-    cache->overlay = baseCache->overlay;
-    cache->container = baseCache->container;
-
-    // set specific elements of progress bar
-    HUGO::String backgroundName = containerName + "/Background";
-    ErrorOrType<Ogre::OverlayElement*> bgResult = OgreOverlayUtils::getElement(backgroundName);
-    if (!bgResult.isError())
-        cache->background = static_cast<Ogre::OverlayContainer*>(bgResult.getValue());
-
-    HUGO::String fillName = containerName + "/Fill";
-    ErrorOrType<Ogre::OverlayElement*> fillResult = OgreOverlayUtils::getElement(fillName);
-    if (!fillResult.isError())
-        cache->fill = static_cast<Ogre::OverlayContainer*>(fillResult.getValue());
-
-    // registry in the map
-    uiCache[entity] = cache;
-
     return cache;
 }
 
@@ -222,6 +193,59 @@ void UISystem::processPanelChanges()
     }
 }
 
+void UISystem::syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr)
+{
+    EntityID entity = p.entity;
+    std::shared_ptr<UIElementCache> cache = uiCache[entity];
+    if (!cache || !cache->container || !cache->element) return;
+
+    cache->container->setWidth(p.width);
+    cache->container->setHeight(p.height);
+    // calculate percentaje
+
+    //testing
+    HUGO::Float percent = (pr.currentValue - pr.minValue) / (pr.maxValue - pr.minValue);
+    percent = std::clamp(percent, 0.0f, 1.0f);
+
+    // sync fill
+    switch (pr.fillMode)
+    {
+        case ProgressBarComponent::HORIZONTAL_LEFT_TO_RIGHT:
+            cache->element->setLeft(0.0f);
+            cache->element->setWidth(p.width * pr.fillWidth * percent);
+            cache->element->setTop(0.0f);
+            cache->element->setHeight(p.height * pr.fillHeight);
+            break;
+
+        case ProgressBarComponent::HORIZONTAL_RIGHT_TO_LEFT:
+            cache->element->setLeft(p.width * pr.fillWidth * (1.0f - percent));
+            cache->element->setWidth(p.width * pr.fillWidth *percent);
+            cache->element->setTop(0.0f);
+            cache->element->setHeight(p.height * pr.fillHeight);
+            break;
+
+        case ProgressBarComponent::VERTICAL_BOTTOM_TO_TOP:
+            cache->element->setTop(p.height * pr.fillHeight * (1.0f - percent));
+            cache->element->setHeight(p.height * pr.fillWidth * percent);
+            cache->element->setLeft(0.0f);
+            cache->element->setWidth(p.width* pr.fillWidth);
+            break;
+
+        case ProgressBarComponent::VERTICAL_TOP_TO_BOTTOM:
+            cache->element->setTop(0.0f);
+            cache->element->setHeight(p.height *pr.fillHeight * percent);
+            cache->element->setLeft(0.0f);
+            cache->element->setWidth(p.width * pr.fillWidth);
+            break;
+    }
+    // optional: sync colores/materiales
+    if (!pr.fillMaterial.empty())
+        cache->element->setMaterialName(pr.fillMaterial);
+
+    if (!p.material.empty())
+        cache->container->setMaterialName(p.material);
+}
+
 void UISystem::processVisibility()
 {
     for (auto &pack : scene->query<PanelComponent, VisibilityDirtyTag>())
@@ -235,6 +259,10 @@ void UISystem::processVisibility()
             {
                 cache->overlay->show();
                 cache->container->show();
+                // hide all children overlay element
+                for (auto child : cache->container->getChildren())
+                    child.second->hide();
+
                 if (cache->element)
                     cache->element->show();
             }
@@ -434,6 +462,20 @@ void UISystem::processInput()
     input.toggleTextInput(anyFieldActive);
 }
 
+void UISystem::processProgressBarChanges()
+{
+    for (auto &pack : scene->query<PanelComponent, ProgressBarComponent, ProgressBarDirtyTag>())
+    {
+        PanelComponent& panel = pack.get<PanelComponent&>();
+        ProgressBarComponent& pr = pack.get<ProgressBarComponent&>();
+        //ProgressBarDirtyTag& tag = pack.get<ProgressBarDirtyTag &>();
+        pr.currentValue = std::min(pr.maxValue, pr.currentValue + 0.1f);
+        //syncText(panel, text, tag);
+        syncProgressBar(panel, pr);
+        //scene->removeComponent<ProgressBarDirtyTag>(tag.entity);
+    }
+}
+
 //====================================================
 // CACHE MANAGEMENT
 //====================================================
@@ -461,6 +503,7 @@ void UISystem::update(double)
     processTextChanges();
     processVisibility();
     processInput();
+    processProgressBarChanges();
 }
 
 void UISystem::fixedUpdate(double) {}
@@ -469,123 +512,160 @@ void UISystem::fixedUpdate(double) {}
 // TEST UI
 //====================================================
 
-EntityID UISystem::createTestCanvas()
+EntityID UISystem::createPanel(const HUGO::String& overlayName)
 {
     EntityID ent = scene->createEntity();
-    PanelComponent &panel = scene->addAndGetComponent<PanelComponent>(ent);
+    PanelComponent& panel = scene->addAndGetComponent<PanelComponent>(ent);
 
-    panel.overlayName = "testCanvas/SimpleTest";
-    panel.containerName = panel.overlayName + "/Container";
+    // assign names
+    panel.overlayName = overlayName;
+    panel.containerName = overlayName + "/Container";
 
+    // create cache
     std::shared_ptr<UIElementCache> cache = createElementCache(ent, panel.overlayName, panel.containerName);
     Ogre::OverlayContainer* container = cache->container;
 
-    panel.left = container->getLeft();
-    panel.top = container->getTop();
-    panel.width = container->getWidth();
+    if (!container)
+        return 0;
+
+    // initialize panel from OGRE values
+    panel.left   = container->getLeft();
+    panel.top    = container->getTop();
+    panel.width  = container->getWidth();
     panel.height = container->getHeight();
+
     panel.metricsMode = OgreUtils::toHugo(container->getMetricsMode());
-    panel.alignmentX = OgreUtils::toHugo(container->getHorizontalAlignment());
-    panel.alignmentY = OgreUtils::toHugo(container->getVerticalAlignment());
-    panel.material = "UI/Test";
-    container->setMaterialName(panel.material);
+    panel.alignmentX  = OgreUtils::toHugo(container->getHorizontalAlignment());
+    panel.alignmentY  = OgreUtils::toHugo(container->getVerticalAlignment());
 
     panel.isVisible = true;
+
+    // mark dirty for sync
     scene->addComponent<VisibilityDirtyTag>(ent);
     scene->addComponent<PanelDirtyTag>(ent);
+
     return ent;
 }
 
 EntityID UISystem::createButton()
 {
-    EntityID entity = createTestText();
-    ButtonComponent& button = scene->addAndGetComponent<ButtonComponent>(entity);
-    button.state = HUGO::ButtonStateTypes::BS_UP;
+    EntityID entity = 1;
+    // ButtonComponent& button = scene->addAndGetComponent<ButtonComponent>(entity);
+    // button.state = HUGO::ButtonStateTypes::BS_UP;
 
-    // ErrorOrType<Ogre::Overlay*> overlayResult = OgreOverlayUtils::getOverlay(overlayName);
-    // ErrorOrType<Ogre::OverlayContainer*> containerResult = OgreOverlayUtils::getContainer(button.containerName);
-    // ErrorOrType<Ogre::OverlayElement*> elementResult = OgreOverlayUtils::getElement(button.textAreaName);
+    // // ErrorOrType<Ogre::Overlay*> overlayResult = OgreOverlayUtils::getOverlay(overlayName);
+    // // ErrorOrType<Ogre::OverlayContainer*> containerResult = OgreOverlayUtils::getContainer(button.containerName);
+    // // ErrorOrType<Ogre::OverlayElement*> elementResult = OgreOverlayUtils::getElement(button.textAreaName);
 
-    // if (!overlayResult.isError() && !containerResult.isError()) {
-    //     Ogre::Overlay* overlay = overlayResult.getValue();
-    //     Ogre::OverlayContainer* container = containerResult.getValue();
-    //     Ogre::OverlayElement* element = elementResult.isError() ? nullptr : elementResult.getValue();
+    // // if (!overlayResult.isError() && !containerResult.isError()) {
+    // //     Ogre::Overlay* overlay = overlayResult.getValue();
+    // //     Ogre::OverlayContainer* container = containerResult.getValue();
+    // //     Ogre::OverlayElement* element = elementResult.isError() ? nullptr : elementResult.getValue();
 
-    //     button.zOrder = overlay->getZOrder();
-    //     button.metricsMode = OgreUtils::toHugo(container->getMetricsMode());
+    // //     button.zOrder = overlay->getZOrder();
+    // //     button.metricsMode = OgreUtils::toHugo(container->getMetricsMode());
 
-    //     uiCache[entity] = createElementCache(overlay, container, element);
+    // //     uiCache[entity] = createElementCache(overlay, container, element);
 
-    //     container->setMaterialName(button.normalMaterial);
+    // //     container->setMaterialName(button.normalMaterial);
 
-    //     if (element) {
-    //         Ogre::TextAreaOverlayElement* textArea = dynamic_cast<Ogre::TextAreaOverlayElement*>(element);
-    //         if (textArea) {
-    //             textArea->setCaption(text);
-    //             textArea->setCharHeight(button.textSize);
-    //             if (!button.fontName.empty())textArea->setFontName(button.fontName);
-    //         }
-    //     }
+    // //     if (element) {
+    // //         Ogre::TextAreaOverlayElement* textArea = dynamic_cast<Ogre::TextAreaOverlayElement*>(element);
+    // //         if (textArea) {
+    // //             textArea->setCaption(text);
+    // //             textArea->setCharHeight(button.textSize);
+    // //             if (!button.fontName.empty())textArea->setFontName(button.fontName);
+    // //         }
+    // //     }
 
-    //     scene->addComponent<VisibilityDirtyTag>(entity);
-    // }
+    // //     scene->addComponent<VisibilityDirtyTag>(entity);
+    // // }
 
     return entity;
 }
 
-EntityID UISystem::createTestText()
+EntityID UISystem::createText(const HUGO::String& overlayName)
 {
-    EntityID ent = scene->createEntity();
-    PanelComponent &panel = scene->addAndGetComponent<PanelComponent>(ent);
-    TextComponent &text = scene->addAndGetComponent<TextComponent>(ent);
-    panel.overlayName = "testCanvas/SimpleTest";
-    panel.containerName = panel.overlayName + "/Container";
+    EntityID ent = createPanel(overlayName);
+
+    PanelComponent& panel = scene->getComponent<PanelComponent>(ent);
+    TextComponent& text   = scene->addAndGetComponent<TextComponent>(ent);
+
     text.textAreaName = panel.containerName + "/Text";
 
-    std::shared_ptr<UIElementCache> cache = createElementCache(ent, 
-        panel.overlayName, panel.containerName, text.textAreaName);
+    UIElementCache* cache = getCache(ent);
 
-    Ogre::TextAreaOverlayElement* area = dynamic_cast<Ogre::TextAreaOverlayElement *>(cache->element);
+    ErrorOrType<Ogre::OverlayElement*> elementResult = OgreOverlayUtils::getElement(text.textAreaName);
+    if (!elementResult.isError())
+        cache->element = elementResult.getValue();
+
+    Ogre::TextAreaOverlayElement* area = dynamic_cast<Ogre::TextAreaOverlayElement*>(cache->element);
     if (!area)
         return 0;
 
-    text.characterHeight = area->getCharHeight();
+    // initialize from OGRE
     text.text = area->getCaption();
+    text.characterHeight = area->getCharHeight();
 
-    Ogre::ColourValue c = area->getColour();
-    Ogre::ColourValue ct = area->getColourTop();
-    Ogre::ColourValue cb = area->getColourBottom();
+    const Ogre::ColourValue& c  = area->getColour();
+    const Ogre::ColourValue& ct = area->getColourTop();
+    const Ogre::ColourValue& cb = area->getColourBottom();
 
-    text.colour = {c.r, c.g, c.b, c.a};
-    text.colourTop = {ct.r, ct.g, ct.b, ct.a};
+    text.colour       = {c.r,  c.g,  c.b,  c.a};
+    text.colourTop    = {ct.r, ct.g, ct.b, ct.a};
     text.colourBottom = {cb.r, cb.g, cb.b, cb.a};
+
+    scene->addComponent<TextDirtyTag>(ent);
 
     return ent;
 }
-<<<<<<< HEAD
-=======
 
-EntityID UISystem::createConsole()
+EntityID UISystem::createProgressBar(const HUGO::String& overlayName)
 {
-    EntityID entity = createTestText();
+    EntityID ent = scene->createEntity();
 
-    InputFieldComponent& inputField = scene->addAndGetComponent<InputFieldComponent>(entity);
-    inputField.isActive = false;
-    //inputField.onChangeCallback = [this](const std::string& input) { };
-    HUGO::Input &input = HUGO::Input::Instance();
-    input.registerAction("SubmitInput", SDL_KeyCode::SDLK_RETURN); // for submitting input
-    input.registerAction("EraseInput", SDL_KeyCode::SDLK_BACKSPACE); // for erasing input
-    return entity;
+    PanelComponent& panel = scene->addAndGetComponent<PanelComponent>(ent);
+    ProgressBarComponent& pr = scene->addAndGetComponent<ProgressBarComponent>(ent);
+
+    // assign names
+    panel.overlayName = overlayName;
+    panel.containerName = overlayName + "/Background";
+    pr.fillElementName = overlayName + "/Fill";
+    pr.fillMode = ProgressBarComponent::FillMode::HORIZONTAL_LEFT_TO_RIGHT;
+    // create cache
+    std::shared_ptr<UIElementCache> cache = createElementCache(ent, 
+        panel.overlayName, panel.containerName, pr.fillElementName);
+
+    if (!cache || !cache->container || !cache->element)
+        return 0;
+
+    // initialize background from OGRE
+    panel.left   = cache->container->getLeft();
+    panel.top    = cache->container->getTop();
+    panel.width  = cache->container->getWidth();
+    panel.height = cache->container->getHeight();
+
+    panel.metricsMode = OgreUtils::toHugo(cache->container->getMetricsMode());
+    panel.alignmentX  = OgreUtils::toHugo(cache->container->getHorizontalAlignment());
+    panel.alignmentY  = OgreUtils::toHugo(cache->container->getVerticalAlignment());
+
+    panel.isVisible = true;
+
+    // initialize progress bar defaults
+    pr.currentValue = pr.minValue;
+
+    // materials
+    panel.material = "UI/Test";
+    pr.fillMaterial = "UI/Test2";
+    
+    pr.fillWidth = cache->element->getWidth();
+    pr.fillHeight = cache->element->getHeight();
+
+    // mark dirty
+    scene->addComponent<PanelDirtyTag>(ent);
+    scene->addComponent<VisibilityDirtyTag>(ent);
+    scene->addComponent<ProgressBarDirtyTag>(ent);
+
+    return ent;
 }
 
-void UISystem::saveConsoleToFile(const std::string& input)
-{
-    std::ofstream file(CONSOLE_HISTORY_FILE, std::ios::app);
-    if (file.is_open()) {
-        file << input << std::endl;
-        file.close();
-    }else{
-        std::cout << "No se pudo abrir el txt de la consola\n";
-    }
-}
->>>>>>> e9f6947 (crear barra de progreso)
