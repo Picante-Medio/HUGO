@@ -286,7 +286,7 @@ ErrorOrVoid UISystem::processComponentCreations()
     {
         PanelComponent &panel = pack.get<PanelComponent &>();
         CreatePanelDirtyTag &tag = pack.get<CreatePanelDirtyTag &>();
-        
+        EntityID entity = panel.entity;
         ErrorOrType<Ogre::Overlay *> overlayResult = OgreOverlayUtils::getOverlay(panel.overlayName);
         if (overlayResult.isError())
             return ErrorOrVoid("[UISystem] Panel entity " + std::to_string(panel.entity) + " missing overlay");;
@@ -312,7 +312,7 @@ ErrorOrVoid UISystem::processComponentCreations()
         container->setMaterialName(panel.material);
         scene->addComponent<VisibilityDirtyTag>(panel.entity);
         // insert shared_ptr directly
-        uiCache[panel.entity] = createElementCache(overlay, container);
+        createElementCache(entity, overlay, container);
         syncPanel(panel);
         scene->removeComponent<CreatePanelDirtyTag>(tag.entity);
     }
