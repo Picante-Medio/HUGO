@@ -107,9 +107,9 @@ void UISystem::syncPanel(const PanelComponent &p)
         cache->container->setMaterialName(p.material);
 }
 
-void UISystem::syncText(const PanelComponent &p, const TextComponent &t)
+void UISystem::syncText(const TextComponent &t)
 {
-    UIElementCache *cache = getCache(p.entity);
+    UIElementCache *cache = getCache(t.entity);
     if (!cache)
         return;
 
@@ -181,6 +181,15 @@ void UISystem::syncButton(const ButtonComponent &b)
 //====================================================
 // PROCESSING
 //====================================================
+void UISystem::processPanelChanges()
+{
+   for (auto &pack : scene->query<PanelComponent, PanelDirtyTag>())
+    {
+        PanelComponent& panel = pack.get<PanelComponent&>();
+        syncPanel(panel);
+        scene->removeComponent<PanelDirtyTag>(panel.entity);
+    }
+}
 
 void UISystem::processVisibility()
 {
@@ -211,27 +220,93 @@ void UISystem::processVisibility()
     }
 }
 
-void UISystem::processPanelChanges()
+
+ErrorOrVoid UISystem::processComponentCreations()
 {
-    for (auto &pack : scene->query<PanelComponent, PanelDirtyTag>())
+    for (auto &pack : scene->query<PanelComponent, CreatePanelDirtyTag>())
     {
         PanelComponent &panel = pack.get<PanelComponent &>();
-        PanelDirtyTag &tag = pack.get<PanelDirtyTag &>();
-        //syncPanel(panel, tag);
+        CreatePanelDirtyTag &tag = pack.get<CreatePanelDirtyTag &>();
+        
+        ErrorOrType<Ogre::Overlay *> overlayResult = OgreOverlayUtils::getOverlay(panel.overlayName);
+        if (overlayResult.isError())
+            return ErrorOrVoid("[UISystem] Panel entity " + std::to_string(panel.entity) + " missing overlay");;
+
+        Ogre::Overlay *overlay = overlayResult.getValue();
+        panel.zOrder = overlay->getZOrder();
+
+        ErrorOrType<Ogre::OverlayContainer *> containerResult = OgreOverlayUtils::getContainer(panel.containerName);
+        if (containerResult.isError())
+            return ErrorOrVoid("[UISystem] Panel entity " + std::to_string(panel.entity) + " missing container");
+
+
+        Ogre::OverlayContainer *container = containerResult.getValue();
+
+        panel.left = container->getLeft();
+        panel.top = container->getTop();
+        panel.width = container->getWidth();
+        panel.height = container->getHeight();
+        panel.metricsMode = OgreUtils::toHugo(container->getMetricsMode());
+        panel.alignmentX = OgreUtils::toHugo(container->getHorizontalAlignment());
+        panel.alignmentY = OgreUtils::toHugo(container->getVerticalAlignment());
+        
+        container->setMaterialName(panel.material);
+        scene->addComponent<VisibilityDirtyTag>(panel.entity);
+        // insert shared_ptr directly
+        uiCache[panel.entity] = createElementCache(overlay, container);
         syncPanel(panel);
-        scene->removeComponent<PanelDirtyTag>(tag.entity);
+        scene->removeComponent<CreatePanelDirtyTag>(tag.entity);
     }
+    
+    for (auto &pack : scene->query<CreateTextDirtyTag, TextComponent, PanelComponent>())
+    {
+        TextComponent &text = pack.get<TextComponent &>();
+        CreateTextDirtyTag &tag = pack.get<CreateTextDirtyTag &>();
+
+        ErrorOrType<Ogre::OverlayElement *> elementResult = OgreOverlayUtils::getElement(text.textAreaName);
+        if (elementResult.isError())
+            return ErrorOrVoid("[UISystem] Text entity " + std::to_string(text.entity) + " missing element");
+
+        Ogre::TextAreaOverlayElement *area = dynamic_cast<Ogre::TextAreaOverlayElement *>(elementResult.getValue());
+        if (!area)
+            return ErrorOrVoid("[UISystem] Text entity " + std::to_string(text.entity) + " missing container TextAreaOverlayElement");
+
+        text.characterHeight = area->getCharHeight();
+        text.text = area->getCaption();
+
+        Ogre::ColourValue c = area->getColour();
+        Ogre::ColourValue ct = area->getColourTop();
+        Ogre::ColourValue cb = area->getColourBottom();
+
+        text.colour = {c.r, c.g, c.b, c.a};
+        text.colourTop = {ct.r, ct.g, ct.b, ct.a};
+        text.colourBottom = {cb.r, cb.g, cb.b, cb.a};
+
+        UIElementCache *cache = getCache(text.entity);
+        if (cache)
+            cache->element = area;
+
+        syncText(text.entity);
+        scene->removeComponent<CreateTextDirtyTag>(tag.entity);
+    }
+
+    // for (auto &pack : scene->query<CreateInputFieldDirtyTag, InputFieldComponent, PanelComponent, TextComponent>())
+    // {
+    //     InputFieldComponent &inputfield = pack.get<InputFieldComponent &>();
+    //     CreateInputFieldDirtyTag &tag = pack.get<CreateInputFieldDirtyTag &>();
+    //     scene->removeComponent<CreateInputFieldDirtyTag>(tag.entity);
+    // }
+    return ErrorOrVoid();
 }
 
 void UISystem::processTextChanges()
 {
     for (auto &pack : scene->query<PanelComponent, TextComponent, TextDirtyTag>())
     {
-        PanelComponent &panel = pack.get<PanelComponent &>();
         TextComponent &text = pack.get<TextComponent &>();
         TextDirtyTag &tag = pack.get<TextDirtyTag &>();
         //syncText(panel, text, tag);
-        syncText(panel, text);
+        syncText(text);
         scene->removeComponent<TextDirtyTag>(tag.entity);
     }
 }
@@ -344,13 +419,13 @@ void UISystem::clearAllCaches()
 void UISystem::init()
 {
     renderWindow = OgreModule::Instance().getOgreRenderWindow();
-    createConsole();
 }
 
 void UISystem::onLoad() {}
 
 void UISystem::update(double)
 {
+    processComponentCreations();
     processPanelChanges();
     processTextChanges();
     processVisibility();
@@ -401,19 +476,6 @@ const PanelComponent& UISystem::createTestCanvas()
     uiCache[ent] = createElementCache(overlay, container);
 
     return panel;
-}
-
-EntityID UISystem::createConsole()
-{
-    EntityID entity = createTestText();
-
-    InputFieldComponent& inputField = scene->addAndGetComponent<InputFieldComponent>(entity);
-    inputField.isActive = false;
-    //inputField.onChangeCallback = [this](const std::string& input) { };
-    HUGO::Input &input = HUGO::Input::Instance();
-    input.registerAction("SubmitInput", SDL_KeyCode::SDLK_RETURN); // for submitting input
-    input.registerAction("EraseInput", SDL_KeyCode::SDLK_BACKSPACE); // for erasing input
-    return entity;
 }
 
 EntityID UISystem::createButton()
@@ -490,15 +552,4 @@ EntityID UISystem::createTestText()
     // );
 
     return ent;
-}
-
-void UISystem::saveConsoleToFile(const std::string& input)
-{
-    std::ofstream file(CONSOLE_HISTORY_FILE, std::ios::app);
-    if (file.is_open()) {
-        file << input << std::endl;
-        file.close();
-    }else{
-        std::cout << "No se pudo abrir el txt de la consola\n";
-    }
 }

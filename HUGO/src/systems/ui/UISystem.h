@@ -57,7 +57,7 @@ bool isMouseOverPanel(const PanelComponent& panel, HUGO::Float mouseX, HUGO::Flo
 //====================================================
 
 void syncPanel(const PanelComponent& p);
-void syncText(const PanelComponent& p, const TextComponent& t);
+void syncText(const TextComponent& t);
 void syncButton(const ButtonComponent& b);
 void syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr);
 
@@ -75,6 +75,7 @@ void processTextChanges();
 void processButtonChanges();
 void processProgressBarChanges();
 void processInput();
+ErrorOrVoid processComponentCreations();
 //====================================================
 // CACHE
 //====================================================
@@ -88,11 +89,6 @@ void clearAllCaches();
 const PanelComponent& createTestCanvas();
 EntityID createTestText();
 EntityID createButton();
-
-EntityID createConsole();
-
-void saveConsoleToFile(const std::string& input);
-const std::string CONSOLE_HISTORY_FILE = "console_history.txt";
 
 public:
 

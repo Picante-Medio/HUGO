@@ -11,8 +11,17 @@ HCOMPONENT(PanelDirtyTag)
     //HUGO::UInt flags = HUGO::PanelDirtyTags::NONE; 
 END_HCOMPONENT()
 
+HCOMPONENT(CreatePanelDirtyTag)
+    //HUGO::UInt flags = HUGO::PanelDirtyTags::NONE; 
+END_HCOMPONENT()
+
 HCOMPONENT(TextDirtyTag) 
-    //HUGO::UInt flags = HUGO::TextDirtyTags::NONE;  
+END_HCOMPONENT() 
+
+HCOMPONENT(CreateTextDirtyTag) 
+END_HCOMPONENT() 
+
+HCOMPONENT(CreateInputFieldDirtyTag) 
 END_HCOMPONENT() 
 
 HCOMPONENT(ButtonDirtyTag) 
