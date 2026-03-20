@@ -48,10 +48,22 @@ void ConsoleSystem::receiveInput(const HUGO::String& input){
     else command = input;
 
     if(expectsReturn){
-        if(type == "int");
-        else if(type == "float");
-        else if (type == "bool");
-        else if (type == "string");
+        if(type == "int"){
+            ErrorOrType<HUGO::Int> returnedInfo = LuaBinder::Instance().getFromString<HUGO::Int>(command);
+            handleReturn(returnedInfo);
+        }
+        else if(type == "float"){
+            ErrorOrType<HUGO::Float> returnedInfo = LuaBinder::Instance().getFromString<HUGO::Float>(command);
+            handleReturn(returnedInfo);
+        }
+        else if (type == "bool"){
+            ErrorOrType<bool> returnedInfo = LuaBinder::Instance().getFromString<bool>(command);
+            handleReturn(returnedInfo);
+        }
+        else if (type == "string"){
+            ErrorOrType<HUGO::String> returnedInfo = LuaBinder::Instance().getFromString<HUGO::String>(command);
+            handleReturn(returnedInfo);
+        }
         else scene->log(std::shared_ptr<Error>(new StringError("LUA: Invalid return type")));
     }
     else LuaBinder::Instance().interpretString(command);
