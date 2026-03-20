@@ -34,7 +34,7 @@ void ConsoleSystem::printErrors(TextComponent& consoleText){
 void ConsoleSystem::receiveInput(const HUGO::String& input){
 
     size_t start = 0;
-    size_t end = input.find(':');
+    size_t end = input.find('|');
     HUGO::String command = "";
     HUGO::String type = "";
     bool expectsReturn = false;
@@ -71,15 +71,15 @@ void ConsoleSystem::receiveInput(const HUGO::String& input){
 
 void ConsoleSystem::update(double){
 
-    TextComponent& consoleText = scene->getComponent<TextComponent>(console);
+    //TextComponent& consoleTextCmp = scene->getComponent<TextComponent>(consoleText);
 
     // Logs
-    consoleText.colour = HUGO::Vector4(1.f, 1.f, 1.f, 1.f);
-    printLogs(consoleText);
+    //consoleTextCmp.colour = HUGO::Vector4(1.f, 1.f, 1.f, 1.f);
+    //printLogs(consoleTextCmp);
 
     // Errors
-    consoleText.colour = HUGO::Vector4(1.f, 0.f, 0.f, 1.f);
-    printErrors(consoleText);
+    //consoleTextCmp.colour = HUGO::Vector4(1.f, 0.f, 0.f, 1.f);
+    //printErrors(consoleTextCmp);
 }
 
 void ConsoleSystem::fixedUpdate(double){
@@ -92,33 +92,49 @@ void ConsoleSystem::onLoad(){
 
 void ConsoleSystem::init(){
 
-    console = scene->createEntity();
+    //---------------------------------------Input field
+    consoleInput = scene->createEntity();
 
-    PanelComponent& panel = scene->addAndGetComponent<PanelComponent>(console);
+    PanelComponent& panel = scene->addAndGetComponent<PanelComponent>(consoleInput);
     panel.overlayName = "testCanvas/SimpleTest";
     panel.containerName = panel.overlayName + "/Container";
-    panel.left = 0.3f;
-    panel.top = 0.7f;
-    panel.height = 0.1f;
-    panel.width = 0.1f;
-    panel.isVisible = true;
-    panel.zOrder = 550;
     panel.material = "UI/Test";
 
-    scene->addComponent<VisibilityDirtyTag>(console);
+    scene->addComponent<CreatePanelDirtyTag>(consoleInput);
 
-    TextComponent& text = scene->addAndGetComponent<TextComponent>(console);
+    TextComponent& text = scene->addAndGetComponent<TextComponent>(consoleInput);
     text.textAreaName = panel.containerName + "/Text";
-    text.characterHeight = 0.04f;
-    text.text = "";
-    text.colour = {1.f, 1.f, 1.f, 1.f};
-    text.colourTop = {1.f, 1.f, 1.f, 1.f};
-    text.colourBottom = {1.f, 1.f, 1.f, 1.f};
 
-    InputFieldComponent& input = scene->addAndGetComponent<InputFieldComponent>(console);
+    scene->addComponent<CreateTextDirtyTag>(consoleInput);
+
+    InputFieldComponent& input = scene->addAndGetComponent<InputFieldComponent>(consoleInput);
     input.isActive = true;
     input.originalText = "";
     input.onChangeCallback = [this](const HUGO::String& input){
         receiveInput(input);
     };
+
+    scene->addComponent<CreateInputFieldDirtyTag>(consoleInput);
+
+    //---------------------------------------Console text
+
+    //consoleText = scene->createEntity();
+
+    //PanelComponent& panel2 = scene->addAndGetComponent<PanelComponent>(consoleText);
+    //panel2.overlayName = "testCanvas/SimpleTest";
+    //panel2.containerName = panel.overlayName + "/Container";
+    //panel2.material = "UI/Test";
+    //panel2.top = 0.3;
+    //panel2.left = 0.3;
+
+    //scene->addComponent<CreatePanelDirtyTag>(consoleText);
+
+    //TextComponent& text2 = scene->addAndGetComponent<TextComponent>(consoleText);
+    //text2.textAreaName = panel.containerName + "/Text";
+
+    //scene->addComponent<CreateTextDirtyTag>(consoleText);
+
+    scene->log("HOLA\n");
+    StringError testError = StringError("error de prueba");
+    scene->log(std::make_shared<StringError>(testError));
 }

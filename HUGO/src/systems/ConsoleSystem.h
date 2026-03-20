@@ -8,7 +8,8 @@ HSYSTEM(ConsoleSystem)
 
     std::deque<HUGO::String> history;
     std::variant<int, float, bool, HUGO::String> lastValueReturned;
-    EntityID console;
+    EntityID consoleInput;
+    EntityID consoleText;
 
     void printLogs(TextComponent& consoleText);
     void printErrors(TextComponent& consoleText);
@@ -18,7 +19,7 @@ HSYSTEM(ConsoleSystem)
     template<typename T>
     void handleReturn(ErrorOrType<T>& returnedInfo){
 
-        if(returnedInfo.isError()) scene->log(std::make_shared<Error>("LUA: " + returnedInfo.getError()));
+        if(returnedInfo.isError()) scene->log(std::make_shared<StringError>(returnedInfo.getError()));
         else lastValueReturned = returnedInfo.getValue();
     }
 

@@ -187,7 +187,7 @@ public:
         if (luaL_dostring(lua, command.c_str()) != LUA_OK) {
             StringError error = StringError(HUGO::String(lua_tostring(lua, -1)));
             lua_pop(lua, 1);
-            return ErrorOrType<int>(error);
+            return ErrorOrType<T>(error);
         }
 
         //Otherwise
