@@ -45,7 +45,7 @@ public:
 
     template<typename T>
     bool hasComponent(EntityID entity) const {
-        return entityTable->hasComponent(ComponentRegistry::getComponentId<T>() ,entity);
+        return entityTable->hasComponent(entity, ComponentRegistry::getComponentId<T>());
     }
 
 	template <typename T>
