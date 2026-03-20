@@ -43,6 +43,11 @@ public:
 			entityTable->getDenseListIndex(entity, componentID));
 	}
 
+    template<typename T>
+    bool hasComponent(EntityID entity) const {
+        return entityTable->hasComponent(ComponentRegistry::getComponentId<T>() ,entity);
+    }
+
 	template <typename T>
 	T& addAndGetComponent(EntityID entity) {
 		// Creating the component
