@@ -14,22 +14,22 @@ namespace HUGO{
         virtual ErrorOrType<bool> tweenParameter(std::shared_ptr<IScene> scene, HUGO::Float dt) = 0;
     };
     
-    template<typename ClassType, typename EasingType>
+    template<typename ClassType, typename EasingType, typename InterpType>
     class Tween: public ITween{
         //The tweenable value ALWAYS is a HUGO::Float
-        HUGO::Float ClassType::* m_parameterMemberPt;
+        InterpType ClassType::* m_parameterMemberPt;
         EntityID m_componentEntity;
     
         //Interpolation status
     
-        HUGO::Float m_from;
-        HUGO::Float m_to;
+        InterpType m_from;
+        InterpType m_to;
         HUGO::Float m_totalTime;
         HUGO::Float m_currentTime;
 
         EasingType m_easingType;
     public:
-        inline Tween(ClassType& componentToTween, HUGO::Float ClassType::* parameterMemberPt, HUGO::Float from, HUGO::Float to, HUGO::Float time): 
+        inline Tween(ClassType& componentToTween, InterpType ClassType::* parameterMemberPt, InterpType from, InterpType to, HUGO::Float time): 
         m_parameterMemberPt(parameterMemberPt), m_from(from), m_to(to), m_totalTime(time), m_currentTime(0.f), m_easingType(EasingType()){
     
             //Get the entityID associated with componentToTween
@@ -51,7 +51,7 @@ namespace HUGO{
             HUGO::Float t = m_easingType.easingFunction(normalizedTime);
 
             //Interpolated value (LERP)
-            HUGO::Float value = (m_from * (1.0 - t)) + (m_to * t);
+            InterpType value = (m_from * (1.0 - t)) + (m_to * t);
     
             ClassType& component = scene->getComponent<ClassType>(m_componentEntity);
             component.*m_parameterMemberPt = value;
@@ -78,9 +78,9 @@ namespace HUGO{
             @param time Duration of the Tween
             @param easing Easing function that will be used
         */
-        template<typename ClassType>
-        static std::shared_ptr<Tween<ClassType, EasingType>> makeTween(ClassType& componentToTween, HUGO::Float ClassType::* parameterMemberPt, HUGO::Float from, HUGO::Float to, HUGO::Float time){
-            return std::make_shared<Tween<ClassType, EasingType>>(componentToTween, parameterMemberPt, from, to, time);
+        template<typename ClassType, typename InterpType>
+        static std::shared_ptr<Tween<ClassType, EasingType, InterpType>> makeTween(ClassType& componentToTween, InterpType ClassType::* parameterMemberPt, InterpType from, InterpType to, HUGO::Float time){
+            return std::make_shared<Tween<ClassType, EasingType, InterpType>>(componentToTween, parameterMemberPt, from, to, time);
         }
     };
 };
