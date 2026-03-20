@@ -82,11 +82,15 @@ void HUGO::Core::initModules()
     //LuaBinder init
     LuaBinder& luaBinder = LuaBinder::Instance();
     luaBinder.Init();
+    luaBinder.setLuaPath("U:/hlocal/2526-Grupo01-HUGO/HUGO/src/lua/?");
+    // auto pathOrError = luaBinder.getFromFile<HUGO::String>("path.lua");
 }
 //HUGO main loop
 void Core::run(){
   bool exit = false;
   Input& input = Input::Instance();
+
+  auto pathOrError = LuaBinder::Instance().runFile("pathTest.lua");
   
 	while (!exit) {
         vt.update();
