@@ -30,14 +30,14 @@ private:
 
 public:
     // Setters
-    inline void setDiffuse(HUGO::Vector4 nDiff) { diffuse = nDiff; }
-    inline void setSpecular(HUGO::Vector4 nSpec) { specular = nSpec; }
+    inline void setDiffuse(const HUGO::Vector4& nDiff) { diffuse = nDiff; }
+    inline void setSpecular(const HUGO::Vector4& nSpec) { specular = nSpec; }
     inline void setLightType(HUGO::LightType lightT) { lightType = lightT; }
     inline void setSpotOuter(HUGO::Radian sOuter) { spotOuter = sOuter; }
     inline void setSpotInner(HUGO::Radian sInner) { spotInner = sInner; }
     inline void setSpotFallOff(float sFallOff) { spotFalloff = sFallOff; }
     inline void setSpotNearClip(float sNearClip) { spotNearClip = sNearClip; }
-    inline void setAttenuation(HUGO::Vector4 nAtte) { attenuation = nAtte; }
+    inline void setAttenuation(const HUGO::Vector4& nAtte) { attenuation = nAtte; }
     inline void setShadowFarDistance(float nShadowDistance) { shadowFarDist = nShadowDistance; }
     inline void setShadowFarDistanceSquared(float nShadowDistanceSquared) { shadowFarDistSquared = nShadowDistanceSquared; }
     inline void setIndexInFrame(size_t nIndexInFrame) { indexInFrame = nIndexInFrame; }

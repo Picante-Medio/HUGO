@@ -1,14 +1,10 @@
-#include "SDL.h"
-#include "Ogre.h"
-
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"
 
 #include "Core.h"
-#include "Scene.h"
 #include <iostream>
 
-int main(int argc, char* argv[]) {
+int main() {
 
     HUGO::Core core = HUGO::Core();
     ErrorOrVoid err = core.init();

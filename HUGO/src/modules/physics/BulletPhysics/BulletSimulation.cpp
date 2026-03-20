@@ -9,6 +9,7 @@
 #include "TransformComponent.h"
 
 #include "OgreBulletDebugger.h"
+#include <cstddef>
 #define PRINTER(name) printer(#name)
 
 void printer(const char* name){
@@ -65,7 +66,7 @@ void BulletSimulation::destroySimulation() {
 	}
 
 	//delete collision shapes
-	for (int j = 0; j < collisionShapes.size(); j++)
+	for (std::size_t j = 0; j < collisionShapes.size(); j++)
 	{
 		btCollisionShape* shape = collisionShapes[j].bulletShape;
 		collisionShapes[j].bulletShape = 0;
@@ -190,7 +191,7 @@ btCollisionShape* BulletSimulation::getorCreateShape(HUGO::CollisionShapeID& id,
 
 
 #pragma region BulletObject
-HUGO::CollisionObjectID BulletSimulation::createColliderObject(ColliderComponent& hgCol, TransformComponent& tf)
+HUGO::CollisionObjectID BulletSimulation::createColliderObject(ColliderComponent& hgCol)
 {
     // If shape isn't initialized doesn't create a colliderObject
     if(std::holds_alternative<BoxColliderInfo>(hgCol.info) && std::get<BoxColliderInfo>(hgCol.info).halfExtents.x < 0) 
@@ -436,7 +437,6 @@ void BulletSimulation::syncBodiesToBullet() {
     for(auto& pack: scene->query<ColliderComponent, StaticRBTag, RigidBodyComponent, TransformComponent>()) {
         RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
         ColliderComponent& col = pack.get<ColliderComponent&>();
-        TransformComponent& transform = pack.get<TransformComponent&>();
         
         if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
             //create a new CollisionObject
@@ -450,7 +450,6 @@ void BulletSimulation::syncBodiesToBullet() {
     for(auto& pack: scene->query<ColliderComponent, KinematicRBTag, RigidBodyComponent, TransformComponent>()) {
         RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
         ColliderComponent& col = pack.get<ColliderComponent&>();
-        TransformComponent& transform = pack.get<TransformComponent&>();
         
         if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
             //create a new CollisionObject
@@ -467,7 +466,6 @@ void BulletSimulation::syncBodiesToBullet() {
     for(auto& pack: scene->query<ColliderComponent, DynamicRBTag, RigidBodyComponent, TransformComponent>()) {
         RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
         ColliderComponent& col = pack.get<ColliderComponent&>();
-        TransformComponent& transform = pack.get<TransformComponent&>();
         
         if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
             //create a new CollisionObject
@@ -480,10 +478,9 @@ void BulletSimulation::syncBodiesToBullet() {
     // Add colliders to simulation
      for(auto& pack: scene->query<ColliderComponent, TransformComponent>()){
          ColliderComponent& col = pack.get<ColliderComponent&>();
-         TransformComponent& tf = pack.get<TransformComponent&>();
     
          if(col.objectID == HUGO::INVALID_COL_OBJ_ID){
-             col.objectID = createColliderObject(col, tf);
+             col.objectID = createColliderObject(col);
          }
     
          checkColliderFlags(col);

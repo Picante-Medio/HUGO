@@ -3,9 +3,9 @@
 #include "TransformComponent.h"
 
 HUGOMotionState::HUGOMotionState(const btTransform initialPos, std::shared_ptr<Scene> scene, unsigned long int id, btTransform offset)
-: btTransformRegister(initialPos)
+: entityID(id)
 , hugoScene(scene)
-, entityID(id)
+, btTransformRegister(initialPos)
 , centerOfMassOffset(offset)
 {
 

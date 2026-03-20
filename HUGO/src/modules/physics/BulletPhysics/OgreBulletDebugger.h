@@ -20,9 +20,9 @@ class OgreBulletDebugger : public btIDebugDraw {
     void drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, 
                         int lifeTime, const btVector3& color) override;
     
-    void reportErrorWarning(const char* warningString) override {}
+    void reportErrorWarning(const char*) override {}
 
-	void draw3dText(const btVector3& location, const char* textString) override {}
+	void draw3dText(const btVector3&, const char*) override {}
 
     int getDebugMode() const override { return mDebugMode; }
     void setDebugMode(int mode) override;

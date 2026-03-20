@@ -32,7 +32,7 @@ void OgreBulletDebugger::drawLine(const btVector3& from, const btVector3& to, co
 }
 
 void  OgreBulletDebugger::drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, 
-                                            int lifeTime, const btVector3& color) {
+                                            int, const btVector3& color) {
 
     drawLine(PointOnB, PointOnB + normalOnB * distance * 20, color);
 }

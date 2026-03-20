@@ -2,7 +2,7 @@
 //#include "OgreUtils.h"
 using namespace HUGO;
         
-void lineDrawer::draw(Vector3 from, Vector3 to, Vector3 color)
+void lineDrawer::draw(Vector3 , Vector3 , Vector3 )
 {
     // Ogre::Vector3 ogreColor = OgreUtils::vector3ToOgre(color);
     // Ogre::ColourValue c(ogreColor.x, ogreColor.y, ogreColor.z);
