@@ -63,8 +63,9 @@ void PhysicsTestSystem::fixedUpdate(double dt) {
 }
 
 void PhysicsTestSystem::update(double dt) {
-    EntityID e1 = scene->createEntity();
+    /*EntityID e1 = scene->createEntity();
     TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(e1);
     transform.position = HUGO::Vector3(0, -20, 0);
     transform.scale = HUGO::Vector3(1, 0.5f, 0.5f);
+    */
 }

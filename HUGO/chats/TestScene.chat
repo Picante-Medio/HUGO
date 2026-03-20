@@ -6,3 +6,4 @@ SYSTEM UISystem
 SYSTEM PhysicsTestSystem
 SYSTEM TestSystem
 SYSTEM ConsoleSystem
+SYSTEM TweenSystem

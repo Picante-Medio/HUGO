@@ -1,16 +1,27 @@
 #include "TestSystem.h"
+#include "AudioComponent.h"
+#include "RenderComponent.h"
+#include "TweenComponent.h"
 
 #include <iostream>
+#include "TweenComponent.h"
 
 void
-TestSystem::init() {}
+TestSystem::init() {
+    EntityID ent = scene->createEntity();
+
+    auto trComp = scene->addAndGetComponent<AudioComponent>(ent);
+    scene->addAndGetComponent<TweenComponent>(ent).currentTweens.push_back(HUGO::TweenFactory<EaseInBackTween>::makeTween(trComp, &AudioComponent::volume, 100, 0, 5));
+}   
 
 void
 TestSystem::onLoad() {}
 
 void
 TestSystem::update(double dt) {
-    std::cout << "Este sistema se esta ejecutando desde una biblioteca dinámica (dt: "<< dt <<  ")\n";
+    for(auto& pack : scene->query<AudioComponent,TweenComponent>()) {
+        std::cout << pack.get<AudioComponent&>().volume << '\n';
+    }
 }
 
 void

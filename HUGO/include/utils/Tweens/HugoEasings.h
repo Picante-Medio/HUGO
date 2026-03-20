@@ -12,7 +12,7 @@ struct LinearTween: public Easing{
     }
 };
 
-class EaseInBackTween: public Easing{
+struct EaseInBackTween: public Easing{
     inline HUGO::Float easingFunction(HUGO::Float t) override{
         HUGO::Float c1 = 1.70158f;
         HUGO::Float c3 = c1 +1;
@@ -20,20 +20,20 @@ class EaseInBackTween: public Easing{
     }
 };
 
-class EaseInExponentialTween: public Easing{
+struct EaseInExponentialTween: public Easing{
     inline HUGO::Float easingFunction(HUGO::Float t) override{
         if(t ==0) return 0;
         return pow(2, 10 * t - 10);
     }
 };
 
-class EaseOutQuintTween: public Easing{
+struct EaseOutQuintTween: public Easing{
     inline HUGO::Float easingFunction(HUGO::Float t) override{
         return 1- pow(1-t, 5);
     }
 };
 
-class EaseInOutCubicTween: public Easing{
+struct EaseInOutCubicTween: public Easing{
     inline HUGO::Float easingFunction(HUGO::Float t) override{
         if(t < 0.5) return 4 * t * t * t;
         return 1 - pow(-2 * t + 2, 3) / 2;
@@ -41,7 +41,7 @@ class EaseInOutCubicTween: public Easing{
     
 };
 
-class EaseOutElasticTween: public Easing{
+struct EaseOutElasticTween: public Easing{
     inline HUGO::Float easingFunction(HUGO::Float t) override{
         if(t ==0) return 0;
         else if (t ==1) return 1;
