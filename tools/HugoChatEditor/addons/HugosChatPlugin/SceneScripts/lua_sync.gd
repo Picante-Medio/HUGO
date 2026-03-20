@@ -2,7 +2,7 @@
 extends EditorScript
 class_name LuaSync
 
-const ENGINE_FUNC_PATHS = ["../../HUGO/src/lua/test.cpp"]
+var engine_files_paths:FilesPathArray = load("res://addons/HugosChatPlugin/engine_files_paths.tres")
 const LUA_PATH = "../../HUGO/bin/test.lua"
 
 func _run() -> void:
@@ -10,7 +10,7 @@ func _run() -> void:
 
 func sync():
 	var functions:Array[Array] = []
-	for path_name:String in ENGINE_FUNC_PATHS:
+	for path_name:String in engine_files_paths.files_paths:
 		var functions_file := FileAccess.open(path_name, FileAccess.READ)
 		var line := functions_file.get_line().strip_edges()
 		

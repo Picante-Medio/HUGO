@@ -16,6 +16,9 @@
 
 #include "ComponentFactory.h"
 #include "ComponentRegistry.h"
+#include "GameLibraryLoader.h"
+
+#include "StringUtils.h"
 
 Scene::Scene() {
 	entityTable = std::make_unique<EntityTable>();
@@ -56,8 +59,68 @@ Scene::createEntityLUA() {
 }
 
 void
-Scene::addComponentLUA(int entityID, std::string& componentName) {
-	//TO_CHAT problema con el uso de addComponent por las funciones templatizadas, hablar con Marco
+Scene::addComponentLUA(int entityID, std::string& componentData) {
+	//Input Example
+	//AddComponent Rigidbody float mass 2.5 vector3 velocity 2 2 2
+	
+	std::vector<std::string_view> splittedData = StringUtils::split(componentData, ' ');
+	std::string componentName = std::string{splittedData[1]};
+
+	std::unordered_map<std::string, HVariant> parameters = std::unordered_map<std::string, HVariant>();
+
+	std::string parameterNameBuffer = "";
+	std::string_view parameterType = "";
+	ErrorOrVoid error = ErrorOrVoid();
+
+	for(int c = 2; c < splittedData.size(); c++) {
+		std::string stringValue = std::string{splittedData[c]};
+		HVariant parameterValue = "NULL";
+		bool valueAssigned = false;
+
+		if(parameterType == "") parameterType = stringValue;
+		else if(parameterNameBuffer == "") parameterNameBuffer = stringValue;
+		else if(parameterType == "float") parameterValue = static_cast<HUGO::Float>(std::stof(stringValue));
+		else if(parameterType == "int") parameterValue = static_cast<HUGO::Int>(std::stoi(stringValue));
+		else if(parameterType == "string") parameterValue = static_cast<HUGO::String>(stringValue);
+		else if(parameterType == "vector2") {
+			float x = std::stof(stringValue);
+			float y = 0;
+
+			if(c+1 >= splittedData.size()) error = ErrorOrVoid(StringError{"Faltan argumentos para Vector2"});
+			else y = std::stof(std::string{splittedData[c]});
+
+			parameterValue = HUGO::Vector2(x, y);
+			c++;
+		}
+		else if(parameterType == "vector3") {
+			float x = std::stof(stringValue);
+			float y = 0;
+			float z = 0;
+			
+			if(c+1 >= splittedData.size()) error = ErrorOrVoid(StringError{"Faltan argumentos para Vector2"});
+			else y = std::stof(std::string{splittedData[c]});
+
+			if(c+2 >= splittedData.size()) error = ErrorOrVoid(StringError{"Faltan argumentos para Vector2"});
+			else y = std::stof(std::string{splittedData[c]});
+
+			parameterValue = HUGO::Vector3(x, y, z);
+			c += 2;
+		}
+
+		if(valueAssigned) {
+			parameters[parameterNameBuffer] = parameterValue;
+			parameterNameBuffer = "";
+			parameterType = "";
+		} 
+	}
+
+	ErrorOrVoid compResult = HUGO::ComponentFactory::makeComponent(shared_from_this(), static_cast<EntityID>(entityID), componentName, parameters);
+	if(compResult.isError()) {
+		compResult = HUGO::GameLibraryLoader::instance().GenerateComponent(shared_from_this(), static_cast<EntityID>(entityID), componentName, parameters);
+		if(compResult.isError()) {
+			//TO_CHAT Sacar por LuaConsole un mensaje de error
+		}
+	}
 }
 
 void

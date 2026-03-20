@@ -65,6 +65,7 @@ ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
                     return ErrorOrVoid(compResult.getError());
                 }
             }
+
         }
     }
 

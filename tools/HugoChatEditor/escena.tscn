@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dq2fl1vp76r7r"]
 
-[ext_resource type="Script" uid="uid://cft1fgdpqn2vu" path="res://addons/HugosChatPlugin/SceneScripts/scene_tracker.gd" id="1_865ah"]
+[ext_resource type="Script" uid="uid://cft1fgdpqn2vu" path="res://addons/HugosChatPlugin/Entities/scene_tracker.gd" id="1_865ah"]
 [ext_resource type="PackedScene" uid="uid://krs4pyuy4e" path="res://Prefabs/alfonso.tscn" id="2_fanfj"]
 [ext_resource type="Script" uid="uid://dimuk3ggoam44" path="res://addons/HugosChatPlugin/Entities/entity3d.gd" id="3_sks45"]
 [ext_resource type="Script" uid="uid://bnjt3w18hk2gs" path="res://addons/HugosChatPlugin/NativeComponents/RenderComponent.gd" id="4_d4yc1"]
