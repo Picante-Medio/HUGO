@@ -68,4 +68,14 @@ namespace HUGO{
             return ErrorOrType<bool>(false);
         }
     };
+
+    //Factory for just using makeTween<EasingType>(..)
+    template <typename EasingType>
+    class Tween{
+    public:
+        template<typename ClassType>
+        static Tween<ClassType, EasingType> makeTween(ClassType& componentToTween, HUGO::Float ClassType::* parameterMemberPt, HUGO::Float from, HUGO::Float to, HUGO::Float time){
+            return Tween<ClassType, EasingType>(componentToTween, parameterMemberPt, from, to, time);
+        }
+    };
 };
