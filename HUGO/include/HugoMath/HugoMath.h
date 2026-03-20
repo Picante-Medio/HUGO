@@ -1,7 +1,7 @@
 #pragma once
 namespace HUGO {
+	struct Radian;
 	struct Degree;
-    struct Radian;
 	struct Vector2
 	{
 		float x, y;
@@ -26,8 +26,9 @@ namespace HUGO {
 		Vector2 normalized() const;
 	};
 
-// Scalar multiplication from left
-Vector2 operator*(float scalar, const Vector2& v);
+	// Scalar multiplication from left
+	Vector2 operator*(float scalar, const Vector2& v);
+
 	struct Vector3
 	{
 		float x, y, z;
@@ -38,12 +39,10 @@ Vector2 operator*(float scalar, const Vector2& v);
 		Vector3 operator+ (const Vector3& other) const;
 		void operator+=(const Vector3& other);
 		Vector3 operator- (const Vector3& other) const;
-		//Vector3 operator-= (const Vector3& other);
-
-		float operator* (const Vector3& other) const;
-		Vector3 operator* (float scalar) const;
 		
-        
+		Vector3 operator* (float scalar) const;
+		Vector3 operator*(const Vector3& other) const;
+		
 		Vector3 cross(const Vector3& other) const;
 
 		float length() const;
@@ -79,6 +78,7 @@ Vector2 operator*(float scalar, const Vector2& v);
 
 		Quaternion();
 		Quaternion(float w, float x, float y, float z);
+		Quaternion(Radian angle, const Vector3& axis);
 
 		//helpers which are useful to audio listener and other contexts
 		Quaternion inverse() const;
@@ -86,10 +86,14 @@ Vector2 operator*(float scalar, const Vector2& v);
 		Vector3 forward() const;
 		Vector3 up() const;
 		Vector3 right() const;
+		
+		void operator*=(const Quaternion& other);
+		void normalize();
 	};
 	Quaternion operator*(const Quaternion& a, const Quaternion& b);
 		// multiplying a quaternion
 	Vector3 operator*(const Quaternion& q, const Vector3& v);
+	
 	struct Radian {
         float rad;
 

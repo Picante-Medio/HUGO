@@ -70,29 +70,23 @@ namespace HUGO {
 		return { x - other.x, y - other.y, z - other.z };
 	}
 
-    // Vector3 Vector3::operator-=(const Vector3 &other)
-    // {
-    //     x -= other.x;
-	// 	y -= other.y;
-	// 	z -= other.z;
-    // }
-
-    float Vector3::operator* (const Vector3& other) const {
-		return x * other.x + y * other.y + z * other.z;
+    Vector3 Vector3::operator* (const Vector3& other) const {
+		return {x * other.x, y * other.y, z * other.z};
 	}
 
 	Vector3 Vector3::operator* (float scalar) const {
 		return { x * scalar, y * scalar, z * scalar };
 	}
 
-	Vector3 Vector3::cross(const Vector3& other) const {
-		float cx = y * other.z - z * other.y;
+    Vector3 Vector3::cross(const Vector3 &other) const
+    {
+        float cx = y * other.z - z * other.y;
 		float cy = z * other.x - x * other.z;
 		float cz = x * other.y - y * other.x;
 		return { cx, cy, cz };
-	}
+    }
 
-	float Vector3::length() const {
+    float Vector3::length() const {
 		return std::sqrt(x * x + y * y + z * z);
 	}
 
@@ -166,6 +160,9 @@ namespace HUGO {
 	Quaternion::Quaternion(float w, float x, float y, float z) 
 		: w(w), x(x), y(y), z(z) {}
 
+    Quaternion::Quaternion(Radian angle, const Vector3 &axis)
+    	: w(angle.rad), x(axis.x), y(axis.y), z(axis.z){}
+
     Quaternion Quaternion::inverse() const
     {
         float norm = w*w + x*x + y*y + z*z;
@@ -193,7 +190,32 @@ namespace HUGO {
 		return (*this) * Vector3(1,0,0);
 	}
 
-	Quaternion operator*(const Quaternion& a, const Quaternion& b)
+    void Quaternion::operator*=(const Quaternion &other)
+    {
+		float nw, nx, ny, nz;
+		nw = w*other.w - x*other.x - y*other.y - z*other.z;
+		nx = w*other.x + x*other.w + y*other.z - z*other.y;
+		ny = w*other.y - x*other.z + y*other.w + z*other.x;
+		nz = w*other.z + x*other.y - y*other.x + z*other.w;
+
+		w = nw; 
+		x = nx; 
+		y = ny; 
+		z = nz;
+    }
+
+	void Quaternion::normalize()
+	{
+		float mod = std::sqrt(w*w + x*x + y*y + z*z);
+		if(mod > 0.0f){
+			w /= mod;
+			x /= mod;
+			y /= mod;
+			z /= mod;
+		}
+	}
+
+    Quaternion operator*(const Quaternion& a, const Quaternion& b)
 	{
 		return Quaternion(
 			a.w*b.w - a.x*b.x - a.y*b.y - a.z*b.z,

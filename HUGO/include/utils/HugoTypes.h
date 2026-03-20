@@ -5,12 +5,9 @@
 
 namespace HUGO{
 
-    using OgreObjectID = int;
-    constexpr OgreObjectID INVALID_OGRE_OBJECT_ID = std::numeric_limits<int>::max();
-    
     using String = std::string;
 
-    // Audio Types
+    // AUDIO TYPES
     using AudioID = int;
     using SceneID = int;
 
@@ -46,7 +43,10 @@ namespace HUGO{
 
     using AudioEndCallback = std::function<void(HUGO::AudioID)>;
 
-    // Render Types
+    // RENDER TYPES
+    //--------- Ogre Types -----------
+    using OgreObjectID = int;
+    constexpr OgreObjectID INVALID_OGRE_OBJECT_ID = std::numeric_limits<int>::max();
 
     // -------- Camera Types --------
 
