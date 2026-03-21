@@ -93,6 +93,10 @@ namespace HUGO {
 	Quaternion operator*(const Quaternion& a, const Quaternion& b);
 		// multiplying a quaternion
 	Vector3 operator*(const Quaternion& q, const Vector3& v);
+
+	Quaternion operator+(const Quaternion& l, const Quaternion& r);
+
+	Quaternion operator* (const Quaternion& q, const float& f);
 	
 	struct Radian {
         float rad;

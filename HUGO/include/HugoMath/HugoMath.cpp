@@ -232,6 +232,17 @@ namespace HUGO {
 	   return result;
     }
 
+	Quaternion operator+(const Quaternion& l, const Quaternion& r){
+		Quaternion res(l.w+r.w, l.x+r.x, r.y+l.y, r.z+l.z);
+		res.normalize();
+
+		return res;
+	}
+
+	Quaternion operator* (const Quaternion& q, const float& f){
+		return Quaternion(q.w*f, q.x*f, q.y*f, q.z*f);
+	}
+
     // --------------------- RADIAN ---------------------
 	Radian::Radian(float r) 
 		: rad(r) {}

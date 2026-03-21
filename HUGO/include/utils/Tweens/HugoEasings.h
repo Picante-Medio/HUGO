@@ -44,10 +44,12 @@ struct EaseInOutCubicTween: public Easing{
 
 struct EaseOutElasticTween: public Easing{
     inline HUGO::Float easingFunction(HUGO::Float t) override{
-        if(t ==0) return 0;
-        else if (t ==1) return 1;
+        const HUGO::Float c4 = (2.f * HUGO::PI) / 3.f;
 
-        HUGO::Float c4 = (2 * HUGO::PI) / 3;
-        return pow(2, -10 * t) * sin((t * 10 - 0.75) * c4) + 1;
+        return t == 0
+        ? 0
+        : t == 1
+        ? 1
+        : pow(2, -10 * t) * sin((t * 10 - 0.75) * c4) + 1;
     }
 };
