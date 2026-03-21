@@ -16,10 +16,10 @@ HierarchySystem::onLoad(){}
 void 
 HierarchySystem::addChildToParent(EntityID child, EntityID parent)
 {
-    ChildrenComponent& childrenComp = scene->getComponent<ChildrenComponent>(parent);
-    auto it = std::find(childrenComp.children.begin(), childrenComp.children.end(), child);
-    if (it == childrenComp.children.end()) {
-        childrenComp.children.push_back(child);
+    std::vector<EntityID>& children = scene->getComponent<ChildrenComponent>(parent).children;
+    auto it = std::find(children.begin(), children.end(), child);
+    if (it == children.end()) {
+        children.push_back(child);
     }
 }
 
@@ -88,10 +88,10 @@ HierarchySystem::updateHierarchy()
         if(newParent != INVALID_ENTITY_ID){
             addChildToParent(child, newParent);
         }
-        parentComp.previousParent = newParent;
 
+        //update parentComponent and notify
+        parentComp.previousParent = newParent;
         scene->addComponent<WorldTransformDirtyTag>(child);
-        
         addWorldDirtyTagForChildren(child);
 
         scene->removeComponent<ParentCompDirtyTag>(child);
@@ -101,8 +101,8 @@ HierarchySystem::updateHierarchy()
 
 void HierarchySystem::addWorldDirtyTagForChildren(EntityID parent)
 {
-    std::vector<EntityID> needTag;
-    std::unordered_set<EntityID> visited;
+    std::vector<EntityID> needTag; //list of entities that need to propagate the tag
+    std::unordered_set<EntityID> visited; //entities that have been visited
     needTag.push_back(parent);
     visited.insert(parent);
 
@@ -111,6 +111,7 @@ void HierarchySystem::addWorldDirtyTagForChildren(EntityID parent)
         EntityID current = needTag.back(); 
         needTag.pop_back();
         
+        //if entity has children --> add tag to the children
         if (scene->hasComponent<ChildrenComponent>(current)) {
             
             const std::vector<EntityID>& children = scene->getComponent<ChildrenComponent>(current).children;
@@ -149,7 +150,6 @@ HierarchySystem::updateWorldTransform(TransformComponent& transform, std::unorde
     }
 
     ParentComponent& parentComp = scene->getComponent<ParentComponent>(entity);
-
     if(parentComp.parent == INVALID_ENTITY_ID){
         setLocalTransform(transform);
         return;
@@ -164,7 +164,7 @@ HierarchySystem::updateWorldTransform(TransformComponent& transform, std::unorde
     //scale
     transform.worldScale = parentTransform.worldScale * transform.scale;
     
-    //position need update after scale
+    //position
     transform.worldPosition = parentTransform.worldRotation *( parentTransform.worldScale*transform.position);
     transform.worldPosition += parentTransform.worldPosition;
 }
@@ -173,16 +173,19 @@ TransformComponent&
 HierarchySystem::getFullTransform(EntityID entity, std::unordered_set<EntityID>& visited)
 {
     TransformComponent& tr = scene->getComponent<TransformComponent>(entity);
+    
+    //check if entity is has already been visited
     if(visited.count(entity)){
         std::cerr << "[HierarchySystem] Cycle detected in hierarchy for entity " << entity <<"\n";
         return tr;
     }
     visited.insert(entity);
     
+    //check if it needs update
     if (!scene->hasComponent<WorldTransformDirtyTag>(entity))
         return tr;
-
     updateWorldTransform(tr, visited);
+    
     scene->removeComponent<WorldTransformDirtyTag>(entity);
     visited.erase(entity);
     return tr;

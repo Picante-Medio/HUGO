@@ -9,14 +9,14 @@ struct ParentComponent;
 
 HSYSTEM(HierarchySystem)
 private:
-
+    //functions to update hierarchy
     void addChildToParent(EntityID child, EntityID parent);
     void removeChildFromParent(EntityID child, EntityID parent);
     bool hasCycle(EntityID child, EntityID newParent);
     void updateHierarchy();
     
+    //functions to update transform
     void addWorldDirtyTagForChildren(EntityID parent);
-
     void setLocalTransform(TransformComponent& transform);
     void updateWorldTransform(TransformComponent& transform, std::unordered_set<EntityID>& visited);
     TransformComponent& getFullTransform(EntityID entity, std::unordered_set<EntityID>& visited);
