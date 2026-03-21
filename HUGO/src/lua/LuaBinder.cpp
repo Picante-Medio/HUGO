@@ -3,6 +3,7 @@
 #include "HugoTypes.h"
 
 #include <filesystem>
+#include <iostream>
 
 LuaBinder &LuaBinder::Instance() {
   static LuaBinder instance;
@@ -76,12 +77,12 @@ LuaBinder::setScriptPath(HUGO::String path) {
 
 void
 LuaBinder::requireFolder(HUGO::String path) {
-#ifdef __linux
-    setLuaPath(path + "/?.lua");
-#else
-    setLuaPath(path + "\\?.lua");
-#endif
-    for (const auto& entry : std::filesystem::directory_iterator(path)) {
+    std::filesystem::path fsPath(path);
+    std::filesystem::path luaPath = fsPath / "?.lua";
+
+    setLuaPath(luaPath.string());
+
+    for (const auto& entry : std::filesystem::directory_iterator(fsPath)) {
         if (entry.is_regular_file()) {
             HUGO::String moduleName = entry.path().stem().string();
             interpretString("require '" + moduleName + "'");

@@ -126,6 +126,4 @@ Core::initLua() {
         std::filesystem::path("..") / "src" / "lua" / "scripts"
     );
     luaBinder.requireFolder(luaPath.string());
-
-    luaBinder.interpretString("debug()");
 }
