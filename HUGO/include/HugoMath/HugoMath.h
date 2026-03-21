@@ -159,4 +159,6 @@ namespace HUGO {
 	//I dont know if this is necessary, but just in case
 	using Int = int;
 	using Float = float;
+
+	constexpr Float PI = 3.14159265358979323846f;
 }

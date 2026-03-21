@@ -1,4 +1,3 @@
-#define _USE_MATH_DEFINES
 #include <cmath>
 #include "HugoMath.h"
 
@@ -245,7 +244,7 @@ namespace HUGO {
 		: rad(rhs.rad) {}
 
     float Radian::valueDegrees() const {
-        return static_cast<float>(rad * (180.0f / M_PI));
+        return static_cast<float>(rad * (180.0f / PI));
     }
 
     float Radian::valueRadians() const {
@@ -345,7 +344,7 @@ namespace HUGO {
 	}
 	
 	float Degree::valueRadians() const {
-		return static_cast<float>(deg * (M_PI / 180.0f));
+		return static_cast<float>(deg * (PI / 180.0f));
 	}
 
 	const Degree&  Degree::operator + () const 
