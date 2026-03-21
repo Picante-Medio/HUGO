@@ -20,5 +20,5 @@ END_HCOMPONENT()
 HCOMPONENT(TransformDirtyTag)
 END_HCOMPONENT()
 
-HCOMPONENT(TransformChangeTag)
+HCOMPONENT(TransformChangedTag)
 END_HCOMPONENT()

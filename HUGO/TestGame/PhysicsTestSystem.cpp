@@ -1,4 +1,4 @@
-#include "PhysicsTestSystem.h"
+﻿#include "PhysicsTestSystem.h"
 #include "PhysicsTags.h"
 #include "RigidBodyComponent.h"
 #include "ColliderComponent.h"
@@ -25,6 +25,7 @@ void PhysicsTestSystem::init(){
     RenderComponent& rc = scene->addAndGetComponent<RenderComponent>(e1);
     rc.setMeshName("cube.mesh");
     rc.setMaterialName("prueba/ColorRosa");
+    scene->addComponent<TransformChangedTag>(e1);
 
     // Entidad 2: Cuerpo dinámico
     // EntityID e2 = scene->createEntity();

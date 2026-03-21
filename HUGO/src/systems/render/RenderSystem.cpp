@@ -321,10 +321,7 @@ void RenderSystem::updateAnimations(double dt)
     }
 }
 
-void RenderSystem::fixedUpdate(double)
-{
-
-}
+void RenderSystem::fixedUpdate(double){}
 
 void RenderSystem::update(double dt)
 { 
@@ -349,9 +346,9 @@ void RenderSystem::update(double dt)
         OgreObject& obj = getOgreObject(rc.objectID);
 
         //update transform
-        obj.ogreSceneNode->setPosition(OgreUtils::vector3ToOgre(tr.position));
-        obj.ogreSceneNode->setOrientation(OgreUtils::quaternionToOgre(tr.rotation));
-        obj.ogreSceneNode->setScale(OgreUtils::vector3ToOgre(tr.scale));
+        obj.ogreSceneNode->setPosition(OgreUtils::vector3ToOgre(tr.worldPosition));
+        obj.ogreSceneNode->setOrientation(OgreUtils::quaternionToOgre(tr.worldRotation));
+        obj.ogreSceneNode->setScale(OgreUtils::vector3ToOgre(tr.worldScale));
     }
 }
 
