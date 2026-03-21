@@ -1,1 +1,3 @@
-print("Ejecutando pathTest AAAAAAAAA\n\n")
+function debug()
+    print("Debugging a println function from lua!")
+end

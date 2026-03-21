@@ -2,6 +2,8 @@
 #include "HugoError.h"
 #include "HugoTypes.h"
 
+#include <filesystem>
+
 LuaBinder &LuaBinder::Instance() {
   static LuaBinder instance;
   return instance;
@@ -15,8 +17,9 @@ void LuaBinder::Init() {
 }
 
 ErrorOrVoid LuaBinder::runFile(HUGO::String path) {
+    HUGO::String fullPath = basePath + path;
   // If path is invalid
-    if (luaL_loadfile(lua, path.c_str()) != LUA_OK) {
+    if (luaL_loadfile(lua, fullPath.c_str()) != LUA_OK) {
         StringError error = StringError(HUGO::String(lua_tostring(lua, -1)));
         lua_pop(lua, 1);
         return ErrorOrVoid(error);
@@ -45,9 +48,10 @@ LuaBinder::interpretString(HUGO::String command) {
     //Otherwise
     return ErrorOrVoid();
 }
-int LuaBinder::setLuaPath(HUGO::String path )
+
+void LuaBinder::setLuaPath(HUGO::String path )
 {
-  lua_getglobal(lua, "package");
+    lua_getglobal(lua, "package");
     lua_getfield(lua, -1, "path");
 
     const char* cur_path = lua_tostring(lua, -1);
@@ -62,6 +66,25 @@ int LuaBinder::setLuaPath(HUGO::String path )
     lua_setfield(lua, -2, "path");
 
     lua_pop(lua, 1); // pop package
+}
 
-    return 0;
+
+void 
+LuaBinder::setScriptPath(HUGO::String path) {
+    basePath = path;
+}
+
+void
+LuaBinder::requireFolder(HUGO::String path) {
+#ifdef __linux
+    setLuaPath(path + "/?.lua");
+#else
+    setLuaPath(path + "\\?.lua");
+#endif
+    for (const auto& entry : std::filesystem::directory_iterator(path)) {
+        if (entry.is_regular_file()) {
+            HUGO::String moduleName = entry.path().stem().string();
+            interpretString("require '" + moduleName + "'");
+        }
+    }
 }

@@ -21,6 +21,7 @@ namespace HUGO {
     class Core {
         const int FRAME_RATE = 10;
         void initModules();
+        void initLua();
 
         //Ogre
         //std::shared_ptr<OgreModule> m_ogreModule;

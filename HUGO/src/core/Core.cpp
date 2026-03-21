@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h>
 #include <SDL_video.h>
 #include <cstddef>
+#include <filesystem>
 #include <iostream>
 #include <Ogre.h>
 #include <OgreOverlaySystem.h>
@@ -79,11 +80,9 @@ void HUGO::Core::initModules()
     //BulletoModule init
     physicsModule = std::make_shared<BulletModule>();
 
-    //LuaBinder init
-    LuaBinder& luaBinder = LuaBinder::Instance();
-    luaBinder.Init();
-    luaBinder.setLuaPath("U:/hlocal/2526-Grupo01-HUGO/HUGO/src/lua/?");
-    // auto pathOrError = luaBinder.getFromFile<HUGO::String>("path.lua");
+    //LuaBinder initialization
+    initLua();
+
 }
 //HUGO main loop
 void Core::run(){
@@ -91,10 +90,10 @@ void Core::run(){
   Input& input = Input::Instance();
 
   auto pathOrError = LuaBinder::Instance().runFile("pathTest.lua");
-  
+
 	while (!exit) {
         vt.update();
-    
+
         double startTime = vt.getDeltaTime()/1000.0; //ms->s
 
         input.handleInput();
@@ -115,4 +114,16 @@ void Core::run(){
             SDL_Delay(static_cast<Uint32>(FRAME_RATE-frameTime));
         }
 	}
+}
+
+
+void 
+Core::initLua() {
+    //LuaBinder init
+    LuaBinder& luaBinder = LuaBinder::Instance();
+    luaBinder.Init();
+    std::filesystem::path luaPath = std::filesystem::absolute(
+        std::filesystem::path("..") / "src" / "lua" / "scripts"
+    );
+    luaBinder.requireFolder(luaPath);
 }

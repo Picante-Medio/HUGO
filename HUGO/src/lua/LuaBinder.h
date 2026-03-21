@@ -65,6 +65,7 @@ struct LuaRuntimeError : Error {
 class LuaBinder {
     //pointer to the lua interpeter instance
     lua_State* lua;
+    HUGO::String basePath = "";
 
     // private functions that relates a given lua name to a function pointer call
     template<typename ReturnType, typename ...ArgTypes, std::size_t... I>
@@ -92,13 +93,16 @@ class LuaBinder {
             return 1;
         }
     }
+
+    void setLuaPath(HUGO::String path);
 public:
     static LuaBinder &Instance();
-    int setLuaPath(HUGO::String path );
     ~LuaBinder();
-
     //Init must be called before using lua
     void Init();
+
+
+    void setScriptPath(HUGO::String path);
 
     /* Register a standalone cpp function to call it from lua.
     Example for add function that returns int and receives two ints: 
@@ -208,7 +212,7 @@ public:
             lua_pushnumber(lua, i+1); // push the index
 
             // Push value
-            lua_pushvalue(lua, array[i]);
+            lua_push_result(lua, array[i]);
 
             // Fix the table stack offset
             lua_settable(lua, -3);
@@ -216,4 +220,6 @@ public:
 
         lua_setglobal(lua, luaGlobalName.c_str());
     }
+
+    void requireFolder(HUGO::String folderPath);
 };

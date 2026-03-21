@@ -1,4 +1,1 @@
-require("modules.requireModules")
-
-readModules()
 
