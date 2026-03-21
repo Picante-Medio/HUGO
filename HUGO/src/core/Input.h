@@ -27,6 +27,7 @@ class Input {
   bool textInputActive;
 
   bool quit;
+  bool windowChanged;
 
   void processKeyQueue();
   void processMouseQueue();
@@ -52,7 +53,8 @@ public:
   bool isMouseButtonPressed(int button);
 
   bool isActionPressed(std::string action);
-  bool isQuitPressed();
+  bool isQuitPressed() const;
+  bool windowHasChanged() const;
 
   bool wasKeyJustPressed(SDL_Keycode key);
   bool wasMouseButtonJustPressed(int button);
@@ -76,6 +78,8 @@ public:
   const std::string& getTextInput() const;
   // Flush text input buffer once we sent an input
   void clearTextInput();
+
+  void clearWindowFlag();
 
   // Activate/desactivate Text input support of SDL
   void toggleTextInput(bool state);

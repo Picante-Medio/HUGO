@@ -1,8 +1,8 @@
 #include <iostream>
 
 #include "OgreOverlaySystem.h"
-
 #include "RenderSystem.h"
+#include "SDL_video.h"
 #include "Scene.h"
 
 #include "RenderComponent.h"
@@ -16,6 +16,7 @@
 #include "OgreUtils.h"
 #include "OgreModule.h"
 #include "LuaBinder.h"
+#include "Input.h"
 
 RenderSystem::~RenderSystem()
 {
@@ -84,25 +85,25 @@ void RenderSystem::init(){
 
     // Basic light
     setAmbientLight(0.6f, 0.6f, 0.6f);
-
+    sceneManager->setDisplaySceneNodes(true);
 
     // Camera and viewport creation for testing
-    EntityID defaultCamera = createCameraEntity(HUGO::Vector3(0, 0, 150));
-    setMainCamera(defaultCamera);
+    EntityID CamEntity = scene->createEntity();
+    
+    TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(CamEntity);
+    transform.position = HUGO::Vector3(0, 0, 150);
+    scene->addComponent<CameraComponent>(CamEntity);
+    scene->addComponent<TransformChangedTag>(CamEntity);
+    
+    registerCameraEntity(CamEntity);
+    setMainCamera(CamEntity);
 
-    EntityID defaultViewport = createViewportEntity();    
-    setMainViewport(defaultViewport);
-
-    createLightEntity( HUGO::Vector3(0, 20, 50), //light position
-                        HUGO::Vector4(0.9f, 0.9f, 0.8f, 0.2f), //diffuse
-                        HUGO::Vector4(0.0f, 0.0f, 0.0f, 0.0f), //specular
-                        HUGO::LightType::LT_POINT, 
-                        HUGO::Radian(0), 
-                        HUGO::Radian(0), 
-                        0, 
-                        0.1f, 
-                        0.1f, 
-                        100); 
+    EntityID ViewEntity = scene->createEntity();
+    
+    scene->addComponent<ViewportComponent>(ViewEntity);
+    
+    registerViewportEntity(ViewEntity);  
+    setMainViewport(ViewEntity);
 }
 
 void RenderSystem::onLoad(){
@@ -113,6 +114,52 @@ void RenderSystem::onLoad(){
 #pragma region Tags
 void RenderSystem::handleTag()
 {
+
+    for(auto& pack : scene->query<CameraCreateDirtyTag, TransformComponent, CameraComponent>()) {
+        TransformComponent& tr = pack.get<TransformComponent&>();
+        EntityID entity = tr.entity;
+        auto it = cameraMap.find(entity);
+        if (it == cameraMap.end()) {
+           registerCameraEntity(entity);
+        }
+        // eliminate the tag
+        scene->removeComponent<CameraCreateDirtyTag>(entity);
+    }
+
+    for(auto& pack : scene->query<LightCreateDirtyTag, TransformComponent, LightComponent>()) {
+        TransformComponent& tr = pack.get<TransformComponent&>();
+        EntityID entity = tr.entity;
+        auto it = lightMap.find(entity);
+        if (it == lightMap.end()) {
+           registerLightEntity(entity);
+        }
+        // eliminate the tag
+        scene->removeComponent<LightCreateDirtyTag>(entity);
+    }
+
+     for(auto& pack : scene->query<ViewportCreateDirtyTag, ViewportComponent>()) {
+        ViewportComponent& view = pack.get<ViewportComponent&>();
+        EntityID entity = view.entity;
+        auto it = viewportMap.find(entity);
+        if (it == viewportMap.end()) {
+           registerViewportEntity(entity);
+        }
+        // eliminate the tag
+        scene->removeComponent<ViewportCreateDirtyTag>(entity);
+    }
+
+    for(auto& pack : scene->query<CameraCreateDirtyTag, TransformComponent, CameraComponent>()) {
+        TransformComponent& tr = pack.get<TransformComponent&>();
+        CameraComponent& camera = pack.get<CameraComponent&>();
+        EntityID entity = tr.entity;
+        auto it = cameraMap.find(entity);
+        if (it == cameraMap.end()) {
+           registerCameraEntity(entity);
+        }
+        // eliminate the tag
+        scene->removeComponent<CameraCreateDirtyTag>(entity);
+    }
+
     // Camera update
     for(auto& pack : scene->query<CameraDirtyTag, TransformComponent, CameraComponent>()) {
         CameraDirtyTag& tag = pack.get<CameraDirtyTag&>();
@@ -136,6 +183,8 @@ void RenderSystem::handleTag()
         // eliminate the tag
         scene->removeComponent<CameraDirtyTag>(entity);
     }
+
+   
 
     // Light update
     for(auto&pack : scene->query<LightDirtyTag, LightComponent, TransformComponent>()){
@@ -321,7 +370,7 @@ void RenderSystem::updateAnimations(double dt)
     }
 }
 
-void RenderSystem::fixedUpdate(double){}
+void RenderSystem::fixedUpdate(double dt){}
 
 void RenderSystem::update(double dt)
 { 
@@ -349,6 +398,15 @@ void RenderSystem::update(double dt)
         obj.ogreSceneNode->setPosition(OgreUtils::vector3ToOgre(tr.worldPosition));
         obj.ogreSceneNode->setOrientation(OgreUtils::quaternionToOgre(tr.worldRotation));
         obj.ogreSceneNode->setScale(OgreUtils::vector3ToOgre(tr.worldScale));
+    }
+
+    // changes in window
+    HUGO::Input& input = HUGO::Input::Instance();
+
+    if(input.windowHasChanged()){
+        updateViewportDimensions();
+        std::cout << "aaaaa\n";
+        input.clearWindowFlag();
     }
 }
 
@@ -442,54 +500,6 @@ void RenderSystem::destroyOgreObject(OgreObject &obj)
     }
 }
 #pragma endregion
-
-// Helper function for Camera creation
-EntityID RenderSystem::createCameraEntity(const HUGO::Vector3& position)
-{
-    EntityID entity = scene->createEntity();
-    
-    TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(entity);
-    transform.position = position;
-    scene->addComponent<CameraComponent>(entity);
-    
-    registerCameraEntity(entity);
-    
-    return entity;
-}
-
-// Helper function for Viewport creation
-EntityID RenderSystem::createViewportEntity()
-{
-    EntityID entity = scene->createEntity();
-    
-    scene->addComponent<ViewportComponent>(entity);
-    
-    registerViewportEntity(entity);
-    
-    return entity;
-}
-
-EntityID RenderSystem::createLightEntity(const HUGO::Vector3 &position, HUGO::Vector4 diff, HUGO::Vector4 specular, HUGO::LightType lType, const HUGO::Radian &outer, const HUGO::Radian &inner, float falloff, float nearClip, float shadowNearClipDist, float shadowFarClipDist)
-{
-    EntityID entity = scene->createEntity();
-    TransformComponent& tr = scene->addAndGetComponent<TransformComponent>(entity);
-    tr.position=position;
-
-    LightComponent& light = scene->addAndGetComponent<LightComponent>(entity);
-    light.setDiffuse(diff);
-    light.setSpecular(specular);
-    light.setLightType(lType);
-    light.setSpotOuter(outer);
-    light.setSpotInner(inner);
-    light.setSpotFallOff(falloff);
-    light.setSpotNearClip(nearClip);
-    light.setShadowNearClipDist(shadowNearClipDist);
-    light.setShadowFarClipDist(shadowFarClipDist);
-
-    registerLightEntity(entity);
-    
-    return entity;
-}
 
 // ==================== Registering ====================
 #pragma region Registering
@@ -746,9 +756,15 @@ void RenderSystem::updateViewportDimensions()
 {
     for (auto& [entity, res] : viewportMap) {
         if (res.ogreViewport) {
-            res.ogreViewport->_updateDimensions();
+            int w,h;
+            SDL_GetWindowSize(OgreModule::Instance().getSDLWindow(), &w, &h);
+            if (w > 0 && h > 0)
+            {
+                res.ogreViewport->setDimensions(0, 0, 1, 1);
+                res.ogreViewport->update();
+            }
 
-            // upsate cameras asociated to the viewport
+            // update cameras asociated to the viewport
             Ogre::Camera* cam = res.ogreViewport->getCamera();
             if (cam) {
                 cam->setAspectRatio(float(res.ogreViewport->getActualWidth()) / 

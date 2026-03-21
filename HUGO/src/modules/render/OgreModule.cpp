@@ -104,8 +104,14 @@ OgreModule::~OgreModule(){
     SDL_Quit();
 }
 
-Ogre::RenderWindow* OgreModule::getOgreRenderWindow(){
+Ogre::RenderWindow* OgreModule::getOgreRenderWindow() const
+{
     return m_ogreRenderWindow;
+}
+
+SDL_Window *OgreModule::getSDLWindow() const
+{
+    return m_sdlWindow;
 }
 
 void OgreModule::renderOneFrame(){

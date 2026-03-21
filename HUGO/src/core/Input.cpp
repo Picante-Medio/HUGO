@@ -7,7 +7,8 @@
 
 #include "HugoMath.h"
 namespace HUGO {
-Input::Input() :  keyState(), toChange(), keysOfAction(), textInputBuffer(), textInputActive(false), quit(false) 
+Input::Input() :  keyState(), toChange(), keysOfAction(), textInputBuffer(), 
+                  textInputActive(false), quit(false), windowChanged(false) 
 {}
 
 Input &Input::Instance() {
@@ -42,6 +43,11 @@ void Input::handleInput() {
       case SDL_TEXTINPUT:
           textInputBuffer += event.text.text;
           break;
+      case SDL_WINDOWEVENT:
+          if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+              windowChanged = true;
+          }
+          break;  
     }
   }
 }
@@ -80,9 +86,14 @@ bool Input::isActionPressed(std::string action) {
     return false;
 }
 
-bool HUGO::Input::isQuitPressed()
+bool HUGO::Input::isQuitPressed() const
 {
     return quit;
+}
+
+bool Input::windowHasChanged() const
+{
+    return windowChanged;
 }
 
 bool Input::wasKeyJustPressed(SDL_Keycode key) {
@@ -141,6 +152,11 @@ const std::string &Input::getTextInput() const
 void Input::clearTextInput()
 {
   textInputBuffer.clear();
+}
+
+void Input::clearWindowFlag()
+{
+  windowChanged = false;
 }
 
 void Input::toggleTextInput(bool state)

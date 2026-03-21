@@ -4,7 +4,6 @@
 #include "HugoComponentMacros.h"
 
 HCOMPONENT(LightComponent)
-
 private:
     HUGO::Vector4 diffuse = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f);
     HUGO::Vector4 specular = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f);

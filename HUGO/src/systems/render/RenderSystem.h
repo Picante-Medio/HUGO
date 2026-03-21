@@ -80,17 +80,6 @@ HSYSTEM(RenderSystem)
     OgreObject& getOgreObject(HUGO::OgreObjectID id);
     void removeOgreObject(HUGO::OgreObjectID& id);
     void destroyOgreObject(OgreObject& obj);
-
-
-    // Creation of viewport and camera (helpers)
-    EntityID createCameraEntity(const HUGO::Vector3& position = HUGO::Vector3(0, 0, 0));
-    EntityID createViewportEntity();
-    EntityID createLightEntity(const HUGO::Vector3& position = HUGO::Vector3(0, 0, 0)
-                   , HUGO::Vector4 diff = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f), HUGO::Vector4 specular= HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f)
-                   , HUGO::LightType lType = HUGO::LightType::LT_POINT
-                   , const HUGO::Radian& outer = HUGO::Radian(0.0f), const HUGO::Radian& inner = HUGO::Radian(0.0f)
-                   , float falloff = 1.0f, float nearClip = 1.0f, float shadowNearClipDist = 1.0f, float shadowFarClipDist = 100.0f);
-
                    
     // Global light configuration
     void setAmbientLight(float r, float g, float b);

@@ -38,5 +38,6 @@ public:
 
     void renderOneFrame();
 
-    Ogre::RenderWindow* getOgreRenderWindow();
+    Ogre::RenderWindow* getOgreRenderWindow() const;
+    SDL_Window* getSDLWindow() const;
 };

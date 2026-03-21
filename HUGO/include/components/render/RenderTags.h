@@ -11,6 +11,16 @@ END_HCOMPONENT()
 HCOMPONENT(LightDirtyTag)
 END_HCOMPONENT()
 
+HCOMPONENT(CameraCreateDirtyTag)
+END_HCOMPONENT()
+
+HCOMPONENT(ViewportCreateDirtyTag)
+END_HCOMPONENT()
+
+HCOMPONENT(LightCreateDirtyTag)
+END_HCOMPONENT()
+
+
 HCOMPONENT(MaterialDirtyTag)
     HUGO::String materialName = "";
 END_HCOMPONENT()
