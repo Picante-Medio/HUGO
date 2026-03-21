@@ -4,7 +4,6 @@
 #include "HugoTypes.h"
 
 HCOMPONENT(ProgressBarComponent)
-
     // range
     HUGO::Float minValue = 0.0f;
     HUGO::Float maxValue = 100.0f;

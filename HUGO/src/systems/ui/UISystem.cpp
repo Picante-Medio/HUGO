@@ -498,7 +498,11 @@ void UISystem::onLoad() {}
 
 void UISystem::update(double)
 {
-    processComponentCreations();
+    ErrorOrVoid e = processComponentCreations();
+    if(e.isError()){
+        std::cerr<<e.getError().errorMessage;
+    }
+
     processPanelChanges();
     processTextChanges();
     processVisibility();
@@ -550,36 +554,6 @@ EntityID UISystem::createPanel(const HUGO::String& overlayName)
 EntityID UISystem::createButton()
 {
     EntityID entity = 1;
-    // ButtonComponent& button = scene->addAndGetComponent<ButtonComponent>(entity);
-    // button.state = HUGO::ButtonStateTypes::BS_UP;
-
-    // // ErrorOrType<Ogre::Overlay*> overlayResult = OgreOverlayUtils::getOverlay(overlayName);
-    // // ErrorOrType<Ogre::OverlayContainer*> containerResult = OgreOverlayUtils::getContainer(button.containerName);
-    // // ErrorOrType<Ogre::OverlayElement*> elementResult = OgreOverlayUtils::getElement(button.textAreaName);
-
-    // // if (!overlayResult.isError() && !containerResult.isError()) {
-    // //     Ogre::Overlay* overlay = overlayResult.getValue();
-    // //     Ogre::OverlayContainer* container = containerResult.getValue();
-    // //     Ogre::OverlayElement* element = elementResult.isError() ? nullptr : elementResult.getValue();
-
-    // //     button.zOrder = overlay->getZOrder();
-    // //     button.metricsMode = OgreUtils::toHugo(container->getMetricsMode());
-
-    // //     uiCache[entity] = createElementCache(overlay, container, element);
-
-    // //     container->setMaterialName(button.normalMaterial);
-
-    // //     if (element) {
-    // //         Ogre::TextAreaOverlayElement* textArea = dynamic_cast<Ogre::TextAreaOverlayElement*>(element);
-    // //         if (textArea) {
-    // //             textArea->setCaption(text);
-    // //             textArea->setCharHeight(button.textSize);
-    // //             if (!button.fontName.empty())textArea->setFontName(button.fontName);
-    // //         }
-    // //     }
-
-    // //     scene->addComponent<VisibilityDirtyTag>(entity);
-    // // }
 
     return entity;
 }
