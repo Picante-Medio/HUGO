@@ -17,10 +17,7 @@ HCOMPONENT(InputFieldComponent)
     size_t cursorPos = 0; 
 
     // horizontal scroll offset
-    HUGO::Float scrollOffset = 0.0f; 
-
-    // timer used for cursor blinking
-    HUGO::Float blinkTimer = 0.0f;      
+    HUGO::Float scrollOffset = 0.0f;  
 
     // final result after submitting the input
     HUGO::String result = "";     

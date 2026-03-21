@@ -21,6 +21,7 @@ struct PanelComponent;
 struct TextComponent;
 struct ButtonComponent;
 struct ProgressBarComponent;
+struct SliderComponent;
 
 HSYSTEM(UISystem)
 private:
@@ -60,7 +61,7 @@ void syncPanel(const PanelComponent& p);
 void syncText(const TextComponent& t);
 void syncButton(const ButtonComponent& b);
 void syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr);
-
+void syncSlider(const PanelComponent& p, const SliderComponent& s);
 // void syncPanel(const PanelComponent& p, const PanelDirtyTag& tag);
 // void syncText(const PanelComponent& p, const TextComponent& t, const TextDirtyTag& tag);
 // void syncButton(const ButtonComponent& b, const ButtonDirtyTag& tag);
@@ -75,6 +76,8 @@ void processTextChanges();
 void processButtonChanges();
 void processProgressBarChanges();
 void processInput();
+void processSliderInput();
+void processSliderChanges();
 ErrorOrVoid processComponentCreations();
 //====================================================
 // CACHE
@@ -90,6 +93,7 @@ EntityID createPanel(const HUGO::String& overlayName);
 EntityID createText(const HUGO::String& overlayName);
 EntityID createButton();
 EntityID createProgressBar(const HUGO::String& overlayName);
+EntityID createSlider(const HUGO::String& overlayName);
 public:
 
 virtual ~UISystem();

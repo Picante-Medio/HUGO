@@ -23,5 +23,7 @@ HCOMPONENT(PanelComponent)
     HUGO::UIVerticalAlignment alignmentY =
         HUGO::UIVerticalAlignment::UVA_CENTER;
         
+    // appearance
     HUGO::String material = "";
+    HUGO::Vector4 colour = HUGO::Vector4(-1.0f);
 END_HCOMPONENT()

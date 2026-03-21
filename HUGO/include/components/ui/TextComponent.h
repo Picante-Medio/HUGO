@@ -11,9 +11,9 @@ HCOMPONENT(TextComponent)
     HUGO::Float characterHeight = 0.05f; // height in relative units
 
     // appearance
-    HUGO::Vector4 colour = {1.0f, 1.0f, 1.0f, 1.0f};
-    HUGO::Vector4 colourTop = {0.0f, 0.0f, 0.0f, 0.0f}; 
-    HUGO::Vector4 colourBottom = {0.0f, 0.0f, 0.0f, 0.0f};
+    HUGO::Vector4 colour = HUGO::Vector4(-1.0f);
+    HUGO::Vector4 colourTop = HUGO::Vector4(-1.0f); 
+    HUGO::Vector4 colourBottom = HUGO::Vector4(-1.0f);
         
     // space width
     HUGO::Float spaceWidth = 0.03f;  

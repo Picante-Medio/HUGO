@@ -27,3 +27,6 @@ END_HCOMPONENT()
 HCOMPONENT(ProgressBarDirtyTag) 
     //HUGO::UInt flags = HUGO::ProgressBarDirtyTags::NONE;  
 END_HCOMPONENT() 
+
+HCOMPONENT(SliderDirtyTag) 
+END_HCOMPONENT() 

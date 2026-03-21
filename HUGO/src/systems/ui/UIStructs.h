@@ -7,6 +7,7 @@
 #include <OgreOverlayContainer.h>
 #include <OgreOverlayElement.h>
 #include <OgreTextAreaOverlayElement.h>
+#include <OgrePanelOverlayElement.h>
 
 #include <vector>
 // auxiliar TADS for each UI element
@@ -23,4 +24,9 @@ struct UIButtonCache : public UIElementCache
 {
     //Ogre::BorderPanelOverlayElement* panel = nullptr;
     Ogre::TextAreaOverlayElement* textArea = nullptr;
+};
+
+struct UISliderCache : public UIElementCache
+{
+    Ogre::PanelOverlayElement* knob = nullptr;
 };
