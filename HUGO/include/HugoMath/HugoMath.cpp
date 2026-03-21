@@ -89,7 +89,17 @@ namespace HUGO {
 		return std::sqrt(x * x + y * y + z * z);
 	}
 
-	Vector3 Vector3::normalized() const {
+    void Vector3::normalize()
+    {
+		float len = length();
+		if (len > 0) {
+			x / len;
+			y / len;
+			z / len;
+		}
+    }
+
+    Vector3 Vector3::normalized() const {
 		float len = length();
 		if (len > 0) {
 			return { x / len, y / len, z / len };
@@ -155,12 +165,20 @@ namespace HUGO {
 	}
 	
 	Quaternion::Quaternion() 
-		: w(0), x(0), y(0), z(0) {}
+		: w(1), x(0), y(0), z(0) {}
 	Quaternion::Quaternion(float w, float x, float y, float z) 
 		: w(w), x(x), y(y), z(z) {}
 
     Quaternion::Quaternion(Radian angle, const Vector3 &axis)
-    	: w(angle.rad), x(axis.x), y(axis.y), z(axis.z){}
+	{
+		Vector3 k = axis.normalized();
+		float halfAngle = angle.rad* 0.5f;
+        float sin = std::sin(halfAngle);
+        w = std::cos(halfAngle);
+        x = sin*k.x;
+        y = sin*k.y;
+        z = sin*k.z;
+	}
 
     Quaternion Quaternion::inverse() const
     {

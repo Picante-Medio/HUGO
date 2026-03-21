@@ -46,6 +46,7 @@ namespace HUGO {
 		Vector3 cross(const Vector3& other) const;
 
 		float length() const;
+		void normalize();
 		Vector3 normalized() const;
 	};
 
