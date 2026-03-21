@@ -1,7 +1,4 @@
 #pragma once
-
-#include "HugoTypes.h"
-
 #include "HugoComponentMacros.h"
 
 HCOMPONENT(VisibilityDirtyTag)

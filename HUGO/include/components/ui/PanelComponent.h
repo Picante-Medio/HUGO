@@ -1,13 +1,9 @@
 #pragma once
-
+#include "HugoComponentMacros.h"
 #include "HugoMath.h"
 #include "HugoTypes.h"
-#include "HugoComponentMacros.h"
-
-#include "OgreOverlay.h"
 
 HCOMPONENT(PanelComponent)
-
     HUGO::String overlayName = "";
     HUGO::String containerName = "";
 

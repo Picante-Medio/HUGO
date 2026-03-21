@@ -1,12 +1,7 @@
 #pragma once
-#include "Component.h"
-
+#include "HugoComponentMacros.h"
 #include "HugoMath.h"
 #include "HugoTypes.h"
-#include "HugoComponentMacros.h"
-
-#include "OgreOverlay.h"
-#include "OgreTextAreaOverlayElement.h"
 
 HCOMPONENT(TextComponent)
     HUGO::String textAreaName = "textArea";     // text area element name

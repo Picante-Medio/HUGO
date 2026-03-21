@@ -1,13 +1,10 @@
 #pragma once
-#include "Component.h"
-
-#include "HugoMath.h"
-#include "HugoTypes.h"
 #include "HugoComponentMacros.h"
+#include "HugoTypes.h"
 
 HCOMPONENT(InputFieldComponent)
     bool isActive = false;
-    std::string originalText;
+    HUGO::String originalText;
 
     std::function<void(const HUGO::String&)> onChangeCallback;
 
