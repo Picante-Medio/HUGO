@@ -29,10 +29,10 @@ HSYSTEM(ConsoleSystem)
         else lastValueReturned = returnedInfo.getValue();
 
         if(std::holds_alternative<HUGO::Int>(lastValueReturned)){
-            scene->log(std::to_string(std::get<HUGO::Int>(lastValueReturned)));
+            scene->log(std::to_string(std::get<HUGO::Int>(lastValueReturned)) + "\n");
         }
         else if(std::holds_alternative<HUGO::Float>(lastValueReturned)){
-            scene->log(std::to_string(std::get<HUGO::Int>(lastValueReturned)));
+            scene->log(std::to_string(std::get<HUGO::Int>(lastValueReturned)) + "\n");
         }
         else if(std::holds_alternative<bool>(lastValueReturned)){
             bool value = std::get<bool>(lastValueReturned);
@@ -40,7 +40,7 @@ HSYSTEM(ConsoleSystem)
             else scene->log("false\n");
         }
         else{
-            scene->log(std::get<HUGO::String>(lastValueReturned));
+            scene->log(std::get<HUGO::String>(lastValueReturned) + "\n");
         }
     }
 

@@ -492,6 +492,7 @@ void UISystem::clearAllCaches()
 void UISystem::init()
 {
     renderWindow = OgreModule::Instance().getOgreRenderWindow();
+    HUGO::Input::Instance().registerAction("SubmitInput", {SDLK_RETURN});
 }
 
 void UISystem::onLoad() {}

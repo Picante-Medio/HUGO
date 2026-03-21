@@ -169,8 +169,4 @@ void ConsoleSystem::init(){
     text2.textAreaName = panel2.containerName + "/Text";
 
     scene->addComponent<CreateTextDirtyTag>(consoleText);
-
-    scene->log("HOLA\n");
-    StringError testError = StringError("error de prueba");
-    scene->log(std::make_shared<StringError>(testError));
 }
