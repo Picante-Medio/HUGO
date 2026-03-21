@@ -393,6 +393,9 @@ void UISystem::processInput()
                     if (field.originalText.empty()){
                         field.originalText = text.text;
                         text.text.clear();
+
+                        field.fullText.clear();
+                        field.cursorPos = 0;
                         scene->addComponent<TextDirtyTag>(text.entity);
                     }
                 }
@@ -406,12 +409,12 @@ void UISystem::processInput()
 
     // process text for the active input field using SDL text buffer
     const HUGO::String& textInput = input.getTextInput();
-    for (auto &pack : scene->query<InputFieldComponent, TextComponent>()) {
+    for (auto &pack : scene->query<InputFieldComponent, TextComponent, PanelComponent>()) {
         InputFieldComponent& field = pack.get<InputFieldComponent&>();
         if (!field.isActive) continue;
 
         TextComponent& text = pack.get<TextComponent&>();
-        HUGO::String str = text.text; 
+        PanelComponent& panel = pack.get<PanelComponent&>();
         bool changed = false;
 
         // append new text input from SDL
@@ -419,41 +422,76 @@ void UISystem::processInput()
             int c = static_cast<int>(textInput[0]);
             //only english printable ascii codes are accepted
             if (c > 32 && c < 127){
-                str += textInput;
+                field.fullText.insert(field.cursorPos, 1, textInput[0]);
+                field.cursorPos++;
                 changed = true;
             }
         }
 
         // backspace -> remove last character
-        if (input.wasKeyJustPressed(SDLK_BACKSPACE) && !str.empty()) {
-            str.pop_back();
+        if (input.wasKeyJustPressed(SDLK_BACKSPACE) && field.cursorPos > 0) {
+            field.fullText.erase(field.cursorPos - 1, 1);
+            field.cursorPos--;
             changed = true;
         }
 
         // enter -> save result and deactivate
         if (input.wasActionJustPressed("SubmitInput")) {
             field.isActive = false;
-            field.result = str;
-            changed = true;
+            field.result = field.fullText;
+
             if (field.onChangeCallback)
-                field.onChangeCallback(str);
+                field.onChangeCallback(field.fullText);
+
+            // recover the original text
             text.text = field.originalText;
             field.originalText.clear();
+
             scene->addComponent<TextDirtyTag>(text.entity);
+            continue;
         }
-        // update the text component if changed
-        else if (changed && str != text.text) {
-            text.text = str;
+        // update visible text
+        if (changed) {
+            UIElementCache* cache = getCache(text.entity);
+            if (!cache || !cache->element) continue;
+
+            Ogre::TextAreaOverlayElement* area =
+                dynamic_cast<Ogre::TextAreaOverlayElement*>(cache->element);
+            if (!area) continue;
+
+            const HUGO::String& full = field.fullText;
+            HUGO::Float panelWidth = panel.width;
+
+            HUGO::String visible;
+            HUGO::Float width = 0.0f;
+
+            // show only the part that fits from the end
+            for (int i = static_cast<int>(full.size() - 1); i >= 0; --i) {
+                char c = full[i];
+                HUGO::Float w = area->getFont()->getGlyphAspectRatio(c) * text.characterHeight;
+
+                if (width + w > panelWidth)
+                    break;
+
+                visible.insert(visible.begin(), c);
+                width += w;
+            }
+
+            // optionally, add a blinking cursor
+            if (field.isActive)
+                visible += "|";
+
+            text.text = visible;
             scene->addComponent<TextDirtyTag>(text.entity);
         }
     }
 
-    // clear the SDL text input buffer after processing
+    // clear SDL text input buffer
     input.clearTextInput();
 
-    // check if any input field is still active and toggle SDL text input
+    // toggle SDL text input if any field is active
     anyFieldActive = false;
-    for (auto &pack : scene->query<InputFieldComponent>()) {
+    for (auto& pack : scene->query<InputFieldComponent>()) {
         if (pack.get<InputFieldComponent&>().isActive) {
             anyFieldActive = true;
             break;
@@ -461,7 +499,6 @@ void UISystem::processInput()
     }
     input.toggleTextInput(anyFieldActive);
 }
-
 void UISystem::processProgressBarChanges()
 {
     for (auto &pack : scene->query<PanelComponent, ProgressBarComponent, ProgressBarDirtyTag>())
