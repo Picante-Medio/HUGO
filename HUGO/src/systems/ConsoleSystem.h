@@ -1,26 +1,47 @@
 #pragma once
 
 #include "HugoSystemMacros.h"
+#include "HugoMath.h"
 
 class TextComponent;
 
 HSYSTEM(ConsoleSystem)
 
-    std::deque<HUGO::String> history;
-    std::variant<int, float, bool, HUGO::String> lastValueReturned;
+    std::vector<HUGO::String> history;
+    size_t historyIndex; // Constant access and reset
     EntityID consoleInput;
     EntityID consoleText;
 
     void printLogs(TextComponent& consoleText);
     void printErrors(TextComponent& consoleText);
 
+    HUGO::String getNextHistoric();
+    HUGO::String getPreviousHistoric();
+
     void receiveInput(const HUGO::String& input);
 
     template<typename T>
     void handleReturn(ErrorOrType<T>& returnedInfo){
 
+        std::variant<int, float, bool, HUGO::String>  lastValueReturned;
+
         if(returnedInfo.isError()) scene->log(std::make_shared<StringError>(returnedInfo.getError()));
         else lastValueReturned = returnedInfo.getValue();
+
+        if(std::holds_alternative<HUGO::Int>(lastValueReturned)){
+            scene->log(std::to_string(std::get<HUGO::Int>(lastValueReturned)));
+        }
+        else if(std::holds_alternative<HUGO::Float>(lastValueReturned)){
+            scene->log(std::to_string(std::get<HUGO::Int>(lastValueReturned)));
+        }
+        else if(std::holds_alternative<bool>(lastValueReturned)){
+            bool value = std::get<bool>(lastValueReturned);
+            if(value) scene->log("true\n");
+            else scene->log("false\n");
+        }
+        else{
+            scene->log(std::get<HUGO::String>(lastValueReturned));
+        }
     }
 
     

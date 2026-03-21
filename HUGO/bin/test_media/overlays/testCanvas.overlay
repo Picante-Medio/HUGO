@@ -15,10 +15,35 @@ overlay testCanvas/SimpleTest
             top -0.02
             font_name Roboto 
             char_height 0.04 
-            caption Write something
             space_width 0.025
             colour_top 1.0 0.0 1.0 1.0
             colour_bottom 0.0 1.0 1.0 1.0
+            horz_align left 
+            vert_align center  
+        }
+    }
+}
+
+overlay testCanvas/ConsoleTextTest
+{
+    zorder 500
+
+    overlay_element testCanvas/ConsoleTextTest/Container Panel
+    {
+        left 0.3
+        top 0.5
+        width 0.3
+        height 0.1
+
+        overlay_element testCanvas/ConsoleTextTest/Container/Text TextArea
+        {
+            left 0.075
+            top -0.02
+            font_name Roboto 
+            char_height 0.04 
+            space_width 0.025
+            colour_top 1.0 1.0 1.0 1.0
+            colour_bottom 1.0 1.0 1.0 1.0
             horz_align left 
             vert_align center  
         }
