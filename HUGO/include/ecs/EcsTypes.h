@@ -1,4 +1,5 @@
 #pragma once
+#include <limits>
 
 // Entities are just numbers
 using EntityID = unsigned long int;
