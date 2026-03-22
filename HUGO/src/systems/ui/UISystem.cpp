@@ -76,15 +76,14 @@ UIElementCache* UISystem::getCache(EntityID entity)
     return it->second.get();
 }
 
+bool UISystem::isMouseOver(HUGO::Float left, HUGO::Float top, HUGO::Float width, HUGO::Float height, HUGO::Float mouseX, HUGO::Float mouseY)
+{
+    return (mouseX >= left && mouseX <= (left + width) && mouseY >= top  && mouseY <= (top+height));
+}
+
 bool UISystem::isMouseOverPanel(const PanelComponent &panel, HUGO::Float mouseX, HUGO::Float mouseY)
 {
-    HUGO::Float left   = panel.left;
-    HUGO::Float top    = panel.top;
-    HUGO::Float right  = panel.left + panel.width;
-    HUGO::Float bottom = panel.top + panel.height;
-
-    return (mouseX >= left && mouseX <= right &&
-            mouseY >= top  && mouseY <= bottom);
+    return isMouseOver(panel.left, panel.top, panel.width, panel.height, mouseX, mouseY);
 }
 
 //====================================================
@@ -97,7 +96,6 @@ void UISystem::syncPanel(const PanelComponent &p)
     if (!cache || !cache->container)
         return;
     
-    cache->overlay->setZOrder(static_cast<Ogre::ushort>(p.zOrder));
     cache->container->setLeft(p.left);
     cache->container->setTop(p.top);
     cache->container->setWidth(p.width);
@@ -106,19 +104,7 @@ void UISystem::syncPanel(const PanelComponent &p)
     cache->container->setVerticalAlignment(OgreUtils::toOgre(p.alignmentY));
     cache->container->setMetricsMode(OgreUtils::toOgre(p.metricsMode));
 
-    if (!p.material.empty())
-    {
-        cache->container->setMaterialName(p.material);
-    }
-    else
-    {
-        Ogre::PanelOverlayElement* panel = dynamic_cast<Ogre::PanelOverlayElement*>(cache->container);
-        if (!panel) return;
-
-        // if we are using colours
-        if (p.colour.x >= 0.0f)
-            panel->setColour(Ogre::ColourValue(p.colour.x, p.colour.y, p.colour.z, p.colour.w));
-    }
+    if (!p.material.empty()) cache->container->setMaterialName(p.material);
 }
 
 void UISystem::syncText(const TextComponent &t)
@@ -235,30 +221,10 @@ void UISystem::syncProgressBar(const PanelComponent& p, const ProgressBarCompone
             cache->element->setWidth(p.width * pr.fillWidth);
             break;
     }
-    // optional: sync colors/materials
-    if (!pr.fillMaterial.empty())
-        cache->element->setMaterialName(pr.fillMaterial);
-    else
-    {
-        Ogre::PanelOverlayElement* fill = dynamic_cast<Ogre::PanelOverlayElement*>(cache->element);
-        if (!fill) return;
+    // sync materials
+    if (!pr.fillMaterial.empty()) cache->element->setMaterialName(pr.fillMaterial);
 
-        // if we are using colours
-        if (pr.fillColor.x >= 0.0f)
-            fill->setColour(Ogre::ColourValue(pr.fillColor.x, pr.fillColor.y, pr.fillColor.z, pr.fillColor.w));
-    }
-
-    if (!p.material.empty())
-        cache->container->setMaterialName(p.material);
-    else
-    {
-        Ogre::PanelOverlayElement* background = dynamic_cast<Ogre::PanelOverlayElement*>(cache->container);
-        if (!background) return;
-
-        // if we are using colours
-        if (p.colour.x >= 0.0f)
-            background->setColour(Ogre::ColourValue(p.colour.x, p.colour.y, p.colour.z, p.colour.w));
-    }
+    if (!p.material.empty()) cache->container->setMaterialName(p.material);
 }
 
 void UISystem::syncSlider(const PanelComponent& p, const SliderComponent& s)
@@ -270,42 +236,41 @@ void UISystem::syncSlider(const PanelComponent& p, const SliderComponent& s)
     HUGO::Float percent = (s.currentValue - s.minValue) / (s.maxValue - s.minValue);
     percent = std::clamp(percent, 0.0f, 1.0f);
 
+    // sync track and knob
     if (s.orientation == SliderComponent::HORIZONTAL)
     {
-        HUGO::Float trackWidth = p.width - s.knobWidth;
-        cache->knob->setLeft(trackWidth * percent);
-        cache->knob->setTop(0.0f);
+        cache->element->setLeft(0.0f);
+        cache->element->setTop(0.0f);
+        cache->element->setWidth(p.width * percent);
+        cache->element->setHeight(p.height);
+        
+        HUGO::Float knobPos = (p.width - s.knobWidth) * percent;
+        knobPos = std::clamp(knobPos, 0.0f, p.width - s.knobWidth);
+        
+        cache->knob->setLeft(knobPos);
+        cache->knob->setTop(-s.knobWidth/4.0f);
         cache->knob->setWidth(s.knobWidth);
         cache->knob->setHeight(s.knobHeight);
     }
-    else
+    else // VERTICAL
     {
-        HUGO::Float trackHeight = p.height - s.knobHeight;
-        cache->knob->setTop(trackHeight * (1.0f - percent)); // invertido
-        cache->knob->setLeft(0.0f);
+        cache->element->setLeft(0.0f);
+        cache->element->setTop(p.height * (1.0f - percent));
+        cache->element->setWidth(p.width);
+        cache->element->setHeight(p.height * percent);
+        
+        HUGO::Float knobPos = (p.height - s.knobHeight) * (1.0f - percent);
+        knobPos = std::clamp(knobPos, 0.0f, p.height - s.knobHeight);
+        
+        cache->knob->setLeft(-s.knobHeight/4.0f);
+        cache->knob->setTop(knobPos);
         cache->knob->setWidth(s.knobWidth);
         cache->knob->setHeight(s.knobHeight);
     }
-
-    // materiales / colores
-    Ogre::PanelOverlayElement* trackPanel = dynamic_cast<Ogre::PanelOverlayElement*>(cache->container);
-    Ogre::PanelOverlayElement* knobPanel  = dynamic_cast<Ogre::PanelOverlayElement*>(cache->knob);
-
-    if(trackPanel)
-    {
-        if(!s.trackMaterial.empty())
-            trackPanel->setMaterialName(s.trackMaterial);
-        else
-            trackPanel->setColour(Ogre::ColourValue(s.trackColor.x, s.trackColor.y, s.trackColor.z, s.trackColor.w));
-    }
-
-    if(knobPanel)
-    {
-        if(!s.knobMaterial.empty())
-            knobPanel->setMaterialName(s.knobMaterial);
-        else
-            knobPanel->setColour(Ogre::ColourValue(s.knobColor.x, s.knobColor.y, s.knobColor.z, s.knobColor.w));
-    }
+    
+    // apply materials or colors
+    if(!s.trackMaterial.empty()) cache->element->setMaterialName(s.trackMaterial);
+    if(!s.knobMaterial.empty()) cache->knob->setMaterialName(s.knobMaterial);
 }
 
 //====================================================
@@ -330,24 +295,7 @@ void UISystem::processVisibility()
 
         if (cache && cache->overlay && cache->container)
         {
-            if (panel.isVisible)
-            {
-                cache->overlay->show();
-                cache->container->show();
-                // hide all children overlay element
-                for (auto child : cache->container->getChildren())
-                    child.second->hide();
-
-                if (cache->element)
-                    cache->element->show();
-            }
-            else
-            {
-                cache->overlay->hide();
-                cache->container->hide();
-                if (cache->element)
-                    cache->element->hide();
-            }
+            cache->setVisible(panel.isVisible);
         }
 
         scene->removeComponent<VisibilityDirtyTag>(panel.entity);
@@ -364,10 +312,9 @@ ErrorOrVoid UISystem::processComponentCreations()
         EntityID entity = panel.entity;
         ErrorOrType<Ogre::Overlay *> overlayResult = OgreOverlayUtils::getOverlay(panel.overlayName);
         if (overlayResult.isError())
-            return ErrorOrVoid("[UISystem] Panel entity " + std::to_string(panel.entity) + " missing overlay");;
+            return ErrorOrVoid("[UISystem] Panel entity " + std::to_string(panel.entity) + " missing overlay");
 
         Ogre::Overlay *overlay = overlayResult.getValue();
-        panel.zOrder = overlay->getZOrder();
 
         ErrorOrType<Ogre::OverlayContainer *> containerResult = OgreOverlayUtils::getContainer(panel.containerName);
         if (containerResult.isError())
@@ -588,28 +535,28 @@ void UISystem::processSliderInput()
     HUGO::Input& input = HUGO::Input::Instance();
     const HUGO::Input::MouseRelativePosition& mouse = input.getMouseRelativePosition();
 
-    // iteramos todos los sliders
     for (auto &pack : scene->query<SliderComponent, PanelComponent>())
     {
-        SliderComponent &slider = pack.get<SliderComponent&>();
-        PanelComponent &panel   = pack.get<PanelComponent&>();
+        SliderComponent& slider = pack.get<SliderComponent&>();
+        PanelComponent& panel   = pack.get<PanelComponent&>();
 
         UISliderCache* cache = dynamic_cast<UISliderCache*>(uiCache[slider.entity].get());
         if (!cache || !cache->container || !cache->element || !cache->knob)
             continue;
+        
+        // get knob position and size
+        HUGO::Float knobLeft = cache->knob->getLeft();
+        HUGO::Float knobTop = cache->knob->getTop();
+        bool mouseOverKnob = isMouseOver(knobLeft, knobTop, slider.knobWidth, slider.knobHeight, mouse.x, mouse.y);
+        bool mouseOverTrack = isMouseOverPanel(panel, mouse.x, mouse.y);
 
-        // detect if cursor is inside 
-        bool mouseOverKnob = isMouseOverPanel(panel, mouse.x, mouse.y); // opcional: usar bbox del knob si quieres exacto
-        if ((mouseOverKnob || isMouseOverPanel(panel, mouse.x, mouse.y)) &&
-            input.wasMouseButtonJustPressed(SDL_BUTTON_LEFT))
+        // check for initial click to start dragging
+        if ((mouseOverKnob || mouseOverTrack) && input.wasMouseButtonJustPressed(SDL_BUTTON_LEFT))
         {
             slider.isDragging = true;
-        }
-
-        // drag active
-        if (slider.isDragging)
-        {
-            if (input.isMouseButtonPressed(SDL_BUTTON_LEFT))
+            
+            // if clicking directly on the track, move knob to clicked position
+            if (mouseOverTrack && !mouseOverKnob)
             {
                 HUGO::Float percent = 0.0f;
                 if (slider.orientation == SliderComponent::HORIZONTAL)
@@ -625,6 +572,35 @@ void UISystem::processSliderInput()
                 percent = std::clamp(percent, 0.0f, 1.0f);
                 slider.currentValue = slider.minValue + percent * (slider.maxValue - slider.minValue);
             }
+        }
+        
+        // handle active dragging
+        if (slider.isDragging)
+        {
+            if (input.wasMouseButtonJustPressed(SDL_BUTTON_LEFT))
+            {
+                HUGO::Float percent = 0.0f;
+                
+                // value based on mouse position
+                if (slider.orientation == SliderComponent::HORIZONTAL)
+                {
+                    HUGO::Float trackWidth = panel.width - slider.knobWidth;
+                    percent = (mouse.x - panel.left) / trackWidth;
+                    percent = std::clamp(percent, 0.0f, 1.0f);
+                }
+                else // VERTICAL
+                {
+                    HUGO::Float trackHeight = panel.height - slider.knobHeight;
+                    percent = 1.0f - (mouse.y - panel.top) / trackHeight;
+                    percent = std::clamp(percent, 0.0f, 1.0f);
+                }
+                
+                HUGO::Float newValue = slider.minValue + percent * (slider.maxValue - slider.minValue);
+                
+                // only update if it is needed
+                if (slider.currentValue != newValue)
+                    slider.currentValue = newValue;
+            }
             else
             {
                 slider.isDragging = false;
@@ -639,7 +615,6 @@ void UISystem::processSliderChanges()
         PanelComponent& panel = pack.get<PanelComponent&>();
         SliderComponent& slider = pack.get<SliderComponent&>();
         syncSlider(panel, slider);
-        //scene->removeComponent<SliderDirtyTag>(panel.entity);
     }
 }
 //====================================================
@@ -823,8 +798,8 @@ EntityID UISystem::createSlider(const HUGO::String& overlayName)
     // names
     panel.overlayName = overlayName;
     panel.containerName = overlayName + "/Background"; // container
-    slider.trackElementName = overlayName + "/Track";     // track
-    slider.knobElementName = overlayName + "/Knob";      // knob
+    slider.trackElementName = overlayName + "/Track"; // track
+    slider.knobElementName = overlayName + "/Knob"; // knob
 
     slider.orientation = SliderComponent::Orientation::HORIZONTAL;
 
@@ -842,10 +817,9 @@ EntityID UISystem::createSlider(const HUGO::String& overlayName)
     // get track
     ErrorOrType<Ogre::OverlayElement*> trackResult = OgreOverlayUtils::getElement(slider.trackElementName);
     if (!trackResult.isError()) cache->element = trackResult.getValue();
-
     // get knob
-    ErrorOrType<Ogre::OverlayElement*> knobResult = OgreOverlayUtils::getElement(slider.knobElementName);
-    if (!knobResult.isError()) cache->knob = dynamic_cast<Ogre::PanelOverlayElement*>(knobResult.getValue());
+    ErrorOrType<Ogre::OverlayContainer*> knobContainerResult = OgreOverlayUtils::getContainer(slider.knobElementName);
+    if (!knobContainerResult.isError()) cache->knob = knobContainerResult.getValue();
 
     if (!cache->container || !cache->element || !cache->knob) return 0;
 
@@ -854,23 +828,24 @@ EntityID UISystem::createSlider(const HUGO::String& overlayName)
     panel.top = cache->container->getTop();
     panel.width = cache->container->getWidth();
     panel.height = cache->container->getHeight();
-
     panel.metricsMode = OgreUtils::toHugo(cache->container->getMetricsMode());
     panel.alignmentX  = OgreUtils::toHugo(cache->container->getHorizontalAlignment());
     panel.alignmentY  = OgreUtils::toHugo(cache->container->getVerticalAlignment());
 
     panel.isVisible = true;
+    
     panel.material = "UI/Test";
-    // initialize slider
-    slider.knobWidth = cache->knob->getWidth();
-    slider.knobHeight = cache->knob->getHeight();
+    
+    // initialize slider 
+    slider.knobWidth = cache->knob->getWidth() * panel.width;
+    slider.knobHeight = cache->knob->getHeight() * panel.height;
+    
     slider.currentValue = slider.minValue;
-
+    
     // materials and colors
+    //to use colors, the material fields must be blank.
     slider.trackMaterial = "UI/Test2";
-    slider.knobMaterial  = "UI/Test2";
-    //slider.trackColor = {1.0f, 1.0f, 1.0f, 1.0f};
-    //slider.knobColor = {0.0f, 0.0f, 0.0f, 1.0f};
+    slider.knobMaterial = "prueba/Textura"; 
 
     // dirty tags
     scene->addComponent<PanelDirtyTag>(ent);

@@ -27,10 +27,8 @@ HCOMPONENT(SliderComponent)
     // relative sizes
     HUGO::Float knobWidth = 0.0f;
     HUGO::Float knobHeight = 0.0f;
-
-    // colour if we do not use any materials
-    HUGO::Vector4 knobColor = HUGO::Vector4(-1.0f);
-    HUGO::Vector4 trackColor = HUGO::Vector4(-1.0f);
+    HUGO::Float knobLeft = 0.0f;
+    HUGO::Float knobTop =0.0f;
 
     bool isDragging = false;
 

@@ -52,6 +52,7 @@ UIElementCache* getCache(EntityID entity);
 // HELPERS
 //====================================================
 //helper to calculate if the mouse cursor is above a panel
+bool isMouseOver(HUGO::Float left, HUGO::Float top, HUGO::Float width, HUGO::Float height, HUGO::Float mouseX, HUGO::Float mouseY);
 bool isMouseOverPanel(const PanelComponent& panel, HUGO::Float mouseX, HUGO::Float mouseY);
 //====================================================
 // SYNCHRONIZATION

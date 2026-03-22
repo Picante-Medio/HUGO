@@ -27,6 +27,4 @@ HCOMPONENT(ProgressBarComponent)
     
     // material
     HUGO::String fillMaterial = "";
-    // fill color (if we dont use any material)
-    HUGO::Vector4 fillColor = HUGO::Vector4(-1.0f);
 END_HCOMPONENT()

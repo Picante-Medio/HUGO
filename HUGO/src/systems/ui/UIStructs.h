@@ -18,6 +18,7 @@ struct UIElementCache
     Ogre::OverlayContainer* container = nullptr;
     Ogre::OverlayElement* element = nullptr;
     virtual ~UIElementCache() = default;
+    virtual void setVisible(bool visible);
 };
 
 struct UIButtonCache : public UIElementCache
@@ -28,5 +29,6 @@ struct UIButtonCache : public UIElementCache
 
 struct UISliderCache : public UIElementCache
 {
-    Ogre::PanelOverlayElement* knob = nullptr;
+    Ogre::OverlayContainer* knob = nullptr;
+    void setVisible(bool visible) override;
 };

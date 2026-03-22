@@ -9,7 +9,6 @@ HCOMPONENT(PanelComponent)
 
     bool isVisible = true;
 
-    HUGO::Int zOrder = 10;
     HUGO::UIMetricsMode metricsMode = HUGO::UIMetricsMode::GMM_RELATIVE;
 
     HUGO::Float left = 0;
@@ -25,5 +24,4 @@ HCOMPONENT(PanelComponent)
         
     // appearance
     HUGO::String material = "";
-    HUGO::Vector4 colour = HUGO::Vector4(-1.0f);
 END_HCOMPONENT()
