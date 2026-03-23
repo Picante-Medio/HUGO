@@ -8,6 +8,15 @@
 #include "DenseList.h"
 
 #include "ComponentRegistry.h"
+#include "ComponentEvent.h"
+
+/// @brief Helper structure to group the events of each component
+struct ComponentModificationEvents {
+	// Events must be shared ptr to allow casting
+	std::shared_ptr<IComponentEvent> onAdd = nullptr;
+	std::shared_ptr<IComponentEvent> onUpdate = nullptr;
+	std::shared_ptr<IComponentEvent> onRemove = nullptr;
+};
 
 /**
   * @brief a list of DenseList objects, each DenseList of a different type of component
@@ -15,6 +24,7 @@
 class IComponentDenseTable {
 protected:
 	std::array<std::shared_ptr<IDenseList>, MAX_COMPONENTS> componentLists; // Components packed and alligned in memory
+	std::array<std::unique_ptr<ComponentModificationEvents>, MAX_COMPONENTS> eventsList; // Events associated to each component
 
 	/**
 	 * @brief auxiliar function that creates a DenseList of the specified type if it does not exist yet
@@ -24,7 +34,13 @@ protected:
 	void ensureListExists() {
 		ComponentID componentID = ComponentRegistry::getComponentId<T>();
 		if(componentLists[componentID] != nullptr) return;
-		componentLists[componentID] = std::make_unique<DenseList<T>>();
+		componentLists[componentID] = std::make_shared<DenseList<T>>();
+
+		// Create events
+		eventsList[componentID] = std::make_unique<ComponentModificationEvents>();
+		eventsList[componentID]->onAdd = std::make_shared<ComponentEvent<T>>();
+		eventsList[componentID]->onUpdate = std::make_shared<ComponentEvent<T>>();
+		eventsList[componentID]->onRemove = std::make_shared<ComponentEvent<T>>();
 	}
 
 	/**
@@ -40,6 +56,8 @@ protected:
 	}
 
 public:
+
+	virtual ~IComponentDenseTable() = default;
 
 	/**
 	 * @brief calls removeComponent on the DenseList that stores components of id componentID
@@ -85,6 +103,35 @@ public:
 		return getComponentList<T>()->remove(index);
 	};
 
+	/// @brief Returns a remporal reference to the addEvent of T
+	/// @tparam T Component
+	/// @return 
+	template<typename T>
+	std::shared_ptr<ComponentEvent<T>> getAddEvent() {
+		ensureListExists<T>();
+		ComponentID cmpID = ComponentRegistry::getComponentId<T>();
+		return std::static_pointer_cast<ComponentEvent<T>>(eventsList[cmpID]->onAdd);
+	}
+
+	/// @brief Returns a remporal reference to the updateEvent of T
+	/// @tparam T Component
+	/// @return 
+	template<typename T>
+	std::shared_ptr<ComponentEvent<T>> getUpdateEvent() {
+		ensureListExists<T>();
+		ComponentID cmpID = ComponentRegistry::getComponentId<T>();
+		return std::static_pointer_cast<ComponentEvent<T>>(eventsList[cmpID]->onUpdate);
+	}
+
+	/// @brief Returns a remporal reference to de removeEvent of T
+	/// @tparam T Component
+	/// @return 
+	template<typename T>
+	std::shared_ptr<ComponentEvent<T>> getRemoveEvent() {
+		ensureListExists<T>();
+		ComponentID cmpID = ComponentRegistry::getComponentId<T>();
+		return std::static_pointer_cast<ComponentEvent<T>>(eventsList[cmpID]->onRemove);
+	}
 
 	/**
 	 * @brief calls getCount on the DenseList that stores components of type T
@@ -93,7 +140,7 @@ public:
 	 */
 	template<typename T>
 	DenseListIndex getCount() const {
-		return getCount(ComponentRegistry::getComponentId<T>());
+		return getCount(ComponentRegistry::getComponentId<T>(ComponentRegistry::getComponentId<T>()));
 	}
 
 	virtual std::vector<EntityID> affectedEntities(ComponentID componentID) = 0;

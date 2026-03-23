@@ -75,6 +75,21 @@ public:
 		if(needsUpdate) entityTable->updateDenseListIndex(toUpdate, id, oldIndex);
 	}
 
+	template <typename T>
+	ComponentEventTemporalReference<T> onAddComponent() {
+		return ComponentEventTemporalReference<T>(componentTable->getAddEvent());
+	}
+
+	template <typename T>
+	ComponentEventTemporalReference<T> onUpdateComponent() {
+		return ComponentEventTemporalReference<T>(componentTable->getUpdateEvent());
+	}
+
+	template <typename T>
+	ComponentEventTemporalReference<T> onRemoveComponent() {
+		return ComponentEventTemporalReference<T>(componentTable->getRemoveEvent());
+	}
+
 	template <typename... Ts> 
 	HUGO::Query<Ts...> query() {
 		HUGO::Query<Ts...> returnedQuery;
