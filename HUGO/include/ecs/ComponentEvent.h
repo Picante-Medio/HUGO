@@ -7,6 +7,7 @@
 
 #include "EcsTypes.h"
 #include "Component.h"
+#include "System.h"
 
 template <typename T>
 using ComponentEventFunction = std::function<void(T&, EntityID)>;
@@ -91,9 +92,12 @@ class ComponentEventTemporalReference {
 
 public:
     ComponentEventTemporalReference(std::shared_ptr<ComponentEvent<T>> event): event(event) {}
-    
+
     template<typename Caller>
     std::shared_ptr<ComponentEventFunctionHandle<T>> connect(Caller* instance, void(Caller::*method)(T&, EntityID)) {
+
+        static_assert(std::is_base_of_v<System, Caller>, "instance must inherit from System");
+
         return event.connect([instance, method]
             (T& component, EntityID entity) {
                 (instance->*method)(component, entity);
