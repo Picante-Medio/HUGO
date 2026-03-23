@@ -70,8 +70,6 @@ overlay testCanvas/PBTest
 
 overlay testCanvas/SliderTest
 {
-    zorder 1
-
     // background of the slider
     overlay_element testCanvas/SliderTest/Background Panel
     {
@@ -80,19 +78,25 @@ overlay testCanvas/SliderTest
         top 0.4
         width 0.4
         height 0.04
-        //knob
-        overlay_element testCanvas/SliderTest/Knob Panel
-        {
-            metrics_mode relative
-            left 0.0 
-            top -0.25
-            width 0.1 
-            height 1.5
-        }
         // fill 
         overlay_element testCanvas/SliderTest/Track Panel
         {
+            zorder 1
             metrics_mode relative
+            left 0.0
+            top 0.0
+            width 0.0
+            height 0.0
+        }
+        //knob
+        overlay_element testCanvas/SliderTest/Knob Panel
+        {
+            zorder 100
+            metrics_mode relative
+            left -0.1 
+            top -0.25
+            width 0.1 
+            height 1.5
         }
     }
 }

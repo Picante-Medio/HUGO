@@ -834,7 +834,7 @@ EntityID UISystem::createSlider(const HUGO::String& overlayName)
 
     panel.isVisible = true;
     
-    panel.material = "UI/Test";
+    panel.material = "UI/Background";
     
     // initialize slider 
     slider.knobWidth = cache->knob->getWidth() * panel.width;
@@ -844,8 +844,8 @@ EntityID UISystem::createSlider(const HUGO::String& overlayName)
     
     // materials and colors
     //to use colors, the material fields must be blank.
-    slider.trackMaterial = "UI/Test2";
-    slider.knobMaterial = "prueba/Textura"; 
+    slider.trackMaterial = "UI/Track";
+    slider.knobMaterial = "UI/Knob"; 
 
     // dirty tags
     scene->addComponent<PanelDirtyTag>(ent);
