@@ -24,20 +24,20 @@ struct EaseInBackTween: public Easing{
 struct EaseInExponentialTween: public Easing{
     inline HUGO::Float easingFunction(HUGO::Float t) override{
         if(t ==0) return 0;
-        return pow(2, 10 * t - 10);
+        return static_cast<HUGO::Float>(pow(2, 10 * t - 10));
     }
 };
 
 struct EaseOutQuintTween: public Easing{
     inline HUGO::Float easingFunction(HUGO::Float t) override{
-        return 1- pow(1-t, 5);
+        return static_cast<HUGO::Float>(1- pow(1-t, 5));
     }
 };
 
 struct EaseInOutCubicTween: public Easing{
     inline HUGO::Float easingFunction(HUGO::Float t) override{
         if(t < 0.5) return 4 * t * t * t;
-        return 1 - pow(-2 * t + 2, 3) / 2;
+        return static_cast<HUGO::Float>(1 - pow(-2 * t + 2, 3) / 2);
     }
     
 };
@@ -46,10 +46,10 @@ struct EaseOutElasticTween: public Easing{
     inline HUGO::Float easingFunction(HUGO::Float t) override{
         const HUGO::Float c4 = (2.f * HUGO::PI) / 3.f;
 
-        return t == 0
+        return static_cast<HUGO::Float>(t == 0
         ? 0
         : t == 1
         ? 1
-        : pow(2, -10 * t) * sin((t * 10 - 0.75) * c4) + 1;
+        : pow(2, -10 * t) * sin((t * 10 - 0.75) * c4) + 1);
     }
 };

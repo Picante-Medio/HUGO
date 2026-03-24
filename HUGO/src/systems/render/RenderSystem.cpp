@@ -376,7 +376,7 @@ void RenderSystem::updateAnimations(double dt)
     }
 }
 // ==================== Fixed Update ====================
-void RenderSystem::fixedUpdate(double dt){}
+void RenderSystem::fixedUpdate(double){}
 
 // ==================== Update ====================
 void RenderSystem::update(double dt)
@@ -738,7 +738,7 @@ ErrorOrVoid RenderSystem::createOgreViewport(EntityID entity)
         viewportComp->getWidth(),
         viewportComp->getHeight()
     );
-
+    
     // background color
     res.ogreViewport->setBackgroundColour(Ogre::ColourValue(
         viewportComp->getClearColor().x,
@@ -746,6 +746,8 @@ ErrorOrVoid RenderSystem::createOgreViewport(EntityID entity)
         viewportComp->getClearColor().z,
         viewportComp->getClearColor().w
     ));
+    
+    res.ogreViewport->setDimensions(0.0f, 0.0f, 1.0f, 1.0f);
     
     cam->setAspectRatio(float(res.ogreViewport->getActualWidth()) / float(res.ogreViewport->getActualHeight()));
     
@@ -759,23 +761,13 @@ ErrorOrVoid RenderSystem::createOgreViewport(EntityID entity)
 #pragma region  Screen Changes
 void RenderSystem::updateViewportDimensions()
 {
-    for (auto& [entity, res] : viewportMap) {
-        if (res.ogreViewport) {
-            int w,h;
-            SDL_GetWindowSize(OgreModule::Instance().getSDLWindow(), &w, &h);
-            if (w > 0 && h > 0)
-            {
-                res.ogreViewport->setDimensions(0, 0, 1, 1);
-                res.ogreViewport->update();
-            }
-
-            // update cameras asociated to the viewport
-            Ogre::Camera* cam = res.ogreViewport->getCamera();
-            if (cam) {
-                cam->setAspectRatio(float(res.ogreViewport->getActualWidth()) / 
-                                    float(res.ogreViewport->getActualHeight()));
-            }
-        }
+    int w,h;
+    SDL_GetWindowSize(OgreModule::Instance().getSDLWindow(), &w, &h);
+    if (w > 0 && h > 0)
+    {
+        Ogre::RenderWindow* renderWindow = OgreModule::Instance().getOgreRenderWindow();
+        renderWindow->resize(w, h);
+        renderWindow->windowMovedOrResized();
     }
 }
 

@@ -27,6 +27,4 @@ void TweenSystem::update(double dt) {
         }
     }
 }
-void TweenSystem::fixedUpdate(double dt) {
-
-}
+void TweenSystem::fixedUpdate(double) {}
