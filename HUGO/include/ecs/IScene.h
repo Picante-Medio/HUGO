@@ -131,6 +131,11 @@ public:
 
     virtual ErrorOrType<HUGO::String> getNextError() = 0;
     virtual ErrorOrType<HUGO::String> getNextLog() = 0;
+
+	template <typename TMessage>
+	void sendMessage(TMessage message) {
+		
+	}
 };
 
 }

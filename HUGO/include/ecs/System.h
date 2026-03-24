@@ -22,6 +22,10 @@ public:
 
 	virtual void fixedUpdate(double dt) = 0;
 	virtual void update(double dt) = 0;
+
+	// Implement this method per type of message to be subscribed to
+	template <typename TMessage>
+	void receiveMessage(TMessage message) {}
 };
 
 }
