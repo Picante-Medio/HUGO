@@ -9,21 +9,21 @@
 //====================================================
 // CONVERSIONS FOR MATH TYPES
 //====================================================
-Ogre::Vector3 OgreUtils::vector3ToOgre(const HUGO::Vector3 &vec3)
+Ogre::Vector3 HUGO::OgreUtils::vector3ToOgre(const HUGO::Vector3 &vec3)
 {
     return Ogre::Vector3(vec3.x, vec3.y, vec3.z);
 }
 
-Ogre::Quaternion OgreUtils::quaternionToOgre(const HUGO::Quaternion &q)
+Ogre::Quaternion HUGO::OgreUtils::quaternionToOgre(const HUGO::Quaternion &q)
 {
     return Ogre::Quaternion(q.w, q.x, q.y, q.z);
 }
 
-Ogre::Radian OgreUtils::radianToOgre(const HUGO::Radian &radian)
+Ogre::Radian HUGO::OgreUtils::radianToOgre(const HUGO::Radian &radian)
 {
     return Ogre::Radian(radian.rad);
 }
-Ogre::Degree OgreUtils::degreeToOgre(const HUGO::Degree &degree)
+Ogre::Degree HUGO::OgreUtils::degreeToOgre(const HUGO::Degree &degree)
 {
     return Ogre::Degree(degree.deg);
 }
@@ -31,7 +31,7 @@ Ogre::Degree OgreUtils::degreeToOgre(const HUGO::Degree &degree)
 //====================================================
 // CONVERSIONS FOR UI TYPES
 //====================================================
-Ogre::GuiMetricsMode OgreUtils::toOgre(HUGO::UIMetricsMode mode)
+Ogre::GuiMetricsMode HUGO::OgreUtils::toOgre(HUGO::UIMetricsMode mode)
 {
     switch (mode) {
         case HUGO::GMM_RELATIVE:
@@ -45,7 +45,7 @@ Ogre::GuiMetricsMode OgreUtils::toOgre(HUGO::UIMetricsMode mode)
     }
 }
 
-Ogre::GuiHorizontalAlignment OgreUtils::toOgre(HUGO::UIHorizontalAlignment align)
+Ogre::GuiHorizontalAlignment HUGO::OgreUtils::toOgre(HUGO::UIHorizontalAlignment align)
 {
     switch (align) {
         case HUGO::UHA_LEFT:
@@ -59,7 +59,7 @@ Ogre::GuiHorizontalAlignment OgreUtils::toOgre(HUGO::UIHorizontalAlignment align
     }
 }
 
-Ogre::GuiVerticalAlignment OgreUtils::toOgre(HUGO::UIVerticalAlignment align)
+Ogre::GuiVerticalAlignment HUGO::OgreUtils::toOgre(HUGO::UIVerticalAlignment align)
 {
     switch (align) {
         case HUGO::UVA_TOP:
@@ -73,7 +73,7 @@ Ogre::GuiVerticalAlignment OgreUtils::toOgre(HUGO::UIVerticalAlignment align)
     }
 }
 
-HUGO::UIMetricsMode OgreUtils::toHugo(Ogre::GuiMetricsMode mode)
+HUGO::UIMetricsMode HUGO::OgreUtils::toHugo(Ogre::GuiMetricsMode mode)
 {
     switch (mode) {
         case Ogre::GMM_RELATIVE: return HUGO::GMM_RELATIVE;
@@ -83,7 +83,7 @@ HUGO::UIMetricsMode OgreUtils::toHugo(Ogre::GuiMetricsMode mode)
     }
 }
 
-HUGO::UIHorizontalAlignment OgreUtils::toHugo(Ogre::GuiHorizontalAlignment align)
+HUGO::UIHorizontalAlignment HUGO::OgreUtils::toHugo(Ogre::GuiHorizontalAlignment align)
 {
     switch (align) {
         case Ogre::GHA_LEFT: return HUGO::UHA_LEFT;
@@ -93,7 +93,7 @@ HUGO::UIHorizontalAlignment OgreUtils::toHugo(Ogre::GuiHorizontalAlignment align
     }
 }
 
-HUGO::UIVerticalAlignment OgreUtils::toHugo(Ogre::GuiVerticalAlignment align)
+HUGO::UIVerticalAlignment HUGO::OgreUtils::toHugo(Ogre::GuiVerticalAlignment align)
 {
     switch (align) {
         case Ogre::GVA_TOP: return HUGO::UVA_TOP;
@@ -103,7 +103,7 @@ HUGO::UIVerticalAlignment OgreUtils::toHugo(Ogre::GuiVerticalAlignment align)
     }
 }
 
-ErrorOrType<Ogre::Overlay*> OgreOverlayUtils::getOverlay(const HUGO::String& name)
+ErrorOrType<Ogre::Overlay*> HUGO::OgreOverlayUtils::getOverlay(const HUGO::String& name)
 {
     StringError e;
     if (name.empty()) {
@@ -119,7 +119,7 @@ ErrorOrType<Ogre::Overlay*> OgreOverlayUtils::getOverlay(const HUGO::String& nam
     return ErrorOrType<Ogre::Overlay*>(overlay);
 }
 
-ErrorOrType<Ogre::OverlayElement*> OgreOverlayUtils::getElement(const HUGO::String& name)
+ErrorOrType<Ogre::OverlayElement*> HUGO::OgreOverlayUtils::getElement(const HUGO::String& name)
 {
     StringError e;
     if (name.empty()) {
@@ -135,7 +135,7 @@ ErrorOrType<Ogre::OverlayElement*> OgreOverlayUtils::getElement(const HUGO::Stri
     return ErrorOrType<Ogre::OverlayElement*>(element);
 }
 
-ErrorOrType<Ogre::OverlayContainer*> OgreOverlayUtils::getContainer(const HUGO::String& name)
+ErrorOrType<Ogre::OverlayContainer*> HUGO::OgreOverlayUtils::getContainer(const HUGO::String& name)
 {
     StringError e;
     ErrorOrType<Ogre::OverlayElement*> elementResult = getElement(name);

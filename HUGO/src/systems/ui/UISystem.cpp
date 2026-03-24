@@ -49,16 +49,16 @@ std::shared_ptr<UIElementCache> UISystem::createElementCache(EntityID entity, co
 {
     std::shared_ptr<UIElementCache> cache = std::make_shared<UIElementCache>();
     
-    ErrorOrType<Ogre::Overlay*> overlayResult = OgreOverlayUtils::getOverlay(overlayName);
+    ErrorOrType<Ogre::Overlay*> overlayResult = HUGO::OgreOverlayUtils::getOverlay(overlayName);
     if (!overlayResult.isError())
         cache->overlay = overlayResult.getValue();
     
-    ErrorOrType<Ogre::OverlayContainer*> containerResult = OgreOverlayUtils::getContainer(containerName);
+    ErrorOrType<Ogre::OverlayContainer*> containerResult = HUGO::OgreOverlayUtils::getContainer(containerName);
     if (!containerResult.isError())
         cache->container = containerResult.getValue();
     
     if (elementName != ""){
-        ErrorOrType<Ogre::OverlayElement*> elementResult = OgreOverlayUtils::getElement(elementName);
+        ErrorOrType<Ogre::OverlayElement*> elementResult = HUGO::OgreOverlayUtils::getElement(elementName);
         if (!elementResult.isError())
             cache->element = elementResult.getValue();
     }
@@ -100,9 +100,9 @@ void UISystem::syncPanel(const PanelComponent &p)
     cache->container->setTop(p.top);
     cache->container->setWidth(p.width);
     cache->container->setHeight(p.height);
-    cache->container->setHorizontalAlignment(OgreUtils::toOgre(p.alignmentX));
-    cache->container->setVerticalAlignment(OgreUtils::toOgre(p.alignmentY));
-    cache->container->setMetricsMode(OgreUtils::toOgre(p.metricsMode));
+    cache->container->setHorizontalAlignment(HUGO::OgreUtils::toOgre(p.alignmentX));
+    cache->container->setVerticalAlignment(HUGO::OgreUtils::toOgre(p.alignmentY));
+    cache->container->setMetricsMode(HUGO::OgreUtils::toOgre(p.metricsMode));
 
     if (!p.material.empty()) cache->container->setMaterialName(p.material);
 }
@@ -293,13 +293,13 @@ ErrorOrVoid UISystem::processComponentCreations()
         PanelComponent &panel = pack.get<PanelComponent &>();
         CreatePanelDirtyTag &tag = pack.get<CreatePanelDirtyTag &>();
         EntityID entity = panel.entity;
-        ErrorOrType<Ogre::Overlay *> overlayResult = OgreOverlayUtils::getOverlay(panel.overlayName);
+        ErrorOrType<Ogre::Overlay *> overlayResult = HUGO::OgreOverlayUtils::getOverlay(panel.overlayName);
         if (overlayResult.isError())
             return ErrorOrVoid("[UISystem] Panel entity " + std::to_string(panel.entity) + " missing overlay");
 
         Ogre::Overlay *overlay = overlayResult.getValue();
 
-        ErrorOrType<Ogre::OverlayContainer *> containerResult = OgreOverlayUtils::getContainer(panel.containerName);
+        ErrorOrType<Ogre::OverlayContainer *> containerResult = HUGO::OgreOverlayUtils::getContainer(panel.containerName);
         if (containerResult.isError())
             return ErrorOrVoid("[UISystem] Panel entity " + std::to_string(panel.entity) + " missing container");
 
@@ -310,9 +310,9 @@ ErrorOrVoid UISystem::processComponentCreations()
         panel.top = container->getTop();
         panel.width = container->getWidth();
         panel.height = container->getHeight();
-        panel.metricsMode = OgreUtils::toHugo(container->getMetricsMode());
-        panel.alignmentX = OgreUtils::toHugo(container->getHorizontalAlignment());
-        panel.alignmentY = OgreUtils::toHugo(container->getVerticalAlignment());
+        panel.metricsMode = HUGO::OgreUtils::toHugo(container->getMetricsMode());
+        panel.alignmentX = HUGO::OgreUtils::toHugo(container->getHorizontalAlignment());
+        panel.alignmentY = HUGO::OgreUtils::toHugo(container->getVerticalAlignment());
         
         container->setMaterialName(panel.material);
         scene->addComponent<VisibilityDirtyTag>(panel.entity);
@@ -327,7 +327,7 @@ ErrorOrVoid UISystem::processComponentCreations()
         TextComponent &text = pack.get<TextComponent &>();
         CreateTextDirtyTag &tag = pack.get<CreateTextDirtyTag &>();
 
-        ErrorOrType<Ogre::OverlayElement *> elementResult = OgreOverlayUtils::getElement(text.textAreaName);
+        ErrorOrType<Ogre::OverlayElement *> elementResult = HUGO::OgreOverlayUtils::getElement(text.textAreaName);
         if (elementResult.isError())
             return ErrorOrVoid("[UISystem] Text entity " + std::to_string(text.entity) + " missing element");
 
@@ -741,9 +741,9 @@ EntityID UISystem::createPanel(const HUGO::String& overlayName)
     panel.width  = container->getWidth();
     panel.height = container->getHeight();
 
-    panel.metricsMode = OgreUtils::toHugo(container->getMetricsMode());
-    panel.alignmentX  = OgreUtils::toHugo(container->getHorizontalAlignment());
-    panel.alignmentY  = OgreUtils::toHugo(container->getVerticalAlignment());
+    panel.metricsMode = HUGO::OgreUtils::toHugo(container->getMetricsMode());
+    panel.alignmentX  = HUGO::OgreUtils::toHugo(container->getHorizontalAlignment());
+    panel.alignmentY  = HUGO::OgreUtils::toHugo(container->getVerticalAlignment());
 
     panel.isVisible = true;
     panel.material = "test/UI";
@@ -772,7 +772,7 @@ EntityID UISystem::createText(const HUGO::String& overlayName)
 
     UIElementCache* cache = getCache(ent);
 
-    ErrorOrType<Ogre::OverlayElement*> elementResult = OgreOverlayUtils::getElement(text.textAreaName);
+    ErrorOrType<Ogre::OverlayElement*> elementResult = HUGO::OgreOverlayUtils::getElement(text.textAreaName);
     if (!elementResult.isError())
         cache->element = elementResult.getValue();
 
@@ -822,9 +822,9 @@ EntityID UISystem::createProgressBar(const HUGO::String& overlayName)
     panel.width  = cache->container->getWidth();
     panel.height = cache->container->getHeight();
 
-    panel.metricsMode = OgreUtils::toHugo(cache->container->getMetricsMode());
-    panel.alignmentX  = OgreUtils::toHugo(cache->container->getHorizontalAlignment());
-    panel.alignmentY  = OgreUtils::toHugo(cache->container->getVerticalAlignment());
+    panel.metricsMode = HUGO::OgreUtils::toHugo(cache->container->getMetricsMode());
+    panel.alignmentX  = HUGO::OgreUtils::toHugo(cache->container->getHorizontalAlignment());
+    panel.alignmentY  = HUGO::OgreUtils::toHugo(cache->container->getVerticalAlignment());
 
     panel.isVisible = true;
 
@@ -866,17 +866,17 @@ EntityID UISystem::createSlider(const HUGO::String& overlayName)
     uiCache[ent] = cache;
 
     // get overlay and container (background)
-    ErrorOrType<Ogre::Overlay*> overlayResult = OgreOverlayUtils::getOverlay(panel.overlayName);
+    ErrorOrType<Ogre::Overlay*> overlayResult = HUGO::OgreOverlayUtils::getOverlay(panel.overlayName);
     if (!overlayResult.isError()) cache->overlay = overlayResult.getValue();
 
-    ErrorOrType<Ogre::OverlayContainer*> containerResult = OgreOverlayUtils::getContainer(panel.containerName);
+    ErrorOrType<Ogre::OverlayContainer*> containerResult = HUGO::OgreOverlayUtils::getContainer(panel.containerName);
     if (!containerResult.isError()) cache->container = containerResult.getValue();
 
     // get track
-    ErrorOrType<Ogre::OverlayElement*> trackResult = OgreOverlayUtils::getElement(slider.trackElementName);
+    ErrorOrType<Ogre::OverlayElement*> trackResult = HUGO::OgreOverlayUtils::getElement(slider.trackElementName);
     if (!trackResult.isError()) cache->element = trackResult.getValue();
     // get knob
-    ErrorOrType<Ogre::OverlayContainer*> knobContainerResult = OgreOverlayUtils::getContainer(slider.knobElementName);
+    ErrorOrType<Ogre::OverlayContainer*> knobContainerResult = HUGO::OgreOverlayUtils::getContainer(slider.knobElementName);
     if (!knobContainerResult.isError()) cache->knob = knobContainerResult.getValue();
 
     if (!cache->container || !cache->element || !cache->knob) return 0;
@@ -886,9 +886,9 @@ EntityID UISystem::createSlider(const HUGO::String& overlayName)
     panel.top = cache->container->getTop();
     panel.width = cache->container->getWidth();
     panel.height = cache->container->getHeight();
-    panel.metricsMode = OgreUtils::toHugo(cache->container->getMetricsMode());
-    panel.alignmentX  = OgreUtils::toHugo(cache->container->getHorizontalAlignment());
-    panel.alignmentY  = OgreUtils::toHugo(cache->container->getVerticalAlignment());
+    panel.metricsMode = HUGO::OgreUtils::toHugo(cache->container->getMetricsMode());
+    panel.alignmentX  = HUGO::OgreUtils::toHugo(cache->container->getHorizontalAlignment());
+    panel.alignmentY  = HUGO::OgreUtils::toHugo(cache->container->getVerticalAlignment());
 
     panel.isVisible = true;
     
