@@ -103,7 +103,7 @@ void UISystem::syncPanel(const PanelComponent &p)
     cache->container->setHeight(p.height);
     // cache->container->setHorizontalAlignment(OgreUtils::toOgre(p.alignmentX));
     // cache->container->setVerticalAlignment(OgreUtils::toOgre(p.alignmentY));
-    // cache->container->setMetricsMode(OgreUtils::toOgre(p.metricsMode));
+    cache->container->setMetricsMode(Ogre::GuiMetricsMode::GMM_RELATIVE);
 
     if (!p.material.empty()) cache->container->setMaterialName(p.material);
 }
@@ -296,7 +296,7 @@ ErrorOrVoid UISystem::processComponentCreations()
         EntityID entity = panel.entity;
         createElementCache(entity, panel.overlayName, panel.containerName);
         scene->addComponent<VisibilityDirtyTag>(panel.entity);
-        syncPanel(panel);
+        scene->addComponent<PanelDirtyTag>(entity);
         scene->removeComponent<CreatePanelDirtyTag>(tag.entity);
     }
     

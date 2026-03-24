@@ -71,9 +71,11 @@ TestSystem::init() {
 
     EntityID boton = scene->createEntity();
     PanelComponent& panel = scene->addAndGetComponent<PanelComponent>(boton);
-    panel.overlayName = "testCanvas/SimpleTest";
+    panel.overlayName = "testCanvas/test1";
     panel.containerName = panel.overlayName + "/Container";
-    panel.material = "UI/Background";
+    panel.material = "UI/Test";
+    panel.width = 0.3f;
+    panel.height = 0.1f;
 
 
     scene->addComponent<CreatePanelDirtyTag>(boton);

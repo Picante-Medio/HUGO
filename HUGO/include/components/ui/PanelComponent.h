@@ -11,10 +11,10 @@ HCOMPONENT(PanelComponent)
 
     // HUGO::UIMetricsMode metricsMode = HUGO::UIMetricsMode::GMM_RELATIVE;
 
-    HUGO::Float left = 0;
-    HUGO::Float top = 0;
-    HUGO::Float width = 0;
-    HUGO::Float height = 0;
+    HUGO::Float left = 0.0f;
+    HUGO::Float top = 0.0f;
+    HUGO::Float width = 1.0f;
+    HUGO::Float height = 1.0f;
 
     // HUGO::UIHorizontalAlignment alignmentX =
     //     HUGO::UIHorizontalAlignment::UHA_LEFT;
