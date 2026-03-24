@@ -77,17 +77,17 @@ public:
 
 	template <typename T>
 	ComponentEventTemporalReference<T> onAddComponent() {
-		return ComponentEventTemporalReference<T>(componentTable->getAddEvent());
+		return ComponentEventTemporalReference<T>(componentTable->getAddEvent<T>());
 	}
 
 	template <typename T>
 	ComponentEventTemporalReference<T> onUpdateComponent() {
-		return ComponentEventTemporalReference<T>(componentTable->getUpdateEvent());
+		return ComponentEventTemporalReference<T>(componentTable->getUpdateEvent<T>());
 	}
 
 	template <typename T>
 	ComponentEventTemporalReference<T> onRemoveComponent() {
-		return ComponentEventTemporalReference<T>(componentTable->getRemoveEvent());
+		return ComponentEventTemporalReference<T>(componentTable->getRemoveEvent<T>());
 	}
 
 	template <typename... Ts> 

@@ -4,3 +4,7 @@ function myDebug()
     print()
     print()
 end
+
+function suma(a, b)
+    return a+b
+end
