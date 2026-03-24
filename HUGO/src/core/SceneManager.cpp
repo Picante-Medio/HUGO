@@ -101,6 +101,8 @@ void SceneManager::setCurrentScene(const HUGO::String& sceneName){
     }
 
     m_currentScene = m_sceneMap[sceneName];
+    
+    m_currentScene->load();
 }
 
 ErrorOrVoid SceneManager::setMainScene(){
