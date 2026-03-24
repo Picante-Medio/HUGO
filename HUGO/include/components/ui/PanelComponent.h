@@ -13,8 +13,8 @@ HCOMPONENT(PanelComponent)
 
     HUGO::Float left = 0.0f;
     HUGO::Float top = 0.0f;
-    HUGO::Float width = 1.0f;
-    HUGO::Float height = 1.0f;
+    HUGO::Float width = 0.1f;
+    HUGO::Float height = 0.1f;
 
     // HUGO::UIHorizontalAlignment alignmentX =
     //     HUGO::UIHorizontalAlignment::UHA_LEFT;

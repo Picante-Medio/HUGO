@@ -134,9 +134,13 @@ void ConsoleSystem::init(){
     consoleInput = scene->createEntity();
 
     PanelComponent& panel = scene->addAndGetComponent<PanelComponent>(consoleInput);
-    panel.overlayName = "testCanvas/SimpleTest";
+    panel.overlayName = "testCanvas/SimpleTest1";
     panel.containerName = panel.overlayName + "/Container";
-    panel.material = "UI/Test";
+    panel.material = "UI/Background";
+    panel.width = 0.3f;
+    panel.height =0.2f;
+    panel.left =0.5f;
+    panel.top = 0.2f;
 
     scene->addComponent<CreatePanelDirtyTag>(consoleInput);
 
@@ -161,7 +165,7 @@ void ConsoleSystem::init(){
     PanelComponent& panel2 = scene->addAndGetComponent<PanelComponent>(consoleText);
     panel2.overlayName = "testCanvas/ConsoleTextTest";
     panel2.containerName = panel2.overlayName + "/Container";
-    panel2.material = "UI/Test";
+    panel2.material = "UI/Knob";
 
     scene->addComponent<CreatePanelDirtyTag>(consoleText);
 

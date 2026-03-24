@@ -120,7 +120,8 @@ ErrorOrType<Ogre::Overlay*> HUGO::OgreOverlayUtils::getOverlay(const HUGO::Strin
             return ErrorOrType<Ogre::Overlay*>(e);
         }
     }
-
+    
+    //TODO: WE NEED TO ADD INTO THE OVERLAY
     return ErrorOrType<Ogre::Overlay*>(overlay);
 }
 
@@ -142,6 +143,9 @@ ErrorOrType<Ogre::OverlayElement*> HUGO::OgreOverlayUtils::getElement(const HUGO
             e.errorMessage = "Cannot find element: " + name;
             return ErrorOrType<Ogre::OverlayElement*>(e);
         }
+    }
+    else{
+        element = Ogre::OverlayManager::getSingleton().getOverlayElement(name);
     }
     return ErrorOrType<Ogre::OverlayElement*>(element);
 }

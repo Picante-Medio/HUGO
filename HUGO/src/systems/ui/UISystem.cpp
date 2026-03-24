@@ -297,7 +297,7 @@ ErrorOrVoid UISystem::processComponentCreations()
         createElementCache(entity, panel.overlayName, panel.containerName);
         scene->addComponent<VisibilityDirtyTag>(panel.entity);
         scene->addComponent<PanelDirtyTag>(entity);
-        scene->removeComponent<CreatePanelDirtyTag>(tag.entity);
+        scene->removeComponent<CreatePanelDirtyTag>(entity);
     }
     
     
@@ -306,7 +306,7 @@ ErrorOrVoid UISystem::processComponentCreations()
         TextComponent &text = pack.getDeprecated<TextComponent &>();
         CreateTextDirtyTag &tag = pack.getDeprecated<CreateTextDirtyTag &>();
 
-        ErrorOrType<Ogre::OverlayElement *> elementResult = HUGO::OgreOverlayUtils::getElement(text.textAreaName);
+        ErrorOrType<Ogre::OverlayElement *> elementResult = HUGO::OgreOverlayUtils::getElement(text.textAreaName, true);
         if (elementResult.isError())
             return ErrorOrVoid("[UISystem] Text entity " + std::to_string(text.entity) + " missing element");
 
