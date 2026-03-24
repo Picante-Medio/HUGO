@@ -1,12 +1,14 @@
 #pragma once
 #include "HugoComponentMacros.h"
 
-HCOMPONENT(HierarchyDirtyTag)
-END_HCOMPONENT()
-
 HCOMPONENT(WorldTransformDirtyTag)
 END_HCOMPONENT()
 
 HCOMPONENT(ParentCompDirtyTag)
 END_HCOMPONENT()
 
+HCOMPONENT(ChildrenCompDirtyTag)
+END_HCOMPONENT()
+
+HCOMPONENT(DeadEntityTag)
+END_HCOMPONENT()

@@ -10,6 +10,8 @@ struct ParentComponent;
 HSYSTEM(HierarchySystem)
 private:
     //functions to update hierarchy
+    void addParentToChild(EntityID child, EntityID parent);
+    void removeParentFromChild(EntityID child, EntityID parent);
     void addChildToParent(EntityID child, EntityID parent);
     void removeChildFromParent(EntityID child, EntityID parent);
     bool hasCycle(EntityID child, EntityID newParent);
@@ -18,8 +20,10 @@ private:
     //functions to update transform
     void addWorldDirtyTagForChildren(EntityID parent);
     void setLocalTransform(TransformComponent& transform);
-    void updateWorldTransform(TransformComponent& transform, std::unordered_set<EntityID>& visited);
-    TransformComponent& getFullTransform(EntityID entity, std::unordered_set<EntityID>& visited);
+    void updateWorldTransform(TransformComponent& transform);
+    TransformComponent& getFullTransform(EntityID entity);
+
+    void onEntityDestroyed(EntityID entity);
 public:
     virtual ~HierarchySystem(){};
 
