@@ -202,3 +202,9 @@ Scene::getNextLog() {
     stringsToLog.pop();
     return ErrorOrType<HUGO::String>(ret);
 }
+
+void
+Scene::dispatchMessages() {
+
+	messenger.sendAll();
+}

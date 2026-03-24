@@ -3,6 +3,7 @@
 #include "System.h"
 #include "HugoTypes.h"
 #include "HugoError.h"
+#include "Messenger.h"
 
 #include "IScene.h"
 #include <memory>
@@ -12,6 +13,7 @@ class Scene : public HUGO::IScene, public std::enable_shared_from_this<Scene> {
   std::vector<std::shared_ptr<HUGO::System>> systems;
   std::queue<std::shared_ptr<Error>> errorsToLog;
   std::queue<HUGO::String> stringsToLog;
+  HUGO::Messenger messenger;
 
 public:
   Scene();
@@ -46,4 +48,12 @@ public:
 
   ErrorOrType<HUGO::String> getNextError() override;
   ErrorOrType<HUGO::String> getNextLog() override;
+
+  // Called by systems to send a message
+  template <typename TMessage>
+	void sendMessage(TMessage message) {
+		messenger.enqueueMessage<TMessage>(message);
+	}
+
+  void dispatchMessages();
 };

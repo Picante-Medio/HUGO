@@ -1,5 +1,5 @@
 #include <memory>
-#include <vector>
+#include <array>
 
 #include "Channel.h"
 #include "Message.h"
@@ -27,7 +27,7 @@ public:
     void send(std::vector<std::shared_ptr<System>> systems) {
         std::shared_ptr<Channel<TMessage>> channel = getChannel<TMessage>();
         while(!channel->empty()) {
-            TMessage message = std::static_cast<TMessage>(channel->pop());
+            TMessage message = static_cast<TMessage>(channel->pop());
             for(auto system : systems) {
                 system->receiveMessage<TMessage>(message);
             }
@@ -38,5 +38,7 @@ public:
     void enqueueMessage(TMessage message) {
         getChannel<TMessage>().push(message);
     }
+
+    void sendAll() {}
 };
 }

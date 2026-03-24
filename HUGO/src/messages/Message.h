@@ -2,7 +2,7 @@
 namespace HUGO {
 using MsgID = unsigned long int;
 
-// Empty struct, implementation provided by user per type of message
+// Empty struct, implementation must be provided by user per type of message
 struct Message {
 
 };
