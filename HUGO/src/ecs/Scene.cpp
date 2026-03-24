@@ -205,6 +205,5 @@ Scene::getNextLog() {
 
 void
 Scene::dispatchMessages() {
-
 	messenger.sendAll();
 }

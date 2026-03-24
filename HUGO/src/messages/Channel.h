@@ -1,29 +1,19 @@
-#include "Message.h"
+#include <functional>
+#include <memory>
 #include <queue>
+#include <vector>
+
+#include "Message.h"
 
 namespace HUGO {
-class IChannel {
-public:
-    virtual bool empty() const = 0;
-    virtual Message pop() = 0;
-    virtual void push(Message m) = 0;
-};
 
-template <typename TMessage>
-class Channel : public IChannel {
-    std::queue<TMessage> messages;
+class Channel {
+    std::queue<Message> messages;
+    std::vector<std::function<void(std::shared_ptr<Message>)>> callbacks;
 
 public:
-    bool empty() const override { return messages.empty(); }
-
-    Message pop() override { 
-        Message m = messages.front();
-        messages.pop();
-        return m;
-    }
-
-    void push(Message m) override {
-        messages.push(m);
-    }
+    Channel();
+    void sendMessages();
+    void subscribeCallback(std::function<void(std::shared_ptr<Message>)> callback);
 };
 }

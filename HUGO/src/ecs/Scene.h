@@ -6,6 +6,7 @@
 #include "Messenger.h"
 
 #include "IScene.h"
+#include <functional>
 #include <memory>
 #include <queue>
 
@@ -49,11 +50,10 @@ public:
   ErrorOrType<HUGO::String> getNextError() override;
   ErrorOrType<HUGO::String> getNextLog() override;
 
-  // Called by systems to send a message
-  template <typename TMessage>
-	void sendMessage(TMessage message) {
-		messenger.enqueueMessage<TMessage>(message);
-	}
+  template <typename T>
+  void subscribe(std::function<void(std::shared_ptr<T>)> callback) {
+	  messenger.subscribe<T>(callback);
+  }
 
   void dispatchMessages();
 };
