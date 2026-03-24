@@ -60,7 +60,7 @@ bool isMouseOverPanel(const PanelComponent& panel, HUGO::Float mouseX, HUGO::Flo
 
 void syncPanel(const PanelComponent& p);
 void syncText(const TextComponent& t);
-void syncButton(const ButtonComponent& b);
+void syncButton(const ButtonComponent& b, PanelComponent& p);
 void syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr);
 void syncSlider(const PanelComponent& p, const SliderComponent& s);
 // void syncPanel(const PanelComponent& p, const PanelDirtyTag& tag);

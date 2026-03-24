@@ -136,29 +136,26 @@ void UISystem::syncText(const TextComponent &t)
         t.colourBottom.w));
 }
 
-void UISystem::syncButton(const ButtonComponent &b)
+void UISystem::syncButton(const ButtonComponent &button, PanelComponent &panel)
 {
-    UIElementCache* cache = getCache(b.entity);
+    UIElementCache* cache = getCache(button.entity);
     if (!cache || !cache->container) return;
 
-    switch (b.state) {
-        case HUGO::ButtonStateTypes::BS_UP:
-            if (!b.normalMaterial.empty())
-                cache->container->setMaterialName(b.normalMaterial);
+    switch (button.state) {
+        case HUGO::ButtonStateTypes::BS_UP :
+            panel.material = button.normalMaterial;
             break;
-        case HUGO::ButtonStateTypes::BS_OVER:
-            if (!b.hoverMaterial.empty())
-                cache->container->setMaterialName(b.hoverMaterial);
+        case HUGO::ButtonStateTypes::BS_DOWN :
+            panel.material = button.pressedMaterial;
             break;
-        case HUGO::ButtonStateTypes::BS_DOWN:
-            if (!b.pressedMaterial.empty())
-                cache->container->setMaterialName(b.pressedMaterial);
+        case HUGO::ButtonStateTypes::BS_OVER :
+            panel.material = button.hoverMaterial;
             break;
         default:
-            if (!b.normalMaterial.empty())
-                cache->container->setMaterialName(b.normalMaterial);
+            panel.material = button.normalMaterial;
             break;
-    }
+        }
+    scene->addComponent<PanelComponent>(button.entity);
 }
 
 void UISystem::syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr)
@@ -363,10 +360,26 @@ ErrorOrVoid UISystem::processComponentCreations()
 
     for (auto &pack : scene->query<CreateButtonDirtyTag, ButtonComponent, PanelComponent>())
     {
-        ButtonComponent &inputfield = pack.get<ButtonComponent &>();
+        ButtonComponent &button = pack.get<ButtonComponent &>();
+        PanelComponent &panel = pack.get<PanelComponent &>();
         CreateButtonDirtyTag &tag = pack.get<CreateButtonDirtyTag &>();
+        switch (button.state)
+        {
+        case HUGO::ButtonStateTypes::BS_UP :
+            panel.material = button.normalMaterial;
+            break;
+        case HUGO::ButtonStateTypes::BS_DOWN :
+            panel.material = button.pressedMaterial;
+            break;
+        case HUGO::ButtonStateTypes::BS_OVER :
+            panel.material = button.hoverMaterial;
+            break;
+        default:
+            panel.material = button.normalMaterial;
+            break;
+        }
 
-
+        scene->addComponent<PanelDirtyTag>(button.entity);
         scene->removeComponent<CreateButtonDirtyTag>(tag.entity);
     }
     return ErrorOrVoid();
@@ -374,10 +387,11 @@ ErrorOrVoid UISystem::processComponentCreations()
 
 void UISystem::processButtonChanges()
 {
-    for (auto &pack : scene->query<ButtonComponent, ButtonDirtyTag>())
+    for (auto &pack : scene->query<ButtonComponent, ButtonDirtyTag, PanelComponent>())
     {
         ButtonComponent &button = pack.get<ButtonComponent&>();
-        syncButton(button);
+        PanelComponent &panel = pack.get<PanelComponent&>();
+        syncButton(button, panel);
         scene->removeComponent<ButtonDirtyTag>(button.entity);
     }
 }
@@ -703,14 +717,14 @@ void UISystem::update(double)
         std::cerr<<e.getError().errorMessage;
     }
 
-    processPanelChanges();
-    processTextChanges();
-    processVisibility();
-    processButtonChanges();
     processInput();
     processProgressBarChanges();
     processSliderInput();
     processSliderChanges();
+    processPanelChanges();
+    processTextChanges();
+    processVisibility();
+    processButtonChanges();
 }
 
 void UISystem::fixedUpdate(double) {}

@@ -150,7 +150,6 @@ void RenderSystem::handleTag()
 
     for(auto& pack : scene->query<CameraCreateDirtyTag, TransformComponent, CameraComponent>()) {
         TransformComponent& tr = pack.get<TransformComponent&>();
-        CameraComponent& camera = pack.get<CameraComponent&>();
         EntityID entity = tr.entity;
         auto it = cameraMap.find(entity);
         if (it == cameraMap.end()) {
