@@ -2,10 +2,9 @@
 
 namespace HUGO {
 
-Messenger::Messenger()
-: channels()
-{
-
+Messenger::Messenger() {
+    for (Channel& channel : channels)
+        channel = Channel();
 }
 
 void 

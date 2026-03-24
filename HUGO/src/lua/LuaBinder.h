@@ -187,8 +187,12 @@ public:
     // it returns an error if the string cannot be interpreted as valid lua, if lua rises an error or if the value is not a T
     template<typename T>
     ErrorOrType<T> getFromString(HUGO::String command) {
+        // Add return statement to ensure the return value is written to the stack
+        // This will fail if the function's return type is 'nil' - I don't know how to change that
+        HUGO::String returnCommand = "return " + command;
+
         //if string is invalid
-        if (luaL_dostring(lua, command.c_str()) != LUA_OK) {
+        if (luaL_dostring(lua, returnCommand.c_str()) != LUA_OK) {
             StringError error = StringError(HUGO::String(lua_tostring(lua, -1)));
             lua_pop(lua, 1);
             return ErrorOrType<T>(error);
