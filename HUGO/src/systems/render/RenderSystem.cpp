@@ -1,9 +1,16 @@
+#include "RenderSystem.h"
+
 #include <iostream>
 
 #include "OgreOverlaySystem.h"
-#include "RenderSystem.h"
 #include "SDL_video.h"
+
 #include "Scene.h"
+#include "LuaBinder.h"
+#include "Input.h"
+
+#include "OgreUtils.h"
+#include "OgreModule.h"
 
 #include "RenderComponent.h"
 #include "AnimationComponent.h"
@@ -11,13 +18,10 @@
 #include "CameraComponent.h"
 #include "ViewportComponent.h"
 #include "LightComponent.h"
+
 #include "RenderTags.h"
 
-#include "OgreUtils.h"
-#include "OgreModule.h"
-#include "LuaBinder.h"
-#include "Input.h"
-
+#pragma region Destructor
 RenderSystem::~RenderSystem()
 {
     //detroy all viewports
@@ -70,7 +74,9 @@ RenderSystem::~RenderSystem()
         sceneManager = nullptr;
     }
 }
+#pragma endregion
 
+#pragma region System Init
 void RenderSystem::init(){
 
     ogreRoot = Ogre::Root::getSingletonPtr();
@@ -105,16 +111,18 @@ void RenderSystem::init(){
     registerViewportEntity(ViewEntity);  
     setMainViewport(ViewEntity);
 }
+#pragma endregion
 
+#pragma region SystemLoad
 void RenderSystem::onLoad(){
     LuaBinder& luaBinder = LuaBinder::Instance();
     luaBinder.registerMethod<RenderSystem, void, float, float, float>(*this, &RenderSystem::setAmbientLight, "SetAmbientLight");
 }
+#pragma endregion
 
 #pragma region Tags
 void RenderSystem::handleTag()
 {
-
     for(auto& pack : scene->query<CameraCreateDirtyTag, TransformComponent, CameraComponent>()) {
         TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
         EntityID entity = tr.entity;
@@ -182,8 +190,6 @@ void RenderSystem::handleTag()
         // eliminate the tag
         scene->removeComponent<CameraDirtyTag>(entity);
     }
-
-   
 
     // Light update
     for(auto&pack : scene->query<LightDirtyTag, LightComponent, TransformComponent>()){
@@ -344,6 +350,7 @@ void RenderSystem::handleTag()
 #pragma endregion
 
 #pragma region Updates
+// ==================== Update Animations ====================
 void RenderSystem::updateAnimations(double dt)
 {
     for(auto& pack : scene->query<RenderComponent, AnimationComponent>()) {
@@ -368,9 +375,10 @@ void RenderSystem::updateAnimations(double dt)
         }
     }
 }
-
+// ==================== Fixed Update ====================
 void RenderSystem::fixedUpdate(double dt){}
 
+// ==================== Update ====================
 void RenderSystem::update(double dt)
 { 
     handleTag();
@@ -404,7 +412,6 @@ void RenderSystem::update(double dt)
 
     if(input.windowHasChanged()){
         updateViewportDimensions();
-        std::cout << "aaaaa\n";
         input.clearWindowFlag();
     }
 }
@@ -412,6 +419,7 @@ void RenderSystem::update(double dt)
 #pragma endregion
 
 #pragma region OgreObject
+// ==================== Create OgreObject ====================
 ErrorOrType<HUGO::OgreObjectID> RenderSystem::createOgreObject(const std::string &meshName, const std::string &materialName)
 {
     Ogre::Entity* ent = nullptr;
@@ -458,13 +466,12 @@ ErrorOrType<HUGO::OgreObjectID> RenderSystem::createOgreObject(const std::string
     
     return ErrorOrType<HUGO::OgreObjectID>(id);
 }
-
-RenderSystem::OgreObject& 
-RenderSystem::getOgreObject(HUGO::OgreObjectID id)
+// ==================== Get OgreObject ====================
+RenderSystem::OgreObject& RenderSystem::getOgreObject(HUGO::OgreObjectID id)
 {
     return ogreObjects[idToIndex[id]];
 }
-
+// ==================== Remove OgreObject ====================
 void RenderSystem::removeOgreObject(HUGO::OgreObjectID& id)
 {
     if (id != HUGO::INVALID_OGRE_OBJECT_ID){
@@ -485,7 +492,7 @@ void RenderSystem::removeOgreObject(HUGO::OgreObjectID& id)
         id = HUGO::INVALID_OGRE_OBJECT_ID;
     }
 }
-
+// ==================== Destroy OgreObject ====================
 void RenderSystem::destroyOgreObject(OgreObject &obj)
 {
     if(obj.ogreSceneNode){
@@ -500,8 +507,8 @@ void RenderSystem::destroyOgreObject(OgreObject &obj)
 }
 #pragma endregion
 
-// ==================== Registering ====================
 #pragma region Registering
+// ==================== Register Camera Entity ====================
 void RenderSystem::registerCameraEntity(EntityID entity)
 {
     // check if its already registered
@@ -514,7 +521,7 @@ void RenderSystem::registerCameraEntity(EntityID entity)
         std::cerr<<e.getError().errorMessage;
     }
 }
-
+// ==================== Register ViewPort Entity ====================
 void RenderSystem::registerViewportEntity(EntityID entity)
 {
     //check if its already registered
@@ -527,7 +534,7 @@ void RenderSystem::registerViewportEntity(EntityID entity)
         std::cerr<<e.getError().errorMessage;
     }
 }
-
+// ==================== Register Light Entity ====================
 void RenderSystem::registerLightEntity(EntityID entity)
 {
     if (lightMap.find(entity) != lightMap.end()) {
@@ -539,7 +546,7 @@ void RenderSystem::registerLightEntity(EntityID entity)
         std::cerr<<e.getError().errorMessage;
     }
 }
-
+// ==================== Unregister Camera Entity ====================
 void RenderSystem::unregisterCameraEntity(EntityID entity)
 {
     //destroyOgreCamera(entity);
@@ -549,7 +556,7 @@ void RenderSystem::unregisterCameraEntity(EntityID entity)
         mainCameraEntity = 0;
     }
 }
-
+// ==================== Unregister ViewPort Entity ====================
 void RenderSystem::unregisterViewportEntity(EntityID entity)
 {
     //destroyOgreViewport(entity);
@@ -561,12 +568,11 @@ void RenderSystem::unregisterViewportEntity(EntityID entity)
 }
 #pragma endregion
 
-// ==================== Ogre Camera and ViewPort Creation ====================
 #pragma region  OgreCamera and ViewPort Creation 
+// ==================== Create Ogre Camera ====================
 ErrorOrVoid RenderSystem::createOgreCamera(EntityID entity)
 {
     CameraInfo res;
-    
     // Get the transformComponent and CameraComponent of the camera to set the initial configuration
     const TransformComponent* transformComp = nullptr;
     const CameraComponent* cameraComp = nullptr;
@@ -610,7 +616,7 @@ ErrorOrVoid RenderSystem::createOgreCamera(EntityID entity)
     scene->addComponent<CameraDirtyTag>(entity);
     return ErrorOrVoid();
 }
-
+// ==================== Create Ogre Light ====================
 ErrorOrVoid RenderSystem::createOgreLight(EntityID entity)
 {
     LightInfo res;
@@ -687,7 +693,7 @@ ErrorOrVoid RenderSystem::createOgreLight(EntityID entity)
     lightMap[entity] = res;
     return ErrorOrVoid();
 }
-
+// ==================== Create Ogre Viewport ====================
 ErrorOrVoid RenderSystem::createOgreViewport(EntityID entity)
 {
     ViewportInfo res;    

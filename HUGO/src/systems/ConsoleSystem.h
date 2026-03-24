@@ -3,7 +3,7 @@
 #include "HugoSystemMacros.h"
 #include "HugoMath.h"
 
-class TextComponent;
+struct TextComponent;
 
 HSYSTEM(ConsoleSystem)
 
