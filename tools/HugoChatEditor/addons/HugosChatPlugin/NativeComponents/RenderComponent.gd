@@ -7,7 +7,7 @@ class_name MeshRenderer
 
 func get_component() -> Dictionary[String, Variant]:
 	return {
-		"mesh" : FormatWriter.format(mesh.resource_path),
-		"materialName" : FormatWriter.format(materialName),
-		"objectID" : FormatWriter.format(objectID),
+		"mesh" : FormatWriter.format(mesh.resource_path, "mesh"),
+		"materialName" : FormatWriter.format(materialName, "materialName"),
+		"objectID" : FormatWriter.format(objectID, "objectID"),
 	}

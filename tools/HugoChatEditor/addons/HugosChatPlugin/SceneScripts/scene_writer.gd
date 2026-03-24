@@ -45,7 +45,7 @@ static func write():
 			
 			for parameter_key in component.keys():
 				var value = component[parameter_key]
-				file.store_line("\t\t[%s] %s" % [parameter_key, str(value)])
+				file.store_line("\t\t%s" % [str(value)])
 		
 		file.store_line("")
 	

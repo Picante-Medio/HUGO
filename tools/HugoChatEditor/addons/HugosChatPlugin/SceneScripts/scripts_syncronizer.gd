@@ -2,10 +2,9 @@
 extends EditorScript
 class_name ScriptsSyncronizer
 
-const COMPONENTS_PATH = "../../HUGO/src/components"
-const OUTPUT_COMPONENTS_PATH = "Components"
-const OUTPUT_CHAT_PARSER_PATH = "../../HUGO/src/ecs/ChatParser.cpp"
-const HUGO_TYPES_PATH = "../../HUGO/src/utils/HugoTypes.h"
+const components_path = "../../HUGO/include/components"
+const output_components_path = "Components"
+const HUGO_TYPES_PATH = "../../HUGO/include/utils/HugoTypes.h"
 
 const CHATS_PATH = "../../HUGO/chats/"
 const PREFABS_PATH = "res://Prefabs/"
@@ -29,7 +28,7 @@ static func sync():
 	
 	parse_hugo_types()
 	write_enums()
-	parse_components(COMPONENTS_PATH)
+	parse_components(components_path)
 	create_prefabs(PREFABS_PATH)
 	write_components()
 	EditorInterface.get_resource_filesystem().scan_sources()
@@ -65,10 +64,10 @@ static func ensure_folder(path: String) -> void:
 		push_error("Error creando carpeta: " + abs_path)
 
 static func write_components():
-	ensure_folder(OUTPUT_COMPONENTS_PATH)
+	ensure_folder(output_components_path)
 
 	for component_name:String in components_dictionary.keys():
-		var file := FileAccess.open(OUTPUT_COMPONENTS_PATH.path_join(component_name + ".gd"), FileAccess.WRITE)
+		var file := FileAccess.open(output_components_path.path_join(component_name + ".gd"), FileAccess.WRITE)
 
 		file.store_line("@tool")
 		file.store_line("extends Component")
@@ -77,7 +76,9 @@ static func write_components():
 
 		var component_parameters = components_dictionary[component_name]
 		for parameter:Array in component_parameters:
-			var new_parameter:String = "@export var " + parameter[1] + ":" + parameter[0]
+			var value_text:String = ""
+			if parameter[2]: value_text = " = " + parameter[2]
+			var new_parameter:String = "@export var " + parameter[1] + ":" + parameter[0] + value_text
 			file.store_line(new_parameter)
 
 		file.store_line("")
@@ -85,7 +86,7 @@ static func write_components():
 		file.store_line("\treturn {")
 
 		for parameter:Array in component_parameters:
-			var new_parameter:String = '\t\t"' + parameter[1] + '"' + " : FormatWriter.format(" + parameter[1] + "),"
+			var new_parameter:String = '\t\t"' + parameter[1] + '"' + " : FormatWriter.format(" + parameter[1] + ', "' + parameter[1] + '"),'
 			file.store_line(new_parameter)
 
 		file.store_line("\t}")
@@ -150,11 +151,10 @@ static func hugo_parse_component(path: String) -> void:
 	var file := FileAccess.open(path, FileAccess.READ)
 	var line := file.get_line().strip_edges()
 
-	while not line.contains(":") and not file.eof_reached():
+	while not line.contains("HCOMPONENT(") and not file.eof_reached():
 		line = file.get_line().strip_edges()
 
-	if line.split(":")[1].strip_edges() != "public Component": return
-	var component_name := line.split("struct")[1].split(":")[0].strip_edges()
+	var component_name:String = line.split("(")[1].split(")")[0].strip_edges()
 	if BLACK_LIST.has(component_name): return
 
 	components_dictionary.get_or_add(component_name, [])
@@ -167,12 +167,17 @@ static func hugo_parse_component(path: String) -> void:
 	print(path)
 	while not file.eof_reached():
 		line = file.get_line().strip_edges()
-		if not line.contains(";") or line.contains("void"): continue
+		
+		if not line.contains("@export"): continue
+		else: line = file.get_line().strip_edges()
 
 		var cleaned_parameter:String = line.split("::")[1] if line.split("::").size() > 1 else line.split("::")[0]
-		cleaned_parameter = cleaned_parameter.split("=")[0]
 		cleaned_parameter = cleaned_parameter.split(";")[0]
+		cleaned_parameter = cleaned_parameter.split("=")[0]
+		
 		cleaned_parameter = cleaned_parameter.strip_edges()
+		var parameter_default_value
+		if cleaned_parameter[1]: parameter_default_value = cleaned_parameter[1]
 
 		var parameter:PackedStringArray = cleaned_parameter.split(" ")
 		if parameter.size() != 2: continue
@@ -184,6 +189,6 @@ static func hugo_parse_component(path: String) -> void:
 		elif types_dictionary.has(parameter_type): parameter_type = types_dictionary[parameter_type]
 		elif enums_dictionary.has(parameter_type): parameter_type = "ENUMS." + parameter_type
 
-		components_dictionary[component_name].push_back([parameter_type, parameter_name])
+		components_dictionary[component_name].push_back([parameter_type, parameter_name, parameter_default_value])
 
 	file.close()
