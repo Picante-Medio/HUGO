@@ -114,11 +114,16 @@ Scene::addComponentLUA(int entityID, std::string& componentData) {
 		} 
 	}
 
+	if(error.isError()) {
+		log(error.getError().errorMessage);
+		return;
+	}
+
 	ErrorOrVoid compResult = HUGO::ComponentFactory::makeComponent(shared_from_this(), static_cast<EntityID>(entityID), componentName, parameters);
 	if(compResult.isError()) {
 		compResult = HUGO::GameLibraryLoader::instance().GenerateComponent(shared_from_this(), static_cast<EntityID>(entityID), componentName, parameters);
 		if(compResult.isError()) {
-			//TO_CHAT Sacar por LuaConsole un mensaje de error
+			log(error.getError().errorMessage);
 		}
 	}
 }
@@ -149,9 +154,7 @@ Scene::printEntity(int id) {
 	std::vector<std::bitset<MAX_COMPONENTS>> masks = entityTable->getComponentMask();
 
 	//Imprime la bitmask de todas las entidad de forma provisional
-	//TO_CHAT: Imprimir el nombre de la entidaa y sus componentes
-
-	//console->Print("ENTITY WITH ID: " + std::to_string(id) + " has components " + masks[id].to_string() + "\n");
+	log(static_cast<HUGO::String>("ENTITY WITH ID: " + std::to_string(id) + " has components " + masks[id].to_string() + "\n"));
 }
 
 void 
@@ -159,11 +162,11 @@ Scene::printEntities() {
 	std::vector<std::bitset<MAX_COMPONENTS>> masks = entityTable->getComponentMask();
 
 	//Imprime la bitmask de todas las entidades de forma provisional
-	//TO_CHAT: Imprimir los nombres de las entidades y sus componentes
+	//TO_CHAT: Imprimir los nombres de las entidades y sus componentes en un formato legible
 
 	int index = 0;
 	for(std::bitset mask : masks) {
-		//console->Print("ENTITY WITH ID: " + std::to_string(index) + " has components " + mask.to_string() + "\n");
+		log(static_cast<HUGO::String>("ENTITY WITH ID: " + std::to_string(index) + " has components " + mask.to_string() + "\n"));
 		index += 1;
 	}
 }
