@@ -7,6 +7,8 @@ HCOMPONENT(ButtonComponent)
     HUGO::ButtonStateTypes state = HUGO::ButtonStateTypes::BS_UP;
     HUGO::TrayLocationTypes mTrayLoc;
 
+    std::function<void()> onClickCallback;
+    
     // appearance - normal state
     HUGO::String normalMaterial = "Button/Normal";
     HUGO::String hoverMaterial = "Button/Hover";

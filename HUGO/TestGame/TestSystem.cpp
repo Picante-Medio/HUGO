@@ -9,10 +9,12 @@
 #include "ChildrenComponent.h"
 #include "HierarchyTags.h"
 #include "PanelComponent.h"
+#include "ButtonComponent.h"
 #include "TextComponent.h"
 #include "RenderTags.h"
 #include "InputFieldComponent.h"
 #include "LightComponent.h"
+#include "UITags.h"
 
 
 void
@@ -65,12 +67,21 @@ TestSystem::init() {
     scene->addComponent<TransformChangedTag>(ui);
     scene->addComponent<LightCreateDirtyTag>(ui);
     scene->addComponent<LightDirtyTag>(ui);
-    // PanelComponent& pn = scene->addAndGetComponent<PanelComponent>(ui);
-    // pn.overlayName = "testCanvas/ConsoleTextTest";SS
+
+    // EntityID boton = scene->createEntity();
+    // PanelComponent& panel = scene->addAndGetComponent<PanelComponent>(boton);
+    // panel.overlayName = "testCanvas/SimpleTest";
+    // panel.containerName = panel.overlayName + "/Container";
+    // panel.material = "UI/Test";
+
+    // scene->addComponent<CreatePanelDirtyTag>(boton);
+    // pn.overlayName = "testCanvas/ConsoleTextTest";
     // pn.containerName = pn.overlayName + "/Container";
     // pn.material = "UI/Test";
-    // TextComponent& text = scene->addAndGetComponent<TextComponent>(ui);
-    // InputFieldComponent& ip = scene->addAndGetComponent<InputFieldComponent>(ui);
+    // //ButtonComponent& bt = scene->addAndGetComponent<ButtonComponent>(boton);
+
+    // scene->addComponent<CreatePanelDirtyTag>(boton);
+    // //scene->addComponent<CreateButtonDirtyTag>(boton);
 }
 
 

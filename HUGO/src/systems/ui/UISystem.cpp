@@ -141,13 +141,6 @@ void UISystem::syncButton(const ButtonComponent &b)
     UIElementCache* cache = getCache(b.entity);
     if (!cache || !cache->container) return;
 
-    // cache->container->setLeft(b.left);
-    // cache->container->setTop(b.top);
-    // cache->container->setWidth(b.width);
-    // cache->container->setHeight(b.height);
-    // cache->overlay->setZOrder(b.zOrder);
-    // cache->container->setMetricsMode(OgreUtils::toOgre(b.metricsMode));
-
     switch (b.state) {
         case HUGO::ButtonStateTypes::BS_UP:
             if (!b.normalMaterial.empty())
@@ -166,16 +159,6 @@ void UISystem::syncButton(const ButtonComponent &b)
                 cache->container->setMaterialName(b.normalMaterial);
             break;
     }
-
-    // if (cache->element) {
-    //     Ogre::TextAreaOverlayElement* textArea =
-    //         dynamic_cast<Ogre::TextAreaOverlayElement*>(cache->element);
-    //     if (textArea) {
-    //         textArea->setCaption(b.text);
-    //         textArea->setCharHeight(b.textSize);
-    //         textArea->setFontName(b.fontName);
-    //     }
-    // }
 }
 
 void UISystem::syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr)
@@ -377,7 +360,26 @@ ErrorOrVoid UISystem::processComponentCreations()
     //     CreateInputFieldDirtyTag &tag = pack.get<CreateInputFieldDirtyTag &>();
     //     scene->removeComponent<CreateInputFieldDirtyTag>(tag.entity);
     // }
+
+    for (auto &pack : scene->query<CreateButtonDirtyTag, ButtonComponent, PanelComponent>())
+    {
+        ButtonComponent &inputfield = pack.get<ButtonComponent &>();
+        CreateButtonDirtyTag &tag = pack.get<CreateButtonDirtyTag &>();
+
+
+        scene->removeComponent<CreateButtonDirtyTag>(tag.entity);
+    }
     return ErrorOrVoid();
+}
+
+void UISystem::processButtonChanges()
+{
+    for (auto &pack : scene->query<ButtonComponent, ButtonDirtyTag>())
+    {
+        ButtonComponent &button = pack.get<ButtonComponent&>();
+        syncButton(button);
+        scene->removeComponent<ButtonDirtyTag>(button.entity);
+    }
 }
 
 void UISystem::processTextChanges()
@@ -396,7 +398,6 @@ void UISystem::processInput()
     HUGO::Input& input = HUGO::Input::Instance();
 
     bool anyFieldActive = false; // flag to control SDL text input
-
     // handle mouse click: activate/deactivate input fields
     if (input.wasMouseButtonJustPressed(SDL_BUTTON_LEFT)) {
         for (auto& pack : scene->query<PanelComponent, TextComponent, InputFieldComponent>()) {
@@ -411,6 +412,7 @@ void UISystem::processInput()
                     // activate this field
                     field.isActive = true;
                     anyFieldActive = true;
+
                     if (field.originalText.empty()){
                         field.originalText = text.text;
                         text.text.clear();
@@ -425,8 +427,63 @@ void UISystem::processInput()
                 field.isActive = false;
             }
         }
-        input.toggleTextInput(anyFieldActive);
+        input.toggleTextInput(anyFieldActive);    
+
+        for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
+        {
+            PanelComponent& panel = pack.get<PanelComponent&>();
+            ButtonComponent& button = pack.get<ButtonComponent&>();
+
+            HUGO::Input::MouseRelativePosition mouse = input.getMouseRelativePosition();
+            if (isMouseOverPanel(panel, mouse.x, mouse.y))
+            {
+                button.state = HUGO::BS_DOWN;
+                scene->addComponent<ButtonDirtyTag>(button.entity);
+                break;
+            }
+        }
+    } else if (input.wasMouseButtonJustReleased(SDL_BUTTON_LEFT))
+    {
+    
+        for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
+        {
+            std::cout << "aaaaa\n";
+            PanelComponent& panel = pack.get<PanelComponent&>();
+            ButtonComponent& button = pack.get<ButtonComponent&>();
+
+            HUGO::Input::MouseRelativePosition mouse = input.getMouseRelativePosition();
+            bool isOver = isMouseOverPanel(panel, mouse.x, mouse.y);
+
+            if (isOver){
+                if (button.onClickCallback) button.onClickCallback();
+                button.state = HUGO::BS_OVER;
+            }
+            else 
+                button.state = HUGO::BS_UP;
+            
+            scene->addComponent<ButtonDirtyTag>(panel.entity);
+        }
     }
+
+    for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
+        {
+            PanelComponent& panel = pack.get<PanelComponent&>();
+            ButtonComponent& button = pack.get<ButtonComponent&>();
+
+            HUGO::Input::MouseRelativePosition mouse = input.getMouseRelativePosition();
+            bool isOver = isMouseOverPanel(panel, mouse.x, mouse.y);
+
+            if (isOver && button.state != HUGO::BS_DOWN)
+            {
+                button.state = HUGO::BS_OVER;
+                scene->addComponent<ButtonDirtyTag>(button.entity);
+            }
+            else if (!isOver && button.state != HUGO::BS_UP && button.state != HUGO::BS_DOWN)
+            {
+                button.state = HUGO::BS_UP;
+                scene->addComponent<ButtonDirtyTag>(button.entity);
+            }
+        }
 
     // process text for the active input field using SDL text buffer
     const HUGO::String& textInput = input.getTextInput();
@@ -649,6 +706,7 @@ void UISystem::update(double)
     processPanelChanges();
     processTextChanges();
     processVisibility();
+    processButtonChanges();
     processInput();
     processProgressBarChanges();
     processSliderInput();

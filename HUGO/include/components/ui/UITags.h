@@ -21,6 +21,9 @@ END_HCOMPONENT()
 HCOMPONENT(CreateInputFieldDirtyTag) 
 END_HCOMPONENT() 
 
+HCOMPONENT(CreateButtonDirtyTag) 
+END_HCOMPONENT()
+
 HCOMPONENT(ButtonDirtyTag) 
 END_HCOMPONENT() 
 
