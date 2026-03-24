@@ -100,9 +100,9 @@ void UISystem::syncPanel(const PanelComponent &p)
     cache->container->setTop(p.top);
     cache->container->setWidth(p.width);
     cache->container->setHeight(p.height);
-    cache->container->setHorizontalAlignment(HUGO::OgreUtils::toOgre(p.alignmentX));
-    cache->container->setVerticalAlignment(HUGO::OgreUtils::toOgre(p.alignmentY));
-    cache->container->setMetricsMode(HUGO::OgreUtils::toOgre(p.metricsMode));
+    // cache->container->setHorizontalAlignment(OgreUtils::toOgre(p.alignmentX));
+    // cache->container->setVerticalAlignment(OgreUtils::toOgre(p.alignmentY));
+    // cache->container->setMetricsMode(OgreUtils::toOgre(p.metricsMode));
 
     if (!p.material.empty()) cache->container->setMaterialName(p.material);
 }
@@ -173,28 +173,28 @@ void UISystem::syncProgressBar(const PanelComponent& p, const ProgressBarCompone
     // sync fill
     switch (pr.fillMode)
     {
-        case ProgressBarComponent::HORIZONTAL_LEFT_TO_RIGHT:
+        case HUGO::ProgressBarFillMode::HORIZONTAL_LEFT_TO_RIGHT:
             cache->element->setLeft(0.0f);
             cache->element->setWidth(p.width * pr.fillWidth * percent);
             cache->element->setTop(0.0f);
             cache->element->setHeight(p.height * pr.fillHeight);
             break;
 
-        case ProgressBarComponent::HORIZONTAL_RIGHT_TO_LEFT:
+        case HUGO::ProgressBarFillMode::HORIZONTAL_RIGHT_TO_LEFT:
             cache->element->setLeft(p.width * pr.fillWidth * (1.0f - percent));
             cache->element->setWidth(p.width * pr.fillWidth *percent);
             cache->element->setTop(0.0f);
             cache->element->setHeight(p.height * pr.fillHeight);
             break;
 
-        case ProgressBarComponent::VERTICAL_BOTTOM_TO_TOP:
+        case HUGO::ProgressBarFillMode::VERTICAL_BOTTOM_TO_TOP:
             cache->element->setTop(p.height * pr.fillHeight * (1.0f - percent));
             cache->element->setHeight(p.height * pr.fillWidth * percent);
             cache->element->setLeft(0.0f);
             cache->element->setWidth(p.width* pr.fillWidth);
             break;
 
-        case ProgressBarComponent::VERTICAL_TOP_TO_BOTTOM:
+        case HUGO::ProgressBarFillMode::VERTICAL_TOP_TO_BOTTOM:
             cache->element->setTop(0.0f);
             cache->element->setHeight(p.height *pr.fillHeight * percent);
             cache->element->setLeft(0.0f);
@@ -217,8 +217,9 @@ void UISystem::syncSlider(const PanelComponent& p, const SliderComponent& s)
     percent = std::clamp(percent, 0.0f, 1.0f);
 
     // sync track and knob
-    if (s.orientation == SliderComponent::HORIZONTAL)
+    switch (s.orientation)
     {
+    case HUGO::SliderOrientation::HORIZONTAL:
         cache->element->setLeft(0.0f);
         cache->element->setTop(0.0f);
         cache->element->setWidth(p.width * percent);
@@ -231,9 +232,9 @@ void UISystem::syncSlider(const PanelComponent& p, const SliderComponent& s)
         cache->knob->setTop(-s.knobWidth/4.0f);
         cache->knob->setWidth(s.knobWidth);
         cache->knob->setHeight(s.knobHeight);
-    }
-    else // VERTICAL
-    {
+        break;
+    
+    case HUGO::SliderOrientation::VERTICAL:
         cache->element->setLeft(0.0f);
         cache->element->setTop(p.height * (1.0f - percent));
         cache->element->setWidth(p.width);
@@ -246,6 +247,7 @@ void UISystem::syncSlider(const PanelComponent& p, const SliderComponent& s)
         cache->knob->setTop(knobPos);
         cache->knob->setWidth(s.knobWidth);
         cache->knob->setHeight(s.knobHeight);
+        break;
     }
     
     // apply materials or colors
@@ -285,39 +287,18 @@ void UISystem::processVisibility()
 
 ErrorOrVoid UISystem::processComponentCreations()
 {
+    //panels
     for (auto &pack : scene->query<PanelComponent, CreatePanelDirtyTag>())
     {
         PanelComponent &panel = pack.get<PanelComponent &>();
         CreatePanelDirtyTag &tag = pack.get<CreatePanelDirtyTag &>();
         EntityID entity = panel.entity;
-        ErrorOrType<Ogre::Overlay *> overlayResult = HUGO::OgreOverlayUtils::getOverlay(panel.overlayName);
-        if (overlayResult.isError())
-            return ErrorOrVoid("[UISystem] Panel entity " + std::to_string(panel.entity) + " missing overlay");
-
-        Ogre::Overlay *overlay = overlayResult.getValue();
-
-        ErrorOrType<Ogre::OverlayContainer *> containerResult = HUGO::OgreOverlayUtils::getContainer(panel.containerName);
-        if (containerResult.isError())
-            return ErrorOrVoid("[UISystem] Panel entity " + std::to_string(panel.entity) + " missing container");
-
-
-        Ogre::OverlayContainer *container = containerResult.getValue();
-
-        panel.left = container->getLeft();
-        panel.top = container->getTop();
-        panel.width = container->getWidth();
-        panel.height = container->getHeight();
-        panel.metricsMode = HUGO::OgreUtils::toHugo(container->getMetricsMode());
-        panel.alignmentX = HUGO::OgreUtils::toHugo(container->getHorizontalAlignment());
-        panel.alignmentY = HUGO::OgreUtils::toHugo(container->getVerticalAlignment());
-        
-        container->setMaterialName(panel.material);
+        createElementCache(entity, panel.overlayName, panel.containerName);
         scene->addComponent<VisibilityDirtyTag>(panel.entity);
-        // insert shared_ptr directly
-        createElementCache(entity, overlay, container);
         syncPanel(panel);
         scene->removeComponent<CreatePanelDirtyTag>(tag.entity);
     }
+    
     
     for (auto &pack : scene->query<CreateTextDirtyTag, TextComponent, PanelComponent>())
     {
@@ -705,7 +686,6 @@ void UISystem::init()
 {
     renderWindow = OgreModule::Instance().getOgreRenderWindow();
     HUGO::Input::Instance().registerAction("SubmitInput", {SDLK_RETURN});
-    //createSlider("testCanvas/SliderTest");
 }
 
 void UISystem::onLoad() {}

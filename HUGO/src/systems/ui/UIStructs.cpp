@@ -5,13 +5,15 @@ void UIElementCache::setVisible(bool visible)
     {
         overlay->show();
         container->show();
-        element->show();
+        if (element != nullptr)
+            element->show();
     }
     else
     {
         overlay->hide();
         container->hide();
-        element->hide();
+        if (element != nullptr)
+            element->hide();
     }
 }
 

@@ -10,11 +10,7 @@ HCOMPONENT(SliderComponent)
     HUGO::Float currentValue = 0.0f;
 
     // orientation
-    enum Orientation {
-        HORIZONTAL,
-        VERTICAL
-    };
-    Orientation orientation = HORIZONTAL;
+    HUGO::SliderOrientation orientation = HUGO::SliderOrientation::HORIZONTAL;
 
     // knob name
     HUGO::String trackElementName = "";

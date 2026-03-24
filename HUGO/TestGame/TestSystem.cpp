@@ -14,6 +14,7 @@
 #include "RenderTags.h"
 #include "InputFieldComponent.h"
 #include "LightComponent.h"
+#include "SliderComponent.h"
 #include "UITags.h"
 
 
@@ -68,17 +69,18 @@ TestSystem::init() {
     scene->addComponent<LightCreateDirtyTag>(ui);
     scene->addComponent<LightDirtyTag>(ui);
 
-    // EntityID boton = scene->createEntity();
-    // PanelComponent& panel = scene->addAndGetComponent<PanelComponent>(boton);
-    // panel.overlayName = "testCanvas/SimpleTest";
-    // panel.containerName = panel.overlayName + "/Container";
-    // panel.material = "UI/Test";
+    EntityID boton = scene->createEntity();
+    PanelComponent& panel = scene->addAndGetComponent<PanelComponent>(boton);
+    panel.overlayName = "testCanvas/SimpleTest";
+    panel.containerName = panel.overlayName + "/Container";
+    panel.material = "UI/Background";
 
-    // scene->addComponent<CreatePanelDirtyTag>(boton);
+
+    scene->addComponent<CreatePanelDirtyTag>(boton);
     // pn.overlayName = "testCanvas/ConsoleTextTest";
     // pn.containerName = pn.overlayName + "/Container";
     // pn.material = "UI/Test";
-    // //ButtonComponent& bt = scene->addAndGetComponent<ButtonComponent>(boton);
+    //ButtonComponent& bt = scene->addAndGetComponent<ButtonComponent>(boton);
 
     // scene->addComponent<CreatePanelDirtyTag>(boton);
     // //scene->addComponent<CreateButtonDirtyTag>(boton);
