@@ -123,14 +123,18 @@ Scene::addComponentLUA(int entityID, std::string& componentData) {
 	if(compResult.isError()) {
 		compResult = HUGO::GameLibraryLoader::instance().GenerateComponent(shared_from_this(), static_cast<EntityID>(entityID), componentName, parameters);
 		if(compResult.isError()) {
-			log(error.getError().errorMessage);
+			log(compResult.getError().errorMessage);
 		}
 	}
 }
 
 void
 Scene::removeComponentLUA(int entityID, std::string& componentName) {
-	//TO_CHAT problema con el uso de removeComponent por las funciones templatizadas, hablar con Marco
+	ErrorOrVoid result = HUGO::ComponentFactory::removeComponent(shared_from_this(), entityID, componentName);
+
+	if(result.isError()) {
+		log(result.getError().errorMessage);
+	}
 }
 
 void
