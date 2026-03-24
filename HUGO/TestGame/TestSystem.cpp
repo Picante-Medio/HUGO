@@ -35,16 +35,16 @@ TestSystem::init() {
     RenderComponent& rc = scene->addAndGetComponent<RenderComponent>(e1);
     rc.setMeshName("cube.mesh");
     rc.setMaterialName("prueba/ColorRosa");
-    scene->addComponent<ParentComponent>(e1);
     scene->addComponent<TransformChangedTag>(e1);
 
-    // e2 = scene->createEntity();
-    // scene->addAndGetComponent<TransformComponent>(e2).position = HUGO::Vector3(-100, 100, 0);
-    // RenderComponent& rc2 = scene->addAndGetComponent<RenderComponent>(e2);
-    // rc2.setMeshName("cube.mesh");
-    // rc2.setMaterialName("prueba/ColorVerde");
-    // scene->addAndGetComponent<ParentComponent>(e2).parent=e1;
-    // scene->addAndGetComponent<ChildrenComponent>(e1).children.push_back(e2);
+    EntityID e2 = scene->createEntity();
+    scene->addAndGetComponent<TransformComponent>(e2).position = HUGO::Vector3(-100, 100, 0);
+    RenderComponent& rc2 = scene->addAndGetComponent<RenderComponent>(e2);
+    rc2.setMeshName("cube.mesh");
+    rc2.setMaterialName("prueba/ColorVerde");
+    scene->addAndGetComponent<ChildrenComponent>(e1).addChild(e2);
+    scene->addComponent<ChildrenCompDirtyTag>(e1);
+
     // //----------------------------------------
     // EntityID ui = scene->createEntity();
     // TransformComponent& tr = scene->addAndGetComponent<TransformComponent>(ui);
@@ -71,11 +71,9 @@ TestSystem::init() {
 
     EntityID boton = scene->createEntity();
     PanelComponent& panel = scene->addAndGetComponent<PanelComponent>(boton);
-    panel.overlayName = "testCanvas/test1";
+    panel.overlayName = "testCanvas/SimpleTest";
     panel.containerName = panel.overlayName + "/Container";
-    panel.material = "UI/Test";
-    panel.width = 0.3f;
-    panel.height = 0.1f;
+    panel.material = "UI/Background";
 
 
     scene->addComponent<CreatePanelDirtyTag>(boton);
@@ -119,13 +117,12 @@ TestSystem::update(double dt) {
     // }
 
       // ------------HierarchySystemTest----------
-    // TransformComponent& tr=scene->getComponent<TransformComponent>(e1);
-    // // tr.position.x += dt * 4;
-    // // tr.scale.x+= dt*0.03;
-    // tr.rotation *= HUGO::Quaternion(HUGO::Radian(HUGO::Degree(5.0f)), HUGO::Vector3(0,1,0));
-    // tr.rotation.normalize();
-    // if(!scene->hasComponent<TransformChangedTag>(e1))scene->addComponent<TransformChangedTag>(e1);
-    // //----------------------------------------
+    TransformComponent& tr=scene->getComponent<TransformComponent>(e1);
+    // tr.position.x += dt * 4;
+    // tr.scale.x+= dt*0.03;
+    tr.rotation *= HUGO::Quaternion(HUGO::Radian(HUGO::Degree(1.0f)), HUGO::Vector3(0,1,0));
+    if(!scene->hasComponent<TransformChangedTag>(e1))scene->addComponent<TransformChangedTag>(e1);
+    //----------------------------------------
 
 
     // for(auto& pack : scene->query<LightComponent, TransformComponent>()) {

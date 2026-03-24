@@ -11,7 +11,7 @@ HSYSTEM(HierarchySystem)
 private:
     //functions to update hierarchy
     void addParentToChild(EntityID child, EntityID parent);
-    void removeParentFromChild(EntityID child, EntityID parent);
+    void removeParentFromChild(EntityID child);
     void addChildToParent(EntityID child, EntityID parent);
     void removeChildFromParent(EntityID child, EntityID parent);
     bool hasCycle(EntityID child, EntityID newParent);

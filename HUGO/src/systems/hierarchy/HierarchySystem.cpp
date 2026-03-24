@@ -50,7 +50,7 @@ HierarchySystem::addParentToChild(EntityID child, EntityID parent){
     }
 }
 void 
-HierarchySystem::removeParentFromChild(EntityID child, EntityID parent){
+HierarchySystem::removeParentFromChild(EntityID child){
     if(scene->hasComponent<ParentComponent>(child)){
         scene->getComponent<ParentComponent>(child).parent = INVALID_ENTITY_ID;
     }
@@ -112,7 +112,7 @@ HierarchySystem::updateHierarchy(){
                 } 
                 
                 //remove the parent
-                removeParentFromChild(child, parent); 
+                removeParentFromChild(child); 
                 
                 //remove the child
                 auto it = std::find(children.begin(), children.end(), child);
@@ -140,7 +140,7 @@ HierarchySystem::updateHierarchy(){
             continue;
         }
 
-        //remove child from old parent
+         //remove child from old parent
         if(oldParent != INVALID_ENTITY_ID){
             removeChildFromParent(child, oldParent);
         }
@@ -156,7 +156,6 @@ HierarchySystem::updateHierarchy(){
             scene->addComponent<WorldTransformDirtyTag>(child);
             addWorldDirtyTagForChildren(child);
         }
-
         scene->removeComponent<ParentCompDirtyTag>(child);
     }
 }
@@ -272,9 +271,9 @@ void HierarchySystem::onEntityDestroyed(EntityID entity){
         removeChildFromParent(entity,scene->getComponent<ParentComponent>(entity).parent);
     }
     if (!scene->hasComponent<ChildrenComponent>(entity)) return;
-    const std::vector<EntityID>& children = scene->getComponent<ChildrenComponent>(entity).children;
-    for (EntityID child : children)
-    {
-        //decir que los hijos estan muertos tambien
-    }
+    // const std::vector<EntityID>& children = scene->getComponent<ChildrenComponent>(entity).children;
+    // for (EntityID child : children)
+    // {
+    //     //decir que los hijos estan muertos tambien
+    // }
 }
