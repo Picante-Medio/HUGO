@@ -6,7 +6,7 @@ HUGO::Channel::Channel()
 
 void HUGO::Channel::sendMessages() {
     while(!messages.empty()) {
-        std::shared_ptr<Message> msg = std::make_shared<Message>(messages.front());
+        std::shared_ptr<Message> msg = messages.front();
 
         for(auto callback : callbacks)
             callback(msg);
@@ -17,4 +17,8 @@ void HUGO::Channel::sendMessages() {
 
 void HUGO::Channel::subscribeCallback(std::function<void(std::shared_ptr<Message>)> callback) {
     callbacks.push_back(callback);
+}
+
+void HUGO::Channel::enqueueMessage(std::shared_ptr<Message> msg) {
+    messages.push(msg);
 }

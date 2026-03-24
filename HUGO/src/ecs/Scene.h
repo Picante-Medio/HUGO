@@ -10,50 +10,58 @@
 #include <memory>
 #include <queue>
 
-class Scene : public HUGO::IScene, public std::enable_shared_from_this<Scene> {
-  std::vector<std::shared_ptr<HUGO::System>> systems;
-  std::queue<std::shared_ptr<Error>> errorsToLog;
-  std::queue<HUGO::String> stringsToLog;
-  HUGO::Messenger messenger;
+class Scene : public HUGO::IScene, public std::enable_shared_from_this<Scene>
+{
+    std::vector<std::shared_ptr<HUGO::System>> systems;
+    std::queue<std::shared_ptr<Error>> errorsToLog;
+    std::queue<HUGO::String> stringsToLog;
+    HUGO::Messenger messenger;
 
 public:
-  Scene();
-  
-  void load();
+    Scene();
 
-  inline void addSystem(std::shared_ptr<HUGO::System> system) { systems.push_back(system); }
+    void load();
 
-  // Logic update
-  void update(double dt);
+    inline void addSystem(std::shared_ptr<HUGO::System> system) { systems.push_back(system); }
 
-  // Physics update
-  void fixedUpdate(double dt);
+    // Logic update
+    void update(double dt);
 
-  // Entity handling
-  EntityID createEntity();
+    // Physics update
+    void fixedUpdate(double dt);
 
-  // LUA console stuff
-  int createEntityLUA();
+    // Entity handling
+    EntityID createEntity();
 
-  void addComponentLUA(int entityID, std::string& componentName);
-  void removeComponentLUA(int entityID, std::string& componentName);
+    // LUA console stuff
+    int createEntityLUA();
 
-  void removeEntity(EntityID entity);
-  void removeEntityLUA(int entity);
+    void addComponentLUA(int entityID, std::string &componentName);
+    void removeComponentLUA(int entityID, std::string &componentName);
 
-  void printEntity(int id);
-  void printEntities();
+    void removeEntity(EntityID entity);
+    void removeEntityLUA(int entity);
 
-  void log(std::shared_ptr<Error> error) override;
-  void log(HUGO::String log) override;
+    void printEntity(int id);
+    void printEntities();
 
-  ErrorOrType<HUGO::String> getNextError() override;
-  ErrorOrType<HUGO::String> getNextLog() override;
+    void log(std::shared_ptr<Error> error) override;
+    void log(HUGO::String log) override;
 
-  template <typename T>
-  void subscribe(std::function<void(std::shared_ptr<T>)> callback) {
-	  messenger.subscribe<T>(callback);
-  }
+    ErrorOrType<HUGO::String> getNextError() override;
+    ErrorOrType<HUGO::String> getNextLog() override;
 
-  void dispatchMessages();
+    // Subscribe a callback to a message channel
+    template <typename TMessage>
+    void subscribe(std::function<void(std::shared_ptr<TMessage>)> callback) {
+        messenger.subscribe<TMessage>(callback);
+    }
+
+    template <typename TMessage>
+    void sendMessage(TMessage msg) {
+        messenger.enqueue(msg);
+    }
+
+    // Dispatch all messages to systems
+    void dispatchMessages();
 };

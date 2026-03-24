@@ -103,6 +103,7 @@ void Core::run(){
         sceneManager.fixedUpdateCurrentScene(startTime);
         physicsModule->performSimulations(startTime);
         sceneManager.updateCurrentScene(startTime);
+        sceneManager.dispatchMessagesCurrentScene();
 
         physicsModule->debugDraw();
         

@@ -123,3 +123,7 @@ void SceneManager::updateCurrentScene(double dt){
 void SceneManager::fixedUpdateCurrentScene(double dt){
     m_currentScene->fixedUpdate(dt);
 }
+
+void SceneManager::dispatchMessagesCurrentScene() {
+    m_currentScene->dispatchMessages();
+}

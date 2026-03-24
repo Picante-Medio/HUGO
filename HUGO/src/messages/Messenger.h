@@ -18,6 +18,12 @@ public:
         channels[msgID].subscribeCallback(callback);
     }
 
+    template<typename TMessage>
+    void enqueue(TMessage msg) {
+        MsgID msgID = getMsgID<TMessage>();
+        channels[msgID].enqueueMessage(msg);
+    }
+
     void sendAll();
 };
 }

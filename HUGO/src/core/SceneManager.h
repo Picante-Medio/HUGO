@@ -44,4 +44,5 @@ public:
     //---Updates and fixedUpdates of current Scene
     void updateCurrentScene(double dt);
     void fixedUpdateCurrentScene(double dt);
+    void dispatchMessagesCurrentScene();
 };
