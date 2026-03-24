@@ -1,6 +1,7 @@
 #include "Message.h"
 #include <queue>
 
+namespace HUGO {
 class IChannel {
 public:
     virtual bool empty() const = 0;
@@ -25,3 +26,4 @@ public:
         messages.push(m);
     }
 };
+}
