@@ -132,9 +132,10 @@ ErrorOrType<Ogre::OverlayElement*> HUGO::OgreOverlayUtils::getElement(const HUGO
         return ErrorOrType<Ogre::OverlayElement*>(e);
     }
 
-    Ogre::OverlayElement* element = Ogre::OverlayManager::getSingleton().getOverlayElement(name);
+    bool hasElement = Ogre::OverlayManager::getSingleton().hasOverlayElement(name);
+    Ogre::OverlayElement*  element = nullptr;
     // if it is not created yet, just create one
-    if (element == 0) {
+    if (hasElement) {
         HUGO::String type = isTextArea ? "TextArea" : "Panel";
         element = Ogre::OverlayManager::getSingleton().createOverlayElement(type, name);
         if (!element){

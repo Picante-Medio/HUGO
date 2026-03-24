@@ -46,7 +46,7 @@ std::shared_ptr<UIElementCache> UISystem::createElementCache(EntityID entity,
 }
 
 std::shared_ptr<UIElementCache> UISystem::createElementCache(EntityID entity, const HUGO::String &overlayName, const HUGO::String &containerName, const HUGO::String &elementName,
-                                                            bool isTextArea = false)
+                                                            bool isTextArea)
 {
     std::shared_ptr<UIElementCache> cache = std::make_shared<UIElementCache>();
     
@@ -216,7 +216,7 @@ void UISystem::syncSlider(const PanelComponent& p, const SliderComponent& s)
 
     HUGO::Float percent = (s.currentValue - s.minValue) / (s.maxValue - s.minValue);
     percent = std::clamp(percent, 0.0f, 1.0f);
-
+    HUGO::Float knobPos;
     // sync track and knob
     switch (s.orientation)
     {
@@ -226,7 +226,7 @@ void UISystem::syncSlider(const PanelComponent& p, const SliderComponent& s)
         cache->element->setWidth(p.width * percent);
         cache->element->setHeight(p.height);
         
-        HUGO::Float knobPos = (p.width - s.knobWidth) * percent;
+        knobPos = (p.width - s.knobWidth) * percent;
         knobPos = std::clamp(knobPos, 0.0f, p.width - s.knobWidth);
         
         cache->knob->setLeft(knobPos);
@@ -241,7 +241,7 @@ void UISystem::syncSlider(const PanelComponent& p, const SliderComponent& s)
         cache->element->setWidth(p.width);
         cache->element->setHeight(p.height * percent);
         
-        HUGO::Float knobPos = (p.height - s.knobHeight) * (1.0f - percent);
+        knobPos = (p.height - s.knobHeight) * (1.0f - percent);
         knobPos = std::clamp(knobPos, 0.0f, p.height - s.knobHeight);
         
         cache->knob->setLeft(-s.knobHeight/4.0f);
@@ -612,15 +612,15 @@ void UISystem::processSliderInput()
             if (mouseOverTrack && !mouseOverKnob)
             {
                 HUGO::Float percent = 0.0f;
+                HUGO::Float trackHeight = panel.height - slider.knobHeight;                    
+                HUGO::Float trackWidth = panel.width - slider.knobWidth;
                 switch (slider.orientation)
                 {
                 case HUGO::SliderOrientation::HORIZONTAL:
-                    HUGO::Float trackWidth = panel.width - slider.knobWidth;
                     percent = (mouse.x - panel.left) / trackWidth;
                     break;
                 
                 case HUGO::SliderOrientation::VERTICAL:
-                    HUGO::Float trackHeight = panel.height - slider.knobHeight;
                     percent = 1.0f - (mouse.y - panel.top) / trackHeight;
                     break;
                 }
@@ -638,16 +638,16 @@ void UISystem::processSliderInput()
                 HUGO::Float percent = 0.0f;
                 
                 // value based on mouse position
+                HUGO::Float trackWidth = panel.width - slider.knobWidth;
+                HUGO::Float trackHeight = panel.height - slider.knobHeight;
                 switch (slider.orientation)
                 {
                     case HUGO::SliderOrientation::HORIZONTAL:
-                        HUGO::Float trackWidth = panel.width - slider.knobWidth;
                         percent = (mouse.x - panel.left) / trackWidth;
                         percent = std::clamp(percent, 0.0f, 1.0f);
                         break;
                     
                     case HUGO::SliderOrientation::VERTICAL:
-                        HUGO::Float trackHeight = panel.height - slider.knobHeight;
                         percent = 1.0f - (mouse.y - panel.top) / trackHeight;
                         percent = std::clamp(percent, 0.0f, 1.0f);
                         break;
