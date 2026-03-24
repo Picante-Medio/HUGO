@@ -26,13 +26,13 @@ namespace HUGO {
 
 class GameLibraryLoader {
 
-    typedef void (*InitializeGameFn)(std::shared_ptr<ComponentRegistry>);
+    typedef void (*InitializeGameFn)(std::shared_ptr<HUGO::ComponentRegistry>);
 
-    typedef bool (*GenerateComponentFn)(std::shared_ptr<IScene>, EntityID, const std::string&,
+    typedef bool (*GenerateComponentFn)(std::shared_ptr<HUGO::IScene>, EntityID, const std::string&,
         const std::unordered_map<std::string, HVariant>&);
 
-    typedef bool (*GenerateAndGetSystemFn)(std::shared_ptr<IScene>, const std::string&,
-        std::shared_ptr<System>&);
+    typedef bool (*GenerateAndGetSystemFn)(std::shared_ptr<HUGO::IScene>, const std::string&,
+        std::shared_ptr<HUGO::System>&);
 
 
     GameLibraryLoader(const std::string& gameLibraryName);
@@ -53,10 +53,10 @@ public:
 
     ~GameLibraryLoader();
 
-    ErrorOrVoid GenerateComponent(std::shared_ptr<IScene> scene, EntityID ent, const std::string& component, 
+    ErrorOrVoid GenerateComponent(std::shared_ptr<HUGO::IScene> scene, EntityID ent, const std::string& component, 
         const std::unordered_map<std::string, HVariant>& componentMembers);
 
-    ErrorOrType<std::shared_ptr<System>>GenerateAndGetSystem(std::shared_ptr<IScene> scene, 
+    ErrorOrType<std::shared_ptr<HUGO::System>>GenerateAndGetSystem(std::shared_ptr<HUGO::IScene> scene, 
         const std::string& systemName);
 };
 

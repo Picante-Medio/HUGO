@@ -31,12 +31,12 @@ HUGO::GameLibraryLoader::GameLibraryLoader(const std::string& gameLibraryName) {
     }
     generateComponentFnPointer = reinterpret_cast<GenerateComponentFn>(GET_FUNC(gameHandle, "GenerateComponent"));
     if (!generateComponentFnPointer) {
-        throw std::runtime_error("[GameLibraryLoader] bool GenerateComponent(std::shared_ptr<IScene>, EntityID, " 
+        throw std::runtime_error("[GameLibraryLoader] bool GenerateComponent(std::shared_ptr<HUGO::IScene>, EntityID, " 
             "const std::string&, const std::unordered_map<std::string, HVariant>&) not found in " + gameLibraryName);
     }
     generateAndGetSystemFnPointer = reinterpret_cast<GenerateAndGetSystemFn>(GET_FUNC(gameHandle, "GenerateAndGetSystem"));
     if (!generateAndGetSystemFnPointer) {
-        throw std::runtime_error("[GameLibraryLoader] bool GenerateAndGetSystemFn(std::shared_ptr<IScene>, "
+        throw std::runtime_error("[GameLibraryLoader] bool GenerateAndGetSystemFn(std::shared_ptr<HUGO::IScene>, "
             "EntityID, const std::string&, std::shared_ptr<System>&)  not found in " + gameLibraryName);
     }
 
@@ -76,7 +76,7 @@ HUGO::GameLibraryLoader::destroy() {
 }
 
 ErrorOrVoid 
-HUGO::GameLibraryLoader::GenerateComponent(std::shared_ptr<IScene> scene, EntityID ent, const std::string& componentName, 
+HUGO::GameLibraryLoader::GenerateComponent(std::shared_ptr<HUGO::IScene> scene, EntityID ent, const std::string& componentName, 
     const std::unordered_map<std::string, HVariant>& componentMembers) {
 
     if (generateComponentFnPointer(scene, ent, componentName, componentMembers)) {
@@ -86,8 +86,8 @@ HUGO::GameLibraryLoader::GenerateComponent(std::shared_ptr<IScene> scene, Entity
     return ErrorOrVoid(StringError{"No se ha podido generar el componente de tipo: " + componentName});
 }
 
-ErrorOrType<std::shared_ptr<System>>
-HUGO::GameLibraryLoader::GenerateAndGetSystem(std::shared_ptr<IScene> scene, const std::string& systemName) {
+ErrorOrType<std::shared_ptr<HUGO::System>>
+HUGO::GameLibraryLoader::GenerateAndGetSystem(std::shared_ptr<HUGO::IScene> scene, const std::string& systemName) {
 
     std::shared_ptr<System> returnedSystem = nullptr;
 

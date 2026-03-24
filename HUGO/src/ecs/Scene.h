@@ -8,8 +8,8 @@
 #include <memory>
 #include <queue>
 
-class Scene : public IScene, public std::enable_shared_from_this<Scene> {
-  std::vector<std::shared_ptr<System>> systems;
+class Scene : public HUGO::IScene, public std::enable_shared_from_this<Scene> {
+  std::vector<std::shared_ptr<HUGO::System>> systems;
   std::queue<std::shared_ptr<Error>> errorsToLog;
   std::queue<HUGO::String> stringsToLog;
 
@@ -18,7 +18,7 @@ public:
   
   void load();
 
-  inline void addSystem(std::shared_ptr<System> system) { systems.push_back(system); }
+  inline void addSystem(std::shared_ptr<HUGO::System> system) { systems.push_back(system); }
 
   // Logic update
   void update(double dt);

@@ -96,7 +96,7 @@ public:
     template<typename Caller>
     std::shared_ptr<ComponentEventFunctionHandle<T>> connect(Caller* instance, void(Caller::*method)(T&, EntityID)) {
 
-        static_assert(std::is_base_of_v<System, Caller>, "instance must inherit from System");
+        static_assert(std::is_base_of_v<HUGO::System, Caller>, "instance must inherit from System");
 
         return event.connect([instance, method]
             (T& component, EntityID entity) {

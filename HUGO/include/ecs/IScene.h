@@ -13,6 +13,8 @@
 #include "ComponentRegistry.h"
 #include "HugoQuery.h"
 
+namespace HUGO {
+
 class IScene {
 protected:
 
@@ -29,7 +31,7 @@ public:
 	void addComponent(EntityID entity, Ts &&...args) {
 		// Creating the component
 		T component(entity, std::forward<Ts>(args)...);
-		ComponentID id = ComponentRegistry::getComponentId<T>();
+		ComponentID id = HUGO::ComponentRegistry::getComponentId<T>();
 
 		// Adding the component
 		DenseListIndex index = componentTable->addComponent(component, entity);
@@ -38,21 +40,21 @@ public:
 
 	template<typename T> 
 	T &getComponent(EntityID entity) {
-	ComponentID componentID = ComponentRegistry::getComponentId<T>();
+	ComponentID componentID = HUGO::ComponentRegistry::getComponentId<T>();
 		return componentTable->getComponent<T>(
 			entityTable->getDenseListIndex(entity, componentID));
 	}
 
     template<typename T>
     bool hasComponent(EntityID entity) const {
-        return entityTable->hasComponent(entity, ComponentRegistry::getComponentId<T>());
+        return entityTable->hasComponent(entity, HUGO::ComponentRegistry::getComponentId<T>());
     }
 
 	template <typename T>
 	T& addAndGetComponent(EntityID entity) {
 		// Creating the component
 		T component(entity);
-		ComponentID id = ComponentRegistry::getComponentId<T>();
+		ComponentID id = HUGO::ComponentRegistry::getComponentId<T>();
 
 		// Adding the component
 		DenseListIndex index = componentTable->addComponent(component, entity);
@@ -64,7 +66,7 @@ public:
 	template <typename T> 
 	void removeComponent(EntityID entity) {
 		// Obtaining the index of the component to delete
-		ComponentID id = ComponentRegistry::getComponentId<T>();
+		ComponentID id = HUGO::ComponentRegistry::getComponentId<T>();
 		DenseListIndex oldIndex = entityTable->getDenseListIndex(entity, id);
 
 		// Deleting the component
@@ -95,7 +97,7 @@ public:
 		HUGO::Query<Ts...> returnedQuery;
 
 		// Expand the parameter pack to get the affected components by ID
-		std::vector<ComponentID> ids = ComponentRegistry::getAllComponentIds<Ts...>();
+		std::vector<ComponentID> ids = HUGO::ComponentRegistry::getAllComponentIds<Ts...>();
 
 		// Create the bitmask to avoid hasComponent operations
 		std::bitset<MAX_COMPONENTS> queryMask;
@@ -130,3 +132,5 @@ public:
     virtual ErrorOrType<HUGO::String> getNextError() = 0;
     virtual ErrorOrType<HUGO::String> getNextLog() = 0;
 };
+
+}

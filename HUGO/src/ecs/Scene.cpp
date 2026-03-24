@@ -31,20 +31,20 @@ void Scene::load() {
 	luaBinder.registerMethod<Scene, void, int>(*this, &Scene::removeEntityLUA, "RemoveEntity");
 	luaBinder.registerMethod<Scene, int>(*this, &Scene::createEntityLUA, "CreateEntity");
 
-	for(std::shared_ptr<System> system : systems) {
+	for(std::shared_ptr<HUGO::System> system : systems) {
 		system->onLoad();
 	}
 }
 
 void 
 Scene::update(double dt) {
-	for(std::shared_ptr<System> system : systems) 
+	for(std::shared_ptr<HUGO::System> system : systems) 
 		system->update(dt);
 }
 
 void 
 Scene::fixedUpdate(double dt) {
-	for(std::shared_ptr<System> system : systems) 
+	for(std::shared_ptr<HUGO::System> system : systems) 
 		system->fixedUpdate(dt);
 }
 

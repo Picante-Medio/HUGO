@@ -3,6 +3,8 @@
 #include <unordered_map>
 #include "EcsTypes.h"
 
+namespace HUGO {
+
 class ComponentRegistry {
 protected:
 
@@ -53,3 +55,5 @@ public:
 		}
 	}
 };
+
+}

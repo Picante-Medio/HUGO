@@ -32,7 +32,7 @@ protected:
 	 */
 	template<typename T>
 	void ensureListExists() {
-		ComponentID componentID = ComponentRegistry::getComponentId<T>();
+		ComponentID componentID = HUGO::ComponentRegistry::getComponentId<T>();
 		if(componentLists[componentID] != nullptr) return;
 		componentLists[componentID] = std::make_shared<DenseList<T>>();
 
@@ -51,7 +51,7 @@ protected:
 	template<typename T>
 	std::shared_ptr<DenseList<T>> getComponentList() {
 		ensureListExists<T>();
-		ComponentID cmpID = ComponentRegistry::getComponentId<T>();
+		ComponentID cmpID = HUGO::ComponentRegistry::getComponentId<T>();
 		return std::static_pointer_cast<DenseList<T>>(componentLists[cmpID]);
 	}
 
@@ -109,7 +109,7 @@ public:
 	template<typename T>
 	std::shared_ptr<ComponentEvent<T>> getAddEvent() {
 		ensureListExists<T>();
-		ComponentID cmpID = ComponentRegistry::getComponentId<T>();
+		ComponentID cmpID = HUGO::ComponentRegistry::getComponentId<T>();
 		return std::static_pointer_cast<ComponentEvent<T>>(eventsList[cmpID]->onAdd);
 	}
 
@@ -119,7 +119,7 @@ public:
 	template<typename T>
 	std::shared_ptr<ComponentEvent<T>> getUpdateEvent() {
 		ensureListExists<T>();
-		ComponentID cmpID = ComponentRegistry::getComponentId<T>();
+		ComponentID cmpID = HUGO::ComponentRegistry::getComponentId<T>();
 		return std::static_pointer_cast<ComponentEvent<T>>(eventsList[cmpID]->onUpdate);
 	}
 
@@ -129,7 +129,7 @@ public:
 	template<typename T>
 	std::shared_ptr<ComponentEvent<T>> getRemoveEvent() {
 		ensureListExists<T>();
-		ComponentID cmpID = ComponentRegistry::getComponentId<T>();
+		ComponentID cmpID = HUGO::ComponentRegistry::getComponentId<T>();
 		return std::static_pointer_cast<ComponentEvent<T>>(eventsList[cmpID]->onRemove);
 	}
 
@@ -140,7 +140,7 @@ public:
 	 */
 	template<typename T>
 	DenseListIndex getCount() const {
-		return getCount(ComponentRegistry::getComponentId<T>(ComponentRegistry::getComponentId<T>()));
+		return getCount(HUGO::ComponentRegistry::getComponentId<T>(HUGO::ComponentRegistry::getComponentId<T>()));
 	}
 
 	virtual std::vector<EntityID> affectedEntities(ComponentID componentID) = 0;
