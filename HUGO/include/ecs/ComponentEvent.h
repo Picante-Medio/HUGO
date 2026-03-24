@@ -10,7 +10,7 @@
 #include "System.h"
 
 template <typename T>
-using ComponentEventFunction = std::function<void(T&, EntityID)>;
+using ComponentEventFunction = std::function<void(T&)>;
 
 /// @brief Handle to release functions associated with an event that is related with objects of component T
 /// @tparam T Component
@@ -66,7 +66,7 @@ public:
     ///         removed on the fly
     /// @param component the affected component
     /// @param entity the entity the component should be part of
-    void dispatch(T& component, EntityID entity) {
+    void dispatch(T& component) {
 
         for (size_t i = 0; i < functionList.size(); ++i) {
 
@@ -78,7 +78,7 @@ public:
             }
             else {
 
-                (*functionList[i]->fn)(component, entity);
+                (*functionList[i]->fn)(component);
             }
         }
     }
@@ -94,13 +94,13 @@ public:
     ComponentEventTemporalReference(std::shared_ptr<ComponentEvent<T>> event): event(event) {}
 
     template<typename Caller>
-    std::shared_ptr<ComponentEventFunctionHandle<T>> connect(Caller* instance, void(Caller::*method)(T&, EntityID)) {
+    std::shared_ptr<ComponentEventFunctionHandle<T>> connect(Caller* instance, void(Caller::*method)(T&)) {
 
         static_assert(std::is_base_of_v<HUGO::System, Caller>, "instance must inherit from System");
 
         return event.connect([instance, method]
-            (T& component, EntityID entity) {
-                (instance->*method)(component, entity);
+            (T& component) {
+                (instance->*method)(component);
             }
         );
     }

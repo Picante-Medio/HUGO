@@ -94,7 +94,7 @@ public:
 
 	template <typename... Ts> 
 	HUGO::Query<Ts...> query() {
-		HUGO::Query<Ts...> returnedQuery;
+		HUGO::Query<Ts...> returnedQuery(componentTable->getUpdateEvent<Ts>()...);
 
 		// Expand the parameter pack to get the affected components by ID
 		std::vector<ComponentID> ids = HUGO::ComponentRegistry::getAllComponentIds<Ts...>();
@@ -121,8 +121,10 @@ public:
 		// Add components of the right entities to the query
 		for (EntityID entity : potentialEntities)
 			if (entityTable->isInQuery(entity, queryMask))
-			returnedQuery.push_back(getComponent<Ts>(entity)...);
+				returnedQuery.push_back(getComponent<Ts>(entity)...);
 
+		
+				
 		return returnedQuery;
 	}
 

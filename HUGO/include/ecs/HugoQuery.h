@@ -7,27 +7,36 @@
 
 #include "ComponentEvent.h"
 #include "EcsTypes.h"
+#include "Mutable.h"
 
 namespace HUGO {
 
 	template<typename ...Ts>
 	class ComponentTuple {
-		std::tuple<Ts&...> pack;
 
-		public:
-		ComponentTuple(Ts&... components) 
-			: pack(components...)
+		std::tuple<Ts&...> pack;
+		
+		std::tuple<std::shared_ptr<ComponentEvent<Ts>>...>& updateEvents;
+
+	public:
+		ComponentTuple(Ts&... components, std::tuple<std::shared_ptr<ComponentEvent<Ts>>...>& updateEvents) 
+			: pack(components...), updateEvents(updateEvents)
 		{}
 
 		// Antiguo get
 		template<typename T>
 		T& getDeprecated() {
-			return std::get<T>(pack);
+			return std::get<T&>(pack);
 		}
 
 		template<typename T>
 		const T& getConst() const {
 			return std::get<T&>(pack);
+		}
+
+		template<typename T>
+		Mutable<T> getMutable() {
+			return Mutable<T>(std::get<std::shared_ptr<ComponentEvent<T>>>(updateEvents), std::get<T&>(pack));
 		}
 	};
 
@@ -36,11 +45,13 @@ namespace HUGO {
 		using TupleList = std::vector<ComponentTuple<Ts...>>;
 		TupleList componentPacks;
 
-		public:
-		Query() : componentPacks() {}
+		std::tuple<std::shared_ptr<ComponentEvent<Ts>>...> updateEvents;
+
+	public:
+		Query(std::shared_ptr<ComponentEvent<Ts>>... events) : componentPacks(), updateEvents(events...) {}
 
 		void push_back(Ts&... components) { 
-			componentPacks.emplace_back(components...);
+			componentPacks.emplace_back(components..., updateEvents);
 		}
 
 		typename TupleList::iterator begin() { return componentPacks.begin(); }

@@ -5,30 +5,35 @@
 
 namespace HUGO {
 
-template<typename T>
-class Mutable {
+    template<typename T>
+    class Mutable {
 
-    std::shared_ptr<ComponentEvent<T>> updateEvent;
-    T& reference;
-    EntityID entity;
+        std::shared_ptr<ComponentEvent<T>> updateEvent;
+        T& reference;
+        bool moved = false;
 
-public:
+    public:
 
-    Mutable(std::shared_ptr<SafeComponentEventDispatcher<T>> updateEvent, T& reference, EntityID entity) 
-    : updateEvent(updateEvent), reference(reference), entity(entity) {}
+        Mutable() = delete;
+        Mutable(const Mutable&) = delete;
+        Mutable& operator=(const Mutable&) = delete;
+        Mutable& operator=(Mutable&&) = delete;
 
-    ~Mutable() {
-        updateEvent->dispatch(reference, entity);
-    }
+        Mutable(Mutable&& other): updateEvent(other.updateEvent), reference(other.reference), moved(false) {
+            other.moved = true;
+        }
 
-    T& operator->() {
-        return reference;
-    }
+        Mutable(std::shared_ptr<ComponentEvent<T>> updateEvent, T& reference) 
+        : updateEvent(updateEvent), reference(reference) {}
 
-    Mutable(const Mutable&) = delete;
-    Mutable(Mutable&&) = delete;
-    Mutable& operator=(const Mutable&) = delete;
-    Mutable& operator=(Mutable&&) = delete;
-};
+        ~Mutable() {
+            if (!moved) 
+                updateEvent->dispatch(reference);
+        }
+
+        T& operator->() {
+            return reference;
+        }
+    };
 
 }
