@@ -9,7 +9,7 @@ void TweenSystem::onLoad() {
 }
 void TweenSystem::update(double dt) {
     for(auto& pack : scene->query<TweenComponent>()) {
-        TweenComponent& comp = pack.get<TweenComponent&>();
+        TweenComponent& comp = pack.getDeprecated<TweenComponent&>();
 
         for(auto it = comp.currentTweens.begin(); it != comp.currentTweens.end();){
 

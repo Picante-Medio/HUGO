@@ -433,9 +433,9 @@ void AudioSystem::update(double dt)
                                TransformComponent,
                                TransformDirtyTag>())
     {
-        AudioListenerComponent& listener = pack.get<AudioListenerComponent&>();
-        TransformComponent& tr   = pack.get<TransformComponent&>();
-        TransformDirtyTag& tag  = pack.get<TransformDirtyTag&>();
+        AudioListenerComponent& listener = pack.getDeprecated<AudioListenerComponent&>();
+        TransformComponent& tr   = pack.getDeprecated<TransformComponent&>();
+        TransformDirtyTag& tag  = pack.getDeprecated<TransformDirtyTag&>();
         updateListeners(listener, tr);
         scene->removeComponent<TransformDirtyTag>(tag.entity);
     }
@@ -444,10 +444,10 @@ void AudioSystem::update(double dt)
          scene->query<AudioComponent, Audio3DInfoComponent,
                     TransformComponent, Audio3DDirtyTag>())
     {
-        AudioComponent& a = pack.get<AudioComponent&>();
-        Audio3DInfoComponent& info = pack.get<Audio3DInfoComponent&>();
-        TransformComponent& tr   = pack.get<TransformComponent&>();
-        Audio3DDirtyTag& tag  = pack.get<Audio3DDirtyTag&>();
+        AudioComponent& a = pack.getDeprecated<AudioComponent&>();
+        Audio3DInfoComponent& info = pack.getDeprecated<Audio3DInfoComponent&>();
+        TransformComponent& tr   = pack.getDeprecated<TransformComponent&>();
+        Audio3DDirtyTag& tag  = pack.getDeprecated<Audio3DDirtyTag&>();
 
         process3DChanges(a, info, tr, tag);
 
@@ -458,8 +458,8 @@ void AudioSystem::update(double dt)
     for (auto& pack :
          scene->query<AudioComponent, AudioDirtyTag>())
     {
-        AudioComponent& c   = pack.get<AudioComponent&>();
-        AudioDirtyTag& tag = pack.get<AudioDirtyTag&>();
+        AudioComponent& c   = pack.getDeprecated<AudioComponent&>();
+        AudioDirtyTag& tag = pack.getDeprecated<AudioDirtyTag&>();
 
         processChanges(c, tag);
 
@@ -470,7 +470,7 @@ void AudioSystem::update(double dt)
     for (auto& pack :
          scene->query<AudioComponent, AudioPlayTag>())
     {
-        AudioComponent& c = pack.get<AudioComponent&>();
+        AudioComponent& c = pack.getDeprecated<AudioComponent&>();
 
         ma_sound* s = acquireVoice(c);
         playAudio(s);
@@ -483,7 +483,7 @@ void AudioSystem::update(double dt)
     // stop events
     for (auto& pack :scene->query<AudioComponent, AudioStopTag>())
     {
-        AudioComponent& c = pack.get<AudioComponent&>();
+        AudioComponent& c = pack.getDeprecated<AudioComponent&>();
 
         if (c.activePtr)
         {
@@ -497,7 +497,7 @@ void AudioSystem::update(double dt)
 
     for (auto& pack : scene->query<AudioComponent>())
     {
-        AudioComponent& c = pack.get<AudioComponent&>();
+        AudioComponent& c = pack.getDeprecated<AudioComponent&>();
 
         if (c.activePtr && !ma_sound_is_playing(c.activePtr))
         {
@@ -510,7 +510,7 @@ void AudioSystem::update(double dt)
 
     for (auto& pack : scene->query<AudioComponent>())
     {
-        AudioComponent& sc = pack.get<AudioComponent&>();
+        AudioComponent& sc = pack.getDeprecated<AudioComponent&>();
         EntityID id = sc.entity;
 
         if (i > 0)
@@ -575,7 +575,7 @@ void AudioSystem::createTestEntity()
     scene->addComponent<AudioPlayTag>(ent);
     int i = 0;
     for (auto& pack : scene->query<AudioComponent>()) {
-        AudioComponent& sc = pack.get<AudioComponent&>();
+        AudioComponent& sc = pack.getDeprecated<AudioComponent&>();
         if (i == 0){
             sc.isPlaying = true;
             sc.loop = false;

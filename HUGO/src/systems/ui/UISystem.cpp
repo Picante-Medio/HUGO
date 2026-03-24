@@ -263,7 +263,7 @@ void UISystem::processPanelChanges()
 {
    for (auto &pack : scene->query<PanelComponent, PanelDirtyTag>())
     {
-        PanelComponent& panel = pack.get<PanelComponent&>();
+        PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
         syncPanel(panel);
         scene->removeComponent<PanelDirtyTag>(panel.entity);
     }
@@ -273,7 +273,7 @@ void UISystem::processVisibility()
 {
     for (auto &pack : scene->query<PanelComponent, VisibilityDirtyTag>())
     {
-        PanelComponent &panel = pack.get<PanelComponent &>();
+        PanelComponent &panel = pack.getDeprecated<PanelComponent &>();
         UIElementCache *cache = getCache(panel.entity);
 
         if (cache && cache->overlay && cache->container)
@@ -291,8 +291,8 @@ ErrorOrVoid UISystem::processComponentCreations()
     //panels
     for (auto &pack : scene->query<PanelComponent, CreatePanelDirtyTag>())
     {
-        PanelComponent &panel = pack.get<PanelComponent &>();
-        CreatePanelDirtyTag &tag = pack.get<CreatePanelDirtyTag &>();
+        PanelComponent &panel = pack.getDeprecated<PanelComponent &>();
+        CreatePanelDirtyTag &tag = pack.getDeprecated<CreatePanelDirtyTag &>();
         EntityID entity = panel.entity;
         createElementCache(entity, panel.overlayName, panel.containerName);
         scene->addComponent<VisibilityDirtyTag>(panel.entity);
@@ -303,8 +303,8 @@ ErrorOrVoid UISystem::processComponentCreations()
     
     for (auto &pack : scene->query<CreateTextDirtyTag, TextComponent, PanelComponent>())
     {
-        TextComponent &text = pack.get<TextComponent &>();
-        CreateTextDirtyTag &tag = pack.get<CreateTextDirtyTag &>();
+        TextComponent &text = pack.getDeprecated<TextComponent &>();
+        CreateTextDirtyTag &tag = pack.getDeprecated<CreateTextDirtyTag &>();
 
         ErrorOrType<Ogre::OverlayElement *> elementResult = HUGO::OgreOverlayUtils::getElement(text.textAreaName);
         if (elementResult.isError())
@@ -342,9 +342,9 @@ ErrorOrVoid UISystem::processComponentCreations()
 
     for (auto &pack : scene->query<CreateButtonDirtyTag, ButtonComponent, PanelComponent>())
     {
-        ButtonComponent &button = pack.get<ButtonComponent &>();
-        PanelComponent &panel = pack.get<PanelComponent &>();
-        CreateButtonDirtyTag &tag = pack.get<CreateButtonDirtyTag &>();
+        ButtonComponent &button = pack.getDeprecated<ButtonComponent &>();
+        PanelComponent &panel = pack.getDeprecated<PanelComponent &>();
+        CreateButtonDirtyTag &tag = pack.getDeprecated<CreateButtonDirtyTag &>();
         switch (button.state)
         {
         case HUGO::ButtonStateTypes::BS_UP :
@@ -371,8 +371,8 @@ void UISystem::processButtonChanges()
 {
     for (auto &pack : scene->query<ButtonComponent, ButtonDirtyTag, PanelComponent>())
     {
-        ButtonComponent &button = pack.get<ButtonComponent&>();
-        PanelComponent &panel = pack.get<PanelComponent&>();
+        ButtonComponent &button = pack.getDeprecated<ButtonComponent&>();
+        PanelComponent &panel = pack.getDeprecated<PanelComponent&>();
         syncButton(button, panel);
         scene->removeComponent<ButtonDirtyTag>(button.entity);
     }
@@ -382,8 +382,8 @@ void UISystem::processTextChanges()
 {
     for (auto &pack : scene->query<PanelComponent, TextComponent, TextDirtyTag>())
     {
-        TextComponent &text = pack.get<TextComponent &>();
-        TextDirtyTag &tag = pack.get<TextDirtyTag &>();
+        TextComponent &text = pack.getDeprecated<TextComponent &>();
+        TextDirtyTag &tag = pack.getDeprecated<TextDirtyTag &>();
         syncText(text);
         scene->removeComponent<TextDirtyTag>(tag.entity);
     }
@@ -397,9 +397,9 @@ void UISystem::processInput()
     // handle mouse click: activate/deactivate input fields
     if (input.wasMouseButtonJustPressed(SDL_BUTTON_LEFT)) {
         for (auto& pack : scene->query<PanelComponent, TextComponent, InputFieldComponent>()) {
-            PanelComponent& panel = pack.get<PanelComponent&>();
-            TextComponent& text = pack.get<TextComponent&>();
-            InputFieldComponent& field = pack.get<InputFieldComponent&>();
+            PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
+            TextComponent& text = pack.getDeprecated<TextComponent&>();
+            InputFieldComponent& field = pack.getDeprecated<InputFieldComponent&>();
 
             // get normalized mouse position
             HUGO::Input::MouseRelativePosition mp = input.getMouseRelativePosition();
@@ -427,8 +427,8 @@ void UISystem::processInput()
 
         for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
         {
-            PanelComponent& panel = pack.get<PanelComponent&>();
-            ButtonComponent& button = pack.get<ButtonComponent&>();
+            PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
+            ButtonComponent& button = pack.getDeprecated<ButtonComponent&>();
 
             HUGO::Input::MouseRelativePosition mouse = input.getMouseRelativePosition();
             if (isMouseOverPanel(panel, mouse.x, mouse.y))
@@ -444,8 +444,8 @@ void UISystem::processInput()
         for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
         {
             std::cout << "aaaaa\n";
-            PanelComponent& panel = pack.get<PanelComponent&>();
-            ButtonComponent& button = pack.get<ButtonComponent&>();
+            PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
+            ButtonComponent& button = pack.getDeprecated<ButtonComponent&>();
 
             HUGO::Input::MouseRelativePosition mouse = input.getMouseRelativePosition();
             bool isOver = isMouseOverPanel(panel, mouse.x, mouse.y);
@@ -463,8 +463,8 @@ void UISystem::processInput()
 
     for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
         {
-            PanelComponent& panel = pack.get<PanelComponent&>();
-            ButtonComponent& button = pack.get<ButtonComponent&>();
+            PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
+            ButtonComponent& button = pack.getDeprecated<ButtonComponent&>();
 
             HUGO::Input::MouseRelativePosition mouse = input.getMouseRelativePosition();
             bool isOver = isMouseOverPanel(panel, mouse.x, mouse.y);
@@ -484,11 +484,11 @@ void UISystem::processInput()
     // process text for the active input field using SDL text buffer
     const HUGO::String& textInput = input.getTextInput();
     for (auto &pack : scene->query<InputFieldComponent, TextComponent, PanelComponent>()) {
-        InputFieldComponent& field = pack.get<InputFieldComponent&>();
+        InputFieldComponent& field = pack.getDeprecated<InputFieldComponent&>();
         if (!field.isActive) continue;
 
-        TextComponent& text = pack.get<TextComponent&>();
-        PanelComponent& panel = pack.get<PanelComponent&>();
+        TextComponent& text = pack.getDeprecated<TextComponent&>();
+        PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
         bool changed = false;
 
         // append new text input from SDL
@@ -561,7 +561,7 @@ void UISystem::processInput()
     // toggle SDL text input if any field is active
     anyFieldActive = false;
     for (auto& pack : scene->query<InputFieldComponent>()) {
-        if (pack.get<InputFieldComponent&>().isActive) {
+        if (pack.getDeprecated<InputFieldComponent&>().isActive) {
             anyFieldActive = true;
             break;
         }
@@ -573,8 +573,8 @@ void UISystem::processProgressBarChanges()
 {
     for (auto &pack : scene->query<PanelComponent, ProgressBarComponent, ProgressBarDirtyTag>())
     {
-        PanelComponent& panel = pack.get<PanelComponent&>();
-        ProgressBarComponent& pr = pack.get<ProgressBarComponent&>();
+        PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
+        ProgressBarComponent& pr = pack.getDeprecated<ProgressBarComponent&>();
         //ProgressBarDirtyTag& tag = pack.get<ProgressBarDirtyTag &>();
         pr.currentValue = std::min(pr.maxValue, pr.currentValue + 0.1f);
         //syncText(panel, text, tag);
@@ -590,8 +590,8 @@ void UISystem::processSliderInput()
 
     for (auto &pack : scene->query<SliderComponent, PanelComponent>())
     {
-        SliderComponent& slider = pack.get<SliderComponent&>();
-        PanelComponent& panel   = pack.get<PanelComponent&>();
+        SliderComponent& slider = pack.getDeprecated<SliderComponent&>();
+        PanelComponent& panel   = pack.getDeprecated<PanelComponent&>();
 
         UISliderCache* cache = dynamic_cast<UISliderCache*>(uiCache[slider.entity].get());
         if (!cache || !cache->container || !cache->element || !cache->knob)
@@ -670,8 +670,8 @@ void UISystem::processSliderChanges()
 {
    for (auto &pack : scene->query<PanelComponent, SliderComponent, SliderDirtyTag>())
     {
-        PanelComponent& panel = pack.get<PanelComponent&>();
-        SliderComponent& slider = pack.get<SliderComponent&>();
+        PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
+        SliderComponent& slider = pack.getDeprecated<SliderComponent&>();
         syncSlider(panel, slider);
     }
 }

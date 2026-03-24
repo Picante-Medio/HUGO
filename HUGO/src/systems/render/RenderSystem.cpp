@@ -116,7 +116,7 @@ void RenderSystem::handleTag()
 {
 
     for(auto& pack : scene->query<CameraCreateDirtyTag, TransformComponent, CameraComponent>()) {
-        TransformComponent& tr = pack.get<TransformComponent&>();
+        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
         EntityID entity = tr.entity;
         auto it = cameraMap.find(entity);
         if (it == cameraMap.end()) {
@@ -127,7 +127,7 @@ void RenderSystem::handleTag()
     }
 
     for(auto& pack : scene->query<LightCreateDirtyTag, TransformComponent, LightComponent>()) {
-        TransformComponent& tr = pack.get<TransformComponent&>();
+        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
         EntityID entity = tr.entity;
         auto it = lightMap.find(entity);
         if (it == lightMap.end()) {
@@ -138,7 +138,7 @@ void RenderSystem::handleTag()
     }
 
      for(auto& pack : scene->query<ViewportCreateDirtyTag, ViewportComponent>()) {
-        ViewportComponent& view = pack.get<ViewportComponent&>();
+        ViewportComponent& view = pack.getDeprecated<ViewportComponent&>();
         EntityID entity = view.entity;
         auto it = viewportMap.find(entity);
         if (it == viewportMap.end()) {
@@ -149,7 +149,7 @@ void RenderSystem::handleTag()
     }
 
     for(auto& pack : scene->query<CameraCreateDirtyTag, TransformComponent, CameraComponent>()) {
-        TransformComponent& tr = pack.get<TransformComponent&>();
+        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
         EntityID entity = tr.entity;
         auto it = cameraMap.find(entity);
         if (it == cameraMap.end()) {
@@ -161,9 +161,9 @@ void RenderSystem::handleTag()
 
     // Camera update
     for(auto& pack : scene->query<CameraDirtyTag, TransformComponent, CameraComponent>()) {
-        CameraDirtyTag& tag = pack.get<CameraDirtyTag&>();
-        TransformComponent& tr = pack.get<TransformComponent&>();
-        CameraComponent& camera = pack.get<CameraComponent&>();
+        CameraDirtyTag& tag = pack.getDeprecated<CameraDirtyTag&>();
+        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
+        CameraComponent& camera = pack.getDeprecated<CameraComponent&>();
         EntityID entity = tag.entity;
         
         auto it = cameraMap.find(entity);
@@ -187,9 +187,9 @@ void RenderSystem::handleTag()
 
     // Light update
     for(auto&pack : scene->query<LightDirtyTag, LightComponent, TransformComponent>()){
-        LightDirtyTag& tag = pack.get<LightDirtyTag&>();
-        LightComponent& light = pack.get<LightComponent&>();
-        TransformComponent& tr = pack.get<TransformComponent&>();
+        LightDirtyTag& tag = pack.getDeprecated<LightDirtyTag&>();
+        LightComponent& light = pack.getDeprecated<LightComponent&>();
+        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
         EntityID entity = tag.entity;
 
         auto it = lightMap.find(entity);
@@ -235,8 +235,8 @@ void RenderSystem::handleTag()
 
     // Viewport update
     for(auto& pack : scene->query<ViewportDirtyTag, ViewportComponent>()) {
-        ViewportDirtyTag& tag = pack.get<ViewportDirtyTag&>();
-        ViewportComponent& viewport = pack.get<ViewportComponent&>();
+        ViewportDirtyTag& tag = pack.getDeprecated<ViewportDirtyTag&>();
+        ViewportComponent& viewport = pack.getDeprecated<ViewportComponent&>();
         EntityID entity = tag.entity;
         
         auto it = viewportMap.find(entity);
@@ -265,8 +265,8 @@ void RenderSystem::handleTag()
 
     //Material Update
     for(auto& pack : scene->query<MaterialDirtyTag, RenderComponent>()) {
-        MaterialDirtyTag& material = pack.get<MaterialDirtyTag&>();
-        RenderComponent& rc = pack.get<RenderComponent&>();
+        MaterialDirtyTag& material = pack.getDeprecated<MaterialDirtyTag&>();
+        RenderComponent& rc = pack.getDeprecated<RenderComponent&>();
 
         if (rc.objectID != HUGO::INVALID_OGRE_OBJECT_ID) {
             rc.materialName=material.materialName;
@@ -280,8 +280,8 @@ void RenderSystem::handleTag()
     //Animation Update
     for(auto& pack : scene->query<AnimationComponent,AnimationDirtyTag,RenderComponent>())
     {
-        AnimationComponent& animComp = pack.get<AnimationComponent&>();
-        RenderComponent& rc = pack.get<RenderComponent&>();
+        AnimationComponent& animComp = pack.getDeprecated<AnimationComponent&>();
+        RenderComponent& rc = pack.getDeprecated<RenderComponent&>();
 
         if(rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) continue;
         
@@ -347,8 +347,8 @@ void RenderSystem::handleTag()
 void RenderSystem::updateAnimations(double dt)
 {
     for(auto& pack : scene->query<RenderComponent, AnimationComponent>()) {
-        AnimationComponent& animComp = pack.get<AnimationComponent&>();
-        RenderComponent& rc = pack.get<RenderComponent&>();
+        AnimationComponent& animComp = pack.getDeprecated<AnimationComponent&>();
+        RenderComponent& rc = pack.getDeprecated<RenderComponent&>();
 
         if(rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) continue;
         
@@ -378,8 +378,8 @@ void RenderSystem::update(double dt)
 
     //Update transform of entity with renderComponent
     for(auto& pack : scene->query<TransformComponent,RenderComponent>()) {
-        RenderComponent& rc = pack.get<RenderComponent&>();
-        TransformComponent& tr=pack.get<TransformComponent&>();
+        RenderComponent& rc = pack.getDeprecated<RenderComponent&>();
+        TransformComponent& tr=pack.getDeprecated<TransformComponent&>();
 
         if (rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) {
             //create a new ogreObject

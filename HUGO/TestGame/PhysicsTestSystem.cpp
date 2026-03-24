@@ -55,11 +55,11 @@ void PhysicsTestSystem::onLoad(){
 
 void PhysicsTestSystem::fixedUpdate(double dt) {
     for(auto pack : scene->query<TransformComponent, StaticRBTag>()) {
-        TransformComponent& body = pack.get<TransformComponent&>();
+        TransformComponent& body = pack.getDeprecated<TransformComponent&>();
     }
 
     for(auto pack : scene->query<TransformComponent, RigidBodyComponent, DynamicRBTag>()) {
-        RigidBodyComponent& body = pack.get<RigidBodyComponent&>();
+        RigidBodyComponent& body = pack.getDeprecated<RigidBodyComponent&>();
     }
 }
 

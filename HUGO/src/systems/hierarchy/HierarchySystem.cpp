@@ -60,7 +60,7 @@ HierarchySystem::updateHierarchy()
     //change parent
     for (auto& pack : scene->query<ParentComponent, ParentCompDirtyTag>())
     {
-        ParentComponent& parentComp = pack.get<ParentComponent&>();
+        ParentComponent& parentComp = pack.getDeprecated<ParentComponent&>();
         EntityID child = parentComp.entity;
         EntityID newParent= parentComp.parent;
         EntityID oldParent= parentComp.previousParent;
@@ -198,7 +198,7 @@ HierarchySystem::update(double)
     
     //proccess local transform changes --> add WorldTransformDirty Tag
     for (auto& pack : scene->query<TransformChangedTag, TransformComponent>()) {
-        EntityID e = pack.get<TransformComponent&>().entity;
+        EntityID e = pack.getDeprecated<TransformComponent&>().entity;
     
         if(!scene->hasComponent<WorldTransformDirtyTag>(e))
         {
@@ -211,7 +211,7 @@ HierarchySystem::update(double)
 
     //process dirty tag: update worldTranforms
     for (auto& pack : scene->query<WorldTransformDirtyTag, TransformComponent>()) {
-        TransformComponent& tr= pack.get<TransformComponent&>();
+        TransformComponent& tr= pack.getDeprecated<TransformComponent&>();
         std::unordered_set<EntityID> visited; 
         getFullTransform(tr.entity, visited);
     }

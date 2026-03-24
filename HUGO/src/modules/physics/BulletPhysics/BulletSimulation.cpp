@@ -435,8 +435,8 @@ void BulletSimulation::syncBodiesToBullet() {
     // Add new rigidBodies to simulation and Update kinematic bodies
     // Static rigidBodies 
     for(auto& pack: scene->query<ColliderComponent, StaticRBTag, RigidBodyComponent, TransformComponent>()) {
-        RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
-        ColliderComponent& col = pack.get<ColliderComponent&>();
+        RigidBodyComponent& rb = pack.getDeprecated<RigidBodyComponent&>();
+        ColliderComponent& col = pack.getDeprecated<ColliderComponent&>();
         
         if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
             //create a new CollisionObject
@@ -448,8 +448,8 @@ void BulletSimulation::syncBodiesToBullet() {
     
     // Kinematic rigidBodies (creation and update)
     for(auto& pack: scene->query<ColliderComponent, KinematicRBTag, RigidBodyComponent, TransformComponent>()) {
-        RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
-        ColliderComponent& col = pack.get<ColliderComponent&>();
+        RigidBodyComponent& rb = pack.getDeprecated<RigidBodyComponent&>();
+        ColliderComponent& col = pack.getDeprecated<ColliderComponent&>();
         
         if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
             //create a new CollisionObject
@@ -464,8 +464,8 @@ void BulletSimulation::syncBodiesToBullet() {
     
     // Dynamic rigidBodies
     for(auto& pack: scene->query<ColliderComponent, DynamicRBTag, RigidBodyComponent, TransformComponent>()) {
-        RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
-        ColliderComponent& col = pack.get<ColliderComponent&>();
+        RigidBodyComponent& rb = pack.getDeprecated<RigidBodyComponent&>();
+        ColliderComponent& col = pack.getDeprecated<ColliderComponent&>();
         
         if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
             //create a new CollisionObject
@@ -477,7 +477,7 @@ void BulletSimulation::syncBodiesToBullet() {
 
     // Add colliders to simulation
      for(auto& pack: scene->query<ColliderComponent, TransformComponent>()){
-         ColliderComponent& col = pack.get<ColliderComponent&>();
+         ColliderComponent& col = pack.getDeprecated<ColliderComponent&>();
     
          if(col.objectID == HUGO::INVALID_COL_OBJ_ID){
              col.objectID = createColliderObject(col);
@@ -490,7 +490,7 @@ void BulletSimulation::syncBodiesToBullet() {
 void BulletSimulation::syncBodiesToGame() {
 
     for(auto& pack: scene->query<ColliderComponent, RigidBodyComponent, TransformComponent>()) {
-        RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
+        RigidBodyComponent& rb = pack.getDeprecated<RigidBodyComponent&>();
         btRigidBody* btRb = btRigidBody::upcast(getCollisionObject(rb.objectID).bulletRB);
         
         if(btRb->wantsSleeping())
@@ -509,7 +509,7 @@ void BulletSimulation::syncBodiesToGame() {
 
     if (numSubSteps != 0){
         for(auto& pack: scene->query<ColliderComponent, TransformComponent>()) {
-            ColliderComponent& col = pack.get<ColliderComponent&>();
+            ColliderComponent& col = pack.getDeprecated<ColliderComponent&>();
         
             col.collisionInfo.clear();
             col.collisionInfo = col.collisionBuffer;

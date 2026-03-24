@@ -5,7 +5,11 @@
 #include <tuple>
 #include <vector>
 
+#include "ComponentEvent.h"
+#include "EcsTypes.h"
+
 namespace HUGO {
+
 	template<typename ...Ts>
 	class ComponentTuple {
 		std::tuple<Ts&...> pack;
@@ -15,13 +19,14 @@ namespace HUGO {
 			: pack(components...)
 		{}
 
+		// Antiguo get
 		template<typename T>
-		T& get() {
+		T& getDeprecated() {
 			return std::get<T>(pack);
 		}
 
 		template<typename T>
-		const T& get() const {
+		const T& getConst() const {
 			return std::get<T&>(pack);
 		}
 	};
