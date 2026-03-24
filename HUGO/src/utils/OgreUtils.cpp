@@ -110,16 +110,21 @@ ErrorOrType<Ogre::Overlay*> HUGO::OgreOverlayUtils::getOverlay(const HUGO::Strin
         e.errorMessage = "Overlay name is empty";
         return ErrorOrType<Ogre::Overlay*>(e);
     }
-
-    Ogre::Overlay* overlay = Ogre::OverlayManager::getSingleton().create(name);
-    if (!overlay) {
-        e.errorMessage = "Cannot find overlay: " + name;
-        return ErrorOrType<Ogre::Overlay*>(e);
+    
+    Ogre::Overlay* overlay = Ogre::OverlayManager::getSingleton().getByName(name);
+    // if it is not created yet, just create one
+    if (overlay == 0){
+        overlay = Ogre::OverlayManager::getSingleton().create(name);
+        if (!overlay) {
+            e.errorMessage = "Cannot create overlay: " + name;
+            return ErrorOrType<Ogre::Overlay*>(e);
+        }
     }
+
     return ErrorOrType<Ogre::Overlay*>(overlay);
 }
 
-ErrorOrType<Ogre::OverlayElement*> HUGO::OgreOverlayUtils::getElement(const HUGO::String& name)
+ErrorOrType<Ogre::OverlayElement*> HUGO::OgreOverlayUtils::getElement(const HUGO::String& name, bool isTextArea)
 {
     StringError e;
     if (name.empty()) {
@@ -127,13 +132,19 @@ ErrorOrType<Ogre::OverlayElement*> HUGO::OgreOverlayUtils::getElement(const HUGO
         return ErrorOrType<Ogre::OverlayElement*>(e);
     }
 
-    Ogre::OverlayElement* element = Ogre::OverlayManager::getSingleton().createOverlayElement(name);
-    if (!element) {
-        e.errorMessage = "Cannot find element: " + name;
-        return ErrorOrType<Ogre::OverlayElement*>(e);
+    Ogre::OverlayElement* element = Ogre::OverlayManager::getSingleton().getOverlayElement(name);
+    // if it is not created yet, just create one
+    if (element == 0) {
+        HUGO::String type = isTextArea ? "TextArea" : "Panel";
+        element = Ogre::OverlayManager::getSingleton().createOverlayElement(type, name);
+        if (!element){
+            e.errorMessage = "Cannot find element: " + name;
+            return ErrorOrType<Ogre::OverlayElement*>(e);
+        }
     }
     return ErrorOrType<Ogre::OverlayElement*>(element);
 }
+
 
 ErrorOrType<Ogre::OverlayContainer*> HUGO::OgreOverlayUtils::getContainer(const HUGO::String& name)
 {

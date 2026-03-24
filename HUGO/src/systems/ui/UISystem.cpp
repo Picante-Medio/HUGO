@@ -45,7 +45,8 @@ std::shared_ptr<UIElementCache> UISystem::createElementCache(EntityID entity,
     return cache;
 }
 
-std::shared_ptr<UIElementCache> UISystem::createElementCache(EntityID entity, const HUGO::String &overlayName, const HUGO::String &containerName, const HUGO::String &elementName)
+std::shared_ptr<UIElementCache> UISystem::createElementCache(EntityID entity, const HUGO::String &overlayName, const HUGO::String &containerName, const HUGO::String &elementName,
+                                                            bool isTextArea = false)
 {
     std::shared_ptr<UIElementCache> cache = std::make_shared<UIElementCache>();
     
@@ -58,7 +59,7 @@ std::shared_ptr<UIElementCache> UISystem::createElementCache(EntityID entity, co
         cache->container = containerResult.getValue();
     
     if (elementName != ""){
-        ErrorOrType<Ogre::OverlayElement*> elementResult = HUGO::OgreOverlayUtils::getElement(elementName);
+        ErrorOrType<Ogre::OverlayElement*> elementResult = HUGO::OgreOverlayUtils::getElement(elementName, isTextArea);
         if (!elementResult.isError())
             cache->element = elementResult.getValue();
     }
@@ -611,16 +612,19 @@ void UISystem::processSliderInput()
             if (mouseOverTrack && !mouseOverKnob)
             {
                 HUGO::Float percent = 0.0f;
-                if (slider.orientation == SliderComponent::HORIZONTAL)
+                switch (slider.orientation)
                 {
+                case HUGO::SliderOrientation::HORIZONTAL:
                     HUGO::Float trackWidth = panel.width - slider.knobWidth;
                     percent = (mouse.x - panel.left) / trackWidth;
-                }
-                else // VERTICAL
-                {
+                    break;
+                
+                case HUGO::SliderOrientation::VERTICAL:
                     HUGO::Float trackHeight = panel.height - slider.knobHeight;
                     percent = 1.0f - (mouse.y - panel.top) / trackHeight;
+                    break;
                 }
+
                 percent = std::clamp(percent, 0.0f, 1.0f);
                 slider.currentValue = slider.minValue + percent * (slider.maxValue - slider.minValue);
             }
@@ -634,17 +638,19 @@ void UISystem::processSliderInput()
                 HUGO::Float percent = 0.0f;
                 
                 // value based on mouse position
-                if (slider.orientation == SliderComponent::HORIZONTAL)
+                switch (slider.orientation)
                 {
-                    HUGO::Float trackWidth = panel.width - slider.knobWidth;
-                    percent = (mouse.x - panel.left) / trackWidth;
-                    percent = std::clamp(percent, 0.0f, 1.0f);
-                }
-                else // VERTICAL
-                {
-                    HUGO::Float trackHeight = panel.height - slider.knobHeight;
-                    percent = 1.0f - (mouse.y - panel.top) / trackHeight;
-                    percent = std::clamp(percent, 0.0f, 1.0f);
+                    case HUGO::SliderOrientation::HORIZONTAL:
+                        HUGO::Float trackWidth = panel.width - slider.knobWidth;
+                        percent = (mouse.x - panel.left) / trackWidth;
+                        percent = std::clamp(percent, 0.0f, 1.0f);
+                        break;
+                    
+                    case HUGO::SliderOrientation::VERTICAL:
+                        HUGO::Float trackHeight = panel.height - slider.knobHeight;
+                        percent = 1.0f - (mouse.y - panel.top) / trackHeight;
+                        percent = std::clamp(percent, 0.0f, 1.0f);
+                        break;
                 }
                 
                 HUGO::Float newValue = slider.minValue + percent * (slider.maxValue - slider.minValue);
@@ -735,9 +741,9 @@ EntityID UISystem::createPanel(const HUGO::String& overlayName)
     panel.width  = container->getWidth();
     panel.height = container->getHeight();
 
-    panel.metricsMode = HUGO::OgreUtils::toHugo(container->getMetricsMode());
-    panel.alignmentX  = HUGO::OgreUtils::toHugo(container->getHorizontalAlignment());
-    panel.alignmentY  = HUGO::OgreUtils::toHugo(container->getVerticalAlignment());
+    // panel.metricsMode = HUGO::OgreUtils::toHugo(container->getMetricsMode());
+    // panel.alignmentX  = HUGO::OgreUtils::toHugo(container->getHorizontalAlignment());
+    // panel.alignmentY  = HUGO::OgreUtils::toHugo(container->getVerticalAlignment());
 
     panel.isVisible = true;
     panel.material = "test/UI";
@@ -802,7 +808,7 @@ EntityID UISystem::createProgressBar(const HUGO::String& overlayName)
     panel.overlayName = overlayName;
     panel.containerName = overlayName + "/Background";
     pr.fillElementName = overlayName + "/Fill";
-    pr.fillMode = ProgressBarComponent::FillMode::HORIZONTAL_LEFT_TO_RIGHT;
+    pr.fillMode = HUGO::ProgressBarFillMode::HORIZONTAL_LEFT_TO_RIGHT;
     // create cache
     std::shared_ptr<UIElementCache> cache = createElementCache(ent, 
         panel.overlayName, panel.containerName, pr.fillElementName);
@@ -816,9 +822,9 @@ EntityID UISystem::createProgressBar(const HUGO::String& overlayName)
     panel.width  = cache->container->getWidth();
     panel.height = cache->container->getHeight();
 
-    panel.metricsMode = HUGO::OgreUtils::toHugo(cache->container->getMetricsMode());
-    panel.alignmentX  = HUGO::OgreUtils::toHugo(cache->container->getHorizontalAlignment());
-    panel.alignmentY  = HUGO::OgreUtils::toHugo(cache->container->getVerticalAlignment());
+    // panel.metricsMode = HUGO::OgreUtils::toHugo(cache->container->getMetricsMode());
+    // panel.alignmentX  = HUGO::OgreUtils::toHugo(cache->container->getHorizontalAlignment());
+    // panel.alignmentY  = HUGO::OgreUtils::toHugo(cache->container->getVerticalAlignment());
 
     panel.isVisible = true;
 
@@ -853,7 +859,7 @@ EntityID UISystem::createSlider(const HUGO::String& overlayName)
     slider.trackElementName = overlayName + "/Track"; // track
     slider.knobElementName = overlayName + "/Knob"; // knob
 
-    slider.orientation = SliderComponent::Orientation::HORIZONTAL;
+    slider.orientation = HUGO::SliderOrientation::HORIZONTAL;
 
     // create slider cache
     std::shared_ptr<UISliderCache> cache = std::make_shared<UISliderCache>();
@@ -880,9 +886,9 @@ EntityID UISystem::createSlider(const HUGO::String& overlayName)
     panel.top = cache->container->getTop();
     panel.width = cache->container->getWidth();
     panel.height = cache->container->getHeight();
-    panel.metricsMode = HUGO::OgreUtils::toHugo(cache->container->getMetricsMode());
-    panel.alignmentX  = HUGO::OgreUtils::toHugo(cache->container->getHorizontalAlignment());
-    panel.alignmentY  = HUGO::OgreUtils::toHugo(cache->container->getVerticalAlignment());
+    // panel.metricsMode = HUGO::OgreUtils::toHugo(cache->container->getMetricsMode());
+    // panel.alignmentX  = HUGO::OgreUtils::toHugo(cache->container->getHorizontalAlignment());
+    // panel.alignmentY  = HUGO::OgreUtils::toHugo(cache->container->getVerticalAlignment());
 
     panel.isVisible = true;
     

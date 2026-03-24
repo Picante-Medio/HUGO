@@ -107,7 +107,7 @@ namespace HUGO{
         GMM_RELATIVE_ASPECT_ADJUSTED
     };
 
-    enum FillMode { // enum for fill mode of the progress bars
+    enum ProgressBarFillMode { // enum for fill mode of the progress bars
         HORIZONTAL_LEFT_TO_RIGHT,
         HORIZONTAL_RIGHT_TO_LEFT,
         VERTICAL_BOTTOM_TO_TOP, 

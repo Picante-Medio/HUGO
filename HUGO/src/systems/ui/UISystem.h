@@ -45,7 +45,7 @@ std::unordered_map<EntityID, std::shared_ptr<UIElementCache>> uiCache;
 std::shared_ptr<UIElementCache> createElementCache(EntityID entity, Ogre::Overlay* o, 
     Ogre::OverlayContainer* c, Ogre::OverlayElement* e = nullptr);
 std::shared_ptr<UIElementCache> createElementCache(EntityID entity, const HUGO::String& overlayName,
-    const HUGO::String& containerName, const HUGO::String& elementName = "");
+    const HUGO::String& containerName, const HUGO::String& elementName = "", bool isTextArea = false);
 UIElementCache* getCache(EntityID entity);
 
 //====================================================
