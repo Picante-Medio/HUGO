@@ -71,16 +71,10 @@ TestSystem::init() {
 
     EntityID boton = scene->createEntity();
     PanelComponent& panel = scene->addAndGetComponent<PanelComponent>(boton);
-<<<<<<< Updated upstream
     panel.overlayName = "testCanvas/SimpleTest";
     panel.containerName = panel.overlayName + "/Container";
     panel.material = "UI/Background";
 
-=======
-    panel.overlayName = "testCanvas/hola";
-    panel.containerName = panel.overlayName + "/Container";
-    panel.material = "UI/Test";
->>>>>>> Stashed changes
 
     scene->addComponent<CreatePanelDirtyTag>(boton);
     // pn.overlayName = "testCanvas/ConsoleTextTest";
