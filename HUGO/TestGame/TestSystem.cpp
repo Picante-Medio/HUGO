@@ -74,7 +74,8 @@ TestSystem::init() {
     panel.overlayName = "testCanvas/SimpleTest";
     panel.containerName = panel.overlayName + "/Container";
     panel.material = "UI/Background";
-
+    panel.left = 0.7f;
+    panel.top = 0.5f;
 
     scene->addComponent<CreatePanelDirtyTag>(boton);
     // pn.overlayName = "testCanvas/ConsoleTextTest";

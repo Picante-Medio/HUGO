@@ -54,12 +54,12 @@ std::shared_ptr<UIElementCache> UISystem::createElementCache(EntityID entity, co
     if (!overlayResult.isError())
         cache->overlay = overlayResult.getValue();
     
-    ErrorOrType<Ogre::OverlayContainer*> containerResult = HUGO::OgreOverlayUtils::getContainer(containerName);
+    ErrorOrType<Ogre::OverlayContainer*> containerResult = HUGO::OgreOverlayUtils::getContainer(containerName, cache->overlay);
     if (!containerResult.isError())
         cache->container = containerResult.getValue();
     
     if (elementName != ""){
-        ErrorOrType<Ogre::OverlayElement*> elementResult = HUGO::OgreOverlayUtils::getElement(elementName, isTextArea);
+        ErrorOrType<Ogre::OverlayElement*> elementResult = HUGO::OgreOverlayUtils::getElement(elementName, isTextArea, cache->container);
         if (!elementResult.isError())
             cache->element = elementResult.getValue();
     }
@@ -869,14 +869,14 @@ EntityID UISystem::createSlider(const HUGO::String& overlayName)
     ErrorOrType<Ogre::Overlay*> overlayResult = HUGO::OgreOverlayUtils::getOverlay(panel.overlayName);
     if (!overlayResult.isError()) cache->overlay = overlayResult.getValue();
 
-    ErrorOrType<Ogre::OverlayContainer*> containerResult = HUGO::OgreOverlayUtils::getContainer(panel.containerName);
+    ErrorOrType<Ogre::OverlayContainer*> containerResult = HUGO::OgreOverlayUtils::getContainer(panel.containerName, cache->overlay);
     if (!containerResult.isError()) cache->container = containerResult.getValue();
 
     // get track
     ErrorOrType<Ogre::OverlayElement*> trackResult = HUGO::OgreOverlayUtils::getElement(slider.trackElementName);
     if (!trackResult.isError()) cache->element = trackResult.getValue();
     // get knob
-    ErrorOrType<Ogre::OverlayContainer*> knobContainerResult = HUGO::OgreOverlayUtils::getContainer(slider.knobElementName);
+    ErrorOrType<Ogre::OverlayContainer*> knobContainerResult = HUGO::OgreOverlayUtils::getContainer(slider.knobElementName, cache->overlay);
     if (!knobContainerResult.isError()) cache->knob = knobContainerResult.getValue();
 
     if (!cache->container || !cache->element || !cache->knob) return 0;

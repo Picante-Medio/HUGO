@@ -120,12 +120,10 @@ ErrorOrType<Ogre::Overlay*> HUGO::OgreOverlayUtils::getOverlay(const HUGO::Strin
             return ErrorOrType<Ogre::Overlay*>(e);
         }
     }
-    
-    //TODO: WE NEED TO ADD INTO THE OVERLAY
     return ErrorOrType<Ogre::Overlay*>(overlay);
 }
 
-ErrorOrType<Ogre::OverlayElement*> HUGO::OgreOverlayUtils::getElement(const HUGO::String& name, bool isTextArea)
+ErrorOrType<Ogre::OverlayElement*> HUGO::OgreOverlayUtils::getElement(const HUGO::String& name, bool isTextArea, Ogre::OverlayContainer* containerToAdd)
 {
     StringError e;
     if (name.empty()) {
@@ -146,12 +144,15 @@ ErrorOrType<Ogre::OverlayElement*> HUGO::OgreOverlayUtils::getElement(const HUGO
     }
     else{
         element = Ogre::OverlayManager::getSingleton().getOverlayElement(name);
+        // WE NEED TO ADD INTO THE OVERLAY
+        if (containerToAdd != nullptr)
+            containerToAdd->addChild(element);
     }
     return ErrorOrType<Ogre::OverlayElement*>(element);
 }
 
 
-ErrorOrType<Ogre::OverlayContainer*> HUGO::OgreOverlayUtils::getContainer(const HUGO::String& name)
+ErrorOrType<Ogre::OverlayContainer*> HUGO::OgreOverlayUtils::getContainer(const HUGO::String& name, Ogre::Overlay* overlayToAdd)
 {
     StringError e;
     ErrorOrType<Ogre::OverlayElement*> elementResult = getElement(name);
@@ -165,5 +166,6 @@ ErrorOrType<Ogre::OverlayContainer*> HUGO::OgreOverlayUtils::getContainer(const 
         e.errorMessage = "Element exists but is not a container: " + name;
         return ErrorOrType<Ogre::OverlayContainer*>(e);
     }
+    overlayToAdd->add2D(container);
     return ErrorOrType<Ogre::OverlayContainer*>(container);
 }
