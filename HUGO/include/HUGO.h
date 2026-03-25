@@ -15,3 +15,4 @@
 #include "SystemFactory.h"
 #include "HugoComponentMacros.h"
 #include "HugoSystemMacros.h"
+#include "Message.h"

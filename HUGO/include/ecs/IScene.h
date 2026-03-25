@@ -12,6 +12,7 @@
 #include "EcsTypes.h"
 #include "ComponentRegistry.h"
 #include "HugoQuery.h"
+#include "Messenger.h"
 
 namespace HUGO {
 
@@ -20,6 +21,7 @@ protected:
 
 	std::unique_ptr<IEntityTable> entityTable;
   	std::unique_ptr<IComponentDenseTable> componentTable;
+	Messenger messenger;
 
 public:
 	// Entity handling
@@ -133,6 +135,23 @@ public:
 
     virtual ErrorOrType<HUGO::String> getNextError() = 0;
     virtual ErrorOrType<HUGO::String> getNextLog() = 0;
+
+	// Message handling
+
+	// Subscribe a callback to a message channel
+    template <typename T>
+    void subscribe(std::function<void(std::shared_ptr<Message>)> callback) {
+        messenger.subscribe<T>(callback);
+    }
+
+	// Allow a system to send a message
+	template <typename TMessage>
+    void sendMessage(const TMessage& msg) {
+        messenger.enqueue(msg);
+    }
+
+	// Send all enqueued messages
+	virtual void dispatchMessages() = 0;
 };
 
 }

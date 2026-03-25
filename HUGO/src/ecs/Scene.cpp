@@ -23,6 +23,7 @@
 Scene::Scene() {
 	entityTable = std::make_unique<EntityTable>();
 	componentTable = std::make_unique<ComponentDenseTable>();
+	messenger = HUGO::Messenger();
 }
 
 //Load method is called when the scene is loaded so LUA methods are overwritten
