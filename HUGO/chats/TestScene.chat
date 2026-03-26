@@ -8,3 +8,4 @@ SYSTEM TestSystem
 SYSTEM ConsoleSystem
 SYSTEM TweenSystem
 SYSTEM HierarchySystem
+SYSTEM MessagesTestSystem

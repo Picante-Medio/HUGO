@@ -1,4 +1,5 @@
 #include "Messenger.h"
+#include "Message.h"
 
 namespace HUGO {
 
@@ -9,8 +10,10 @@ Messenger::Messenger() {
 
 void 
 Messenger::sendAll() {
-    for(Channel channel : channels) 
-        channel.sendMessages();
+    for(MsgID id : activeChannels) 
+        channels[id].sendMessages();
+
+    activeChannels.clear();
 }
 
 };

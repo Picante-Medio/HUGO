@@ -146,7 +146,7 @@ public:
 
 	// Allow a system to send a message
 	template <typename TMessage>
-    void sendMessage(const TMessage& msg) {
+    void sendMessage(TMessage msg) {
         messenger.enqueue(msg);
     }
 

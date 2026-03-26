@@ -187,8 +187,6 @@ function(enable_warnings target)
 endfunction()
 
 ################################## Hugo Math
-
-
 add_library(HugoMath STATIC
     ${CMAKE_SOURCE_DIR}/include/HugoMath/HugoMath.cpp)
 enable_warnings(HugoMath)
@@ -201,6 +199,23 @@ set_target_properties(HugoMath PROPERTIES
 
 target_include_directories(HugoMath PUBLIC 
     ${CMAKE_SOURCE_DIR}/include/HugoMath)
+
+################################## Messaging
+add_library(HugoMessages STATIC
+    ${CMAKE_SOURCE_DIR}/include/messages/Messenger.cpp
+    ${CMAKE_SOURCE_DIR}/include/messages/Channel.cpp)
+    
+
+enable_warnings(HugoMessages)
+
+set_target_properties(HugoMessages PROPERTIES
+    DEBUG_POSTFIX "d"
+    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
+    ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/lib
+    ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/lib)
+
+target_include_directories(HugoMessages PUBLIC 
+    ${CMAKE_SOURCE_DIR}/include/messages)
 
 ################################## Aquí empieza el proyecto principal
 
@@ -253,7 +268,8 @@ target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     ${HUGO_LINKED_LIBRARIES}
-    HugoMath)
+    HugoMath
+    HugoMessages)
 
 set(CMAKE_SKIP_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
@@ -304,4 +320,5 @@ target_include_directories(TestGame PRIVATE
     ${SDK_INCLUDE_DIRS})
 
 target_link_libraries(TestGame PRIVATE
-    HugoMath)
+    HugoMath
+    HugoMessages)
