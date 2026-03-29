@@ -73,9 +73,12 @@ TestSystem::init() {
     PanelComponent& panel = scene->addAndGetComponent<PanelComponent>(boton);
     panel.overlayName = "testCanvas/SimpleTest";
     panel.containerName = panel.overlayName + "/Container";
-    panel.material = "UI/Background";
-    panel.left = 0.7f;
-    panel.top = 0.5f;
+    panel.material = "UI/Knob";
+    panel.left = 100.0f;
+    panel.top = 50.0f;
+    panel.width = 256.0f;
+    panel.height = 64.0f;
+    panel.metricsMode = HUGO::UIMetricsMode::GMM_PIXELS;
 
     scene->addComponent<CreatePanelDirtyTag>(boton);
     // pn.overlayName = "testCanvas/ConsoleTextTest";

@@ -9,7 +9,7 @@ HCOMPONENT(PanelComponent)
 
     bool isVisible = true;
 
-    // HUGO::UIMetricsMode metricsMode = HUGO::UIMetricsMode::GMM_RELATIVE;
+    HUGO::UIMetricsMode metricsMode = HUGO::UIMetricsMode::GMM_RELATIVE;
 
     HUGO::Float left = 0.0f;
     HUGO::Float top = 0.0f;

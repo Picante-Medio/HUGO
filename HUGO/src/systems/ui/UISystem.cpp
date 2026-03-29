@@ -103,7 +103,7 @@ void UISystem::syncPanel(const PanelComponent &p)
     cache->container->setHeight(p.height);
     // cache->container->setHorizontalAlignment(OgreUtils::toOgre(p.alignmentX));
     // cache->container->setVerticalAlignment(OgreUtils::toOgre(p.alignmentY));
-    cache->container->setMetricsMode(Ogre::GuiMetricsMode::GMM_RELATIVE);
+    cache->container->setMetricsMode(HUGO::OgreUtils::toOgre(p.metricsMode));
 
     if (!p.material.empty()) cache->container->setMaterialName(p.material);
 }
@@ -741,7 +741,7 @@ EntityID UISystem::createPanel(const HUGO::String& overlayName)
     panel.width  = container->getWidth();
     panel.height = container->getHeight();
 
-    // panel.metricsMode = HUGO::OgreUtils::toHugo(container->getMetricsMode());
+    panel.metricsMode = HUGO::OgreUtils::toHugo(container->getMetricsMode());
     // panel.alignmentX  = HUGO::OgreUtils::toHugo(container->getHorizontalAlignment());
     // panel.alignmentY  = HUGO::OgreUtils::toHugo(container->getVerticalAlignment());
 
@@ -822,7 +822,7 @@ EntityID UISystem::createProgressBar(const HUGO::String& overlayName)
     panel.width  = cache->container->getWidth();
     panel.height = cache->container->getHeight();
 
-    // panel.metricsMode = HUGO::OgreUtils::toHugo(cache->container->getMetricsMode());
+    panel.metricsMode = HUGO::OgreUtils::toHugo(cache->container->getMetricsMode());
     // panel.alignmentX  = HUGO::OgreUtils::toHugo(cache->container->getHorizontalAlignment());
     // panel.alignmentY  = HUGO::OgreUtils::toHugo(cache->container->getVerticalAlignment());
 
@@ -886,7 +886,7 @@ EntityID UISystem::createSlider(const HUGO::String& overlayName)
     panel.top = cache->container->getTop();
     panel.width = cache->container->getWidth();
     panel.height = cache->container->getHeight();
-    // panel.metricsMode = HUGO::OgreUtils::toHugo(cache->container->getMetricsMode());
+    panel.metricsMode = HUGO::OgreUtils::toHugo(cache->container->getMetricsMode());
     // panel.alignmentX  = HUGO::OgreUtils::toHugo(cache->container->getHorizontalAlignment());
     // panel.alignmentY  = HUGO::OgreUtils::toHugo(cache->container->getVerticalAlignment());
 
