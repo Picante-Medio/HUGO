@@ -120,25 +120,25 @@ bool usedTimer = false;
 
 void
 TestSystem::update(double dt) {
-    // timer += dt;
+    timer += dt;
 
-    // if(timer >= 1 && !usedTimer){
-    //     usedTimer = true;
+    if(timer >= 1 && !usedTimer){
+        usedTimer = true;
 
-    //     for(auto& elem : scene->query<TweenComponent, TransformComponent>()){
-    //         TransformComponent& tr = elem.get<TransformComponent&>();
-    //         TweenComponent& tween = elem.get<TweenComponent&>();
+        for(auto& elem : scene->query<TweenComponent, TransformComponent>()){
+            TransformComponent& tr = elem.getDeprecated<TransformComponent&>();
+            auto tween = elem.getMutable<TweenComponent>();
 
-    //         tween.currentTweens.push_back(HUGO::TweenFactory<EaseInBackTween>::makeTween(tr, &TransformComponent::position,
-    //         HUGO::Vector3(0,0,0), HUGO::Vector3(100,0,0), 1.f));
+            tween->currentTweens.push_back(HUGO::TweenFactory<EaseInBackTween>::makeTween(tr, &TransformComponent::position,
+            HUGO::Vector3(0,0,0), HUGO::Vector3(100,0,0), 1.f));
 
 
-    //         tween.currentTweens.push_back(HUGO::TweenFactory<EaseInBackTween>::makeTween(tr, &TransformComponent::rotation,
-    //         HUGO::Quaternion(HUGO::Radian(HUGO::Degree(0)), HUGO::Vector3(1,0,0)),
-    //         HUGO::Quaternion(HUGO::Radian(HUGO::Degree(-360)), HUGO::Vector3(1,0,0)),
-    //         1.f));
-    //     }
-    // }
+            tween->currentTweens.push_back(HUGO::TweenFactory<EaseInBackTween>::makeTween(tr, &TransformComponent::rotation,
+            HUGO::Quaternion(HUGO::Radian(HUGO::Degree(0)), HUGO::Vector3(1,0,0)),
+            HUGO::Quaternion(HUGO::Radian(HUGO::Degree(-360)), HUGO::Vector3(1,0,0)),
+            1.f));
+        }
+    }
 
       // ------------HierarchySystemTest----------
     // TransformComponent& tr=scene->getComponent<TransformComponent>(e1);

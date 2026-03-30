@@ -27,8 +27,8 @@ namespace HUGO {
         : updateEvent(updateEvent), reference(reference) {}
 
         ~Mutable() {
-            if (!moved) 
-                updateEvent->dispatch(reference);
+            // if (!moved) 
+            //     updateEvent->dispatch(reference);
         }
 
         T* operator->() {
