@@ -123,7 +123,7 @@ bool Input::wasActionJustReleased(std::string action) {
 }
 
 bool Input::isMouseButtonPressed(int button) {
-    return mouseState[button] == JUST_PRESSED || mouseState[button] == JUST_RELEASED;
+    return mouseState[button] == JUST_PRESSED || mouseState[button] == PRESSED;
 }
 
 bool Input::wasMouseButtonJustPressed(int button) {
