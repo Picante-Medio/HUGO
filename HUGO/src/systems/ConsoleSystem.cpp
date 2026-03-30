@@ -4,6 +4,7 @@
 #include "PanelComponent.h"
 #include "TextComponent.h"
 #include "InputFieldComponent.h"
+#include "Input.h"
 
 #include <iostream>
 
@@ -45,7 +46,7 @@ HUGO::String ConsoleSystem::getNextHistoric(){
         historyIndex--;
     }
     // item out of if so when 0 is reached it is always returned
-    item = history[historyIndex];
+    if(!history.empty()) item = history[historyIndex];
     return item;
 }
 
@@ -108,6 +109,22 @@ void ConsoleSystem::receiveInput(const HUGO::String& input){
     }
 }
 
+void ConsoleSystem::handleKeyInput(){
+
+    if(HUGO::Input::Instance().wasKeyJustPressed(SDLK_UP)){
+        HUGO::String next = getNextHistoric();
+        scene->getComponent<InputFieldComponent>(consoleInput).fullText = next;
+        scene->getComponent<TextComponent>(consoleInput).text = next;
+        scene->addComponent<TextDirtyTag>(consoleInput);
+    }
+    if(HUGO::Input::Instance().wasKeyJustPressed(SDLK_DOWN)){
+        HUGO::String prev = getPreviousHistoric();
+        scene->getComponent<InputFieldComponent>(consoleInput).fullText = prev;
+        scene->getComponent<TextComponent>(consoleInput).text = prev;
+        scene->addComponent<TextDirtyTag>(consoleInput);
+    }
+}
+
 void ConsoleSystem::update(double){
 
     TextComponent& consoleTextCmp = scene->getComponent<TextComponent>(consoleText);
@@ -128,6 +145,8 @@ void ConsoleSystem::update(double){
     printErrors(consoleTextCmp);
 
     scene->addComponent<TextDirtyTag>(consoleText);
+
+    handleKeyInput();
 }
 
 void ConsoleSystem::fixedUpdate(double){

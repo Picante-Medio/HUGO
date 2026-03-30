@@ -35,6 +35,7 @@ static inline std::queue<HUGO::String> luaOutput = std::queue<HUGO::String>();
     HUGO::String getPreviousHistoric();
 
     void receiveInput(const HUGO::String& input);
+    void handleKeyInput();
 
     template<typename T>
     void handleReturn(ErrorOrType<T>& returnedInfo){
