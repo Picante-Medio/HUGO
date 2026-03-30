@@ -14,32 +14,36 @@ void PhysicsTestSystem::init(){
     // Entidad 1: Cuerpo estático
     EntityID e1 = scene->createEntity();
     TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(e1);
-    transform.position = HUGO::Vector3(0, -20, -1000);
-    transform.scale = HUGO::Vector3(1, 0.5f, 0.5f);
+    transform.position = HUGO::Vector3(0, 0, 0);
+    transform.scale = HUGO::Vector3(0.05, 0.05f, 0.05f);
+    transform.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(45.f)), HUGO::Vector3(0,1,0));
     ColliderComponent& collider = scene->addAndGetComponent<ColliderComponent>(e1);
-    collider.info = BoxColliderInfo{HUGO::Vector3(2.f, 1.f, 1.f)};
+    collider.info = BoxColliderInfo{HUGO::Vector3(1.f, 1.f, 1.f)};
     RigidBodyComponent& rb = scene->addAndGetComponent<RigidBodyComponent>(e1);
     // rb->setShape()
-    rb.setMass(5.f);
-    scene->addComponent<DynamicRBTag>(e1);
+    // rb.setMass(5.f);
+    // scene->addComponent<DynamicRBTag>(e1);
+    scene->addComponent<StaticRBTag>(e1);
     RenderComponent& rc = scene->addAndGetComponent<RenderComponent>(e1);
     rc.setMeshName("cube.mesh");
     rc.setMaterialName("prueba/ColorRosa");
     scene->addComponent<TransformChangedTag>(e1);
 
     // Entidad 2: Cuerpo dinámico
-    // EntityID e2 = scene->createEntity();
-    // TransformComponent& transform2 = scene->addAndGetComponent<TransformComponent>(e2);
-    // transform2.position = HUGO::Vector3(20, 10, -50);
-    // transform2.scale = HUGO::Vector3(0.15f, 0.25f, 0.15f);
-    // ColliderComponent& collider2 = scene->addAndGetComponent<ColliderComponent>(e2);
-    // collider2.info = BoxColliderInfo{HUGO::Vector3(1.f, 1.f, 1.f)};
-    // RigidBodyComponent& rb2 = scene->addAndGetComponent<RigidBodyComponent>(e2);
-    // rb2.setMass(5.f);
-    // // rb->setShape()
-    // scene->addComponent<DynamicRBTag>(e2);
-    // RenderComponent& rc2 = scene->addAndGetComponent<RenderComponent>(e2);
-    // rc2.setMeshName("cube.mesh");
+    EntityID e2 = scene->createEntity();
+    TransformComponent& transform2 = scene->addAndGetComponent<TransformComponent>(e2);
+    transform2.position = HUGO::Vector3(0, 5, 0);
+    transform2.scale = HUGO::Vector3(0.05f, 0.05f, 0.05f);
+    ColliderComponent& collider2 = scene->addAndGetComponent<ColliderComponent>(e2);
+    collider2.info = BoxColliderInfo{HUGO::Vector3(1.f, 1.f, 1.f)};
+    RigidBodyComponent& rb2 = scene->addAndGetComponent<RigidBodyComponent>(e2);
+    rb2.setMass(5.f);
+    // rb->setShape()
+    scene->addComponent<DynamicRBTag>(e2);
+    RenderComponent& rc2 = scene->addAndGetComponent<RenderComponent>(e2);
+    rc2.setMeshName("cube.mesh");
+    rc2.setMaterialName("prueba/ColorVerde");
+    scene->addComponent<TransformChangedTag>(e2);
     
     // Entidad 3: Cuerpo kinemático
     // EntityID e3 = scene->createEntity();

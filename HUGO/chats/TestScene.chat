@@ -2,10 +2,8 @@ SCENE TestScene
 
 SYSTEM AudioSystem
 SYSTEM RenderSystem
-SYSTEM UISystem
 SYSTEM PhysicsTestSystem
-SYSTEM TestSystem
 SYSTEM ConsoleSystem
 SYSTEM TweenSystem
 SYSTEM HierarchySystem
-SYSTEM MessagesTestSystem
+SYSTEM CameraMovementSystem
