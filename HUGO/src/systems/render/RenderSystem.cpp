@@ -7,7 +7,6 @@
 
 #include "Scene.h"
 #include "LuaBinder.h"
-#include "Input.h"
 
 #include "OgreUtils.h"
 #include "OgreModule.h"
@@ -97,7 +96,7 @@ void RenderSystem::init(){
     EntityID CamEntity = scene->createEntity();
     
     TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(CamEntity);
-    transform.position = HUGO::Vector3(0, 0, 150);
+    transform.position = HUGO::Vector3(0, 0, 50);
     scene->addComponent<CameraComponent>(CamEntity);
     scene->addComponent<TransformChangedTag>(CamEntity);
     
@@ -408,11 +407,11 @@ void RenderSystem::update(double dt)
     }
 
     // changes in window
-    HUGO::Input& input = HUGO::Input::Instance();
+    std::shared_ptr<HUGO::IInput> input = scene->getInput();
 
-    if(input.windowHasChanged()){
+    if(input->windowHasChanged()){
         updateViewportDimensions();
-        input.clearWindowFlag();
+        input->clearWindowFlag();
     }
 }
 

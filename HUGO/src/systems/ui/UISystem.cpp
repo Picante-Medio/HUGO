@@ -7,7 +7,6 @@
 #include "InputFieldComponent.h"
 #include "ProgressBarComponent.h"
 #include "SliderComponent.h"
-#include "Input.h"
 #include <SDL.h>
 
 #include <algorithm>
@@ -292,7 +291,6 @@ ErrorOrVoid UISystem::processComponentCreations()
     for (auto &pack : scene->query<PanelComponent, CreatePanelDirtyTag>())
     {
         PanelComponent &panel = pack.getDeprecated<PanelComponent &>();
-        CreatePanelDirtyTag &tag = pack.getDeprecated<CreatePanelDirtyTag &>();
         EntityID entity = panel.entity;
         createElementCache(entity, panel.overlayName, panel.containerName);
         scene->addComponent<VisibilityDirtyTag>(panel.entity);
@@ -391,18 +389,18 @@ void UISystem::processTextChanges()
 
 void UISystem::processInput()
 {
-    HUGO::Input& input = HUGO::Input::Instance();
+    std::shared_ptr<HUGO::IInput> input = scene->getInput();
 
     bool anyFieldActive = false; // flag to control SDL text input
     // handle mouse click: activate/deactivate input fields
-    if (input.wasMouseButtonJustPressed(SDL_BUTTON_LEFT)) {
+    if (input->wasMouseButtonJustPressed(SDL_BUTTON_LEFT)) {
         for (auto& pack : scene->query<PanelComponent, TextComponent, InputFieldComponent>()) {
             PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
             TextComponent& text = pack.getDeprecated<TextComponent&>();
             InputFieldComponent& field = pack.getDeprecated<InputFieldComponent&>();
 
             // get normalized mouse position
-            HUGO::Input::MouseRelativePosition mp = input.getMouseRelativePosition();
+            HUGO::IInput::MouseRelativePosition mp = input->getMouseRelativePosition();
             if (isMouseOverPanel(panel, mp.x, mp.y)) {
                 if (!field.isActive){
                     // activate this field
@@ -423,14 +421,14 @@ void UISystem::processInput()
                 field.isActive = false;
             }
         }
-        input.toggleTextInput(anyFieldActive);    
+        input->toggleTextInput(anyFieldActive);    
 
         for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
         {
             PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
             ButtonComponent& button = pack.getDeprecated<ButtonComponent&>();
 
-            HUGO::Input::MouseRelativePosition mouse = input.getMouseRelativePosition();
+            HUGO::IInput::MouseRelativePosition mouse = input->getMouseRelativePosition();
             if (isMouseOverPanel(panel, mouse.x, mouse.y))
             {
                 button.state = HUGO::BS_DOWN;
@@ -438,7 +436,7 @@ void UISystem::processInput()
                 break;
             }
         }
-    } else if (input.wasMouseButtonJustReleased(SDL_BUTTON_LEFT))
+    } else if (input->wasMouseButtonJustReleased(SDL_BUTTON_LEFT))
     {
     
         for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
@@ -447,7 +445,7 @@ void UISystem::processInput()
             PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
             ButtonComponent& button = pack.getDeprecated<ButtonComponent&>();
 
-            HUGO::Input::MouseRelativePosition mouse = input.getMouseRelativePosition();
+            HUGO::IInput::MouseRelativePosition mouse = input->getMouseRelativePosition();
             bool isOver = isMouseOverPanel(panel, mouse.x, mouse.y);
 
             if (isOver){
@@ -466,7 +464,7 @@ void UISystem::processInput()
             PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
             ButtonComponent& button = pack.getDeprecated<ButtonComponent&>();
 
-            HUGO::Input::MouseRelativePosition mouse = input.getMouseRelativePosition();
+            HUGO::IInput::MouseRelativePosition mouse = input->getMouseRelativePosition();
             bool isOver = isMouseOverPanel(panel, mouse.x, mouse.y);
 
             if (isOver && button.state != HUGO::BS_DOWN)
@@ -482,7 +480,7 @@ void UISystem::processInput()
         }
 
     // process text for the active input field using SDL text buffer
-    const HUGO::String& textInput = input.getTextInput();
+    const HUGO::String& textInput = input->getTextInput();
     for (auto &pack : scene->query<InputFieldComponent, TextComponent, PanelComponent>()) {
         InputFieldComponent& field = pack.getDeprecated<InputFieldComponent&>();
         if (!field.isActive) continue;
@@ -503,14 +501,14 @@ void UISystem::processInput()
         }
 
         // backspace -> remove last character
-        if (input.wasKeyJustPressed(SDLK_BACKSPACE) && field.cursorPos > 0) {
+        if (input->wasKeyJustPressed(SDLK_BACKSPACE) && field.cursorPos > 0) {
             field.fullText.erase(field.cursorPos - 1, 1);
             field.cursorPos--;
             changed = true;
         }
 
         // enter -> save result and deactivate
-        if (input.wasActionJustPressed("SubmitInput")) {
+        if (input->wasActionJustPressed("SubmitInput")) {
             field.isActive = false;
             field.result = field.fullText;
 
@@ -556,7 +554,7 @@ void UISystem::processInput()
     }
 
     // clear SDL text input buffer
-    input.clearTextInput();
+    input->clearTextInput();
 
     // toggle SDL text input if any field is active
     anyFieldActive = false;
@@ -566,7 +564,7 @@ void UISystem::processInput()
             break;
         }
     }
-    input.toggleTextInput(anyFieldActive);
+    input->toggleTextInput(anyFieldActive);
 }
 
 void UISystem::processProgressBarChanges()
@@ -585,8 +583,9 @@ void UISystem::processProgressBarChanges()
 
 void UISystem::processSliderInput()
 {
-    HUGO::Input& input = HUGO::Input::Instance();
-    const HUGO::Input::MouseRelativePosition& mouse = input.getMouseRelativePosition();
+    std::shared_ptr<HUGO::IInput> input = scene->getInput();
+
+    const HUGO::IInput::MouseRelativePosition& mouse = input->getMouseRelativePosition();
 
     for (auto &pack : scene->query<SliderComponent, PanelComponent>())
     {
@@ -604,7 +603,7 @@ void UISystem::processSliderInput()
         bool mouseOverTrack = isMouseOverPanel(panel, mouse.x, mouse.y);
 
         // check for initial click to start dragging
-        if ((mouseOverKnob || mouseOverTrack) && input.wasMouseButtonJustPressed(SDL_BUTTON_LEFT))
+        if ((mouseOverKnob || mouseOverTrack) && input->wasMouseButtonJustPressed(SDL_BUTTON_LEFT))
         {
             slider.isDragging = true;
             
@@ -633,7 +632,7 @@ void UISystem::processSliderInput()
         // handle active dragging
         if (slider.isDragging)
         {
-            if (input.wasMouseButtonJustPressed(SDL_BUTTON_LEFT))
+            if (input->wasMouseButtonJustPressed(SDL_BUTTON_LEFT))
             {
                 HUGO::Float percent = 0.0f;
                 
@@ -691,7 +690,7 @@ void UISystem::clearAllCaches()
 void UISystem::init()
 {
     renderWindow = OgreModule::Instance().getOgreRenderWindow();
-    HUGO::Input::Instance().registerAction("SubmitInput", {SDLK_RETURN});
+    scene->getInput()->registerAction("SubmitInput", {SDLK_RETURN});
 }
 
 void UISystem::onLoad() {}

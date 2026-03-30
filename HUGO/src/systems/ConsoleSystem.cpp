@@ -4,7 +4,6 @@
 #include "PanelComponent.h"
 #include "TextComponent.h"
 #include "InputFieldComponent.h"
-#include "Input.h"
 
 #include <iostream>
 
@@ -111,13 +110,13 @@ void ConsoleSystem::receiveInput(const HUGO::String& input){
 
 void ConsoleSystem::handleKeyInput(){
 
-    if(HUGO::Input::Instance().wasKeyJustPressed(SDLK_UP)){
+    if(scene->getInput()->wasKeyJustPressed(SDLK_UP)){
         HUGO::String next = getNextHistoric();
         scene->getComponent<InputFieldComponent>(consoleInput).fullText = next;
         scene->getComponent<TextComponent>(consoleInput).text = next;
         scene->addComponent<TextDirtyTag>(consoleInput);
     }
-    if(HUGO::Input::Instance().wasKeyJustPressed(SDLK_DOWN)){
+    if(scene->getInput()->wasKeyJustPressed(SDLK_DOWN)){
         HUGO::String prev = getPreviousHistoric();
         scene->getComponent<InputFieldComponent>(consoleInput).fullText = prev;
         scene->getComponent<TextComponent>(consoleInput).text = prev;

@@ -83,11 +83,13 @@ void HUGO::Core::initModules()
     //LuaBinder initialization
     initLua();
 
+    // Input
+    Input::Instance()->setSDLWindow(OgreModule::Instance().getSDLWindow());
 }
 //HUGO main loop
 void Core::run(){
   bool exit = false;
-  Input& input = Input::Instance();
+  std::shared_ptr<Input> input = Input::Instance();
 
   auto pathOrError = LuaBinder::Instance().runFile("pathTest.lua");
 
@@ -96,8 +98,8 @@ void Core::run(){
 
         double startTime = vt.getDeltaTime()/1000.0; //ms->s
 
-        input.handleInput();
-        if(input.isQuitPressed()) {
+        input->handleInput();
+        if(input->isQuitPressed()) {
             exit = true;
         }
         sceneManager.fixedUpdateCurrentScene(startTime);

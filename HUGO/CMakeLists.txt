@@ -205,7 +205,6 @@ add_library(HugoMessages STATIC
     ${CMAKE_SOURCE_DIR}/include/messages/Messenger.cpp
     ${CMAKE_SOURCE_DIR}/include/messages/Channel.cpp)
     
-
 enable_warnings(HugoMessages)
 
 set_target_properties(HugoMessages PROPERTIES
@@ -321,4 +320,6 @@ target_include_directories(TestGame PRIVATE
 
 target_link_libraries(TestGame PRIVATE
     HugoMath
-    HugoMessages)
+    HugoMessages
+    SDL2::SDL2
+    SDL2::SDL2main)

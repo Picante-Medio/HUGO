@@ -1,13 +1,14 @@
 #pragma once
 
+#include <memory>
+#include <queue>
+#include <functional>
+
 #include "System.h"
 #include "HugoTypes.h"
 #include "HugoError.h"
 
 #include "IScene.h"
-#include <functional>
-#include <memory>
-#include <queue>
 
 class Scene : public HUGO::IScene, public std::enable_shared_from_this<Scene>
 {
@@ -50,4 +51,6 @@ public:
     ErrorOrType<HUGO::String> getNextLog() override;
 
     void dispatchMessages();
+
+    std::shared_ptr<HUGO::IInput> getInput();
 };

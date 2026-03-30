@@ -16,3 +16,4 @@
 #include "HugoComponentMacros.h"
 #include "HugoSystemMacros.h"
 #include "Message.h"
+#include "IInput.h"
