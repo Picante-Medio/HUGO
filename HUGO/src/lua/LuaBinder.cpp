@@ -76,6 +76,11 @@ LuaBinder::setScriptPath(HUGO::String path) {
 }
 
 void
+LuaBinder::setPrintFunction(lua_CFunction nPrint){
+    lua_register(lua, "print", nPrint);
+}
+
+void
 LuaBinder::requireFolder(HUGO::String path) {
     std::filesystem::path fsPath(path);
     std::filesystem::path luaPath = fsPath / "?.lua";

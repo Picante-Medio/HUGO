@@ -2,16 +2,32 @@
 
 #include "HugoSystemMacros.h"
 #include "HugoMath.h"
+#include "LuaBinder.h"
+
+#include <queue>
 
 struct TextComponent;
 
 HSYSTEM(ConsoleSystem)
 
-    std::vector<HUGO::String> history;
-    size_t historyIndex; // Constant access and reset
-    EntityID consoleInput;
-    EntityID consoleText;
 
+std::vector<HUGO::String> history;
+size_t historyIndex; // Constant access and reset
+EntityID consoleInput;
+EntityID consoleText;
+
+static inline std::queue<HUGO::String> luaOutput = std::queue<HUGO::String>();
+
+    static int consoleLuaPrint(lua_State* lua){
+    
+        HUGO::String out = HUGO::String(lua_tostring(lua, -1));
+        lua_pop(lua, -1);
+        ConsoleSystem::luaOutput.push(out);
+
+        return 0;
+    }
+
+    void printLuaOutput(TextComponent& consoleText);
     void printLogs(TextComponent& consoleText);
     void printErrors(TextComponent& consoleText);
 

@@ -103,6 +103,7 @@ public:
 
 
     void setScriptPath(HUGO::String path);
+    void setPrintFunction(lua_CFunction nPrint);
 
     /* Register a standalone cpp function to call it from lua.
     Example for add function that returns int and receives two ints: 

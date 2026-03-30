@@ -4,9 +4,16 @@
 #include "PanelComponent.h"
 #include "TextComponent.h"
 #include "InputFieldComponent.h"
-#include "LuaBinder.h"
 
 #include <iostream>
+
+void ConsoleSystem::printLuaOutput(TextComponent& consoleTextCmp){
+
+    while(!ConsoleSystem::luaOutput.empty()){
+        consoleTextCmp.text += ConsoleSystem::luaOutput.front() + "\n";
+        ConsoleSystem::luaOutput.pop();
+    }
+}
 
 void ConsoleSystem::printLogs(TextComponent& consoleTextCmp){
     ErrorOrType log = scene->getNextLog();
@@ -111,6 +118,9 @@ void ConsoleSystem::update(double){
     //consoleTextCmp.colourTop = HUGO::Vector4(1.f, 1.f, 1.f, 1.f);
     //consoleTextCmp.colourBottom = HUGO::Vector4(1.f, 1.f, 1.f, 1.f);
     printLogs(consoleTextCmp);
+    
+    // Lua output
+    printLuaOutput(consoleTextCmp);
 
     // Errors
     //consoleTextCmp.colourTop = HUGO::Vector4(1.f, 0.f, 0.f, 1.f);
@@ -126,6 +136,7 @@ void ConsoleSystem::fixedUpdate(double){
 
 void ConsoleSystem::onLoad(){
 
+    LuaBinder::Instance().setPrintFunction(consoleLuaPrint);
 }
 
 void ConsoleSystem::init(){
