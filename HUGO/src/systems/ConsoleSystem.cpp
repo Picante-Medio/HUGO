@@ -53,11 +53,11 @@ HUGO::String ConsoleSystem::getNextHistoric(){
 HUGO::String ConsoleSystem::getPreviousHistoric(){
     HUGO::String item = "";
 
-    if(++historyIndex < history.size()){
+    if(historyIndex < history.size()){
         // item inside of if so when history.size() is reached "" is returned
-        item = history[historyIndex];
+        historyIndex++;
+        if(historyIndex < history.size()) item = history[historyIndex];
     }
-    else historyIndex--;
 
     return item;
 }
@@ -151,14 +151,16 @@ void ConsoleSystem::update(double){
 
 void ConsoleSystem::fixedUpdate(double){
     
-    LuaBinder::Instance().setPrintFunction(consoleLuaPrint);
 }
 
 void ConsoleSystem::onLoad(){
-
+    
 }
 
 void ConsoleSystem::init(){
+    
+    LuaBinder::Instance().setPrintFunction(consoleLuaPrint);
+
 
     //---------------------------------------Input field
     consoleInput = scene->createEntity();
