@@ -118,7 +118,7 @@ void ConsoleSystem::update(double){
     //consoleTextCmp.colourTop = HUGO::Vector4(1.f, 1.f, 1.f, 1.f);
     //consoleTextCmp.colourBottom = HUGO::Vector4(1.f, 1.f, 1.f, 1.f);
     printLogs(consoleTextCmp);
-    
+
     // Lua output
     printLuaOutput(consoleTextCmp);
 
@@ -131,12 +131,12 @@ void ConsoleSystem::update(double){
 }
 
 void ConsoleSystem::fixedUpdate(double){
-
+    
+    LuaBinder::Instance().setPrintFunction(consoleLuaPrint);
 }
 
 void ConsoleSystem::onLoad(){
 
-    LuaBinder::Instance().setPrintFunction(consoleLuaPrint);
 }
 
 void ConsoleSystem::init(){
