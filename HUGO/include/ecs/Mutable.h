@@ -31,9 +31,11 @@ namespace HUGO {
                 updateEvent->dispatch(reference);
         }
 
-        T& operator->() {
-            return reference;
+        T* operator->() {
+            return &reference;
         }
+
+
     };
 
 }
