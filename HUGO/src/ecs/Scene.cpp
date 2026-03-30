@@ -20,8 +20,12 @@
 
 #include "StringUtils.h"
 
-Scene::Scene() {
-	entityTable = std::make_unique<EntityTable>();
+#include "ParentComponent.h"
+#include "ChildrenComponent.h"
+
+Scene::Scene()
+{
+    entityTable = std::make_unique<EntityTable>();
 	componentTable = std::make_unique<ComponentDenseTable>();
 	messenger = HUGO::Messenger();
 }
@@ -140,6 +144,22 @@ Scene::removeComponentLUA(int entityID, std::string& componentName) {
 
 void
 Scene::removeEntity(EntityID entity) {
+	//if the entity has children, remove them
+	if(hasComponent<ChildrenComponent>(entity)){
+		std::vector<EntityID> children = getComponent<ChildrenComponent>(entity).getChildren();
+		for(EntityID child : children){
+			removeEntity(child);
+		}
+	}
+
+	//notify parent
+	if(hasComponent<ParentComponent>(entity)){
+		EntityID parent = getComponent<ParentComponent>(entity).parent;
+		if(parent != INVALID_ENTITY_ID && hasComponent<ChildrenComponent>(parent)){
+			getComponent<ChildrenComponent>(parent).removeChild(entity);
+		}
+	}
+	
 	// Deleting the components that the entity had
 	std::vector<std::pair<ComponentID, DenseListIndex>> componentsToDelete = entityTable->getAllDenseListIndexes(entity);
 	for(auto [componentID, direction] : componentsToDelete)

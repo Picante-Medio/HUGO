@@ -42,8 +42,28 @@ TestSystem::init() {
     RenderComponent& rc2 = scene->addAndGetComponent<RenderComponent>(e2);
     rc2.setMeshName("cube.mesh");
     rc2.setMaterialName("prueba/ColorVerde");
+
+    EntityID e3 = scene->createEntity();
+    scene->addAndGetComponent<TransformComponent>(e3).position = HUGO::Vector3(-100, 100, 0);
+    RenderComponent& rc3 = scene->addAndGetComponent<RenderComponent>(e3);
+    rc3.setMeshName("cube.mesh");
+
+    // EntityID e4 = scene->createEntity();
+    // scene->addAndGetComponent<TransformComponent>(e4).position = HUGO::Vector3(-100, 100, 0);
+    // RenderComponent& rc4 = scene->addAndGetComponent<RenderComponent>(e4);
+    // rc4.setMeshName("cube.mesh");
+
+    // EntityID e5 = scene->createEntity();
+    // scene->addAndGetComponent<TransformComponent>(e5).position = HUGO::Vector3(-100, 100, 0);
+
     scene->addAndGetComponent<ChildrenComponent>(e1).addChild(e2);
+    scene->getComponent<ChildrenComponent>(e1).addChild(e3);
+    // scene->getComponent<ChildrenComponent>(e1).addChild(e5);
+    // scene->addAndGetComponent<ChildrenComponent>(e2).addChild(e4);
+
     scene->addComponent<ChildrenCompDirtyTag>(e1);
+   // scene->addComponent<ChildrenCompDirtyTag>(e2);
+
 
     // //----------------------------------------
     // EntityID ui = scene->createEntity();
@@ -121,11 +141,20 @@ TestSystem::update(double dt) {
     // }
 
       // ------------HierarchySystemTest----------
-    TransformComponent& tr=scene->getComponent<TransformComponent>(e1);
-    // tr.position.x += dt * 4;
-    // tr.scale.x+= dt*0.03;
-    tr.rotation *= HUGO::Quaternion(HUGO::Radian(HUGO::Degree(1.0f)), HUGO::Vector3(0,1,0));
-    if(!scene->hasComponent<TransformChangedTag>(e1))scene->addComponent<TransformChangedTag>(e1);
+    // TransformComponent& tr=scene->getComponent<TransformComponent>(e1);
+    // // tr.position.x += dt * 4;
+    // // tr.scale.x+= dt*0.03;
+    // tr.rotation *= HUGO::Quaternion(HUGO::Radian(HUGO::Degree(1.0f)), HUGO::Vector3(0,1,0));
+    // if(!scene->hasComponent<TransformChangedTag>(e1))scene->addComponent<TransformChangedTag>(e1);
+
+    timer += dt;
+
+    if(timer >= 3 && !usedTimer){
+        usedTimer = true;
+        //scene->removeEntity(e1);
+        std::cout<<"eliminado"<<"\n";
+    }
+
     //----------------------------------------
 
 

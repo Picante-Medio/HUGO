@@ -13,5 +13,8 @@ public:
     inline void removeChild(EntityID child){
         removedChildren.push_back(child);
     }
+    inline const std::vector<EntityID>& getChildren(){
+        return children;
+    }
     friend class HierarchySystem;
 END_HCOMPONENT()

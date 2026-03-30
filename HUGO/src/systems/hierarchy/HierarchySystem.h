@@ -22,8 +22,6 @@ private:
     void setLocalTransform(TransformComponent& transform);
     void updateWorldTransform(TransformComponent& transform);
     TransformComponent& getFullTransform(EntityID entity);
-
-    void onEntityDestroyed(EntityID entity);
 public:
     virtual ~HierarchySystem(){};
 

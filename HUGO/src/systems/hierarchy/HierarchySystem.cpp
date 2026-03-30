@@ -264,16 +264,3 @@ HierarchySystem::update(double){
 
 void 
 HierarchySystem::fixedUpdate(double) {}
-
-void HierarchySystem::onEntityDestroyed(EntityID entity){
-
-    if(scene->hasComponent<ParentComponent>(entity)){
-        removeChildFromParent(entity,scene->getComponent<ParentComponent>(entity).parent);
-    }
-    if (!scene->hasComponent<ChildrenComponent>(entity)) return;
-    // const std::vector<EntityID>& children = scene->getComponent<ChildrenComponent>(entity).children;
-    // for (EntityID child : children)
-    // {
-    //     //decir que los hijos estan muertos tambien
-    // }
-}
