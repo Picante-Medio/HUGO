@@ -175,9 +175,10 @@ namespace HUGO
     {
         MouseRelativePosition mp;
         MousePosition mpABS = getMousePosition();
-        // Ogre::RenderWindow *window = OgreModule::Instance().getOgreRenderWindow();
-        // mp.x = static_cast<HUGO::Float>(mpABS.x) / static_cast<HUGO::Float>(window->getWidth());
-        // mp.y = static_cast<HUGO::Float>(mpABS.y) / static_cast<HUGO::Float>(window->getHeight());
+        int w, h;
+        SDL_GetWindowSize(sdlWindow, &w, &h);
+        mp.x = static_cast<HUGO::Float>(mpABS.x) / static_cast<HUGO::Float>(w);
+        mp.y = static_cast<HUGO::Float>(mpABS.y) / static_cast<HUGO::Float>(h);
         return mp;
     }
     const std::string &Input::getTextInput() const

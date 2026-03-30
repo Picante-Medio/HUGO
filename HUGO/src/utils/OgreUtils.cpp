@@ -141,6 +141,9 @@ ErrorOrType<Ogre::OverlayElement*> HUGO::OgreOverlayUtils::getElement(const HUGO
             e.errorMessage = "Cannot find element: " + name;
             return ErrorOrType<Ogre::OverlayElement*>(e);
         }
+
+        if (containerToAdd != nullptr)
+            containerToAdd->addChild(element);
     }
     else{
         element = Ogre::OverlayManager::getSingleton().getOverlayElement(name);
@@ -166,6 +169,8 @@ ErrorOrType<Ogre::OverlayContainer*> HUGO::OgreOverlayUtils::getContainer(const 
         e.errorMessage = "Element exists but is not a container: " + name;
         return ErrorOrType<Ogre::OverlayContainer*>(e);
     }
-    overlayToAdd->add2D(container);
+    if (overlayToAdd != nullptr && container->getParent() == nullptr) {
+        overlayToAdd->add2D(container);
+    }
     return ErrorOrType<Ogre::OverlayContainer*>(container);
 }

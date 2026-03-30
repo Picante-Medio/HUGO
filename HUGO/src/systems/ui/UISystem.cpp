@@ -574,8 +574,7 @@ void UISystem::processProgressBarChanges()
         PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
         ProgressBarComponent& pr = pack.getDeprecated<ProgressBarComponent&>();
         //ProgressBarDirtyTag& tag = pack.get<ProgressBarDirtyTag &>();
-        pr.currentValue = std::min(pr.maxValue, pr.currentValue + 0.1f);
-        //syncText(panel, text, tag);
+        //pr.currentValue = std::min(pr.maxValue, pr.currentValue + 0.1f);
         syncProgressBar(panel, pr);
         //scene->removeComponent<ProgressBarDirtyTag>(tag.entity);
     }
