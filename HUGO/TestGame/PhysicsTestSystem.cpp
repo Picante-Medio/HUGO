@@ -18,7 +18,7 @@ void PhysicsTestSystem::init(){
     transform.scale = HUGO::Vector3(1., 1.f, 1.f);
     transform.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(45.f)), HUGO::Vector3(0,0,1));
     ColliderComponent& collider = scene->addAndGetComponent<ColliderComponent>(e1);
-    collider.info = BoxColliderInfo{HUGO::Vector3(0.5f)};
+    collider.info = SphereColliderInfo{1.f};
     RigidBodyComponent& rb = scene->addAndGetComponent<RigidBodyComponent>(e1);
     // rb->setShape()
     // rb.setMass(5.f);
@@ -30,8 +30,9 @@ void PhysicsTestSystem::init(){
     TransformComponent& transform2 = scene->addAndGetComponent<TransformComponent>(e2);
     transform2.position = HUGO::Vector3(0, 5, 40.f);
     transform2.scale = HUGO::Vector3(1.f, 1.f, 1.f);
+    //scene->addComponent<TransformChangedTag>(e2);
     ColliderComponent& collider2 = scene->addAndGetComponent<ColliderComponent>(e2);
-    collider2.info = BoxColliderInfo{HUGO::Vector3(0.5f)};
+    collider2.info = CylinderColliderInfo{HUGO::Vector3(.5f, 1, 1)};
     RigidBodyComponent& rb2 = scene->addAndGetComponent<RigidBodyComponent>(e2);
     rb2.setMass(5.f);
     // rb->setShape()

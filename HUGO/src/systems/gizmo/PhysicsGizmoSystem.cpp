@@ -23,7 +23,7 @@ ErrorOrType<EntityID> createGizmo(std::shared_ptr<HUGO::IScene> scene, ColliderC
         gizmoRender.setMaterialName("debug/WireframeMaterial");
 
         BoxColliderInfo collInfo = std::get<BoxColliderInfo>(collider.info);
-        gizmoTr.worldScale = collInfo.halfExtents * 2;
+        gizmoTr.scale = collInfo.halfExtents * 2;
 
         return ErrorOrType<EntityID>(newID);
     }
@@ -35,7 +35,7 @@ ErrorOrType<EntityID> createGizmo(std::shared_ptr<HUGO::IScene> scene, ColliderC
         gizmoRender.setMaterialName("debug/WireframeMaterial");
 
         SphereColliderInfo collInfo = std::get<SphereColliderInfo>(collider.info);
-        gizmoTr.worldScale = HUGO::Vector3(collInfo.r * 2);
+        gizmoTr.scale = HUGO::Vector3(collInfo.r * 2);
 
         return ErrorOrType<EntityID>(newID);
     }
@@ -47,7 +47,7 @@ ErrorOrType<EntityID> createGizmo(std::shared_ptr<HUGO::IScene> scene, ColliderC
         gizmoRender.setMaterialName("debug/WireframeMaterial");
 
         CylinderColliderInfo collInfo = std::get<CylinderColliderInfo>(collider.info);
-        gizmoTr.worldScale = collInfo.halfExtents * 2;
+        gizmoTr.scale = collInfo.halfExtents * 2;
 
         return ErrorOrType<EntityID>(newID);
     }
@@ -59,7 +59,7 @@ ErrorOrType<EntityID> createGizmo(std::shared_ptr<HUGO::IScene> scene, ColliderC
         gizmoRender.setMaterialName("debug/WireframeMaterial");
 
         ConeColliderInfo collInfo = std::get<ConeColliderInfo>(collider.info);
-        gizmoTr.worldScale = HUGO::Vector3(collInfo.r * 2, collInfo.height, collInfo.r * 2);
+        gizmoTr.scale = HUGO::Vector3(collInfo.r * 2, collInfo.height, collInfo.r * 2);
 
         return ErrorOrType<EntityID>(newID);
     }
@@ -104,10 +104,12 @@ void PhysicsGizmoSystem::update(double dt){
 
         TransformComponent& gizmoTr = scene->getComponent<TransformComponent>(entVisited.entityID);
 
-        gizmoTr.worldPosition = transform.worldPosition;
+        gizmoTr.position = transform.position;
         //gizmoTr.position = transform.position;
-        gizmoTr.worldRotation = transform.worldRotation;
+        gizmoTr.position = transform.position;
         //gizmoTr.rotation = transform.rotation;
+
+        scene->addAndGetComponent<TransformChangedTag>(entVisited.entityID);
     }
 
     //If an entry was not visited, we remove that entry.
