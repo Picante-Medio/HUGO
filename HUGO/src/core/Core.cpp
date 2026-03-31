@@ -106,7 +106,7 @@ void Core::run(){
         sceneManager.updateCurrentScene(startTime);
         sceneManager.dispatchMessagesCurrentScene();
 
-        physicsModule->debugDraw();
+        //physicsModule->debugDraw();
         
         //m_ogreModule->renderOneFrame();
         OgreModule::Instance().renderOneFrame();

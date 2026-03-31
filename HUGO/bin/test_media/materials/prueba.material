@@ -47,3 +47,18 @@ material debug/DefaultMaterial
 		}
 	}
 }
+
+material debug/WireframeMaterial
+{
+	technique 
+	{
+		pass{
+
+			polygon_mode wireframe
+
+			ambient 1.00 1.00 1.00 1.00
+			diffuse 1.00 1.00 1.00 1.00
+			specular 0.6 0.6 0.6 8
+		}
+	}
+}
