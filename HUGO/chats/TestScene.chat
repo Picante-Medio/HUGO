@@ -8,3 +8,4 @@ SYSTEM TweenSystem
 SYSTEM HierarchySystem
 SYSTEM CameraMovementSystem
 SYSTEM PhysicsGizmoSystem
+SYSTEM TestSystem

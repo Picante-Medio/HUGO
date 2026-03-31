@@ -48,24 +48,12 @@ TestSystem::init() {
     RenderComponent& rc3 = scene->addAndGetComponent<RenderComponent>(e3);
     rc3.setMeshName("cube.mesh");
 
-    // EntityID e4 = scene->createEntity();
-    // scene->addAndGetComponent<TransformComponent>(e4).position = HUGO::Vector3(-100, 100, 0);
-    // RenderComponent& rc4 = scene->addAndGetComponent<RenderComponent>(e4);
-    // rc4.setMeshName("cube.mesh");
-
-    // EntityID e5 = scene->createEntity();
-    // scene->addAndGetComponent<TransformComponent>(e5).position = HUGO::Vector3(-100, 100, 0);
-
     scene->addAndGetComponent<ChildrenComponent>(e1).addChild(e2);
     scene->getComponent<ChildrenComponent>(e1).addChild(e3);
-    // scene->getComponent<ChildrenComponent>(e1).addChild(e5);
-    // scene->addAndGetComponent<ChildrenComponent>(e2).addChild(e4);
 
     scene->addComponent<ChildrenCompDirtyTag>(e1);
-   // scene->addComponent<ChildrenCompDirtyTag>(e2);
-
-
     // //----------------------------------------
+
     // EntityID ui = scene->createEntity();
     // TransformComponent& tr = scene->addAndGetComponent<TransformComponent>(ui);
     // //tr.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(0)), HUGO::Vector3(0,0,0));
@@ -120,25 +108,25 @@ bool usedTimer = false;
 
 void
 TestSystem::update(double dt) {
-    timer += dt;
+    // timer += dt;
 
-    if(timer >= 1 && !usedTimer){
-        usedTimer = true;
+    // if(timer >= 1 && !usedTimer){
+    //     usedTimer = true;
 
-        for(auto& elem : scene->query<TweenComponent, TransformComponent>()){
-            TransformComponent& tr = elem.getDeprecated<TransformComponent&>();
-            auto tween = elem.getMutable<TweenComponent>();
+    //     for(auto& elem : scene->query<TweenComponent, TransformComponent>()){
+    //         TransformComponent& tr = elem.getDeprecated<TransformComponent&>();
+    //         auto tween = elem.getMutable<TweenComponent>();
 
-            tween->currentTweens.push_back(HUGO::TweenFactory<EaseInBackTween>::makeTween(tr, &TransformComponent::position,
-            HUGO::Vector3(0,0,0), HUGO::Vector3(100,0,0), 1.f));
+    //         tween->currentTweens.push_back(HUGO::TweenFactory<EaseInBackTween>::makeTween(tr, &TransformComponent::position,
+    //         HUGO::Vector3(0,0,0), HUGO::Vector3(100,0,0), 1.f));
 
 
-            tween->currentTweens.push_back(HUGO::TweenFactory<EaseInBackTween>::makeTween(tr, &TransformComponent::rotation,
-            HUGO::Quaternion(HUGO::Radian(HUGO::Degree(0)), HUGO::Vector3(1,0,0)),
-            HUGO::Quaternion(HUGO::Radian(HUGO::Degree(-360)), HUGO::Vector3(1,0,0)),
-            1.f));
-        }
-    }
+    //         tween->currentTweens.push_back(HUGO::TweenFactory<EaseInBackTween>::makeTween(tr, &TransformComponent::rotation,
+    //         HUGO::Quaternion(HUGO::Radian(HUGO::Degree(0)), HUGO::Vector3(1,0,0)),
+    //         HUGO::Quaternion(HUGO::Radian(HUGO::Degree(-360)), HUGO::Vector3(1,0,0)),
+    //         1.f));
+    //     }
+    // }
 
       // ------------HierarchySystemTest----------
     // TransformComponent& tr=scene->getComponent<TransformComponent>(e1);
