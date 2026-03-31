@@ -31,7 +31,7 @@ TestSystem::init() {
     e1 = scene->createEntity();
     TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(e1);
     transform.position = HUGO::Vector3(0, 0, 0);
-    transform.scale = HUGO::Vector3(0.05f, 0.05f, 0.05f);
+    transform.scale = HUGO::Vector3(1.f, 1.f, 1.f);
     RenderComponent& rc = scene->addAndGetComponent<RenderComponent>(e1);
     rc.setMeshName("cube.mesh");
     rc.setMaterialName("prueba/ColorRosa");
