@@ -48,8 +48,8 @@ HCOMPONENT(ColliderComponent)
 
     bool active = true;
 
-    std::vector<std::reference_wrapper<ColliderComponent>> collisionInfo;
-    std::vector<std::reference_wrapper<ColliderComponent>> collisionBuffer;
+    std::vector<EntityID> collisionInfo;
+    std::vector<EntityID> collisionBuffer;
 
     std::variant<BoxColliderInfo, SphereColliderInfo, CapsuleColliderInfo, CylinderColliderInfo, ConeColliderInfo> info = BoxColliderInfo{HUGO::Vector3(-1.f, -1.f, -1.f)};
     HUGO::CollisionShapeID shapeID = HUGO::INVALID_SHAPE_ID;
@@ -90,6 +90,6 @@ HCOMPONENT(ColliderComponent)
 
     inline bool getActive() const { return active; }
 
-    inline std::vector<std::reference_wrapper<ColliderComponent>> getCollisionInfo() const { return collisionInfo; }
+    inline std::vector<EntityID> getCollisionInfo() const { return collisionInfo; }
 
 END_HCOMPONENT()

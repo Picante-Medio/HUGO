@@ -24,13 +24,16 @@ void HUGODispatcher::dispatchAllCollisionPairs(btOverlappingPairCache *pairCache
         if(dispatcher->needsCollision(co0, co1)){
             ColliderComponent* hgCol0 = static_cast<ColliderComponent*>(co0->getUserPointer());
             ColliderComponent* hgCol1 = static_cast<ColliderComponent*>(co1->getUserPointer());
+
+            EntityID hgEnt0 = hgCol0->entity;
+            EntityID hgEnt1 = hgCol1->entity;
             
             // Activations to not let the objects sleep if they are colliding
             co0->activate(true);
             co1->activate(true);
     
-            hgCol0->collisionBuffer.push_back(*hgCol1);
-            hgCol1->collisionBuffer.push_back(*hgCol0);
+            hgCol0->collisionBuffer.push_back(hgEnt1);
+            hgCol1->collisionBuffer.push_back(hgEnt0);
         }
     }
 
