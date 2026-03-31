@@ -18,16 +18,12 @@ void PhysicsTestSystem::init(){
     transform.scale = HUGO::Vector3(1., 1.f, 1.f);
     transform.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(45.f)), HUGO::Vector3(0,0,1));
     ColliderComponent& collider = scene->addAndGetComponent<ColliderComponent>(e1);
-    collider.info = CapsuleColliderInfo{.5f, 1.f};
+    collider.info = BoxColliderInfo{HUGO::Vector3(0.5f)};
     RigidBodyComponent& rb = scene->addAndGetComponent<RigidBodyComponent>(e1);
     // rb->setShape()
     // rb.setMass(5.f);
     // scene->addComponent<DynamicRBTag>(e1);
     scene->addComponent<StaticRBTag>(e1);
-    RenderComponent& rc = scene->addAndGetComponent<RenderComponent>(e1);
-    rc.setMeshName("capsule.mesh");
-    rc.setMaterialName("debug/WireframeMaterial");
-    scene->addComponent<TransformChangedTag>(e1);
 
     // Entidad 2: Cuerpo dinámico
     EntityID e2 = scene->createEntity();
@@ -40,10 +36,6 @@ void PhysicsTestSystem::init(){
     rb2.setMass(5.f);
     // rb->setShape()
     scene->addComponent<DynamicRBTag>(e2);
-    RenderComponent& rc2 = scene->addAndGetComponent<RenderComponent>(e2);
-    rc2.setMeshName("cube.mesh");
-    rc2.setMaterialName("debug/WireframeMaterial");
-    scene->addComponent<TransformChangedTag>(e2);
     
     // Entidad 3: Cuerpo kinemático
     // EntityID e3 = scene->createEntity();
@@ -71,22 +63,4 @@ float rate = 0.2f;
 float t = 0;
 void PhysicsTestSystem::update(double dt) {
 
-    t+=dt;
-    if (t < rate) return;
-    t = 0;
-
-    EntityID e2 = scene->createEntity();
-    TransformComponent& transform2 = scene->addAndGetComponent<TransformComponent>(e2);
-    transform2.position = HUGO::Vector3(sin(dt) * 100.f, 5.f, 40.f);
-    transform2.scale = HUGO::Vector3(.5f, .5f, .5f);
-    ColliderComponent& collider2 = scene->addAndGetComponent<ColliderComponent>(e2);
-    collider2.info = BoxColliderInfo{HUGO::Vector3(0.25f)};
-    RigidBodyComponent& rb2 = scene->addAndGetComponent<RigidBodyComponent>(e2);
-    rb2.setMass(5.f);
-    // rb->setShape()
-    scene->addComponent<DynamicRBTag>(e2);
-    RenderComponent& rc2 = scene->addAndGetComponent<RenderComponent>(e2);
-    rc2.setMeshName("cube.mesh");
-    rc2.setMaterialName("debug/WireframeMaterial");
-    scene->addComponent<TransformChangedTag>(e2);
 }

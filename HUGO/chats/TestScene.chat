@@ -7,3 +7,4 @@ SYSTEM ConsoleSystem
 SYSTEM TweenSystem
 SYSTEM HierarchySystem
 SYSTEM CameraMovementSystem
+SYSTEM PhysicsGizmoSystem
