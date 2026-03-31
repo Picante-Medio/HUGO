@@ -16,16 +16,16 @@ void PhysicsTestSystem::init(){
     TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(e1);
     transform.position = HUGO::Vector3(1.f, 0.f, 20.f);
     transform.scale = HUGO::Vector3(1., 1.f, 1.f);
-    transform.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(45.f)), HUGO::Vector3(0,1,0));
+    transform.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(45.f)), HUGO::Vector3(0,0,1));
     ColliderComponent& collider = scene->addAndGetComponent<ColliderComponent>(e1);
-    collider.info = SphereColliderInfo{1.f};
+    collider.info = CapsuleColliderInfo{.5f, 1.f};
     RigidBodyComponent& rb = scene->addAndGetComponent<RigidBodyComponent>(e1);
     // rb->setShape()
     // rb.setMass(5.f);
     // scene->addComponent<DynamicRBTag>(e1);
     scene->addComponent<StaticRBTag>(e1);
     RenderComponent& rc = scene->addAndGetComponent<RenderComponent>(e1);
-    rc.setMeshName("sphere.mesh");
+    rc.setMeshName("capsule.mesh");
     rc.setMaterialName("prueba/ColorRosa");
     scene->addComponent<TransformChangedTag>(e1);
 
@@ -35,7 +35,7 @@ void PhysicsTestSystem::init(){
     transform2.position = HUGO::Vector3(0, 5, 20.f);
     transform2.scale = HUGO::Vector3(1.f, 1.f, 1.f);
     ColliderComponent& collider2 = scene->addAndGetComponent<ColliderComponent>(e2);
-    collider2.info = BoxColliderInfo{HUGO::Vector3(1.f, 1.f, 1.f)};
+    collider2.info = BoxColliderInfo{HUGO::Vector3(0.5f)};
     RigidBodyComponent& rb2 = scene->addAndGetComponent<RigidBodyComponent>(e2);
     rb2.setMass(5.f);
     // rb->setShape()
