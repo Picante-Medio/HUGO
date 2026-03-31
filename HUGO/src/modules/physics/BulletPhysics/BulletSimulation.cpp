@@ -229,8 +229,8 @@ HUGO::CollisionObjectID BulletSimulation::createColliderObject(ColliderComponent
     btWorld->addCollisionObject(obj);
 
     //save reference to HugoRB in bulletRB. We use the collision object as its position in memory won't change
-    obj->setUserPointer(&colObj);
-
+    obj->setUserPointer(&getCollisionObject(id));
+    
     return id;
 }
 
@@ -295,7 +295,7 @@ HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderCompo
     btWorld->addRigidBody(rb);
 
     //save reference to HugoRB in bulletRB
-    rb->setUserPointer(&colObj);
+    rb->setUserPointer(&getCollisionObject(id));
 
     return id;
 }

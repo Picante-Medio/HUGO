@@ -21,7 +21,6 @@ void HUGODispatcher::dispatchAllCollisionPairs(btOverlappingPairCache *pairCache
         btBroadphasePair pair = collisionsThisFrame.at(i);
         btCollisionObject* co0 = static_cast<btCollisionObject*>(pair.m_pProxy0->m_clientObject);
         btCollisionObject* co1 = static_cast<btCollisionObject*>(pair.m_pProxy1->m_clientObject);
-
         
         if(dispatcher->needsCollision(co0, co1)){
             CollisionObject* hgColObj0 = static_cast<CollisionObject*>(co0->getUserPointer());
