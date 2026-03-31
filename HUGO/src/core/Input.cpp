@@ -9,17 +9,6 @@ namespace HUGO
     {
     }
 
-    std::shared_ptr<Input>
-    Input::Instance()
-    {
-        static std::shared_ptr<Input> instance;
-
-        if(instance == nullptr)
-            instance = std::make_shared<Input>();
-            
-        return instance;
-    }
-
     void Input::setSDLWindow(SDL_Window* m_sdlWindow) {
         sdlWindow = m_sdlWindow;
     }

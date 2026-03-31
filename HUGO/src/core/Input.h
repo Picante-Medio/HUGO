@@ -41,9 +41,6 @@ namespace HUGO {
     public:
     Input();
     
-    // Singleton pattern
-    static std::shared_ptr<Input> Instance();
-    
     void setSDLWindow(SDL_Window *m_sdlWindow);
     
     // Input handling, needs to be called every update tick

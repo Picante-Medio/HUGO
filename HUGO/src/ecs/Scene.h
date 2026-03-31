@@ -9,15 +9,18 @@
 #include "HugoError.h"
 
 #include "IScene.h"
+#include "IInput.h"
 
+class Input;
 class Scene : public HUGO::IScene, public std::enable_shared_from_this<Scene>
 {
     std::vector<std::shared_ptr<HUGO::System>> systems;
     std::queue<std::shared_ptr<Error>> errorsToLog;
     std::queue<HUGO::String> stringsToLog;
 
+    std::shared_ptr<HUGO::IInput> input;
 public:
-    Scene();
+    Scene(std::shared_ptr<HUGO::IInput> input);
 
     void load();
 

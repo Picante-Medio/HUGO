@@ -32,7 +32,7 @@
 
 // se podría hacer clase singleton¿? -Marco
 using namespace HUGO;
-Core::Core(): sceneManager()
+Core::Core(): input(), sceneManager(std::static_pointer_cast<IInput>(std::make_shared<Input>(input)))
 {
 
 }
@@ -84,12 +84,11 @@ void HUGO::Core::initModules()
     initLua();
 
     // Input
-    Input::Instance()->setSDLWindow(OgreModule::Instance().getSDLWindow());
+    input.setSDLWindow(OgreModule::Instance().getSDLWindow());
 }
 //HUGO main loop
 void Core::run(){
   bool exit = false;
-  std::shared_ptr<Input> input = Input::Instance();
 
   auto pathOrError = LuaBinder::Instance().runFile("pathTest.lua");
 
@@ -98,8 +97,8 @@ void Core::run(){
 
         double startTime = vt.getDeltaTime()/1000.0; //ms->s
 
-        input->handleInput();
-        if(input->isQuitPressed()) {
+        input.handleInput();
+        if(input.isQuitPressed()) {
             exit = true;
         }
         sceneManager.fixedUpdateCurrentScene(startTime);

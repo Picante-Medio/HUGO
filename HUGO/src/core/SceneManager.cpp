@@ -5,10 +5,11 @@
 #include "ComponentFactory.h"
 #include "ComponentRegistry.h"
 #include "IPhysicsModule.h"
+#include "IInput.h"
 
 #include "GameLibraryLoader.h"
 
-SceneManager::SceneManager(): m_chatParser(), m_sceneMap(){
+SceneManager::SceneManager(std::shared_ptr<HUGO::IInput> inputModule): m_chatParser(), m_sceneMap(), m_input(inputModule) {
 }
 
 ErrorOrVoid SceneManager::initializeParser(const HUGO::String& chatFolder, std::shared_ptr<IPhysicsModule> physicsModule){
@@ -34,7 +35,7 @@ ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
 
     -> Create entities with components
     */
-    m_sceneMap[sceneName] = std::make_shared<Scene>();
+    m_sceneMap[sceneName] = std::make_shared<Scene>(m_input);
 
     for(auto systemName : sceneData.getValue().systems){
         ErrorOrType<std::shared_ptr<HUGO::System>> value = HUGO::SystemFactory::makeSystem(m_sceneMap[sceneName], systemName);

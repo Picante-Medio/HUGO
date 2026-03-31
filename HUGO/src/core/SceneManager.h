@@ -8,7 +8,10 @@
 
 class Scene;
 class IPhysicsModule;
-class SceneManager{
+namespace HUGO {
+class IInput;
+}
+class SceneManager {
 
     HUGO::ChatParser m_chatParser;
     //Scene map that stores created game scenes.
@@ -24,9 +27,12 @@ class SceneManager{
 
     //Physics module
     std::shared_ptr<IPhysicsModule> m_physicsModule;
+
+    //Input module
+    std::shared_ptr<HUGO::IInput> m_input;
 public:
     //initializeParser() must be called after this.
-    SceneManager();
+    SceneManager(std::shared_ptr<HUGO::IInput> inputModule);
 
     //Initializes the parser with chat folder and sets physicsModule
     ErrorOrVoid initializeParser(const HUGO::String& chatFolder, std::shared_ptr<IPhysicsModule> physicsModule);

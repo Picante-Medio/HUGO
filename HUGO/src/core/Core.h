@@ -10,6 +10,7 @@
 #include "HugoError.h"
 
 #include "SceneManager.h"
+#include "Input.h"
 
 class Scene;
 class VirtualTimer;
@@ -34,6 +35,7 @@ namespace HUGO {
 
         VirtualTimer vt;
 
+        Input input;
         SceneManager sceneManager;
 
     public:

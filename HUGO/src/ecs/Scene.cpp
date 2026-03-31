@@ -21,13 +21,11 @@
 #include "StringUtils.h"
 #include "ParentComponent.h"
 #include "ChildrenComponent.h"
-#include "Input.h"
 
-Scene::Scene() {
+Scene::Scene(std::shared_ptr<HUGO::IInput> input) : input(input) {
 	entityTable = std::make_unique<EntityTable>();
 	componentTable = std::make_unique<ComponentDenseTable>();
 	messenger = HUGO::Messenger();
-	input = std::static_pointer_cast<HUGO::IInput>(HUGO::Input::Instance());
 }
 
 //Load method is called when the scene is loaded so LUA methods are overwritten
