@@ -4,6 +4,7 @@
 #include "btBulletDynamicsCommon.h"
 #include "IPhysicsSimulation.h"
 #include "HugoTypes.h"
+#include "EcsTypes.h"
 
 struct TransformComponent;
 struct RigidBodyComponent;
@@ -13,7 +14,9 @@ struct Shape;
 class OgreBulletDebugger;
 
 struct CollisionObject{
+    std::shared_ptr<Scene> scene;
     HUGO::CollisionObjectID id;
+    EntityID hgId;
     btCollisionObject* bulletRB = nullptr;
 };
 

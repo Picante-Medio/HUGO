@@ -215,8 +215,11 @@ HUGO::CollisionObjectID BulletSimulation::createColliderObject(ColliderComponent
         rbIdToIndex.push_back(0);
     }
     
+    //get entity id
+    EntityID hgId = hgCol.objectID;
+
     //create CollisionObject
-    CollisionObject colObj = {id, obj};
+    CollisionObject colObj = {scene, id, hgId, obj};
 
     //store object
     std::size_t index = rigidBodies.push_back(std::move(colObj));
@@ -225,8 +228,8 @@ HUGO::CollisionObjectID BulletSimulation::createColliderObject(ColliderComponent
     //add to simulation
     btWorld->addCollisionObject(obj);
 
-    //save reference to HugoRB in bulletRB
-    obj->setUserPointer(&hgCol);
+    //save reference to HugoRB in bulletRB. We use the collision object as its position in memory won't change
+    obj->setUserPointer(&colObj);
 
     return id;
 }
@@ -277,9 +280,12 @@ HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderCompo
     }
     // Store same id for collider and rigidbody
     hgCol.objectID = id;
+
+    //get entity id
+    EntityID hgId = hgCol.entity;
     
     //create CollisionObject
-    CollisionObject colObj = {id, rb};
+    CollisionObject colObj = {scene, id, hgId, rb};
 
     //store object
     std::size_t index = rigidBodies.push_back(std::move(colObj));
@@ -289,7 +295,7 @@ HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderCompo
     btWorld->addRigidBody(rb);
 
     //save reference to HugoRB in bulletRB
-    rb->setUserPointer(&hgCol);
+    rb->setUserPointer(&colObj);
 
     return id;
 }

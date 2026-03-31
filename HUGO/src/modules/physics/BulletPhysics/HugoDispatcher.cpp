@@ -1,5 +1,7 @@
 #include "HugoDispatcher.h"
+#include "BulletSimulation.h"
 #include "ColliderComponent.h"
+#include "Scene.h"
 
 HUGODispatcher::HUGODispatcher(btCollisionConfiguration *collisionConfiguration)
 : btCollisionDispatcher(collisionConfiguration)
@@ -22,18 +24,18 @@ void HUGODispatcher::dispatchAllCollisionPairs(btOverlappingPairCache *pairCache
 
         
         if(dispatcher->needsCollision(co0, co1)){
-            ColliderComponent* hgCol0 = static_cast<ColliderComponent*>(co0->getUserPointer());
-            ColliderComponent* hgCol1 = static_cast<ColliderComponent*>(co1->getUserPointer());
+            CollisionObject* hgColObj0 = static_cast<CollisionObject*>(co0->getUserPointer());
+            CollisionObject* hgColObj1 = static_cast<CollisionObject*>(co1->getUserPointer());
 
-            EntityID hgEnt0 = hgCol0->entity;
-            EntityID hgEnt1 = hgCol1->entity;
+            EntityID hgEnt0 = hgColObj0->hgId;
+            EntityID hgEnt1 = hgColObj1->hgId;
             
             // Activations to not let the objects sleep if they are colliding
             co0->activate(true);
             co1->activate(true);
     
-            hgCol0->collisionBuffer.push_back(hgEnt1);
-            hgCol1->collisionBuffer.push_back(hgEnt0);
+            hgColObj0->scene->getComponent<ColliderComponent>(hgEnt0).collisionBuffer.push_back(hgEnt1);
+            hgColObj1->scene->getComponent<ColliderComponent>(hgEnt1).collisionBuffer.push_back(hgEnt0);
         }
     }
 
