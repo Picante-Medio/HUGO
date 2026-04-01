@@ -49,6 +49,16 @@ public:
 			entityTable->getDenseListIndex(entity, componentID));
 	}
 
+	template<typename T, typename Func>
+	void modifyComponent(EntityID entity, Func&& modifier) {
+
+		static_assert(std::is_invocable_r_v<void, Func, T&>, "modifier() must have void(T&) signature");
+
+		T& cmp = getComponent<T>(entity);
+		std::forward<Func>(modifier)(cmp);
+		componentTable->getUpdateEvent<T>()->dispatch(cmp);
+	}
+
     template<typename T>
     bool hasComponent(EntityID entity) const {
         return entityTable->hasComponent(entity, HUGO::ComponentRegistry::getComponentId<T>());
@@ -67,11 +77,56 @@ public:
 		return getComponent<T>(entity);
 	}
 
+	/// @brief Adds the component with default values
+	/// @tparam T Component
+	/// @param entity the entity the component is part of
+	template<typename T>
+	void addComponent(EntityID entity) {
+		// Creating the component
+		T component(entity);
+		ComponentID id = HUGO::ComponentRegistry::getComponentId<T>();
+
+		// Adding the component
+		DenseListIndex index = componentTable->addComponent(component, entity);
+		entityTable->registerComponent(entity, id, index);
+
+		// Dispatches addEvent
+		componentTable->getAddEvent<T>()->dispatch(component);
+	}
+
+	/// @brief Adds the component and initilizes it via initializer
+	/// @tparam T Component
+	/// @tparam Func Initializer function
+	/// @param entity the entity the component is part of
+	/// @param initializer callable that is supposed to initialize the component
+	template<typename T, typename Func>
+	void addComponent(EntityID entity, Func&& initializer) {
+		
+		static_assert(std::is_invocable_r_v<void, Func, T&>, "initializer() must have void(T&) signature");
+
+		// Creating the component
+		T component(entity);
+		// The component is initialized with the initializer callable
+		std::forward<Func>(initializer)(component);
+
+		ComponentID id = HUGO::ComponentRegistry::getComponentId<T>();
+
+		// Adding the component
+		DenseListIndex index = componentTable->addComponent(component, entity);
+		entityTable->registerComponent(entity, id, index);
+
+		// Dispatches addEvent
+		componentTable->getAddEvent<T>()->dispatch(component);
+	}
+
 	template <typename T> 
 	void removeComponent(EntityID entity) {
 		// Obtaining the index of the component to delete
 		ComponentID id = HUGO::ComponentRegistry::getComponentId<T>();
 		DenseListIndex oldIndex = entityTable->getDenseListIndex(entity, id);
+
+		// Calls removal event before removing
+		componentTable->getAddEvent<T>()->dispatch(componentTable->getComponent<T>(oldIndex));
 
 		// Deleting the component
 		entityTable->deRegisterComponent(entity, id);
