@@ -95,7 +95,6 @@ bool UISystem::isMouseOverPanel(const PanelComponent &panel, HUGO::Float mouseX,
     {
         case HUGO::UIMetricsMode::GMM_RELATIVE:
         {
-            // Panel en espacio relativo (0-1), convertir a píxeles
             screenRect.left = panel.left * screenPixelsW;
             screenRect.top = panel.top * screenPixelsH;
             screenRect.width = panel.width * screenPixelsW;

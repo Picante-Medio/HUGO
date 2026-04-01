@@ -5,12 +5,10 @@
 #include "HugoTypes.h"
 
 struct Particle {
-
     HUGO::String material = "";
 
     HUGO::Float width = 0.0f;
     HUGO::Float height = 0.0f;
-
 };
 
 HCOMPONENT(ParticleEmitterComponent)
@@ -29,5 +27,6 @@ HCOMPONENT(ParticleEmitterComponent)
     HUGO::Float duration = 0.0f;   
 
     Particle pivot = {};
-    bool active=false;
+    bool emitting = false;
+    bool active = false;
 END_HCOMPONENT()

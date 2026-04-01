@@ -21,6 +21,7 @@ private:
     Ogre::SceneManager* sm = nullptr;
 
     void createParticleSystem(EntityID id, const HUGO::String& particleName, ParticleEmitterComponent& pe, const HUGO::Vector3& iniPos);
+    void destroyParticleSystem(EntityID id);
     void processCreations();
     void processChanges();
 

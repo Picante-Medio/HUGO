@@ -16,6 +16,8 @@
 #include "LightComponent.h"
 #include "SliderComponent.h"
 #include "UITags.h"
+#include "ParticleEmitterComponent.h"
+#include "ParticleEmitterComponentTag.h"
 
 #include "AudioComponent.h"
 
@@ -98,18 +100,14 @@ TestSystem::init() {
     bt.normalMaterial = "UI/Knob";
     panel.material = bt.normalMaterial;
 
-    // EntityID boton2 = scene->createEntity();
-    // PanelComponent& panel2 = scene->addAndGetComponent<PanelComponent>(boton2);
-    // panel2.overlayName = "testCanvas/SimpleTest2";
-    // panel2.containerName = panel2.overlayName + "/Container";
-    // panel2.material = "UI/Knob";
-    // panel2.left = 200.0f;
-    // panel2.top = 50.0f;
-    // panel2.width = 256.0f;
-    // panel2.height = 64.0f;
-    // panel2.metricsMode = HUGO::UIMetricsMode::GMM_PIXELS;
+    // EntityID emmiter = scene->createEntity();
+    // scene->addAndGetComponent<TransformComponent>(emmiter).position = HUGO::Vector3(0, 0, 0);
+    // ParticleEmitterComponent& pe = scene->addAndGetComponent<ParticleEmitterComponent>(emmiter);
+    // pe.particleName = "Particle/SmokeBomb";
+    // pe.emitting = true;
+    // pe.active = true;
+    // scene->addComponent<ParticleEmitterComponentTag>(emmiter);
 
-    // scene->addComponent<CreatePanelDirtyTag>(boton2);
 }
 
 
