@@ -273,7 +273,7 @@ void RenderSystem::handleTag()
         RenderComponent& rc = pack.getDeprecated<RenderComponent&>();
 
         if (rc.objectID != HUGO::INVALID_OGRE_OBJECT_ID) {
-            rc.materialName=material.materialName;
+            rc.materialName = material.materialName;
             OgreObject& obj = getOgreObject(rc.objectID);
             obj.ogreEntity->setMaterialName(rc.materialName);
 

@@ -85,8 +85,8 @@ void PhysicsGizmoSystem::update(double){
 #ifndef NDEBUG
     
     for(auto pack : scene->query<ColliderComponent, TransformComponent>()){
-        ColliderComponent& collider = pack.getConst<ColliderComponent&>();
-        TransformComponent& transform = pack.getConst<TransformComponent&>();
+        ColliderComponent& collider = pack.getDeprecated<ColliderComponent&>();
+        TransformComponent& transform = pack.getDeprecated<TransformComponent&>();
 
         //If collider isnt registered, we register it in the map and create a gizmo entity
         if(m_gizmoEntities.find(transform.entity) == m_gizmoEntities.end()) {
