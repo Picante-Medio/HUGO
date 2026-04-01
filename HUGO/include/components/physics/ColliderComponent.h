@@ -48,6 +48,8 @@ HCOMPONENT(ColliderComponent)
 
     bool active = true;
 
+    bool useGizmo = true;
+
     std::vector<EntityID> collisionInfo;
     std::vector<EntityID> collisionBuffer;
 

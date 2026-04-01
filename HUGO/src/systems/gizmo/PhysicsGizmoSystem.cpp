@@ -101,6 +101,9 @@ void PhysicsGizmoSystem::update(double){
         ColliderComponent& collider = pack.getDeprecated<ColliderComponent&>();
         TransformComponent& transform = pack.getDeprecated<TransformComponent&>();
 
+        //If we dont want gizmos, we skip all of this
+        if(!collider.useGizmo) continue;
+
         //If collider isnt registered, we register it in the map and create a gizmo entity
         if(m_gizmoEntities.find(transform.entity) == m_gizmoEntities.end()) {
             ErrorOrType<EntityID> newID = createGizmo(scene, collider, transform);
