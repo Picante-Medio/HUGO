@@ -2,7 +2,6 @@
 #include "HugoError.h"
 #include "HugoSystemMacros.h"
 #include "HugoTypes.h"
-#include <unordered_set>
 
 struct TransformComponent;
 struct ParentComponent;

@@ -1,7 +1,16 @@
 #pragma once
 #include "HugoComponentMacros.h"
-
+#include <optional>
 HCOMPONENT(ParentComponent)
-    EntityID parent = INVALID_ENTITY_ID;
-    EntityID previousParent = INVALID_ENTITY_ID;
+private:
+    std::optional<EntityID> parent;
+    std::optional<EntityID>  previousParent;
+public:
+    void setParent(EntityID newParent){
+        parent = newParent;
+    }
+    std::optional<EntityID> getParent() const{
+        return parent;
+    }
+    friend class HierarchySystem;
 END_HCOMPONENT()

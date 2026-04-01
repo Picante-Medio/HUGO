@@ -47,6 +47,4 @@ void HUGOMotionState::setWorldTransform(const btTransform& worldTrans)
     hugoTransform.rotation = HUGO::Quaternion(rot.w(), rot.x(), rot.y(), rot.z());
     btVector3 pos = btTransformRegister.getOrigin();
     hugoTransform.position = HUGO::Vector3(pos.x(), pos.y(), pos.z());
-
-    hugoScene->addComponent<TransformChangedTag>(entityID);
 }

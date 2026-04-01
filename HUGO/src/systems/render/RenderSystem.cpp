@@ -98,7 +98,6 @@ void RenderSystem::init(){
     TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(CamEntity);
     transform.position = HUGO::Vector3(0, 0, 50);
     scene->addComponent<CameraComponent>(CamEntity);
-    scene->addComponent<TransformChangedTag>(CamEntity);
     
     registerCameraEntity(CamEntity);
     setMainCamera(CamEntity);

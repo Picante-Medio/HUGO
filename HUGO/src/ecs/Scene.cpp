@@ -144,7 +144,7 @@ void
 Scene::removeEntity(EntityID entity) {
 	//if the entity has children, remove them
 	if(hasComponent<ChildrenComponent>(entity)){
-		std::vector<EntityID> children = getComponent<ChildrenComponent>(entity).getChildren();
+		std::unordered_set<EntityID> children = getComponent<ChildrenComponent>(entity).getChildren();
 		for(EntityID child : children){
 			removeEntity(child);
 		}
@@ -152,9 +152,9 @@ Scene::removeEntity(EntityID entity) {
 
 	//notify parent
 	if(hasComponent<ParentComponent>(entity)){
-		EntityID parent = getComponent<ParentComponent>(entity).parent;
-		if(parent != INVALID_ENTITY_ID && hasComponent<ChildrenComponent>(parent)){
-			getComponent<ChildrenComponent>(parent).removeChild(entity);
+		std::optional<EntityID> parent = getComponent<ParentComponent>(entity).getParent();
+		if(parent && hasComponent<ChildrenComponent>(parent.value())){
+			getComponent<ChildrenComponent>(parent.value()).removeChild(entity);
 		}
 	}
 	

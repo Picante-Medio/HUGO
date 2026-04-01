@@ -17,6 +17,7 @@
 #include "SliderComponent.h"
 #include "UITags.h"
 
+#include "AudioComponent.h"
 
 void
 TestSystem::init() {
@@ -31,27 +32,28 @@ TestSystem::init() {
     e1 = scene->createEntity();
     TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(e1);
     transform.position = HUGO::Vector3(0, 0, 0);
-    transform.scale = HUGO::Vector3(1.f, 1.f, 1.f);
+    transform.scale = HUGO::Vector3(2.f, 2.f, 2.f);
     RenderComponent& rc = scene->addAndGetComponent<RenderComponent>(e1);
     rc.setMeshName("cube.mesh");
     rc.setMaterialName("prueba/ColorRosa");
-    scene->addComponent<TransformChangedTag>(e1);
 
-    EntityID e2 = scene->createEntity();
-    scene->addAndGetComponent<TransformComponent>(e2).position = HUGO::Vector3(-100, 100, 0);
+    e2 = scene->createEntity();
+    scene->addAndGetComponent<TransformComponent>(e2).position = HUGO::Vector3(-2, 2, 0);
+    scene->addComponent<AudioComponent>(e2);
     RenderComponent& rc2 = scene->addAndGetComponent<RenderComponent>(e2);
     rc2.setMeshName("cube.mesh");
     rc2.setMaterialName("prueba/ColorVerde");
 
-    EntityID e3 = scene->createEntity();
-    scene->addAndGetComponent<TransformComponent>(e3).position = HUGO::Vector3(-100, 100, 0);
+    e3 = scene->createEntity(); 
+    scene->addAndGetComponent<TransformComponent>(e3).position = HUGO::Vector3(-2, 4, 0);
+    scene->addComponent<AudioComponent>(e3);
     RenderComponent& rc3 = scene->addAndGetComponent<RenderComponent>(e3);
     rc3.setMeshName("cube.mesh");
 
-    scene->addAndGetComponent<ChildrenComponent>(e1).addChild(e2);
-    scene->getComponent<ChildrenComponent>(e1).addChild(e3);
+    // scene->addAndGetComponent<ChildrenComponent>(e1).addChild(e2);
+    // scene->getComponent<ChildrenComponent>(e1).addChild(e3);
 
-    scene->addComponent<ChildrenCompDirtyTag>(e1);
+    // scene->addComponent<ChildrenCompDirtyTag>(e1);
     // //----------------------------------------
 
     // EntityID ui = scene->createEntity();
@@ -73,7 +75,6 @@ TestSystem::init() {
     lg.setLightType(HUGO::LightType::LT_SPOTLIGHT);
     lg.setDiffuse(HUGO::Vector4(0.8f, 1.8f, 0.8f, 1.0f));
     lg.setSpecular(HUGO::Vector4(0.8f, 0.8f, 0.8f, 1.0f));
-    scene->addComponent<TransformChangedTag>(ui);
     scene->addComponent<LightCreateDirtyTag>(ui);
     scene->addComponent<LightDirtyTag>(ui);
 
@@ -133,13 +134,14 @@ TestSystem::update(double dt) {
     // // tr.position.x += dt * 4;
     // // tr.scale.x+= dt*0.03;
     // tr.rotation *= HUGO::Quaternion(HUGO::Radian(HUGO::Degree(1.0f)), HUGO::Vector3(0,1,0));
-    // if(!scene->hasComponent<TransformChangedTag>(e1))scene->addComponent<TransformChangedTag>(e1);
 
     timer += dt;
 
     if(timer >= 3 && !usedTimer){
         usedTimer = true;
-        //scene->removeEntity(e1);
+        // scene->removeEntity(e1);
+        // scene->removeEntity(e2);
+        // scene->removeEntity(e3);
         std::cout<<"eliminado"<<"\n";
     }
 

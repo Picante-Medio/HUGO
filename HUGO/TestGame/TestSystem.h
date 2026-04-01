@@ -6,6 +6,8 @@
 HSYSTEM(TestSystem)
     //test
     EntityID e1;
+    EntityID e2;
+    EntityID e3;
 public:
     void init() override;
     //Called every time the scene is loaded

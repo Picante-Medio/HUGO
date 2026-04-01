@@ -1,10 +1,7 @@
 #pragma once
-#include <limits>
 
 // Entities are just numbers
 using EntityID = unsigned long int;
-
-constexpr EntityID INVALID_ENTITY_ID = std::numeric_limits<EntityID>::max();
 
 // Identifier assigned dynamically to every component
 using ComponentID = unsigned int;
