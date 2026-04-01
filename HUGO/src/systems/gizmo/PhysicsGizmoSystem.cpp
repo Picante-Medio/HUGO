@@ -105,9 +105,7 @@ void PhysicsGizmoSystem::update(double dt){
         TransformComponent& gizmoTr = scene->getComponent<TransformComponent>(entVisited.entityID);
 
         gizmoTr.position = transform.position;
-        //gizmoTr.position = transform.position;
         gizmoTr.position = transform.position;
-        //gizmoTr.rotation = transform.rotation;
     }
 
     //If an entry was not visited, we remove that entry.
