@@ -83,7 +83,51 @@ bool UISystem::isMouseOver(HUGO::Float left, HUGO::Float top, HUGO::Float width,
 
 bool UISystem::isMouseOverPanel(const PanelComponent &panel, HUGO::Float mouseX, HUGO::Float mouseY)
 {
-    return isMouseOver(panel.left, panel.top, panel.width, panel.height, mouseX, mouseY);
+    int screenPixelsW, screenPixelsH;
+    SDL_GL_GetDrawableSize(OgreModule::Instance().getSDLWindow(), &screenPixelsW, &screenPixelsH);
+    
+    float mouseXPixels = mouseX * screenPixelsW;
+    float mouseYPixels = mouseY * screenPixelsH;
+    
+    HUGO::Rect screenRect;
+    
+    switch (panel.metricsMode)
+    {
+        case HUGO::UIMetricsMode::GMM_RELATIVE:
+        {
+            // Panel en espacio relativo (0-1), convertir a píxeles
+            screenRect.left = panel.left * screenPixelsW;
+            screenRect.top = panel.top * screenPixelsH;
+            screenRect.width = panel.width * screenPixelsW;
+            screenRect.height = panel.height * screenPixelsH;
+            break;
+        }
+            
+        case HUGO::UIMetricsMode::GMM_PIXELS:
+        {
+            screenRect.left = panel.left;
+            screenRect.top = panel.top;
+            screenRect.width = panel.width;
+            screenRect.height = panel.height;
+            break;
+        }
+            
+        case HUGO::UIMetricsMode::GMM_RELATIVE_ASPECT_ADJUSTED:
+        {
+            HUGO::Float baseSizePixels = std::min((float)screenPixelsW, (float)screenPixelsH);
+            screenRect.left = panel.left * baseSizePixels;
+            screenRect.top = panel.top * baseSizePixels;
+            screenRect.width = panel.width * baseSizePixels;
+            screenRect.height = panel.height * baseSizePixels;
+            
+            screenRect.left += (screenPixelsW - baseSizePixels) * 0.5f;
+            screenRect.top += (screenPixelsH - baseSizePixels) * 0.5f;
+            break;
+        }
+    }
+    
+    return isMouseOver(screenRect.left, screenRect.top, screenRect.width, screenRect.height, mouseXPixels, mouseYPixels);
+
 }
 
 //====================================================
@@ -435,7 +479,6 @@ void UISystem::processInput()
 
         HUGO::IInput::MouseRelativePosition mouse = input->getMouseRelativePosition();
         bool isOver = isMouseOverPanel(panel, mouse.x, mouse.y);
-
         if (isOver && button.state != HUGO::BS_DOWN)
         {
             button.state = HUGO::BS_OVER;

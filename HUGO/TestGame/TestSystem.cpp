@@ -82,8 +82,8 @@ TestSystem::init() {
     panel.containerName = panel.overlayName + "/Container";
     panel.material = "UI/Background";
     panel.left = 400.0f;
-    panel.top = 50.0f;
-    panel.width = 256.0f;
+    panel.top = 550.0f;
+    panel.width = 64.0f;
     panel.height = 64.0f;
     panel.metricsMode = HUGO::UIMetricsMode::GMM_PIXELS;
 

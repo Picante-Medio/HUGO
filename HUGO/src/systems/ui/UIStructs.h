@@ -32,3 +32,12 @@ struct UISliderCache : public UIElementCache
     Ogre::OverlayContainer* knob = nullptr;
     void setVisible(bool visible) override;
 };
+
+namespace HUGO {
+    struct Rect {
+        Float left;
+        Float top;
+        Float width;
+        Float height;
+    };
+}
