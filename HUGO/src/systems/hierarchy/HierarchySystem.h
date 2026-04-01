@@ -17,7 +17,6 @@ private:
     void updateHierarchy();
     
     //functions to update transform
-    void addWorldDirtyTagForChildren(EntityID parent);
     void setLocalTransform(TransformComponent& transform);
     void updateWorldTransform(TransformComponent& transform);
     TransformComponent& getFullTransform(EntityID entity);

@@ -39,21 +39,19 @@ TestSystem::init() {
 
     e2 = scene->createEntity();
     scene->addAndGetComponent<TransformComponent>(e2).position = HUGO::Vector3(-2, 2, 0);
-    scene->addComponent<AudioComponent>(e2);
     RenderComponent& rc2 = scene->addAndGetComponent<RenderComponent>(e2);
     rc2.setMeshName("cube.mesh");
     rc2.setMaterialName("prueba/ColorVerde");
 
     e3 = scene->createEntity(); 
     scene->addAndGetComponent<TransformComponent>(e3).position = HUGO::Vector3(-2, 4, 0);
-    scene->addComponent<AudioComponent>(e3);
     RenderComponent& rc3 = scene->addAndGetComponent<RenderComponent>(e3);
     rc3.setMeshName("cube.mesh");
 
-    // scene->addAndGetComponent<ChildrenComponent>(e1).addChild(e2);
-    // scene->getComponent<ChildrenComponent>(e1).addChild(e3);
+    scene->addAndGetComponent<ChildrenComponent>(e1).addChild(e2);
+    scene->getComponent<ChildrenComponent>(e1).addChild(e3);
 
-    // scene->addComponent<ChildrenCompDirtyTag>(e1);
+    scene->addComponent<ChildrenCompDirtyTag>(e1);
     // //----------------------------------------
 
     // EntityID ui = scene->createEntity();
@@ -129,21 +127,19 @@ TestSystem::update(double dt) {
     //     }
     // }
 
-      // ------------HierarchySystemTest----------
-    // TransformComponent& tr=scene->getComponent<TransformComponent>(e1);
-    // // tr.position.x += dt * 4;
-    // // tr.scale.x+= dt*0.03;
-    // tr.rotation *= HUGO::Quaternion(HUGO::Radian(HUGO::Degree(1.0f)), HUGO::Vector3(0,1,0));
+    // ------------HierarchySystemTest----------
+    TransformComponent& tr=scene->getComponent<TransformComponent>(e1);
+    // tr.position.x += dt * 4;
+    // tr.scale.x+= dt*0.03;
+    tr.rotation *= HUGO::Quaternion(HUGO::Radian(HUGO::Degree(1.0f)), HUGO::Vector3(0,1,0));
 
-    timer += dt;
+    // timer += dt;
 
-    if(timer >= 3 && !usedTimer){
-        usedTimer = true;
-        // scene->removeEntity(e1);
-        // scene->removeEntity(e2);
-        // scene->removeEntity(e3);
-        std::cout<<"eliminado"<<"\n";
-    }
+    // if(timer >= 3 && !usedTimer){
+    //     usedTimer = true;
+    //     scene->removeEntity(e3);
+    //     std::cout<<"eliminado"<<"\n";
+    // }
 
     //----------------------------------------
 

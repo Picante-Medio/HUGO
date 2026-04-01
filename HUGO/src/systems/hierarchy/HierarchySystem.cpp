@@ -135,30 +135,6 @@ HierarchySystem::updateHierarchy(){
     }
 }
 
-void HierarchySystem::addWorldDirtyTagForChildren(EntityID parent)
-{
-    std::vector<EntityID> needTag; //list of entities that need to propagate the tag
-    needTag.push_back(parent);
-
-    while(!needTag.empty())
-    {
-        EntityID current = needTag.back(); 
-        needTag.pop_back();
-        
-        //if entity has children --> add tag to the children
-        if (scene->hasComponent<ChildrenComponent>(current)) {
-            
-            const std::unordered_set<EntityID>& children = scene->getComponent<ChildrenComponent>(current).children;
-            for (EntityID child : children) {
-                if(!scene->hasComponent<WorldTransformDirtyTag>(child)){
-                    scene->addComponent<WorldTransformDirtyTag>(child);
-                    needTag.push_back(child);
-                }
-            }
-        }
-    }
-}
-
 void 
 HierarchySystem::setLocalTransform(TransformComponent &transform){
     transform.worldPosition = transform.position;
@@ -218,11 +194,7 @@ HierarchySystem::update(double){
     //add WorldTransformDirty Tag
     for (auto& pack : scene->query<TransformComponent>()) {
         EntityID e = pack.getDeprecated<TransformComponent&>().entity;
-        if(!scene->hasComponent<WorldTransformDirtyTag>(e))
-        {
-            scene->addComponent<WorldTransformDirtyTag>(e);
-            addWorldDirtyTagForChildren(e);
-        }
+        scene->addComponent<WorldTransformDirtyTag>(e);
     }
 
     //process dirty tag: update worldTranforms
