@@ -35,7 +35,7 @@ namespace HUGO {
 
         VirtualTimer vt;
 
-        Input input;
+        std::shared_ptr<Input> input;
         SceneManager sceneManager;
 
     public:
