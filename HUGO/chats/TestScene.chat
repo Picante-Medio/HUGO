@@ -9,3 +9,5 @@ SYSTEM HierarchySystem
 SYSTEM CameraMovementSystem
 SYSTEM PhysicsGizmoSystem
 SYSTEM TestSystem
+SYSTEM MessagesTestSystem
+SYSTEM EventTestSystem
