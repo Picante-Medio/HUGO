@@ -4,6 +4,7 @@
 #include <queue>
 #include <functional>
 
+#include "EcsTypes.h"
 #include "System.h"
 #include "HugoTypes.h"
 #include "HugoError.h"
@@ -19,6 +20,8 @@ class Scene : public HUGO::IScene, public std::enable_shared_from_this<Scene>
     std::queue<HUGO::String> stringsToLog;
 
     std::shared_ptr<HUGO::IInput> input;
+
+    void removeComponentAux(EntityID entity, ComponentID componentID, DenseListIndex index);
 public:
     Scene(std::shared_ptr<HUGO::IInput> input);
 
@@ -39,6 +42,7 @@ public:
     int createEntityLUA();
 
     void addComponentLUA(int entityID, std::string &componentName);
+
     void removeComponentLUA(int entityID, std::string &componentName);
 
     void removeEntity(EntityID entity);

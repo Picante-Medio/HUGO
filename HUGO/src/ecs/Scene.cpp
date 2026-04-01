@@ -143,7 +143,7 @@ Scene::removeComponentLUA(int entityID, std::string& componentName) {
 
 void
 Scene::removeEntity(EntityID entity) {
-	//if the entity has children, remove them
+	// If the entity has children, remove them
 	if(hasComponent<ChildrenComponent>(entity)){
 		std::unordered_set<EntityID> children = getComponent<ChildrenComponent>(entity).getChildren();
 		for(EntityID child : children){
@@ -151,26 +151,20 @@ Scene::removeEntity(EntityID entity) {
 		}
 	}
 
-	//notify parent
+	// If the entity had a parent, notify them
 	if(hasComponent<ParentComponent>(entity)){
 		std::optional<EntityID> parent = getComponent<ParentComponent>(entity).getParent();
 		if(parent && hasComponent<ChildrenComponent>(parent.value())){
 			getComponent<ChildrenComponent>(parent.value()).removeChild(entity);
 		}
 	}
-	
-	// Deleting the components that the entity had
+    
+	// Delete the components that the entity had
 	std::vector<std::pair<ComponentID, DenseListIndex>> componentsToDelete = entityTable->getAllDenseListIndexes(entity);
 	for(auto [componentID, direction] : componentsToDelete)
-	{
-		componentTable->dispatchRemoveEvent(componentID, direction);
-		std::pair<bool, EntityID> needUpdate = componentTable->removeComponent(componentID, direction);  
-        if (needUpdate.first) {
-            entityTable->updateDenseListIndex(needUpdate.second, componentID, direction);
-        }
-	}
+        removeComponentAux(entity, componentID, direction);
 		
-	// Deleting the entity
+	// Delete the entity
 	entityTable->removeEntity(entity);
 }
 
@@ -237,4 +231,18 @@ Scene::dispatchMessages() {
 std::shared_ptr<HUGO::IInput>
 Scene::getInput() {
 	return input;
+}
+
+
+void 
+Scene::removeComponentAux(EntityID entity, ComponentID componentID, DenseListIndex index) {
+    // Calls removal event before removing
+    componentTable->dispatchRemoveEvent(componentID, index);
+
+    // Deleting the component
+    entityTable->deRegisterComponent(entity, componentID);
+    auto [needsUpdate, toUpdate] = componentTable->removeComponent(index, componentID);
+
+    // Updating the index of the moved component upon deletion
+    if(needsUpdate) entityTable->updateDenseListIndex(toUpdate, componentID, index);
 }
