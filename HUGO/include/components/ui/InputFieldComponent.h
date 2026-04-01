@@ -26,3 +26,4 @@ HCOMPONENT(InputFieldComponent)
     std::function<void(const HUGO::String&)> onChangeCallback;
 
 END_HCOMPONENT()
+

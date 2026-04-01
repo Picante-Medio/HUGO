@@ -15,3 +15,4 @@ HCOMPONENT(ButtonComponent)
     HUGO::String pressedMaterial = "Button/Pressed";
     HUGO::String disabledMaterial = "Button/Disabled";
 END_HCOMPONENT()
+

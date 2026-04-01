@@ -25,3 +25,4 @@ HCOMPONENT(PanelComponent)
     // appearance
     HUGO::String material = "";
 END_HCOMPONENT()
+

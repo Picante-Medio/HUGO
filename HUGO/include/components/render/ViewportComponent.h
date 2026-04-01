@@ -50,3 +50,4 @@ public:
     inline bool isActive() const { return active; }
 
 END_HCOMPONENT()
+

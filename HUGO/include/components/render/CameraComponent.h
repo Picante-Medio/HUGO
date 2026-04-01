@@ -52,3 +52,4 @@ public:
     inline HUGO::PolygonMode getPolygonMode() const { return polygonMode; }
 
 END_HCOMPONENT()
+

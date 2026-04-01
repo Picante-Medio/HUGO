@@ -10,3 +10,4 @@ HCOMPONENT(TweenComponent)
     std::list<std::shared_ptr<HUGO::ITween>> currentTweens;
 
 END_HCOMPONENT()
+

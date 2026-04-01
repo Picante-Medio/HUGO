@@ -93,3 +93,4 @@ HCOMPONENT(ColliderComponent)
     inline std::vector<EntityID> getCollisionInfo() const { return collisionInfo; }
 
 END_HCOMPONENT()
+

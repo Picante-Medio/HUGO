@@ -119,3 +119,4 @@ HCOMPONENT(RigidBodyComponent)
     inline float getAngularSleepingThreshold() const { return angularSleepingThreshold; }
 
 END_HCOMPONENT()
+

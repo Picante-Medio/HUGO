@@ -24,3 +24,4 @@ HCOMPONENT(AudioComponent)
     std::function<void(HUGO::AudioID)> onEnd = nullptr;
 
 END_HCOMPONENT()
+

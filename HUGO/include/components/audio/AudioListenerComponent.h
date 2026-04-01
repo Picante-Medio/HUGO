@@ -11,3 +11,4 @@ HCOMPONENT(AudioListenerComponent)
     HUGO::Float masterVolume =1.0f;
 
 END_HCOMPONENT()
+

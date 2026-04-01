@@ -1,5 +1,6 @@
 #include "Scene.h"
 
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <utility>
@@ -75,7 +76,7 @@ Scene::addComponentLUA(int entityID, std::string& componentData) {
 	std::string_view parameterType = "";
 	ErrorOrVoid error = ErrorOrVoid();
 
-	for(int c = 2; c < splittedData.size(); c++) {
+	for(size_t c = 2; c < splittedData.size(); c++) {
 		std::string stringValue = std::string{splittedData[c]};
 		HVariant parameterValue = "NULL";
 		bool valueAssigned = false;

@@ -31,3 +31,4 @@ HCOMPONENT(Audio3DInfoComponent)
     HUGO::Float coneOuterGain=0.0f; // gain outside the cone
 
 END_HCOMPONENT()
+

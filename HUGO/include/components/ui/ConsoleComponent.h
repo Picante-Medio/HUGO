@@ -3,3 +3,4 @@
 
 HCOMPONENT(ConsoleComponent)
 END_HCOMPONENT()
+

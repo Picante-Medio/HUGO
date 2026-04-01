@@ -93,9 +93,9 @@ namespace HUGO {
     {
 		float len = length();
 		if (len > 0) {
-			x / len;
-			y / len;
-			z / len;
+			x /= len;
+			y /= len;
+			z /= len;
 		}
     }
 
@@ -271,6 +271,11 @@ namespace HUGO {
 
     Radian::Radian(const Radian& rhs) 
 		: rad(rhs.rad) {}
+
+    void 
+    Radian::operator=(const Radian& r) {
+        this->rad = r.rad;
+    }
 
     float Radian::valueDegrees() const {
         return static_cast<float>(rad * (180.0f / PI));

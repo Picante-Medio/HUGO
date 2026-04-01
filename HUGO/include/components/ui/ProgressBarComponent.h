@@ -22,3 +22,4 @@ HCOMPONENT(ProgressBarComponent)
     // material
     HUGO::String fillMaterial = "";
 END_HCOMPONENT()
+

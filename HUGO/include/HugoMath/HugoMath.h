@@ -105,6 +105,7 @@ namespace HUGO {
         Radian(float r = 0);
         Radian(const Degree& d);
         Radian(const HUGO::Radian& rhs);
+        void operator=(const Radian& r);
         
         float valueDegrees() const;
         float valueRadians() const;

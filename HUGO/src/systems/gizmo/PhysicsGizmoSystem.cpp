@@ -81,7 +81,7 @@ ErrorOrType<EntityID> createGizmo(std::shared_ptr<HUGO::IScene> scene, ColliderC
 
 #pragma endregion
 
-void PhysicsGizmoSystem::update(double dt){
+void PhysicsGizmoSystem::update(double){
 #ifndef NDEBUG
     
     for(auto pack : scene->query<ColliderComponent, TransformComponent>()){
@@ -122,6 +122,4 @@ void PhysicsGizmoSystem::update(double dt){
 
 
 
-void PhysicsGizmoSystem::fixedUpdate(double dt){
-    
-}
+void PhysicsGizmoSystem::fixedUpdate(double) {}

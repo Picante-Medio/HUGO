@@ -30,3 +30,4 @@ HCOMPONENT(SliderComponent)
 
     std::function<void(HUGO::Float)> onChangeCallback = nullptr;
 END_HCOMPONENT()
+

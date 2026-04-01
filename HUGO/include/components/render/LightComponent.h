@@ -59,3 +59,4 @@ public:
     inline float getShadowFarClipDistance() const { return shadowFarClipDist; }
 
 END_HCOMPONENT()
+

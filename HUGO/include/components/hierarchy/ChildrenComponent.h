@@ -20,3 +20,4 @@ public:
     }
     friend class HierarchySystem;
 END_HCOMPONENT()
+

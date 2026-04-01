@@ -13,3 +13,4 @@ HCOMPONENT(TestComponent)
     DEFAULT_SERIALIZED_MEMBER(std::string, stringDePrueba, "prueba")
 
 END_HCOMPONENT()
+

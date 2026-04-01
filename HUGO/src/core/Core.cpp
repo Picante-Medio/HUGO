@@ -46,8 +46,6 @@ ErrorOrVoid Core::init(){
     // Carga del juego como biblioteca dinamica
     GameLibraryLoader::init("TestGame");
 
-    //LuaBinder::Instance().Init();
-
     vt.reset();
     initModules();
 
