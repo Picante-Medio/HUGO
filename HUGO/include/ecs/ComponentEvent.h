@@ -8,27 +8,7 @@
 #include "EcsTypes.h"
 #include "Component.h"
 #include "System.h"
-
-template <typename T>
-using ComponentEventFunction = std::function<void(T&)>;
-
-/// @brief Handle to release functions associated with an event that is related with objects of component T
-/// @tparam T Component
-template <typename T>
-class ComponentEventFunctionHandle {
-
-    static_assert(std::is_base_of_v<Component, T>, "T must inherit from Component");
-
-    ComponentEventFunction<T> fn;
-
-    ComponentEventFunctionHandle(ComponentEventFunction<T> newFn): fn(newFn) {}
-
-    friend class ComponentEventList;
-public:
-    void release() {
-        fn = nullptr;
-    }
-};
+#include "ComponentEventFunctionHandle.h"
 
 // To allow polymorphism
 class IComponentEvent {
@@ -78,7 +58,7 @@ public:
             }
             else {
 
-                (*functionList[i]->fn)(component);
+                (functionList[i]->fn)(component);
             }
         }
     }
@@ -98,7 +78,7 @@ public:
 
         static_assert(std::is_base_of_v<HUGO::System, Caller>, "instance must inherit from System");
 
-        return event.connect([instance, method]
+        return event->connect([instance, method]
             (T& component) {
                 (instance->*method)(component);
             }
@@ -106,7 +86,7 @@ public:
     }
 
     ComponentEventTemporalReference(const ComponentEventTemporalReference&) = delete;
-    ComponentEventTemporalReference(ComponentEventTemporalReference&&) = delete;
     ComponentEventTemporalReference& operator=(const ComponentEventTemporalReference&) = delete;
+    ComponentEventTemporalReference(ComponentEventTemporalReference&&) = delete;
     ComponentEventTemporalReference& operator=(ComponentEventTemporalReference&&) = delete;
 };
