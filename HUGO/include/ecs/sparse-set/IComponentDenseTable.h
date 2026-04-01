@@ -11,7 +11,7 @@
 #include "ComponentEvent.h"
 
 /// @brief Helper structure to group the events of each component
-struct ComponentModificationEvents {
+struct ComponentManipulationEvents {
 	// Events must be shared ptr to allow casting
 	std::shared_ptr<IComponentEvent> onAdd = nullptr;
 	std::shared_ptr<IComponentEvent> onUpdate = nullptr;
@@ -24,7 +24,7 @@ struct ComponentModificationEvents {
 class IComponentDenseTable {
 protected:
 	std::array<std::shared_ptr<IDenseList>, MAX_COMPONENTS> componentLists; // Components packed and alligned in memory
-	std::array<std::unique_ptr<ComponentModificationEvents>, MAX_COMPONENTS> eventsList; // Events associated to each component
+	std::array<std::unique_ptr<ComponentManipulationEvents>, MAX_COMPONENTS> eventsList; // Events associated to each component
 
 	/**
 	 * @brief auxiliar function that creates a DenseList of the specified type if it does not exist yet
@@ -37,7 +37,7 @@ protected:
 		componentLists[componentID] = std::make_shared<DenseList<T>>();
 
 		// Create events
-		eventsList[componentID] = std::make_unique<ComponentModificationEvents>();
+		eventsList[componentID] = std::make_unique<ComponentManipulationEvents>();
 		eventsList[componentID]->onAdd = std::make_shared<ComponentEvent<T>>();
 		eventsList[componentID]->onUpdate = std::make_shared<ComponentEvent<T>>();
 		eventsList[componentID]->onRemove = std::make_shared<ComponentEvent<T>>();
