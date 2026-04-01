@@ -240,7 +240,7 @@ Scene::removeComponentAux(EntityID entity, ComponentID componentID, DenseListInd
 
     // Deleting the component
     entityTable->deRegisterComponent(entity, componentID);
-    auto [needsUpdate, toUpdate] = componentTable->removeComponent(index, componentID);
+    auto [needsUpdate, toUpdate] = componentTable->removeComponent(componentID, index);
 
     // Updating the index of the moved component upon deletion
     if(needsUpdate) entityTable->updateDenseListIndex(toUpdate, componentID, index);

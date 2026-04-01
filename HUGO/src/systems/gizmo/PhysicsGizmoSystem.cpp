@@ -78,7 +78,7 @@ ErrorOrVoid updateGizmo<CapsuleColliderInfo>(std::shared_ptr<HUGO::IScene> scene
         gizmoRender.setMaterialName("debug/WireframeMaterial");
         scene->addAndGetComponent<MaterialDirtyTag>(gizmoRender.entity);
     }
-    gizmoTransform.worldScale = HUGO::Vector3(colliderInfo.r * 2, colliderInfo.height, colliderInfo.r * 2);
+    gizmoTransform.scale = HUGO::Vector3(colliderInfo.r * 2, colliderInfo.height, colliderInfo.r * 2);
 
     return ErrorOrVoid();
 }

@@ -399,9 +399,9 @@ void RenderSystem::update(double dt)
         OgreObject& obj = getOgreObject(rc.objectID);
 
         //update transform
-        obj.ogreSceneNode->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.worldPosition));
-        obj.ogreSceneNode->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.worldRotation));
-        obj.ogreSceneNode->setScale(HUGO::OgreUtils::vector3ToOgre(tr.worldScale));
+        obj.ogreSceneNode->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getWorldPosition()));
+        obj.ogreSceneNode->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getWorldRotation()));
+        obj.ogreSceneNode->setScale(HUGO::OgreUtils::vector3ToOgre(tr.getWorldScale()));
     }
 
     // changes in window
