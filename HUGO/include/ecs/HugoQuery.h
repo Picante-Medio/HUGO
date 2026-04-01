@@ -7,7 +7,6 @@
 
 #include "ComponentEvent.h"
 #include "EcsTypes.h"
-#include "Mutable.h"
 
 namespace HUGO {
 
@@ -30,13 +29,18 @@ namespace HUGO {
 		}
 
 		template<typename T>
-		const T& getConst() const {
+		const T& readComponent() const {
 			return std::get<T&>(pack);
 		}
 
-		template<typename T>
-		Mutable<T> getMutable() {
-			return Mutable<T>(std::get<std::shared_ptr<ComponentEvent<T>>>(updateEvents), std::get<T&>(pack));
+		template<typename T, typename Func>
+		void modify(Func&& modifier) {
+
+			static_assert(std::is_invocable_r_v<void, Func, T&>, "modifier() must have void(T&) signature");
+
+			T& cmp = std::get<T&>(pack);
+			std::forward<Func>(modifier)(cmp);
+			std::get<std::shared_ptr<ComponentEvent<T>>>(updateEvents)->dispatch(cmp);
 		}
 	};
 
@@ -44,7 +48,6 @@ namespace HUGO {
 	class Query {
 		using TupleList = std::vector<ComponentTuple<Ts...>>;
 		TupleList componentPacks;
-
 		std::tuple<std::shared_ptr<ComponentEvent<Ts>>...> updateEvents;
 
 	public:
