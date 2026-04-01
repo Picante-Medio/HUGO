@@ -133,6 +133,18 @@ public:
 		return std::static_pointer_cast<ComponentEvent<T>>(eventsList[cmpID]->onRemove);
 	}
 
+	void dispatchAddEvent(ComponentID componentID, DenseListIndex index) {
+		componentLists[componentID]->dispatchEvent(eventsList[componentID]->onAdd, index);
+	}
+
+	void dispatchUpdateEvent(ComponentID componentID, DenseListIndex index) {
+		componentLists[componentID]->dispatchEvent(eventsList[componentID]->onUpdate, index);
+	}
+
+	void dispatchRemoveEvent(ComponentID componentID, DenseListIndex index) {
+		componentLists[componentID]->dispatchEvent(eventsList[componentID]->onRemove, index);
+	}
+
 	/**
 	 * @brief calls getCount on the DenseList that stores components of type T
 	 * @tparam the type of the removed component

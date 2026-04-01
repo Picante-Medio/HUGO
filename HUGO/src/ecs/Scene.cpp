@@ -163,6 +163,7 @@ Scene::removeEntity(EntityID entity) {
 	std::vector<std::pair<ComponentID, DenseListIndex>> componentsToDelete = entityTable->getAllDenseListIndexes(entity);
 	for(auto [componentID, direction] : componentsToDelete)
 	{
+		componentTable->dispatchRemoveEvent(componentID, direction);
 		std::pair<bool, EntityID> needUpdate = componentTable->removeComponent(componentID, direction);  
         if (needUpdate.first) {
             entityTable->updateDenseListIndex(needUpdate.second, componentID, direction);

@@ -6,6 +6,8 @@
 
 #include "EcsTypes.h"
 
+#include "ComponentEvent.h"
+
 /**
  * @brief Middleground interface for the generic dense list
  */
@@ -14,6 +16,7 @@ public:
 	virtual DenseListIndex getCount() const = 0;
 	virtual std::pair<bool, EntityID> remove(DenseListIndex index) = 0;
 	virtual std::vector<EntityID> getAffectedEntities() const = 0;
+	virtual void dispatchEvent(std::shared_ptr<IComponentEvent> event, DenseListIndex index) = 0;
 };
 
 /**
@@ -94,4 +97,9 @@ public:
 		//Slice of the vector with only the alive entities
 		return std::vector<EntityID>(entityIdList.begin(), entityIdList.begin() + activeComponentCount);
 	}
+
+	void dispatchEvent(std::shared_ptr<IComponentEvent> event, DenseListIndex index) override {
+		std::static_pointer_cast<ComponentEvent<T>>(event)->dispatch(getComponent(index));
+	}
+
 };
