@@ -3,6 +3,7 @@
 #include "TransformComponent.h"
 #include "HugoError.h"
 #include "RenderComponent.h"
+#include "RenderTags.h"
 
 void PhysicsGizmoSystem::init(){
 
@@ -13,70 +14,82 @@ void PhysicsGizmoSystem::onLoad(){
 }
 
 #pragma region Gizmo Handling
-ErrorOrType<EntityID> createGizmo(std::shared_ptr<HUGO::IScene> scene, ColliderComponent& collider, TransformComponent& colliderTransform){
-    if(std::holds_alternative<BoxColliderInfo>(collider.info)){
 
-        EntityID newID = scene->createEntity();
-        TransformComponent& gizmoTr = scene->addAndGetComponent<TransformComponent>(newID);
-        RenderComponent& gizmoRender = scene->addAndGetComponent<RenderComponent>(newID);
+//---------------GIZMO UPDATE-----------------
+
+//If updateGizmo has no specialization, then it is not supported
+template <typename T>
+ErrorOrVoid updateGizmo(std::shared_ptr<HUGO::IScene>,TransformComponent&, RenderComponent&, T){
+    return ErrorOrVoid(StringError{"Collider shape not contemplated by PhysicsGizmoSystem"});
+}
+
+template <>
+ErrorOrVoid updateGizmo<BoxColliderInfo>(std::shared_ptr<HUGO::IScene> scene, TransformComponent& gizmoTransform, RenderComponent& gizmoRender, BoxColliderInfo colliderInfo){
+    if(gizmoRender.getMeshName() != "cube.mesh"){
         gizmoRender.setMeshName("cube.mesh");
         gizmoRender.setMaterialName("debug/WireframeMaterial");
-
-        BoxColliderInfo collInfo = std::get<BoxColliderInfo>(collider.info);
-        gizmoTr.scale = collInfo.halfExtents * 2;
-
-        return ErrorOrType<EntityID>(newID);
+        scene->addAndGetComponent<MaterialDirtyTag>(gizmoRender.entity);
     }
-    else if (std::holds_alternative<SphereColliderInfo>(collider.info)){
-        EntityID newID = scene->createEntity();
-        TransformComponent& gizmoTr = scene->addAndGetComponent<TransformComponent>(newID);
-        RenderComponent& gizmoRender = scene->addAndGetComponent<RenderComponent>(newID);
+    gizmoTransform.scale = colliderInfo.halfExtents * 2;
+
+    return ErrorOrVoid();
+}
+
+template <>
+ErrorOrVoid updateGizmo<SphereColliderInfo>(std::shared_ptr<HUGO::IScene> scene, TransformComponent& gizmoTransform, RenderComponent& gizmoRender, SphereColliderInfo colliderInfo){
+    if(gizmoRender.getMeshName() != "sphere.mesh"){
         gizmoRender.setMeshName("sphere.mesh");
         gizmoRender.setMaterialName("debug/WireframeMaterial");
-
-        SphereColliderInfo collInfo = std::get<SphereColliderInfo>(collider.info);
-        gizmoTr.scale = HUGO::Vector3(collInfo.r * 2);
-
-        return ErrorOrType<EntityID>(newID);
+        scene->addAndGetComponent<MaterialDirtyTag>(gizmoRender.entity);
     }
-    else if (std::holds_alternative<CylinderColliderInfo>(collider.info)){
-        EntityID newID = scene->createEntity();
-        TransformComponent& gizmoTr = scene->addAndGetComponent<TransformComponent>(newID);
-        RenderComponent& gizmoRender = scene->addAndGetComponent<RenderComponent>(newID);
+    gizmoTransform.scale = HUGO::Vector3(colliderInfo.r * 2);
+
+    return ErrorOrVoid();
+}
+
+template <>
+ErrorOrVoid updateGizmo<CylinderColliderInfo>(std::shared_ptr<HUGO::IScene> scene, TransformComponent& gizmoTransform, RenderComponent& gizmoRender, CylinderColliderInfo colliderInfo){
+    if(gizmoRender.getMeshName() != "cylinder.mesh"){
         gizmoRender.setMeshName("cylinder.mesh");
         gizmoRender.setMaterialName("debug/WireframeMaterial");
-
-        CylinderColliderInfo collInfo = std::get<CylinderColliderInfo>(collider.info);
-        gizmoTr.scale = collInfo.halfExtents * 2;
-
-        return ErrorOrType<EntityID>(newID);
+        scene->addAndGetComponent<MaterialDirtyTag>(gizmoRender.entity);
     }
-    else if (std::holds_alternative<ConeColliderInfo>(collider.info)){
-        EntityID newID = scene->createEntity();
-        TransformComponent& gizmoTr = scene->addAndGetComponent<TransformComponent>(newID);
-        RenderComponent& gizmoRender = scene->addAndGetComponent<RenderComponent>(newID);
+    gizmoTransform.scale = colliderInfo.halfExtents * 2;
+
+    return ErrorOrVoid();
+}
+
+template <>
+ErrorOrVoid updateGizmo<ConeColliderInfo>(std::shared_ptr<HUGO::IScene> scene, TransformComponent& gizmoTransform, RenderComponent& gizmoRender, ConeColliderInfo colliderInfo){
+    if(gizmoRender.getMeshName() != "cone.mesh"){
         gizmoRender.setMeshName("cone.mesh");
         gizmoRender.setMaterialName("debug/WireframeMaterial");
-
-        ConeColliderInfo collInfo = std::get<ConeColliderInfo>(collider.info);
-        gizmoTr.scale = HUGO::Vector3(collInfo.r * 2, collInfo.height, collInfo.r * 2);
-
-        return ErrorOrType<EntityID>(newID);
+        scene->addAndGetComponent<MaterialDirtyTag>(gizmoRender.entity);
     }
-    else if (std::holds_alternative<CapsuleColliderInfo>(collider.info)){
-        EntityID newID = scene->createEntity();
-        TransformComponent& gizmoTr = scene->addAndGetComponent<TransformComponent>(newID);
-        RenderComponent& gizmoRender = scene->addAndGetComponent<RenderComponent>(newID);
+    gizmoTransform.scale = HUGO::Vector3(colliderInfo.r * 2, colliderInfo.height, colliderInfo.r * 2);
+
+    return ErrorOrVoid();
+}
+
+template <>
+ErrorOrVoid updateGizmo<CapsuleColliderInfo>(std::shared_ptr<HUGO::IScene> scene, TransformComponent& gizmoTransform, RenderComponent& gizmoRender, CapsuleColliderInfo colliderInfo){
+    if(gizmoRender.getMeshName() != "capsule.mesh"){
         gizmoRender.setMeshName("capsule.mesh");
         gizmoRender.setMaterialName("debug/WireframeMaterial");
-
-        CapsuleColliderInfo collInfo = std::get<CapsuleColliderInfo>(collider.info);
-        gizmoTr.worldScale = HUGO::Vector3(collInfo.r * 2, collInfo.height, collInfo.r * 2);
-
-        return ErrorOrType<EntityID>(newID);
+        scene->addAndGetComponent<MaterialDirtyTag>(gizmoRender.entity);
     }
-    
-    return ErrorOrType<EntityID>(StringError{"Collider shape not contemplated by PhysicsGizmoSystem"});
+    gizmoTransform.worldScale = HUGO::Vector3(colliderInfo.r * 2, colliderInfo.height, colliderInfo.r * 2);
+
+    return ErrorOrVoid();
+}
+
+//------------------GIZMO CREATION------------------------
+ErrorOrType<EntityID> createGizmo(std::shared_ptr<HUGO::IScene> scene, ColliderComponent& collider, TransformComponent& colliderTransform){
+    EntityID newID = scene->createEntity();
+    TransformComponent& gizmoTr = scene->addAndGetComponent<TransformComponent>(newID);
+    RenderComponent& gizmoRender = scene->addAndGetComponent<RenderComponent>(newID);
+
+    return ErrorOrType<EntityID>(newID);
 }
 
 #pragma endregion
@@ -103,9 +116,13 @@ void PhysicsGizmoSystem::update(double){
         entVisited.visited = true;
 
         TransformComponent& gizmoTr = scene->getComponent<TransformComponent>(entVisited.entityID);
+        RenderComponent& gizmoRender = scene->getComponent<RenderComponent>(entVisited.entityID);
 
         gizmoTr.position = transform.position;
-        gizmoTr.position = transform.position;
+        gizmoTr.rotation = transform.rotation;
+
+        //C++ magic to determine the type that holds collider.info without if-else madness
+        std::visit([&](auto&& info) {updateGizmo(scene, gizmoTr, gizmoRender, info);}, collider.info);
     }
 
     //If an entry was not visited, we remove that entry.

@@ -22,6 +22,5 @@ END_HCOMPONENT()
 
 
 HCOMPONENT(MaterialDirtyTag)
-    HUGO::String materialName = "";
 END_HCOMPONENT()
 
