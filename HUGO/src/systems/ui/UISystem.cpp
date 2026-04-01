@@ -134,6 +134,8 @@ void UISystem::syncText(const TextComponent &t)
         t.colourBottom.y,
         t.colourBottom.z,
         t.colourBottom.w));
+    textArea->setTop(t.top);
+    textArea->setLeft(t.left);
 }
 
 void UISystem::syncButton(const ButtonComponent &button, PanelComponent &panel)
@@ -441,7 +443,6 @@ void UISystem::processInput()
     
         for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
         {
-            std::cout << "aaaaa\n";
             PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
             ButtonComponent& button = pack.getDeprecated<ButtonComponent&>();
 

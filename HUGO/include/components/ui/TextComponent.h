@@ -17,5 +17,8 @@ HCOMPONENT(TextComponent)
         
     // space width
     HUGO::Float spaceWidth = 0.03f;  
+
+    HUGO::Float left = 0.0f;
+    HUGO::Float top = 0.0f;
 END_HCOMPONENT()
 

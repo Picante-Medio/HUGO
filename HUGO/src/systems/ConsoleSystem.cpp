@@ -177,7 +177,8 @@ void ConsoleSystem::init(){
 
     TextComponent& text = scene->addAndGetComponent<TextComponent>(consoleInput);
     text.textAreaName = panel.containerName + "/Text";
-
+    text.left = 0.025f;
+    
     scene->addComponent<CreateTextDirtyTag>(consoleInput);
 
     InputFieldComponent& input = scene->addAndGetComponent<InputFieldComponent>(consoleInput);
@@ -197,6 +198,10 @@ void ConsoleSystem::init(){
     panel2.overlayName = "testCanvas/ConsoleTextTest";
     panel2.containerName = panel2.overlayName + "/Container";
     panel2.material = "UI/Knob";
+    panel2.width = 0.5f;
+    panel2.height =0.1f;
+    panel2.left =0.01f;
+    panel2.top =0.01f;
 
     scene->addComponent<CreatePanelDirtyTag>(consoleText);
 
