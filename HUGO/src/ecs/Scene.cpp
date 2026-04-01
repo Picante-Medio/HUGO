@@ -16,7 +16,6 @@
 #include "ComponentDenseTable.h"
 
 #include "ComponentFactory.h"
-#include "ComponentRegistry.h"
 #include "GameLibraryLoader.h"
 
 #include "StringUtils.h"

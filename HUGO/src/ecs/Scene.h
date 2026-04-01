@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <queue>
-#include <functional>
 
 #include "EcsTypes.h"
 #include "System.h"
@@ -36,7 +35,7 @@ public:
     void fixedUpdate(double dt);
 
     // Entity handling
-    EntityID createEntity();
+    EntityID createEntity() override;
 
     // LUA console stuff
     int createEntityLUA();
@@ -45,7 +44,7 @@ public:
 
     void removeComponentLUA(int entityID, std::string &componentName);
 
-    void removeEntity(EntityID entity);
+    void removeEntity(EntityID entity) override;
     void removeEntityLUA(int entity);
 
     void printEntity(int id);
@@ -57,7 +56,7 @@ public:
     ErrorOrType<HUGO::String> getNextError() override;
     ErrorOrType<HUGO::String> getNextLog() override;
 
-    void dispatchMessages();
+    void dispatchMessages() override;
 
-    std::shared_ptr<HUGO::IInput> getInput();
+    std::shared_ptr<HUGO::IInput> getInput() override;
 };
