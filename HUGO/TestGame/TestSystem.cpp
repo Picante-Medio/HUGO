@@ -88,13 +88,28 @@ TestSystem::init() {
     panel.metricsMode = HUGO::UIMetricsMode::GMM_PIXELS;
 
     scene->addComponent<CreatePanelDirtyTag>(boton);
-    // pn.overlayName = "testCanvas/ConsoleTextTest";
-    // pn.containerName = pn.overlayName + "/Container";
-    // pn.material = "UI/Test";
-    //ButtonComponent& bt = scene->addAndGetComponent<ButtonComponent>(boton);
+    
+    ButtonComponent& bt = scene->addAndGetComponent<ButtonComponent>(boton);
+    bt.onClickCallback = []() {
+        std::cout << "Button Clicked!" << std::endl;
+    };
+    bt.hoverMaterial = "UI/KnobHover";
+    bt.pressedMaterial = "UI/KnobPressed";
+    bt.normalMaterial = "UI/Knob";
+    panel.material = bt.normalMaterial;
 
-    // scene->addComponent<CreatePanelDirtyTag>(boton);
-    // //scene->addComponent<CreateButtonDirtyTag>(boton);
+    // EntityID boton2 = scene->createEntity();
+    // PanelComponent& panel2 = scene->addAndGetComponent<PanelComponent>(boton2);
+    // panel2.overlayName = "testCanvas/SimpleTest2";
+    // panel2.containerName = panel2.overlayName + "/Container";
+    // panel2.material = "UI/Knob";
+    // panel2.left = 200.0f;
+    // panel2.top = 50.0f;
+    // panel2.width = 256.0f;
+    // panel2.height = 64.0f;
+    // panel2.metricsMode = HUGO::UIMetricsMode::GMM_PIXELS;
+
+    // scene->addComponent<CreatePanelDirtyTag>(boton2);
 }
 
 

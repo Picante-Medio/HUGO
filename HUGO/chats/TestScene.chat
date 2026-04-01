@@ -11,3 +11,4 @@ SYSTEM PhysicsGizmoSystem
 SYSTEM TestSystem
 SYSTEM MessagesTestSystem
 SYSTEM EventTestSystem
+SYSTEM UISystem

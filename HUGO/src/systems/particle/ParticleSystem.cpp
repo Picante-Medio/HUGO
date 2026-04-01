@@ -61,7 +61,7 @@ void ParticleSystem::createParticleSystem(EntityID id, const HUGO::String& parti
 
 void ParticleSystem::processCreations() {
     for (auto& pack : scene->query<TransformComponent, ParticleEmitterComponent>()) {
-        const TransformComponent& tr = pack.getConst<TransformComponent&>();
+        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
         ParticleEmitterComponent& pe = pack.getDeprecated<ParticleEmitterComponent&>();
         createParticleSystem(tr.entity, pe.particleName, 
         pe, tr.position);

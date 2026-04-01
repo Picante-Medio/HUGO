@@ -157,7 +157,7 @@ void UISystem::syncButton(const ButtonComponent &button, PanelComponent &panel)
             panel.material = button.normalMaterial;
             break;
         }
-    scene->addComponent<PanelComponent>(button.entity);
+    scene->addComponent<PanelDirtyTag>(button.entity);
 }
 
 void UISystem::syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr)
@@ -300,7 +300,6 @@ ErrorOrVoid UISystem::processComponentCreations()
         scene->removeComponent<CreatePanelDirtyTag>(entity);
     }
     
-    
     for (auto &pack : scene->query<CreateTextDirtyTag, TextComponent, PanelComponent>())
     {
         TextComponent &text = pack.getDeprecated<TextComponent &>();
@@ -333,37 +332,6 @@ ErrorOrVoid UISystem::processComponentCreations()
         scene->removeComponent<CreateTextDirtyTag>(tag.entity);
     }
 
-    // for (auto &pack : scene->query<CreateInputFieldDirtyTag, InputFieldComponent, PanelComponent, TextComponent>())
-    // {
-    //     InputFieldComponent &inputfield = pack.get<InputFieldComponent &>();
-    //     CreateInputFieldDirtyTag &tag = pack.get<CreateInputFieldDirtyTag &>();
-    //     scene->removeComponent<CreateInputFieldDirtyTag>(tag.entity);
-    // }
-
-    for (auto &pack : scene->query<CreateButtonDirtyTag, ButtonComponent, PanelComponent>())
-    {
-        ButtonComponent &button = pack.getDeprecated<ButtonComponent &>();
-        PanelComponent &panel = pack.getDeprecated<PanelComponent &>();
-        CreateButtonDirtyTag &tag = pack.getDeprecated<CreateButtonDirtyTag &>();
-        switch (button.state)
-        {
-        case HUGO::ButtonStateTypes::BS_UP :
-            panel.material = button.normalMaterial;
-            break;
-        case HUGO::ButtonStateTypes::BS_DOWN :
-            panel.material = button.pressedMaterial;
-            break;
-        case HUGO::ButtonStateTypes::BS_OVER :
-            panel.material = button.hoverMaterial;
-            break;
-        default:
-            panel.material = button.normalMaterial;
-            break;
-        }
-
-        scene->addComponent<PanelDirtyTag>(button.entity);
-        scene->removeComponent<CreateButtonDirtyTag>(tag.entity);
-    }
     return ErrorOrVoid();
 }
 
@@ -461,24 +429,23 @@ void UISystem::processInput()
     }
 
     for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
+    {
+        PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
+        ButtonComponent& button = pack.getDeprecated<ButtonComponent&>();
+
+        HUGO::IInput::MouseRelativePosition mouse = input->getMouseRelativePosition();
+        bool isOver = isMouseOverPanel(panel, mouse.x, mouse.y);
+
+        if (isOver && button.state != HUGO::BS_DOWN)
         {
-            PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
-            ButtonComponent& button = pack.getDeprecated<ButtonComponent&>();
-
-            HUGO::IInput::MouseRelativePosition mouse = input->getMouseRelativePosition();
-            bool isOver = isMouseOverPanel(panel, mouse.x, mouse.y);
-
-            if (isOver && button.state != HUGO::BS_DOWN)
-            {
-                button.state = HUGO::BS_OVER;
-                scene->addComponent<ButtonDirtyTag>(button.entity);
-            }
-            else if (!isOver && button.state != HUGO::BS_UP && button.state != HUGO::BS_DOWN)
-            {
-                button.state = HUGO::BS_UP;
-                scene->addComponent<ButtonDirtyTag>(button.entity);
-            }
+            button.state = HUGO::BS_OVER;
         }
+        else if (!isOver && button.state != HUGO::BS_UP && button.state != HUGO::BS_DOWN)
+        {
+            button.state = HUGO::BS_UP;
+        }
+        scene->addComponent<ButtonDirtyTag>(button.entity);
+    }
 
     // process text for the active input field using SDL text buffer
     const HUGO::String& textInput = input->getTextInput();
