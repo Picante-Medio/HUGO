@@ -186,35 +186,29 @@ function(enable_warnings target)
     endif()
 endfunction()
 
-################################## Hugo Math
-add_library(HugoMath STATIC
-    ${CMAKE_SOURCE_DIR}/include/HugoMath/HugoMath.cpp)
-enable_warnings(HugoMath)
+################################## HugoLib
 
-set_target_properties(HugoMath PROPERTIES
+file(GLOB_RECURSE HUGOLIB_DIRS CONFIGURE_DEPENDS LIST_DIRECTORIES true ${CMAKE_SOURCE_DIR}/include/*)
+set(HUGOLIB_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include)
+
+foreach(path ${HUGOLIB_DIRS})
+    if(IS_DIRECTORY "${path}")
+        list(APPEND HUGOLIB_INCLUDE_DIRS "${path}")
+    endif()
+endforeach()
+
+file(GLOB_RECURSE HugoLib_SRC_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/include/*.cpp)
+
+add_library(HugoLib STATIC ${HugoLib_SRC_FILES})
+enable_warnings(HugoLib)
+
+set_target_properties(HugoLib PROPERTIES
     DEBUG_POSTFIX "d"
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
     ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/lib
     ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/lib)
 
-target_include_directories(HugoMath PUBLIC 
-    ${CMAKE_SOURCE_DIR}/include/HugoMath)
-
-################################## Messaging
-add_library(HugoMessages STATIC
-    ${CMAKE_SOURCE_DIR}/include/messages/Messenger.cpp
-    ${CMAKE_SOURCE_DIR}/include/messages/Channel.cpp)
-    
-enable_warnings(HugoMessages)
-
-set_target_properties(HugoMessages PROPERTIES
-    DEBUG_POSTFIX "d"
-    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
-    ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/lib
-    ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/lib)
-
-target_include_directories(HugoMessages PUBLIC 
-    ${CMAKE_SOURCE_DIR}/include/messages)
+target_include_directories(HugoLib PUBLIC ${HUGOLIB_INCLUDE_DIRS})
 
 ################################## Aquí empieza el proyecto principal
 
@@ -226,21 +220,12 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT $
 enable_warnings(${PROJECT_NAME})
 
 file(GLOB_RECURSE SRC_DIRS CONFIGURE_DEPENDS LIST_DIRECTORIES true ${CMAKE_SOURCE_DIR}/src/*)
-file(GLOB_RECURSE SDK_DIRS CONFIGURE_DEPENDS LIST_DIRECTORIES true ${CMAKE_SOURCE_DIR}/include/*)
 
 set(INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src)
 
 foreach(path ${SRC_DIRS})
     if(IS_DIRECTORY "${path}")
         list(APPEND INCLUDE_DIRS "${path}")
-    endif()
-endforeach()
-
-set(SDK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include)
-
-foreach(path ${SDK_DIRS})
-    if(IS_DIRECTORY "${path}")
-        list(APPEND SDK_INCLUDE_DIRS "${path}")
     endif()
 endforeach()
 
@@ -259,16 +244,14 @@ list(REMOVE_DUPLICATES SYSTEM_INCLUDE_DIRS)
 
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
-    ${INCLUDE_DIRS}
-    ${SDK_INCLUDE_DIRS})
+    ${INCLUDE_DIRS})
 
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE
     ${SYSTEM_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     ${HUGO_LINKED_LIBRARIES}
-    HugoMath
-    HugoMessages)
+    HugoLib)
 
 set(CMAKE_SKIP_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
@@ -314,12 +297,9 @@ set_target_properties(TestGame PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin
     LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin)
 
-target_include_directories(TestGame PRIVATE 
-    ${CMAKE_SOURCE_DIR}/TestGame
-    ${SDK_INCLUDE_DIRS})
+target_include_directories(TestGame PRIVATE ${CMAKE_SOURCE_DIR}/TestGame)
 
 target_link_libraries(TestGame PRIVATE
-    HugoMath
-    HugoMessages
+    HugoLib
     SDL2::SDL2
     SDL2::SDL2main)
