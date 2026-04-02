@@ -117,7 +117,9 @@ void PhysicsGizmoSystem::update(double){
 
             //If an error occured when creating the gizmo entity, current case is skipped
             if(newID.isError()) {
-                scene->log(std::make_shared<Error>(newID.getError()));
+                auto err = std::shared_ptr<StringError>();
+                err->errorMessage = newID.getError().errorMessage;
+                scene->log(std::shared_ptr<Error>(err));
                 continue;
             }
             m_gizmoEntities[transform.entity] = {newID.getValue(), false};
