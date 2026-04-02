@@ -14,6 +14,10 @@ public:
 
     void fixedUpdate(double dt);
 private:
+    /*
+        @param entityID Gizmo entity associated with physics collider
+        @param visited Wether or not this collider was visited this frame
+    */
     struct EntityVisited{
         EntityID entityID;
         bool visited;
