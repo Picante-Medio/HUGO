@@ -81,7 +81,6 @@ overlay testCanvas/SliderTest
         // fill 
         overlay_element testCanvas/SliderTest/Track Panel
         {
-            zorder 1
             metrics_mode relative
             left 0.0
             top 0.0
@@ -91,7 +90,6 @@ overlay testCanvas/SliderTest
         //knob
         overlay_element testCanvas/SliderTest/Knob Panel
         {
-            zorder 100
             metrics_mode relative
             left -0.1 
             top -0.25

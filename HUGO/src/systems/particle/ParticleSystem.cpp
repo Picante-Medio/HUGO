@@ -116,20 +116,78 @@ void ParticleSystem::destroyParticleSystem(EntityID id) {
 }
 
 void ParticleSystem::processChanges() {
-    
+    static float offset = 0.5f;
+    for (auto& pack : scene->query<TransformComponent, ParticleEmitterComponent>()) {
+        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
+        ParticleEmitterComponent& pe = pack.getDeprecated<ParticleEmitterComponent&>();
+        
+        // get the specific particle system
+        EntityID id = tr.entity;
+        auto it = activeParticleSystems.find(id);
+        if (it == activeParticleSystems.end()){
+            std::cout << "[Particle System]: couldn not find a particle system with entityID: " << id<<"\n";
+            continue;
+        }
+
+        ParticleInstance& instance = it->second;
+
+        if (!instance.node || !instance.ps) continue;
+
+        // transform
+        instance.node->setPosition(tr.position.x+offset, tr.position.y, tr.position.z);
+
+        // active and visibility
+        instance.ps->setVisible(pe.active);
+        instance.ps->setEmitting(pe.emitting);
+
+        // update emitter
+        if (instance.ps->getNumEmitters() > 0) {
+            Ogre::ParticleEmitter* e = instance.ps->getEmitter(0);
+
+            // direction
+            e->setDirection(Ogre::Vector3(
+                pe.direction.x,
+                pe.direction.y,
+                pe.direction.z
+            ));
+            // emission rate
+            e->setEmissionRate(pe.emissionRate);
+
+            // time to live
+            e->setTimeToLive(pe.timeToLive);
+
+            // velocity
+            e->setParticleVelocity(pe.velocityMin, pe.velocityMax);
+
+            // colour
+            e->setColour(Ogre::ColourValue(
+                pe.colour.x,
+                pe.colour.y,
+                pe.colour.z,
+                pe.colour.w
+            ));
+
+            // duration
+            e->setDuration(pe.duration);
+            
+        }
+
+        // quota amount
+        instance.ps->setParticleQuota(pe.quota);
+        // update pivot
+        instance.ps->setMaterialName(pe.pivot.material);
+        instance.ps->setDefaultWidth(pe.pivot.width);
+        instance.ps->setDefaultHeight(pe.pivot.height);
+        //sorting
+        instance.ps->setSortingEnabled(pe.sorted);
+
+    }
+    offset += 0.5f;
 }
 
 void ParticleSystem::fixedUpdate(double dt) {}
 
 void ParticleSystem::update(double dt) {
-    //processCreations();
+    processCreations();
     processChanges();
-
-    // for (auto& [entity, instance] : activeParticleSystems) {
-    //     auto& emitter = scene->getComponent<ParticleEmitterComponent>(entity);
-    //     if (instance.ps) {
-    //         instance.ps->setVisible(emitter.active);
-    //         instance.ps->setEmitting(emitter.emitting);
-    //     }
-    // }
 }

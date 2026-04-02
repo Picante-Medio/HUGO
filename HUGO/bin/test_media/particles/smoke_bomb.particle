@@ -1,11 +1,9 @@
 particle_system Particle/SmokeBomb
 {
-    material        UI/Knob
+    billboard_type  point
     particle_width  75
     particle_height 75
-    cull_each       true
     quota           300
-    billboard_type  point
     sorted          true
 
     emitter Point
@@ -20,6 +18,7 @@ particle_system Particle/SmokeBomb
         velocity_min 10
         velocity_max 20
         duration 0
+        
     }
 
     affector Rotator
