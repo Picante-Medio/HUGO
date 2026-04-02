@@ -121,17 +121,6 @@ void RenderSystem::onLoad(){
 #pragma region Tags
 void RenderSystem::handleTag()
 {
-    for(auto& pack : scene->query<CameraCreateDirtyTag, TransformComponent, CameraComponent>()) {
-        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
-        EntityID entity = tr.entity;
-        auto it = cameraMap.find(entity);
-        if (it == cameraMap.end()) {
-           registerCameraEntity(entity);
-        }
-        // eliminate the tag
-        scene->removeComponent<CameraCreateDirtyTag>(entity);
-    }
-
     for(auto& pack : scene->query<LightCreateDirtyTag, TransformComponent, LightComponent>()) {
         TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
         EntityID entity = tr.entity;
@@ -153,42 +142,6 @@ void RenderSystem::handleTag()
         // eliminate the tag
         scene->removeComponent<ViewportCreateDirtyTag>(entity);
     }
-
-    for(auto& pack : scene->query<CameraCreateDirtyTag, TransformComponent, CameraComponent>()) {
-        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
-        EntityID entity = tr.entity;
-        auto it = cameraMap.find(entity);
-        if (it == cameraMap.end()) {
-           registerCameraEntity(entity);
-        }
-        // eliminate the tag
-        scene->removeComponent<CameraCreateDirtyTag>(entity);
-    }
-
-    // Camera update
-    for(auto& pack : scene->query<CameraDirtyTag, TransformComponent, CameraComponent>()) {
-        CameraDirtyTag& tag = pack.getDeprecated<CameraDirtyTag&>();
-        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
-        CameraComponent& camera = pack.getDeprecated<CameraComponent&>();
-        EntityID entity = tag.entity;
-        
-        auto it = cameraMap.find(entity);
-        if (it != cameraMap.end()) {
-            //update node transform
-            it->second.node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.position));
-            it->second.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.rotation));
-            
-            // update projection parameters
-            if (camera.getProjectionType() == HUGO::ProjectionType::Perspective) {
-                it->second.ogreCamera->setFOVy(Ogre::Degree(camera.getFOVY()));
-            }
-            it->second.ogreCamera->setNearClipDistance(camera.getNearClip());
-            it->second.ogreCamera->setFarClipDistance(camera.getFarClip());
-        }
-        // eliminate the tag
-        scene->removeComponent<CameraDirtyTag>(entity);
-    }
-
     // Light update
     for(auto&pack : scene->query<LightDirtyTag, LightComponent, TransformComponent>()){
         LightDirtyTag& tag = pack.getDeprecated<LightDirtyTag&>();
@@ -404,6 +357,29 @@ void RenderSystem::update(double dt)
         obj.ogreSceneNode->setScale(HUGO::OgreUtils::vector3ToOgre(tr.getWorldScale()));
     }
 
+    // Camera update
+    for(auto& pack : scene->query<TransformComponent, CameraComponent>()) {
+        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
+        CameraComponent& camera = pack.getDeprecated<CameraComponent&>();
+        
+        auto it = cameraMap.find(camera.entity);
+        if (it == cameraMap.end()) {
+            registerCameraEntity(camera.entity);
+        }
+        else{
+            //update node transform
+            it->second.node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.position));
+            it->second.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.rotation));
+            
+            // update projection parameters
+            if (camera.getProjectionType() == HUGO::ProjectionType::Perspective) {
+                it->second.ogreCamera->setFOVy(Ogre::Degree(camera.getFOVY()));
+            }
+            it->second.ogreCamera->setNearClipDistance(camera.getNearClip());
+            it->second.ogreCamera->setFarClipDistance(camera.getFarClip());
+        }
+    }
+
     // changes in window
     std::shared_ptr<HUGO::IInput> input = scene->getInput();
 
@@ -608,9 +584,7 @@ ErrorOrVoid RenderSystem::createOgreCamera(EntityID entity)
     res.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(transformComp->rotation));
     
     cameraMap[entity] = res;
-    
-    // Añadir tag para sincronización futura
-    scene->addComponent<CameraDirtyTag>(entity);
+
     return ErrorOrVoid();
 }
 // ==================== Create Ogre Light ====================
