@@ -7,6 +7,8 @@
 // las predeclaraciones los usings no aplican y hay que poner todo el namespace, se podría hacer
 // metiendo la macro pero me parece poco cómodo. Meted el include y palante
 #include "OgreRoot.h"
+#include <unordered_map>
+#include "HugoTypes.h"
 
 namespace Ogre{
     class OverlaySystem;
@@ -29,9 +31,24 @@ class OgreModule{
     
     //Initializes Ogre Singletons and SDL window
     OgreModule();
+
+    std::unordered_map<HUGO::String, Ogre::SceneManager*> m_sceneManagers;
+
+    Ogre::SceneManager* m_currentSceneManager;
 public:
 
     static OgreModule& Instance();
+
+    //Sets the current sceneManager that scene systems will use
+    void setCurrentSceneManager(HUGO::String sceneName);
+
+    //Loads a sceneManager into memory. 
+    void createSceneManager(HUGO::String sceneName);
+
+    //Destroys a sceneManager. It will unload all of Ogres resources being used by it.
+    void destroySceneManager(HUGO::String sceneName);
+
+    Ogre::SceneManager* getCurrentSceneManager();
 
     //Destroys Ogre Singletons and removes SDL window
     ~OgreModule();

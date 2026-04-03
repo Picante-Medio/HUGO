@@ -6,8 +6,11 @@
 #include "ComponentRegistry.h"
 #include "IPhysicsModule.h"
 #include "IInput.h"
+#include "OgreModule.h"
 
 #include "GameLibraryLoader.h"
+
+using namespace HUGO;
 
 SceneManager::SceneManager(std::shared_ptr<HUGO::IInput> inputModule): m_chatParser(), m_sceneMap(), m_input(inputModule) {
 }
@@ -26,6 +29,10 @@ ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
     ErrorOrType<HUGO::SceneData> sceneData = m_chatParser.getSceneData(sceneName);
 
     if(sceneData.isError()) return ErrorOrVoid(StringError{"Error loading scene: " + sceneData.getError().errorMessage});
+
+    //Create sceneManager from OgreModule
+
+    OgreModule::Instance().createSceneManager(sceneName);
 
     /*
     -> Create scene
@@ -81,6 +88,10 @@ ErrorOrVoid SceneManager::unloadScene(const HUGO::String& sceneName){
 
     m_sceneMap.erase(sceneName);
 
+
+    //Destroy sceneManager associated with scene as it is unloaded
+    OgreModule::Instance().destroySceneManager(sceneName);
+
     return ErrorOrVoid();
 }
 
@@ -89,18 +100,30 @@ void SceneManager::setCurrentSceneLUA(const HUGO::String sceneName){
 }
 
 void SceneManager::setCurrentScene(const HUGO::String& sceneName){
+    needsSceneChanged = true;
+    nextSceneName = sceneName;
+}
+
+void SceneManager::sceneChangeRequested(){
+    //If not requested, return.
+    if(!needsSceneChanged) return;
+    needsSceneChanged = false;
 
     //If requested scene is not loaded in the map, load it
-    if(m_sceneMap.find(sceneName) == m_sceneMap.end()){
-        ErrorOrVoid err = loadScene(sceneName);
+    if(m_sceneMap.find(nextSceneName) == m_sceneMap.end()){
+        ErrorOrVoid err = loadScene(nextSceneName);
 
         //Print error in lua console
         if(err.isError()){
             /* It should call Lua console to show the error */
+            m_currentScene->log(std::shared_ptr<Error>(new StringError(err.getError())));
         }
     }
 
-    m_currentScene = m_sceneMap[sceneName];
+    //Sets current sceneManager for the new one.
+    OgreModule::Instance().setCurrentSceneManager(nextSceneName);
+
+    m_currentScene = m_sceneMap[nextSceneName];
     
     m_currentScene->load();
 }

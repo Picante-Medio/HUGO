@@ -104,6 +104,30 @@ OgreModule::~OgreModule(){
     SDL_Quit();
 }
 
+void OgreModule::setCurrentSceneManager(HUGO::String sceneName){
+
+    //If requested sceneManager was not created, we create it
+    if(m_sceneManagers.find(sceneName) == m_sceneManagers.end()){
+        createSceneManager(sceneName);
+    }
+
+    m_currentSceneManager = m_sceneManagers[sceneName];
+}
+
+Ogre::SceneManager* OgreModule::getCurrentSceneManager(){
+    return m_currentSceneManager;
+}
+
+void OgreModule::createSceneManager(HUGO::String sceneName){
+    if(m_sceneManagers.find(sceneName) == m_sceneManagers.end())
+        m_sceneManagers[sceneName] = m_ogreRoot->createSceneManager();
+}
+
+void OgreModule::destroySceneManager(HUGO::String sceneName){
+    if (m_sceneManagers[sceneName] == m_currentSceneManager) m_currentSceneManager = nullptr;
+    m_ogreRoot->destroySceneManager(m_sceneManagers[sceneName]);
+}
+
 Ogre::RenderWindow* OgreModule::getOgreRenderWindow() const
 {
     return m_ogreRenderWindow;

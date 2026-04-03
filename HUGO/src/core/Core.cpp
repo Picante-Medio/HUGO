@@ -97,6 +97,9 @@ void Core::run(){
         if(input->isQuitPressed()) {
             exit = true;
         }
+
+        sceneManager.sceneChangeRequested();
+
         sceneManager.fixedUpdateCurrentScene(startTime);
         physicsModule->performSimulations(startTime);
         sceneManager.updateCurrentScene(startTime);
