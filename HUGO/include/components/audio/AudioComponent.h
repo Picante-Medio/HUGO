@@ -14,7 +14,7 @@ HCOMPONENT(AudioComponent)
     bool playOnStart = false;
     HUGO::Float pitch = 1.0f; 
     // position of the audio in seconds to start to play
-    double startTime=0.0;
+    double startTime=-1.0;
 
     ma_sound* activePtr = nullptr;
     // flag to know if this sound is playing or not
