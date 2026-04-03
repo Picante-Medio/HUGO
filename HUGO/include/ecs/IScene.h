@@ -66,13 +66,8 @@ public:
 
 	template <typename T>
 	T& addAndGetComponent(EntityID entity) {
-		// Creating the component
-		T component(entity);
-		ComponentID id = HUGO::ComponentRegistry::getComponentId<T>();
-
-		// Adding the component
-		DenseListIndex index = componentTable->addComponent(component, entity);
-		entityTable->registerComponent(entity, id, index);
+		
+		addComponent<T>(entity);
 
 		return getComponent<T>(entity);
 	}
