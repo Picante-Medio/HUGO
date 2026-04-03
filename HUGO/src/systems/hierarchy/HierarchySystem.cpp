@@ -15,9 +15,18 @@ HierarchySystem::onLoad(){}
 
 void 
 HierarchySystem::addChildToParent(EntityID child, EntityID parent){
-    std::unordered_set<EntityID>& children = scene->hasComponent<ChildrenComponent>(parent)? 
-    scene->getComponent<ChildrenComponent>(parent).children : scene->addAndGetComponent<ChildrenComponent>(parent).children;
-    children.insert(child);
+
+    if (!scene->hasComponent<ChildrenComponent>(parent)) {
+
+        scene->addComponent<ChildrenComponent>(parent, [child](ChildrenComponent& childrenComponent) {
+            childrenComponent.children.insert(child);
+        });
+    }
+    else {
+        scene->modifyComponent<ChildrenComponent>(parent, [child](ChildrenComponent& childrenComponent) {
+            childrenComponent.children.insert(child);
+        });
+    }
 }
 
 void 
@@ -31,13 +40,17 @@ HierarchySystem::removeChildFromParent(EntityID child, EntityID parent){
 
 void 
 HierarchySystem::addParentToChild(EntityID child, EntityID parent){
-    if(scene->hasComponent<ParentComponent>(child)){
-        ParentComponent& parentComp =scene->getComponent<ParentComponent>(child);
-        parentComp.previousParent = parentComp.parent;
-        parentComp.parent = parent;
+
+    if (scene->hasComponent<ParentComponent>(child)) {
+        scene->addComponent<ParentComponent>(child, [parent](ParentComponent& parentComp){
+            parentComp.previousParent = parentComp.parent;
+            parentComp.parent = parent;
+        });
     }
-    else{
-        scene->addAndGetComponent<ParentComponent>(child).parent = parent;
+    else {
+        scene->addComponent<ParentComponent>(child, [parent](ParentComponent& parentComp){
+            parentComp.parent = parent;
+        });
     }
 }
 void 
