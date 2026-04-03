@@ -536,8 +536,9 @@ void AudioSystem::update(double dt)
             sc.pitch = 0.75f;
             sc.startTime = 10.0;
 
-            AudioDirtyTag& tag = scene->addAndGetComponent<AudioDirtyTag>(id);
-            tag.flags = static_cast<HUGO::AudioDirtyFlags>(HUGO::PITCH | HUGO::STARTTIME);
+            scene->addComponent<AudioDirtyTag>(id, [](AudioDirtyTag& tag){
+                tag.flags = static_cast<HUGO::AudioDirtyFlags>(HUGO::PITCH | HUGO::STARTTIME);
+            });
             scene->addComponent<AudioPlayTag>(id);
 
             startTriggered = true;
@@ -569,9 +570,11 @@ void AudioSystem::init(){
 void AudioSystem::createTestEntity()
 {
     EntityID ent = scene->createEntity();
-    AudioComponent& audio = scene->addAndGetComponent<AudioComponent>(ent);
-    audio.type = HUGO::MUSIC;
-    audio.audioId = nameToID["bgm"];
+
+    scene->addComponent<AudioComponent>(ent, [this](AudioComponent& audio){
+        audio.type = HUGO::MUSIC;
+        audio.audioId = nameToID["bgm"];
+    });
     
     scene->addComponent<AudioPlayTag>(ent);
     int i = 0;
@@ -583,12 +586,14 @@ void AudioSystem::createTestEntity()
             sc.pitch = 2.0f;
             sc.startTime = 30.0;
             sc.volume = 0.1f;
-            AudioDirtyTag& tag = scene->addAndGetComponent<AudioDirtyTag>(ent);
-            tag.flags = static_cast<HUGO::AudioDirtyFlags>(
-                            HUGO::AudioDirtyFlags::LOOP |
-                            HUGO::AudioDirtyFlags::PITCH |
-                            HUGO::AudioDirtyFlags::STARTTIME |
-                            HUGO::AudioDirtyFlags::VOLUME);
+
+            scene->addComponent<AudioDirtyTag>(ent, [](AudioDirtyTag& tag){
+                tag.flags = static_cast<HUGO::AudioDirtyFlags>(
+                                HUGO::AudioDirtyFlags::LOOP |
+                                HUGO::AudioDirtyFlags::PITCH |
+                                HUGO::AudioDirtyFlags::STARTTIME |
+                                HUGO::AudioDirtyFlags::VOLUME);
+            });
             scene->addComponent<AudioPlayTag>(ent);
         }
     }
