@@ -1,6 +1,11 @@
 #pragma once
 
 #include <unordered_map>
+#include <string>
+#include <memory>
+#include <stdexcept>
+#include <vector>
+
 #include "EcsTypes.h"
 
 namespace HUGO {

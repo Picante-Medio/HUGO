@@ -30,9 +30,9 @@ Scene::Scene(std::shared_ptr<HUGO::IInput> input) : input(input) {
 
 //Load method is called when the scene is loaded so LUA methods are overwritten
 void Scene::load() {
-	LuaBinder& luaBinder = LuaBinder::Instance();
-	luaBinder.registerMethod<Scene, void, int>(*this, &Scene::removeEntityLUA, "RemoveEntity");
-	luaBinder.registerMethod<Scene, int>(*this, &Scene::createEntityLUA, "CreateEntity");
+    std::shared_ptr<LuaBinder> luaBinder = LuaBinder::getInstance();
+	luaBinder->registerMethod<Scene, void, int>(*this, &Scene::removeEntityLUA, "RemoveEntity");
+	luaBinder->registerMethod<Scene, int>(*this, &Scene::createEntityLUA, "CreateEntity");
 
 	for(std::shared_ptr<HUGO::System> system : systems) {
 		system->onLoad();

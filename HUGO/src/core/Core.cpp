@@ -88,8 +88,6 @@ void HUGO::Core::initModules()
 void Core::run(){
   bool exit = false;
 
-  auto pathOrError = LuaBinder::Instance().runFile("pathTest.lua");
-
 	while (!exit) {
         vt.update();
 
@@ -120,10 +118,12 @@ void Core::run(){
 void 
 Core::initLua() {
     //LuaBinder init
-    LuaBinder& luaBinder = LuaBinder::Instance();
-    luaBinder.Init();
+    std::shared_ptr<LuaBinder> instance = std::make_shared<LuaBinder>();
+    instance->Init();
+    LuaBinder::setInstance(instance);
+
     std::filesystem::path luaPath = std::filesystem::absolute(
         std::filesystem::path("..") / "src" / "lua" / "scripts"
     );
-    luaBinder.requireFolder(luaPath.string());
+    LuaBinder::getInstance()->requireFolder(luaPath.string());
 }

@@ -9,6 +9,7 @@
 #include <lauxlib.h>
 
 #include <luaconf.h>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -67,6 +68,9 @@ class LuaBinder {
     lua_State* lua;
     HUGO::String basePath = "";
 
+    // Stores the instance to LuaBinder
+    inline static std::shared_ptr<LuaBinder> instance = nullptr;
+
     // private functions that relates a given lua name to a function pointer call
     template<typename ReturnType, typename ...ArgTypes, std::size_t... I>
     static int callLuaFunc(lua_State* lua, ReturnType(*func)(ArgTypes...), std::index_sequence<I...>) {
@@ -96,11 +100,15 @@ class LuaBinder {
 
     void setLuaPath(HUGO::String path);
 public:
-    static LuaBinder &Instance();
+
+    LuaBinder() = default;
     ~LuaBinder();
+
+    static std::shared_ptr<LuaBinder> getInstance();
+    static void setInstance(std::shared_ptr<LuaBinder>);
+
     //Init must be called before using lua
     void Init();
-
 
     void setScriptPath(HUGO::String path);
     void setPrintFunction(lua_CFunction nPrint);

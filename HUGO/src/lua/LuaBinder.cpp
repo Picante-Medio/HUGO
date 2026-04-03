@@ -1,16 +1,21 @@
 #include "LuaBinder.h"
+
+#include <filesystem>
+
 #include "HugoError.h"
 #include "HugoTypes.h"
 
-#include <filesystem>
-#include <iostream>
+LuaBinder::~LuaBinder() { lua_close(lua); }
 
-LuaBinder &LuaBinder::Instance() {
-  static LuaBinder instance;
-  return instance;
+void 
+LuaBinder::setInstance(std::shared_ptr<LuaBinder> newInstance) {
+    instance = newInstance;
 }
 
-LuaBinder::~LuaBinder() { lua_close(lua); }
+std::shared_ptr<LuaBinder> 
+LuaBinder::getInstance() {
+    return instance;
+}
 
 void LuaBinder::Init() {
   lua = luaL_newstate();

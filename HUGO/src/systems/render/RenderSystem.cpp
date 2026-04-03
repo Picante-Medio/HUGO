@@ -113,8 +113,7 @@ void RenderSystem::init(){
 
 #pragma region SystemLoad
 void RenderSystem::onLoad(){
-    LuaBinder& luaBinder = LuaBinder::Instance();
-    luaBinder.registerMethod<RenderSystem, void, float, float, float>(*this, &RenderSystem::setAmbientLight, "SetAmbientLight");
+    LuaBinder::getInstance()->registerMethod<RenderSystem, void, float, float, float>(*this, &RenderSystem::setAmbientLight, "SetAmbientLight");
 }
 #pragma endregion
 

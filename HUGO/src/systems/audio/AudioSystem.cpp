@@ -13,6 +13,7 @@
 #include "MiniaudioModule.h"
 
 #include <fstream>
+#include <memory>
 #include <sstream>
 
 ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id)
@@ -551,9 +552,9 @@ void AudioSystem::fixedUpdate(double)
 }
 
 void AudioSystem::onLoad(){
-    LuaBinder& luaBinder = LuaBinder::Instance();
-    luaBinder.registerMethod<AudioSystem, void, int>(*this, &AudioSystem::playAudioLUA, "playAudio");
-    luaBinder.registerMethod<AudioSystem, ErrorOrVoid, HUGO::String>(*this, &AudioSystem::loadAudiosFromFile, "loadAudiosFromFile");
+    std::shared_ptr<LuaBinder> luaBinder = LuaBinder::getInstance();
+    luaBinder->registerMethod<AudioSystem, void, int>(*this, &AudioSystem::playAudioLUA, "playAudio");
+    luaBinder->registerMethod<AudioSystem, ErrorOrVoid, HUGO::String>(*this, &AudioSystem::loadAudiosFromFile, "loadAudiosFromFile");
 }
 
 void AudioSystem::init(){
