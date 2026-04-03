@@ -667,35 +667,44 @@ void UISystem::fixedUpdate(double) {}
 // TEST UI
 //====================================================
 
-EntityID UISystem::createPanel(const HUGO::String& overlayName)
+EntityID 
+UISystem::createPanel(const HUGO::String& overlayName)
 {
     EntityID ent = scene->createEntity();
-    PanelComponent& panel = scene->addAndGetComponent<PanelComponent>(ent);
 
-    // assign names
-    panel.overlayName = overlayName;
-    panel.containerName = overlayName + "/Container";
+    EntityID returnVal = 0;
 
-    // create cache
-    std::shared_ptr<UIElementCache> cache = createElementCache(ent, panel.overlayName, panel.containerName);
-    Ogre::OverlayContainer* container = cache->container;
+    scene->addComponent<PanelComponent>(ent, [&overlayName, &returnVal, this](PanelComponent& panel) {
 
-    if (!container)
-        return 0;
+        // assign names
+        panel.overlayName = overlayName;
+        panel.containerName = overlayName + "/Container";
 
-    // initialize panel from OGRE values
-    panel.left   = container->getLeft();
-    panel.top    = container->getTop();
-    panel.width  = container->getWidth();
-    panel.height = container->getHeight();
+        // create cache
+        std::shared_ptr<UIElementCache> cache = createElementCache(panel.entity, panel.overlayName, panel.containerName);
+        Ogre::OverlayContainer* container = cache->container;
 
-    panel.metricsMode = HUGO::OgreUtils::toHugo(container->getMetricsMode());
-    // panel.alignmentX  = HUGO::OgreUtils::toHugo(container->getHorizontalAlignment());
-    // panel.alignmentY  = HUGO::OgreUtils::toHugo(container->getVerticalAlignment());
+        // This is the same as the previous way with add_And_Get_Component (underscores to be unindexed by f&r) 
+        //that returned 0 if container was nullptr but is managed via setting returnVal (reference)
+        if (container) {
+            // initialize panel from OGRE values
+            panel.left   = container->getLeft();
+            panel.top    = container->getTop();
+            panel.width  = container->getWidth();
+            panel.height = container->getHeight();
 
-    panel.isVisible = true;
-    panel.material = "test/UI";
-    return ent;
+            panel.metricsMode = HUGO::OgreUtils::toHugo(container->getMetricsMode());
+            // panel.alignmentX  = HUGO::OgreUtils::toHugo(container->getHorizontalAlignment());
+            // panel.alignmentY  = HUGO::OgreUtils::toHugo(container->getVerticalAlignment());
+
+            panel.isVisible = true;
+            panel.material = "test/UI";
+
+            returnVal = panel.entity; // In the previous way this was -> return ent;
+        }
+    });
+
+    return returnVal;
 }
 
 EntityID UISystem::createButton()
@@ -709,138 +718,175 @@ EntityID UISystem::createText(const HUGO::String& overlayName)
 {
     EntityID ent = createPanel(overlayName);
 
-    PanelComponent& panel = scene->getComponent<PanelComponent>(ent);
-    TextComponent& text   = scene->addAndGetComponent<TextComponent>(ent);
+    // Same methodology as in createPanel
+    EntityID returnVal = 0;
 
-    text.textAreaName = panel.containerName + "/Text";
+    scene->addComponent<TextComponent>(ent, [&returnVal, this](TextComponent& text){
+        
+        PanelComponent& panel = scene->getComponent<PanelComponent>(text.entity);
+        text.textAreaName = panel.containerName + "/Text";
+        
+        UIElementCache* cache = getCache(text.entity);
 
-    UIElementCache* cache = getCache(ent);
+        ErrorOrType<Ogre::OverlayElement*> elementResult = HUGO::OgreOverlayUtils::getElement(text.textAreaName);
+        if (!elementResult.isError())
+            cache->element = elementResult.getValue();
 
-    ErrorOrType<Ogre::OverlayElement*> elementResult = HUGO::OgreOverlayUtils::getElement(text.textAreaName);
-    if (!elementResult.isError())
-        cache->element = elementResult.getValue();
+        Ogre::TextAreaOverlayElement* area = dynamic_cast<Ogre::TextAreaOverlayElement*>(cache->element);
 
-    Ogre::TextAreaOverlayElement* area = dynamic_cast<Ogre::TextAreaOverlayElement*>(cache->element);
-    if (!area)
-        return 0;
+        if (area) {
+            // initialize from OGRE
+            text.text = area->getCaption();
+            text.characterHeight = area->getCharHeight();
 
-    // initialize from OGRE
-    text.text = area->getCaption();
-    text.characterHeight = area->getCharHeight();
+            const Ogre::ColourValue& c  = area->getColour();
+            const Ogre::ColourValue& ct = area->getColourTop();
+            const Ogre::ColourValue& cb = area->getColourBottom();
 
-    const Ogre::ColourValue& c  = area->getColour();
-    const Ogre::ColourValue& ct = area->getColourTop();
-    const Ogre::ColourValue& cb = area->getColourBottom();
+            text.colour       = {c.r,  c.g,  c.b,  c.a};
+            text.colourTop    = {ct.r, ct.g, ct.b, ct.a};
+            text.colourBottom = {cb.r, cb.g, cb.b, cb.a};
 
-    text.colour       = {c.r,  c.g,  c.b,  c.a};
-    text.colourTop    = {ct.r, ct.g, ct.b, ct.a};
-    text.colourBottom = {cb.r, cb.g, cb.b, cb.a};
+            returnVal = text.entity;
+        }
+    });
 
-    return ent;
+    return returnVal;
 }
 
 EntityID UISystem::createProgressBar(const HUGO::String& overlayName)
 {
     EntityID ent = scene->createEntity();
 
-    PanelComponent& panel = scene->addAndGetComponent<PanelComponent>(ent);
-    ProgressBarComponent& pr = scene->addAndGetComponent<ProgressBarComponent>(ent);
+    std::string progressFillElementName = overlayName + "/Fill";
 
-    // assign names
-    panel.overlayName = overlayName;
-    panel.containerName = overlayName + "/Background";
-    pr.fillElementName = overlayName + "/Fill";
-    pr.fillMode = HUGO::ProgressBarFillMode::HORIZONTAL_LEFT_TO_RIGHT;
-    // create cache
-    std::shared_ptr<UIElementCache> cache = createElementCache(ent, 
-        panel.overlayName, panel.containerName, pr.fillElementName);
+    EntityID returnVal = 0;
+    std::shared_ptr<UIElementCache> cache;
 
-    if (!cache || !cache->container || !cache->element)
-        return 0;
+    scene->addComponent<PanelComponent>(ent, [&overlayName, &progressFillElementName, &returnVal, &cache, this]
+        (PanelComponent& panel){
+        // assign names
+        panel.overlayName = overlayName;
+        panel.containerName = overlayName + "/Background";
 
-    // initialize background from OGRE
-    panel.left   = cache->container->getLeft();
-    panel.top    = cache->container->getTop();
-    panel.width  = cache->container->getWidth();
-    panel.height = cache->container->getHeight();
+        // create cache
+        cache = createElementCache(panel.entity, 
+            panel.overlayName, panel.containerName, progressFillElementName);
 
-    panel.metricsMode = HUGO::OgreUtils::toHugo(cache->container->getMetricsMode());
-    // panel.alignmentX  = HUGO::OgreUtils::toHugo(cache->container->getHorizontalAlignment());
-    // panel.alignmentY  = HUGO::OgreUtils::toHugo(cache->container->getVerticalAlignment());
+        if (cache && cache->container && cache->element) {
+            // initialize background from OGRE
+            panel.left   = cache->container->getLeft();
+            panel.top    = cache->container->getTop();
+            panel.width  = cache->container->getWidth();
+            panel.height = cache->container->getHeight();
 
-    panel.isVisible = true;
+            panel.metricsMode = HUGO::OgreUtils::toHugo(cache->container->getMetricsMode());
+            // panel.alignmentX  = HUGO::OgreUtils::toHugo(cache->container->getHorizontalAlignment());
+            // panel.alignmentY  = HUGO::OgreUtils::toHugo(cache->container->getVerticalAlignment());
 
-    // initialize progress bar defaults
-    pr.currentValue = pr.minValue;
+            panel.isVisible = true;
+            panel.material = "UI/Test";
 
-    // materials
-    panel.material = "UI/Test";
-    pr.fillMaterial = "UI/Test2";
-    
-    pr.fillWidth = cache->element->getWidth();
-    pr.fillHeight = cache->element->getHeight();
+            returnVal = panel.entity;
+        }
+    });
 
-    return ent;
+    scene->addComponent<ProgressBarComponent>(ent, [&progressFillElementName, &cache, returnVal](ProgressBarComponent& pr){
+        pr.fillElementName = progressFillElementName;
+        pr.fillMode = HUGO::ProgressBarFillMode::HORIZONTAL_LEFT_TO_RIGHT;
+
+        // In the previous implementation this was after the return 0, so this should be in this conditional
+        if (returnVal != 0) {
+            // initialize progress bar defaults
+            pr.currentValue = pr.minValue;
+
+            // materials
+            pr.fillMaterial = "UI/Test2";
+            
+            pr.fillWidth = cache->element->getWidth();
+            pr.fillHeight = cache->element->getHeight();
+        }
+    });
+
+    return returnVal;
 }
 
 EntityID UISystem::createSlider(const HUGO::String& overlayName)
 {
     EntityID ent = scene->createEntity();
 
-    PanelComponent& panel   = scene->addAndGetComponent<PanelComponent>(ent);
-    SliderComponent& slider = scene->addAndGetComponent<SliderComponent>(ent);
 
-    // names
-    panel.overlayName = overlayName;
-    panel.containerName = overlayName + "/Background"; // container
-    slider.trackElementName = overlayName + "/Track"; // track
-    slider.knobElementName = overlayName + "/Knob"; // knob
+    std::string sliderTackElementName = overlayName + "/Track";
+    std::string sliderKnobElementName = overlayName + "/Knob";
 
-    slider.orientation = HUGO::SliderOrientation::HORIZONTAL;
-
-    // create slider cache
     std::shared_ptr<UISliderCache> cache = std::make_shared<UISliderCache>();
-    uiCache[ent] = cache;
 
-    // get overlay and container (background)
-    ErrorOrType<Ogre::Overlay*> overlayResult = HUGO::OgreOverlayUtils::getOverlay(panel.overlayName);
-    if (!overlayResult.isError()) cache->overlay = overlayResult.getValue();
+    EntityID returnVal = 0;
 
-    ErrorOrType<Ogre::OverlayContainer*> containerResult = HUGO::OgreOverlayUtils::getContainer(panel.containerName, cache->overlay);
-    if (!containerResult.isError()) cache->container = containerResult.getValue();
+    scene->addComponent<PanelComponent>(ent, [&overlayName, &sliderTackElementName, &sliderKnobElementName, &cache, &returnVal, this](PanelComponent& panel){
+        // names
+        panel.overlayName = overlayName;
+        panel.containerName = overlayName + "/Background"; // container
 
-    // get track
-    ErrorOrType<Ogre::OverlayElement*> trackResult = HUGO::OgreOverlayUtils::getElement(slider.trackElementName);
-    if (!trackResult.isError()) cache->element = trackResult.getValue();
-    // get knob
-    ErrorOrType<Ogre::OverlayContainer*> knobContainerResult = HUGO::OgreOverlayUtils::getContainer(slider.knobElementName, cache->overlay);
-    if (!knobContainerResult.isError()) cache->knob = knobContainerResult.getValue();
+        // create slider cache
+        uiCache[panel.entity] = cache;
 
-    if (!cache->container || !cache->element || !cache->knob) return 0;
+        // get overlay and container (background)
+        ErrorOrType<Ogre::Overlay*> overlayResult = HUGO::OgreOverlayUtils::getOverlay(panel.overlayName);
+        if (!overlayResult.isError()) cache->overlay = overlayResult.getValue();
 
-    // initialize size and position of the background
-    panel.left = cache->container->getLeft();
-    panel.top = cache->container->getTop();
-    panel.width = cache->container->getWidth();
-    panel.height = cache->container->getHeight();
-    panel.metricsMode = HUGO::OgreUtils::toHugo(cache->container->getMetricsMode());
-    // panel.alignmentX  = HUGO::OgreUtils::toHugo(cache->container->getHorizontalAlignment());
-    // panel.alignmentY  = HUGO::OgreUtils::toHugo(cache->container->getVerticalAlignment());
+        ErrorOrType<Ogre::OverlayContainer*> containerResult = HUGO::OgreOverlayUtils::getContainer(panel.containerName, cache->overlay);
+        if (!containerResult.isError()) cache->container = containerResult.getValue();
 
-    panel.isVisible = true;
+        // get track
+        ErrorOrType<Ogre::OverlayElement*> trackResult = HUGO::OgreOverlayUtils::getElement(sliderTackElementName);
+        if (!trackResult.isError()) cache->element = trackResult.getValue();
+
+        // get knob
+        ErrorOrType<Ogre::OverlayContainer*> knobContainerResult = HUGO::OgreOverlayUtils::getContainer(sliderKnobElementName, cache->overlay);
+        if (!knobContainerResult.isError()) cache->knob = knobContainerResult.getValue();
+
+        if (cache->container && cache->element && cache->knob) {
+            // initialize size and position of the background
+            panel.left = cache->container->getLeft();
+            panel.top = cache->container->getTop();
+            panel.width = cache->container->getWidth();
+            panel.height = cache->container->getHeight();
+            panel.metricsMode = HUGO::OgreUtils::toHugo(cache->container->getMetricsMode());
+            // panel.alignmentX  = HUGO::OgreUtils::toHugo(cache->container->getHorizontalAlignment());
+            // panel.alignmentY  = HUGO::OgreUtils::toHugo(cache->container->getVerticalAlignment());
+
+            panel.isVisible = true;
+            
+            panel.material = "UI/Background";
+
+            returnVal = panel.entity;
+        }
+    });
     
-    panel.material = "UI/Background";
-    
-    // initialize slider 
-    slider.knobWidth = cache->knob->getWidth() * panel.width;
-    slider.knobHeight = cache->knob->getHeight() * panel.height;
-    
-    slider.currentValue = slider.minValue;
-    
-    // materials and colors
-    //to use colors, the material fields must be blank.
-    slider.trackMaterial = "UI/Track";
-    slider.knobMaterial = "UI/Knob"; 
+    scene->addComponent<SliderComponent>(ent, [&sliderTackElementName, &sliderKnobElementName, &cache, returnVal, this](SliderComponent& slider){
+        
+        slider.trackElementName = sliderTackElementName; // track
+        slider.knobElementName = sliderKnobElementName; // knob
 
-    return ent;
+        slider.orientation = HUGO::SliderOrientation::HORIZONTAL;
+
+        PanelComponent& panel = scene->getComponent<PanelComponent>(slider.entity);
+
+        // In the previous implementation this was after the return 0, so this should be in this conditional
+        if (returnVal != 0) {
+            // initialize slider 
+            slider.knobWidth = cache->knob->getWidth() * panel.width;
+            slider.knobHeight = cache->knob->getHeight() * panel.height;
+            
+            slider.currentValue = slider.minValue;
+            
+            // materials and colors
+            //to use colors, the material fields must be blank.
+            slider.trackMaterial = "UI/Track";
+            slider.knobMaterial = "UI/Knob"; 
+        }
+    });
+
+    return returnVal;
 }
