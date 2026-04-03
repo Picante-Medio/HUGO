@@ -121,7 +121,6 @@ void ConsoleSystem::handleKeyInput(){
     if(scene->getInput()->isKeyPressed(SDLK_LCTRL) &&
        scene->getInput()->wasKeyJustPressed(SDLK_t))
     {
-        //! Not working rn
         active = !active;
         HUGO::Vector4 colour = {1.0, 1.0, 1.0, 1.0};
         if(!active) colour.w = 0;
@@ -130,14 +129,10 @@ void ConsoleSystem::handleKeyInput(){
         scene->getComponent<PanelComponent>(consoleInput).isVisible = active;
         scene->getComponent<InputFieldComponent>(consoleInput).isActive = active;
         scene->getComponent<TextComponent>(consoleInput).colour = colour;
-        scene->addComponent<PanelDirtyTag>(consoleInput);
-        scene->addComponent<TextDirtyTag>(consoleInput);
 
         // Console text
         scene->getComponent<PanelComponent>(consoleText).isVisible = active;
         scene->getComponent<TextComponent>(consoleText).colour = colour;
-        scene->addComponent<PanelDirtyTag>(consoleText);
-        scene->addComponent<TextDirtyTag>(consoleText);
     }
 }
 
@@ -173,14 +168,9 @@ void ConsoleSystem::onLoad(){
 
 void ConsoleSystem::init(){
     
-<<<<<<< HEAD
     LuaBinder::getInstance()->setPrintFunction(consoleLuaPrint);
-
-=======
-    LuaBinder::Instance().setPrintFunction(consoleLuaPrint);
     active = true;
     historyIndex = 0;
->>>>>>> a3f5208 (Descubierto bug por el que la consola no imprime bien sin argumentos en print)
 
     //---------------------------------------Input field
     consoleInput = scene->createEntity();
@@ -225,13 +215,15 @@ void ConsoleSystem::init(){
         panel2.material = "UI/Knob";
         panel2.width = 0.5f;
         panel2.height =0.1f;
-        panel2.left =0.01f;
-        panel2.top =0.01f;
+        panel2.left =0.1f;
+        panel2.top =0.1f;
         
         panelContainerName = panel2.containerName;
     });
 
     scene->addComponent<TextComponent>(consoleText, [&panelContainerName](TextComponent& text2){
         text2.textAreaName = panelContainerName + "/Text";
+        text2.colourTop = HUGO::Vector4(0.f, 0.f, 0.f, 1.f);
+        text2.colourBottom = HUGO::Vector4(0.f, 0.f, 0.f, 1.f);
     });
 }

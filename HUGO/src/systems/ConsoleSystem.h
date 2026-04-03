@@ -21,6 +21,11 @@ static inline std::queue<HUGO::String> luaOutput = std::queue<HUGO::String>();
 
     static int consoleLuaPrint(lua_State* lua){
     
+        if(!lua_isstring(lua, -1)){
+            ConsoleSystem::luaOutput.push("HUGO wasn't able to interpret the lua value used in print as a string. If you used \"print()\" try using \"print(\"\")\" instead");
+            return 0;
+        }
+
         HUGO::String out = HUGO::String(lua_tostring(lua, -1));
         lua_pop(lua, -1);
         ConsoleSystem::luaOutput.push(out);
