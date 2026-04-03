@@ -140,19 +140,13 @@ void ConsoleSystem::update(double){
 
     TextComponent& consoleTextCmp = scene->getComponent<TextComponent>(consoleText);
 
-    // Text is completely white because there is no way right now to make text change colour in the same update
-
-    // Logs
-    //consoleTextCmp.colourTop = HUGO::Vector4(1.f, 1.f, 1.f, 1.f);
-    //consoleTextCmp.colourBottom = HUGO::Vector4(1.f, 1.f, 1.f, 1.f);
-    printLogs(consoleTextCmp);
-
     // Lua output
     printLuaOutput(consoleTextCmp);
+    
+    // Logs
+    printLogs(consoleTextCmp);
 
     // Errors
-    //consoleTextCmp.colourTop = HUGO::Vector4(1.f, 0.f, 0.f, 1.f);
-    //consoleTextCmp.colourBottom = HUGO::Vector4(1.f, 0.f, 0.f, 1.f);
     printErrors(consoleTextCmp);
 
     handleKeyInput();

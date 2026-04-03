@@ -13,29 +13,42 @@ void PhysicsTestSystem::init(){
         
     // Entidad 1: Cuerpo estático
     EntityID e1 = scene->createEntity();
-    TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(e1);
-    transform.position = HUGO::Vector3(1.f, 0.f, 40.f);
-    transform.scale = HUGO::Vector3(1., 1.f, 1.f);
-    transform.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(45.f)), HUGO::Vector3(0,0,1));
-    ColliderComponent& collider = scene->addAndGetComponent<ColliderComponent>(e1);
-    collider.info = SphereColliderInfo{1.f};
-    RigidBodyComponent& rb = scene->addAndGetComponent<RigidBodyComponent>(e1);
+
+    scene->addComponent<TransformComponent>(e1, [](TransformComponent& transform){
+        transform.position = HUGO::Vector3(1.f, 0.f, 40.f);
+        transform.scale = HUGO::Vector3(1., 1.f, 1.f);
+        transform.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(45.f)), HUGO::Vector3(0,0,1));
+    });
+
+    scene->addComponent<ColliderComponent>(e1, [](ColliderComponent& collider){
+        collider.info = SphereColliderInfo{1.f};
+    });
+
+    scene->addComponent<RigidBodyComponent>(e1);
     // rb->setShape()
     // rb.setMass(5.f);
     // scene->addComponent<DynamicRBTag>(e1);
+
     scene->addComponent<StaticRBTag>(e1);
 
     // Entidad 2: Cuerpo dinámico
     EntityID e2 = scene->createEntity();
-    TransformComponent& transform2 = scene->addAndGetComponent<TransformComponent>(e2);
-    transform2.position = HUGO::Vector3(0, 5, 40.f);
-    transform2.scale = HUGO::Vector3(1.f, 1.f, 1.f);
+
+    scene->addComponent<TransformComponent>(e2, [](TransformComponent& transform){
+        transform.position = HUGO::Vector3(0.f, 5, 40.f);
+        transform.scale = HUGO::Vector3(1.f, 1.f, 1.f);
+    });
     //scene->addComponent<TransformChangedTag>(e2);
-    ColliderComponent& collider2 = scene->addAndGetComponent<ColliderComponent>(e2);
-    collider2.info = CylinderColliderInfo{HUGO::Vector3(.5f, 1, 1)};
-    RigidBodyComponent& rb2 = scene->addAndGetComponent<RigidBodyComponent>(e2);
-    rb2.setMass(5.f);
-    // rb->setShape()
+
+    scene->addComponent<ColliderComponent>(e2, [](ColliderComponent& collider){
+        collider.info = CylinderColliderInfo{HUGO::Vector3(.5f, 1, 1)};
+    });
+
+    scene->addComponent<RigidBodyComponent>(e2, [](RigidBodyComponent& rb){
+        rb.setMass(5.f);
+        // rb->setShape()
+    });
+
     scene->addComponent<DynamicRBTag>(e2);
     
     // Entidad 3: Cuerpo kinemático
