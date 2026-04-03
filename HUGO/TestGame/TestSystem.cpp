@@ -24,85 +24,113 @@ void
 TestSystem::init() {
     // EntityID ent = scene->createEntity();
 
-    // scene->addAndGetComponent<RenderComponent>(ent).setMeshName("cube.mesh");
+    // scene->addComponent<RenderComponent>(ent, [](RenderComponent& renderComp){
+    //     renderComp.setMeshName("cube.mesh");
+    // });
 
-    // TransformComponent& trComp = scene->addAndGetComponent<TransformComponent>(ent);
-    // TweenComponent& tr= scene->addAndGetComponent<TweenComponent>(ent);
+    // scene->addComponent<TransformComponent>(ent);
+    // scene->addComponent<TweenComponent>(ent);
 
     // // ------------HierarchySystemTest----------
+
     e1 = scene->createEntity();
-    TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(e1);
-    transform.position = HUGO::Vector3(0, 0, 0);
-    transform.scale = HUGO::Vector3(2.f, 2.f, 2.f);
-    RenderComponent& rc = scene->addAndGetComponent<RenderComponent>(e1);
-    rc.setMeshName("cube.mesh");
-    rc.setMaterialName("prueba/ColorRosa");
+    scene->addComponent<TransformComponent>(e1, [](TransformComponent& t1) {
+        t1.position = HUGO::Vector3(0, 0, 0);
+        t1.scale = HUGO::Vector3(2.f, 2.f, 2.f);
+    });
+    scene->addComponent<RenderComponent>(e1, [](RenderComponent& rc) {
+        rc.setMeshName("cube.mesh");
+        rc.setMaterialName("prueba/ColorRosa");
+    });
 
     e2 = scene->createEntity();
-    scene->addAndGetComponent<TransformComponent>(e2).position = HUGO::Vector3(-2, 2, 0);
-    RenderComponent& rc2 = scene->addAndGetComponent<RenderComponent>(e2);
-    rc2.setMeshName("cube.mesh");
-    rc2.setMaterialName("prueba/ColorVerde");
+    scene->addComponent<TransformComponent>(e2, [](TransformComponent& t2) {
+        t2.position = HUGO::Vector3(-2, 2, 0);
+    });
+    scene->addComponent<RenderComponent>(e2, [](RenderComponent& rc2) {
+        rc2.setMeshName("cube.mesh");
+        rc2.setMaterialName("prueba/ColorVerde");
+    });
 
     e3 = scene->createEntity(); 
-    scene->addAndGetComponent<TransformComponent>(e3).position = HUGO::Vector3(-2, 4, 0);
-    RenderComponent& rc3 = scene->addAndGetComponent<RenderComponent>(e3);
-    rc3.setMeshName("cube.mesh");
+    scene->addComponent<TransformComponent>(e3, [](TransformComponent& t3) {
+        t3.position = HUGO::Vector3(-2, 4, 0);
+    });
+    scene->addComponent<RenderComponent>(e3, [](RenderComponent& rc3) {
+        rc3.setMeshName("cube.mesh");
+    });
 
-    scene->addAndGetComponent<ChildrenComponent>(e1).addChild(e2);
-    scene->getComponent<ChildrenComponent>(e1).addChild(e3);
+    scene->addComponent<ChildrenComponent>(e1, [this](ChildrenComponent& childrenComp){
+        childrenComp.addChild(e2);
+        childrenComp.addChild(e3);
+    });
 
     scene->addComponent<ChildrenCompDirtyTag>(e1);
     // //----------------------------------------
 
     // EntityID ui = scene->createEntity();
-    // TransformComponent& tr = scene->addAndGetComponent<TransformComponent>(ui);
-    // //tr.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(0)), HUGO::Vector3(0,0,0));
-    // //tr.rotation.normalize();
-    // LightComponent& lg = scene->addAndGetComponent<LightComponent>(ui);
-    // //lg.setLightType(HUGO::LightType::LT_SPOTLIGHT);
-    // lg.setLightType(HUGO::LightType::LT_DIRECTIONAL);
-    // lg.setAttenuation(HUGO::Vector4(1.0f, 0.0f, 0.001f, 0.0001f));
-    // lg.setDiffuse(HUGO::Vector4(0.8f, 0.8f, 0.8f, 1.0f));
-    // lg.setSpecular(HUGO::Vector4(0.3f, 0.3f, 0.3f, 1.0f));
+    // scene->addComponent<TransformComponent>(ui, [](TransformComponent& tr){
+    //     //tr.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(0)), HUGO::Vector3(0,0,0));
+    //     //tr.rotation.normalize();
+    // });
+    // scene->addComponent<LightComponent>(ui, [](LightComponent& lg){
+    //     //lg.setLightType(HUGO::LightType::LT_SPOTLIGHT);
+    //     lg.setLightType(HUGO::LightType::LT_DIRECTIONAL);
+    //     lg.setAttenuation(HUGO::Vector4(1.0f, 0.0f, 0.001f, 0.0001f));
+    //     lg.setDiffuse(HUGO::Vector4(0.8f, 0.8f, 0.8f, 1.0f));
+    //     lg.setSpecular(HUGO::Vector4(0.3f, 0.3f, 0.3f, 1.0f));
+    // });
+
     EntityID ui = scene->createEntity();
-    TransformComponent& tr = scene->addAndGetComponent<TransformComponent>(ui);
-    tr.position =  HUGO::Vector3(0, 100, 100);
-    //tr.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(0)), HUGO::Vector3(0,0,0));
-    //tr.rotation.normalize();
-    LightComponent& lg = scene->addAndGetComponent<LightComponent>(ui);
-    lg.setLightType(HUGO::LightType::LT_SPOTLIGHT);
-    lg.setDiffuse(HUGO::Vector4(0.8f, 1.8f, 0.8f, 1.0f));
-    lg.setSpecular(HUGO::Vector4(0.8f, 0.8f, 0.8f, 1.0f));
+    scene->addComponent<TransformComponent>(ui, [](TransformComponent& tr){
+        tr.position =  HUGO::Vector3(0, 100, 100);
+        //tr.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(0)), HUGO::Vector3(0,0,0));
+        //tr.rotation.normalize();
+    });
+    scene->addComponent<LightComponent>(ui, [](LightComponent& lg){
+        lg.setLightType(HUGO::LightType::LT_SPOTLIGHT);
+        lg.setDiffuse(HUGO::Vector4(0.8f, 1.8f, 0.8f, 1.0f));
+        lg.setSpecular(HUGO::Vector4(0.8f, 0.8f, 0.8f, 1.0f));
+    });
     scene->addComponent<LightCreateDirtyTag>(ui);
     scene->addComponent<LightDirtyTag>(ui);
 
     EntityID boton = scene->createEntity();
-    PanelComponent& panel = scene->addAndGetComponent<PanelComponent>(boton);
-    panel.overlayName = "testCanvas/SimpleTest";
-    panel.containerName = panel.overlayName + "/Container";
-    panel.material = "UI/Background";
-    panel.left = 400.0f;
-    panel.top = 550.0f;
-    panel.width = 64.0f;
-    panel.height = 64.0f;
-    panel.metricsMode = HUGO::UIMetricsMode::GMM_PIXELS;
-    
-    ButtonComponent& bt = scene->addAndGetComponent<ButtonComponent>(boton);
-    bt.onClickCallback = []() {
+    scene->addComponent<PanelComponent>(boton, [](PanelComponent& panel){
+        panel.overlayName = "testCanvas/SimpleTest";
+        panel.containerName = panel.overlayName + "/Container";
+        panel.material = "UI/Background";
+        panel.left = 400.0f;
+        panel.top = 550.0f;
+        panel.width = 64.0f;
+        panel.height = 64.0f;
+        panel.metricsMode = HUGO::UIMetricsMode::GMM_PIXELS;
+    });
+
+    scene->addComponent<ButtonComponent>(boton, [](ButtonComponent& bt){
+        bt.onClickCallback = []() {
         std::cout << "Button Clicked!" << std::endl;
-    };
-    bt.hoverMaterial = "UI/KnobHover";
-    bt.pressedMaterial = "UI/KnobPressed";
-    bt.normalMaterial = "UI/Knob";
-    panel.material = bt.normalMaterial;
+        };
+        bt.hoverMaterial = "UI/KnobHover";
+        bt.pressedMaterial = "UI/KnobPressed";
+        bt.normalMaterial = "UI/Knob";
+    });
+
+    const HUGO::String& buttonNormalMaterial = scene->getComponent<ButtonComponent>(boton).normalMaterial;
+
+    scene->modifyComponent<PanelComponent>(boton, [buttonNormalMaterial](PanelComponent& panel){
+        panel.material = buttonNormalMaterial;
+    });
 
     // EntityID emmiter = scene->createEntity();
-    // scene->addAndGetComponent<TransformComponent>(emmiter).position = HUGO::Vector3(0, 0, 0);
-    // ParticleEmitterComponent& pe = scene->addAndGetComponent<ParticleEmitterComponent>(emmiter);
-    // pe.particleName = "Particle/SmokeBomb";
-    // pe.emitting = true;
-    // pe.active = true;
+    // scene->addComponent<TransformComponent>(emmiter, [](TransformComponent& transform){
+    //     transform.position = HUGO::Vector3(0, 0, 0);
+    // });
+    // scene->addComponent<ParticleEmitterComponent>(emmiter, [](ParticleEmitterComponent& pe){
+    //     pe.particleName = "Particle/SmokeBomb";
+    //     pe.emitting = true;
+    //     pe.active = true;
+    // });
     // scene->addComponent<ParticleEmitterComponentTag>(emmiter);
 
 }
