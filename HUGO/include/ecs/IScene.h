@@ -64,14 +64,6 @@ public:
         return entityTable->hasComponent(entity, HUGO::ComponentRegistry::getComponentId<T>());
     }
 
-	template <typename T>
-	T& addAndGetComponent(EntityID entity) {
-		
-		addComponent<T>(entity);
-
-		return getComponent<T>(entity);
-	}
-
 	/// @brief Adds the component with default values
 	/// @tparam T Component
 	/// @param entity the entity the component is part of
