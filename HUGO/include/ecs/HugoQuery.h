@@ -29,7 +29,7 @@ namespace HUGO {
 		}
 
 		template<typename T>
-		const T& readComponent() const {
+		const T& getConst() const {
 			return std::get<T&>(pack);
 		}
 
