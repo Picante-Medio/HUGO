@@ -61,12 +61,10 @@ RenderSystem::~RenderSystem()
     lightMap.clear();
 
     // Destroy all renderable Ogre objects
-    for(std::size_t i =0; i<ogreObjects.size(); ++i){
-        destroyOgreObject(ogreObjects[i]);
+    for(auto& obj : ogreObjects){
+        destroyOgreObject(obj.second);
     }
     ogreObjects.clear();
-    idToIndex.clear();
-    freeOgreObjectId.clear();
 
     if(sceneManager){
         ogreRoot->destroySceneManager(sceneManager);
@@ -226,12 +224,12 @@ void RenderSystem::handleTag()
         MaterialDirtyTag& material = pack.getDeprecated<MaterialDirtyTag&>();
         RenderComponent& rc = pack.getDeprecated<RenderComponent&>();
 
-        if (rc.objectID != HUGO::INVALID_OGRE_OBJECT_ID) {
-            OgreObject& obj = getOgreObject(rc.objectID);
+        if(ogreObjects.find(rc.entity) != ogreObjects.end()){
+            OgreObject& obj = ogreObjects[rc.entity];
             obj.ogreEntity->setMaterialName(rc.materialName);
 
             scene->removeComponent<MaterialDirtyTag>(rc.entity);
-        }  
+        }
     }
 
     //Animation Update
@@ -240,9 +238,9 @@ void RenderSystem::handleTag()
         AnimationComponent& animComp = pack.getDeprecated<AnimationComponent&>();
         RenderComponent& rc = pack.getDeprecated<RenderComponent&>();
 
-        if(rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) continue;
+        if(ogreObjects.find(rc.entity) == ogreObjects.end()) continue;
         
-        OgreObject& ogreObj = getOgreObject(rc.objectID);
+        OgreObject& ogreObj = ogreObjects[rc.entity];
         Ogre::Entity* ogre_ent = ogreObj.ogreEntity;
 
         //remove animations that does exist in the Component
@@ -308,9 +306,9 @@ void RenderSystem::updateAnimations(double dt)
         AnimationComponent& animComp = pack.getDeprecated<AnimationComponent&>();
         RenderComponent& rc = pack.getDeprecated<RenderComponent&>();
 
-        if(rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) continue;
+        if(ogreObjects.find(rc.entity) == ogreObjects.end()) continue;
         
-        OgreObject& ogreObj = getOgreObject(rc.objectID);
+        OgreObject& ogreObj = ogreObjects[rc.entity];
         Ogre::Real time = static_cast<Ogre::Real>(dt);
 
         //updates all enable animations
@@ -340,17 +338,12 @@ void RenderSystem::update(double dt)
         RenderComponent& rc = pack.getDeprecated<RenderComponent&>();
         TransformComponent& tr=pack.getDeprecated<TransformComponent&>();
 
-        if (rc.objectID == HUGO::INVALID_OGRE_OBJECT_ID) {
+        if (ogreObjects.find(rc.entity) == ogreObjects.end()) {
             //create a new ogreObject
-            ErrorOrType<HUGO::OgreObjectID> e = createOgreObject(rc.meshName,rc.materialName);
-            if (e.isError()) {
-                rc.objectID=HUGO::INVALID_OGRE_OBJECT_ID;
-                std::cerr<< e.getError().errorMessage;
-                continue;
-            }
-            rc.objectID = e.getValue();
+            ErrorOrVoid e = createOgreObject(rc.entity, rc.meshName,rc.materialName);
+            if (e.isError()) continue;
         } 
-        OgreObject& obj = getOgreObject(rc.objectID);
+        OgreObject& obj = ogreObjects[rc.entity];
 
         //update transform
         obj.ogreSceneNode->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getWorldPosition()));
@@ -394,7 +387,7 @@ void RenderSystem::update(double dt)
 
 #pragma region OgreObject
 // ==================== Create OgreObject ====================
-ErrorOrType<HUGO::OgreObjectID> RenderSystem::createOgreObject(const std::string &meshName, const std::string &materialName)
+ErrorOrVoid RenderSystem::createOgreObject(EntityID id, const std::string &meshName, const std::string &materialName)
 {
     Ogre::Entity* ent = nullptr;
     Ogre::SceneNode* node = nullptr;
@@ -416,54 +409,25 @@ ErrorOrType<HUGO::OgreObjectID> RenderSystem::createOgreObject(const std::string
         if (ent) sceneManager->destroyEntity(ent);
         if (node) sceneManager->destroySceneNode(node);
         
-        return ErrorOrType<HUGO::OgreObjectID>(err);
-    }
-    
-    HUGO::OgreObjectID id;
-    //reuse id
-    if(!freeOgreObjectId.empty()){ 
-        id= freeOgreObjectId.back();
-        freeOgreObjectId.pop_back();
-    }
-    else{
-        //generate new ID
-        id = static_cast<HUGO::OgreObjectID>(idToIndex.size());
-        idToIndex.push_back(0);
+        return ErrorOrVoid(err);
     }
     
     //create OgreObject
-    OgreObject obj = {id, ent, node};
+    OgreObject obj = {ent, node};
 
     //store object
-    std::size_t index = ogreObjects.push_back(std::move(obj));
-    idToIndex[id] = index;
+    ogreObjects[id] = std::move(obj);
     
-    return ErrorOrType<HUGO::OgreObjectID>(id);
-}
-// ==================== Get OgreObject ====================
-RenderSystem::OgreObject& RenderSystem::getOgreObject(HUGO::OgreObjectID id)
-{
-    return ogreObjects[idToIndex[id]];
+    return ErrorOrVoid();
 }
 // ==================== Remove OgreObject ====================
-void RenderSystem::removeOgreObject(HUGO::OgreObjectID& id)
+void RenderSystem::removeOgreObject(EntityID id)
 {
-    if (id != HUGO::INVALID_OGRE_OBJECT_ID){
-        
-        std::size_t index = idToIndex[id];
-        std::size_t lastIndex = ogreObjects.size() - 1;
+    if (ogreObjects.find(id) != ogreObjects.end()){
 
-        destroyOgreObject(ogreObjects[index]);
-        
-        if (index != lastIndex) {
-            ogreObjects[index] = std::move(ogreObjects[lastIndex]);
-            HUGO::OgreObjectID movedID = ogreObjects[index].id;
-            idToIndex[movedID] = index;
-        }
+        destroyOgreObject(ogreObjects[id]);
 
-        ogreObjects.remove(lastIndex);
-        freeOgreObjectId.push_back(id);
-        id = HUGO::INVALID_OGRE_OBJECT_ID;
+        ogreObjects.erase(id);
     }
 }
 // ==================== Destroy OgreObject ====================

@@ -2,6 +2,7 @@
 #include "HugoSystemMacros.h"
 #include <unordered_map>
 #include "EcsTypes.h"
+#include "ColliderComponent.h"
 
 HSYSTEM(PhysicsGizmoSystem)
 
@@ -13,6 +14,9 @@ public:
     void update(double dt);
 
     void fixedUpdate(double dt);
+
+    void createGizmo(ColliderComponent& coll);
+    void destroyGizmo(ColliderComponent& coll);
 private:
     /*
         @param entityID Gizmo entity associated with physics collider

@@ -5,7 +5,6 @@
 HCOMPONENT(RenderComponent)
 
 private:
-    HUGO::OgreObjectID objectID = HUGO::INVALID_OGRE_OBJECT_ID;
     HUGO::String meshName="cube.mesh";
     HUGO::String materialName="";
 public:

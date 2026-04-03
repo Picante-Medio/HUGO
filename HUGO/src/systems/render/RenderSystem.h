@@ -33,7 +33,6 @@ HSYSTEM(RenderSystem)
     // OgreObject Data
     // Represents an Ogre renderable entity.
     struct OgreObject{
-        HUGO::OgreObjectID id = HUGO::INVALID_OGRE_OBJECT_ID; 
         Ogre::Entity* ogreEntity = nullptr;
         Ogre::SceneNode* ogreSceneNode = nullptr;   // Scene node for transform
         std::unordered_map<HUGO::String, Ogre::AnimationState*> animationStates; //Stored animation states
@@ -48,9 +47,8 @@ HSYSTEM(RenderSystem)
     std::unordered_map<EntityID, ViewportInfo> viewportMap; 
     std::unordered_map<EntityID, LightInfo> lightMap;
 
-    std::vector<HUGO::OgreObjectID> freeOgreObjectId; // List of reusable IDs
-    std::vector<std::size_t> idToIndex; // Mapping OgreObjectID to the PagedArray Index
-    PagedArray<OgreObject, 128> ogreObjects; //Storage for renderable objects
+    std::unordered_map<EntityID, OgreObject> ogreObjects;
+
 
     EntityID mainCameraEntity = 0;
     EntityID mainViewportEntity = 0;
@@ -76,9 +74,8 @@ HSYSTEM(RenderSystem)
     void unregisterLightEntity(EntityID entity);
 
     //OgreObjects
-    ErrorOrType<HUGO::OgreObjectID> createOgreObject(const std::string& meshName, const std::string& materialName="");
-    OgreObject& getOgreObject(HUGO::OgreObjectID id);
-    void removeOgreObject(HUGO::OgreObjectID& id);
+    ErrorOrVoid createOgreObject(EntityID id, const std::string& meshName, const std::string& materialName="");
+    void removeOgreObject(EntityID id);
     void destroyOgreObject(OgreObject& obj);
                    
     // Global light configuration
