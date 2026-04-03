@@ -108,15 +108,36 @@ void ConsoleSystem::receiveInput(const HUGO::String& input){
 
 void ConsoleSystem::handleKeyInput(){
 
-    if(scene->getInput()->wasKeyJustPressed(SDLK_UP)){
+    if(active && scene->getInput()->wasKeyJustPressed(SDLK_UP)){
         HUGO::String next = getNextHistoric();
         scene->getComponent<InputFieldComponent>(consoleInput).fullText = next;
         scene->getComponent<TextComponent>(consoleInput).text = next;
     }
-    if(scene->getInput()->wasKeyJustPressed(SDLK_DOWN)){
+    if(active && scene->getInput()->wasKeyJustPressed(SDLK_DOWN)){
         HUGO::String prev = getPreviousHistoric();
         scene->getComponent<InputFieldComponent>(consoleInput).fullText = prev;
         scene->getComponent<TextComponent>(consoleInput).text = prev;
+    }
+    if(scene->getInput()->isKeyPressed(SDLK_LCTRL) &&
+       scene->getInput()->wasKeyJustPressed(SDLK_t))
+    {
+        //! Not working rn
+        active = !active;
+        HUGO::Vector4 colour = {1.0, 1.0, 1.0, 1.0};
+        if(!active) colour.w = 0;
+
+        // Console input
+        scene->getComponent<PanelComponent>(consoleInput).isVisible = active;
+        scene->getComponent<InputFieldComponent>(consoleInput).isActive = active;
+        scene->getComponent<TextComponent>(consoleInput).colour = colour;
+        scene->addComponent<PanelDirtyTag>(consoleInput);
+        scene->addComponent<TextDirtyTag>(consoleInput);
+
+        // Console text
+        scene->getComponent<PanelComponent>(consoleText).isVisible = active;
+        scene->getComponent<TextComponent>(consoleText).colour = colour;
+        scene->addComponent<PanelDirtyTag>(consoleText);
+        scene->addComponent<TextDirtyTag>(consoleText);
     }
 }
 
@@ -152,8 +173,14 @@ void ConsoleSystem::onLoad(){
 
 void ConsoleSystem::init(){
     
+<<<<<<< HEAD
     LuaBinder::getInstance()->setPrintFunction(consoleLuaPrint);
 
+=======
+    LuaBinder::Instance().setPrintFunction(consoleLuaPrint);
+    active = true;
+    historyIndex = 0;
+>>>>>>> a3f5208 (Descubierto bug por el que la consola no imprime bien sin argumentos en print)
 
     //---------------------------------------Input field
     consoleInput = scene->createEntity();

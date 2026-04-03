@@ -15,6 +15,7 @@ std::vector<HUGO::String> history;
 size_t historyIndex; // Constant access and reset
 EntityID consoleInput;
 EntityID consoleText;
+bool active; // to set weather the console is active or not
 
 static inline std::queue<HUGO::String> luaOutput = std::queue<HUGO::String>();
 
