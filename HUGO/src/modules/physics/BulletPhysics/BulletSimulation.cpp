@@ -185,6 +185,7 @@ btCollisionShape* BulletSimulation::getorCreateShape(HUGO::CollisionShapeID& id,
         shape = getShapeObject(createShapeObject(col)).bulletShape;
     }
 
+
     return shape;
 }
 #pragma endregion
@@ -247,9 +248,11 @@ HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderCompo
 
     // Get Shape
     btCollisionShape* shape = getorCreateShape(hgCol.shapeID, hgCol);
+    btVector3 startingInertia = btVector3();
+    shape->calculateLocalInertia(hgRb.mass, startingInertia);
 
     // Set bullet rb parameters
-    btRigidBody* rb = new btRigidBody(hgRb.mass, state, shape);
+    btRigidBody* rb = new btRigidBody(hgRb.mass, state, shape, startingInertia);
     
     // Set flags for static, dynamic or kinematic
     switch(type){
@@ -443,7 +446,7 @@ void BulletSimulation::syncBodiesToBullet() {
     for(auto& pack: scene->query<ColliderComponent, StaticRBTag, RigidBodyComponent, TransformComponent>()) {
         RigidBodyComponent& rb = pack.getDeprecated<RigidBodyComponent&>();
         ColliderComponent& col = pack.getDeprecated<ColliderComponent&>();
-        
+
         if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
             //create a new CollisionObject
             rb.objectID = upgradeToRigidBodyObject(col, rb, HUGO::BodyType::STATIC);
