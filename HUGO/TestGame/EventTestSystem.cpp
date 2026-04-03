@@ -4,22 +4,26 @@
 
 #include "TestComponent.h"
 
-void EventTestSystem::init() {
+void 
+EventTestSystem::init() {
 
     scene->onAddComponent<TestComponent>().connect(this, &EventTestSystem::testEventA);
     scene->onUpdateComponent<TestComponent>().connect(this, &EventTestSystem::testEventB);
     scene->onRemoveComponent<TestComponent>().connect(this, &EventTestSystem::testEventC);
 }
 
-void EventTestSystem::onLoad() {
+void 
+EventTestSystem::onLoad() {
 
 }
 
-void EventTestSystem::fixedUpdate(double dt) {
+void 
+EventTestSystem::fixedUpdate(double dt) {
 
 }
 
-void EventTestSystem::update(double dt) {
+void 
+EventTestSystem::update(double dt) {
 
     timer += dt;
 
@@ -40,14 +44,17 @@ void EventTestSystem::update(double dt) {
     }
 }
 
-void EventTestSystem::testEventA(TestComponent& cmp) {
+void 
+EventTestSystem::testEventA(TestComponent& cmp) {
     std::cout << "A: " << cmp.entity << " - " << cmp.stringDePrueba << "\n";
 }
 
-void EventTestSystem::testEventB(TestComponent& cmp) {
+void 
+EventTestSystem::testEventB(TestComponent& cmp) {
     std::cout << "B: " << cmp.entity << " - " << cmp.stringDePrueba << "\n";
 }
 
-void EventTestSystem::testEventC(TestComponent& cmp) {
+void 
+EventTestSystem::testEventC(TestComponent& cmp) {
     std::cout << "C : " << cmp.entity << " - " << cmp.stringDePrueba << "\n";
 }
