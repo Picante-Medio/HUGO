@@ -158,43 +158,53 @@ void ConsoleSystem::init(){
     //---------------------------------------Input field
     consoleInput = scene->createEntity();
 
-    PanelComponent& panel = scene->addAndGetComponent<PanelComponent>(consoleInput);
-    panel.overlayName = "testCanvas/SimpleTest1";
-    panel.containerName = panel.overlayName + "/Container";
-    panel.material = "UI/Background";
-    panel.width = 0.3f;
-    panel.height =0.2f;
-    panel.left =0.5f;
-    panel.top = 0.2f;
+    std::string panelContainerName;
 
+    scene->addComponent<PanelComponent>(consoleInput, [&panelContainerName](PanelComponent& panel){
+        panel.overlayName = "testCanvas/SimpleTest1";
+        panel.containerName = panel.overlayName + "/Container";
+        panel.material = "UI/Background";
+        panel.width = 0.3f;
+        panel.height =0.2f;
+        panel.left =0.5f;
+        panel.top = 0.2f;
+        
+        panelContainerName = panel.containerName;
+    });
 
-    TextComponent& text = scene->addAndGetComponent<TextComponent>(consoleInput);
-    text.textAreaName = panel.containerName + "/Text";
-    text.left = 0.025f;
-    text.colourTop = HUGO::Vector4(1.0f, 0.0f, 0.0f, 1.f);
-    text.colourBottom = HUGO::Vector4(1.0f, 0.0f, 1.0f, 1.f);
+    scene->addComponent<TextComponent>(consoleInput, [&panelContainerName](TextComponent& text){
+        text.textAreaName = panelContainerName + "/Text";
+        text.left = 0.025f;
+        text.colourTop = HUGO::Vector4(1.0f, 0.0f, 0.0f, 1.f);
+        text.colourBottom = HUGO::Vector4(1.0f, 0.0f, 1.0f, 1.f);
+    });
 
-    InputFieldComponent& input = scene->addAndGetComponent<InputFieldComponent>(consoleInput);
-    input.isActive = true;
-    input.originalText = "";
-    input.onChangeCallback = [this](const HUGO::String& input){
-        receiveInput(input);
-    };
+    scene->addComponent<InputFieldComponent>(consoleInput, [this](InputFieldComponent& input){
+        input.isActive = true;
+        input.originalText = "";
+        input.onChangeCallback = [this](const HUGO::String& input){
+            receiveInput(input);
+        };
+    });
 
     //---------------------------------------Console text
 
     consoleText = scene->createEntity();
 
-    PanelComponent& panel2 = scene->addAndGetComponent<PanelComponent>(consoleText);
-    panel2.overlayName = "testCanvas/ConsoleTextTest";
-    panel2.containerName = panel2.overlayName + "/Container";
-    panel2.material = "UI/Knob";
-    panel2.width = 0.5f;
-    panel2.height =0.1f;
-    panel2.left =0.01f;
-    panel2.top =0.01f;
+        // Reuse panelContainerName
+    scene->addComponent<PanelComponent>(consoleText, [&panelContainerName](PanelComponent& panel2){
+        panel2.overlayName = "testCanvas/ConsoleTextTest";
+        panel2.containerName = panel2.overlayName + "/Container";
+        panel2.material = "UI/Knob";
+        panel2.width = 0.5f;
+        panel2.height =0.1f;
+        panel2.left =0.01f;
+        panel2.top =0.01f;
+        
+        panelContainerName = panel2.containerName;
+    });
 
-
-    TextComponent& text2 = scene->addAndGetComponent<TextComponent>(consoleText);
-    text2.textAreaName = panel2.containerName + "/Text";
+    scene->addComponent<TextComponent>(consoleText, [&panelContainerName](TextComponent& text2){
+        text2.textAreaName = panelContainerName + "/Text";
+    });
 }
