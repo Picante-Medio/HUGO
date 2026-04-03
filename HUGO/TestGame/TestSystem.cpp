@@ -15,7 +15,6 @@
 #include "InputFieldComponent.h"
 #include "LightComponent.h"
 #include "SliderComponent.h"
-#include "UITags.h"
 #include "ParticleEmitterComponent.h"
 #include "ParticleEmitterComponentTag.h"
 
@@ -88,8 +87,6 @@ TestSystem::init() {
     panel.width = 64.0f;
     panel.height = 64.0f;
     panel.metricsMode = HUGO::UIMetricsMode::GMM_PIXELS;
-
-    scene->addComponent<CreatePanelDirtyTag>(boton);
     
     ButtonComponent& bt = scene->addAndGetComponent<ButtonComponent>(boton);
     bt.onClickCallback = []() {

@@ -44,9 +44,12 @@ std::shared_ptr<UIElementCache> UISystem::createElementCache(EntityID entity,
     return cache;
 }
 
-std::shared_ptr<UIElementCache> UISystem::createElementCache(EntityID entity, const HUGO::String &overlayName, const HUGO::String &containerName, const HUGO::String &elementName,
-                                                            bool isTextArea)
+std::shared_ptr<UIElementCache> UISystem::createElementCache(EntityID entity, const HUGO::String &overlayName, const HUGO::String &containerName, const HUGO::String &elementName,bool isTextArea)
 {
+    // if its already created, return it
+    if(uiCache.find(entity) != uiCache.end())
+        return uiCache[entity];{
+    }
     std::shared_ptr<UIElementCache> cache = std::make_shared<UIElementCache>();
     
     ErrorOrType<Ogre::Overlay*> overlayResult = HUGO::OgreOverlayUtils::getOverlay(overlayName);
@@ -146,6 +149,7 @@ void UISystem::syncPanel(const PanelComponent &p)
     // cache->container->setHorizontalAlignment(OgreUtils::toOgre(p.alignmentX));
     // cache->container->setVerticalAlignment(OgreUtils::toOgre(p.alignmentY));
     cache->container->setMetricsMode(HUGO::OgreUtils::toOgre(p.metricsMode));
+    cache->setVisible(p.isVisible);
 
     if (!p.material.empty()) cache->container->setMaterialName(p.material);
 }
@@ -178,6 +182,9 @@ void UISystem::syncText(const TextComponent &t)
         t.colourBottom.z,
         t.colourBottom.w));
     textArea->setTop(t.top);
+    textArea->setFontName(t.textFont);
+    textArea->setSpaceWidth(t.spaceWidth);
+    textArea->setCharHeight(t.characterHeight);
     textArea->setLeft(t.left);
 }
 
@@ -199,8 +206,7 @@ void UISystem::syncButton(const ButtonComponent &button, PanelComponent &panel)
         default:
             panel.material = button.normalMaterial;
             break;
-        }
-    scene->addComponent<PanelDirtyTag>(button.entity);
+    }
 }
 
 void UISystem::syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr)
@@ -305,104 +311,67 @@ void UISystem::syncSlider(const PanelComponent& p, const SliderComponent& s)
 //====================================================
 void UISystem::processPanelChanges()
 {
-   for (auto &pack : scene->query<PanelComponent, PanelDirtyTag>())
+   for (auto &pack : scene->query<PanelComponent>())
     {
         PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
+        if(uiCache.find(panel.entity) == uiCache.end()) { // if it doesn't have cache, create it
+            createElementCache(panel.entity, panel.overlayName, panel.containerName);
+        }
         syncPanel(panel);
-        scene->removeComponent<PanelDirtyTag>(panel.entity);
     }
 }
 
 void UISystem::processVisibility()
 {
-    for (auto &pack : scene->query<PanelComponent, VisibilityDirtyTag>())
+    for (auto &pack : scene->query<PanelComponent>())
     {
-        PanelComponent &panel = pack.getDeprecated<PanelComponent &>();
+        PanelComponent &panel = pack.getDeprecated<PanelComponent&>();
         UIElementCache *cache = getCache(panel.entity);
 
         if (cache && cache->overlay && cache->container)
         {
-            cache->setVisible(panel.isVisible);
         }
-
-        scene->removeComponent<VisibilityDirtyTag>(panel.entity);
     }
 }
 
-
-ErrorOrVoid UISystem::processComponentCreations()
-{
-    //panels
-    for (auto &pack : scene->query<PanelComponent, CreatePanelDirtyTag>())
-    {
-        PanelComponent &panel = pack.getDeprecated<PanelComponent &>();
-        EntityID entity = panel.entity;
-        createElementCache(entity, panel.overlayName, panel.containerName);
-        scene->addComponent<VisibilityDirtyTag>(panel.entity);
-        scene->addComponent<PanelDirtyTag>(entity);
-        scene->removeComponent<CreatePanelDirtyTag>(entity);
-    }
-    
-    for (auto &pack : scene->query<CreateTextDirtyTag, TextComponent, PanelComponent>())
-    {
-        TextComponent &text = pack.getDeprecated<TextComponent &>();
-        CreateTextDirtyTag &tag = pack.getDeprecated<CreateTextDirtyTag &>();
-
-        ErrorOrType<Ogre::OverlayElement *> elementResult = HUGO::OgreOverlayUtils::getElement(text.textAreaName, true);
-        if (elementResult.isError())
-            return ErrorOrVoid("[UISystem] Text entity " + std::to_string(text.entity) + " missing element");
-
-        Ogre::TextAreaOverlayElement *area = dynamic_cast<Ogre::TextAreaOverlayElement *>(elementResult.getValue());
-        if (!area)
-            return ErrorOrVoid("[UISystem] Text entity " + std::to_string(text.entity) + " missing container TextAreaOverlayElement");
-
-        text.characterHeight = area->getCharHeight();
-        text.text = area->getCaption();
-
-        Ogre::ColourValue c = area->getColour();
-        Ogre::ColourValue ct = area->getColourTop();
-        Ogre::ColourValue cb = area->getColourBottom();
-
-        text.colour = {c.r, c.g, c.b, c.a};
-        text.colourTop = {ct.r, ct.g, ct.b, ct.a};
-        text.colourBottom = {cb.r, cb.g, cb.b, cb.a};
-
-        UIElementCache *cache = getCache(text.entity);
-        if (cache)
-            cache->element = area;
-
-        syncText(text.entity);
-        scene->removeComponent<CreateTextDirtyTag>(tag.entity);
-    }
-
-    return ErrorOrVoid();
-}
 
 void UISystem::processButtonChanges()
 {
-    for (auto &pack : scene->query<ButtonComponent, ButtonDirtyTag, PanelComponent>())
+    for (auto &pack : scene->query<ButtonComponent, PanelComponent>())
     {
         ButtonComponent &button = pack.getDeprecated<ButtonComponent&>();
         PanelComponent &panel = pack.getDeprecated<PanelComponent&>();
         syncButton(button, panel);
-        scene->removeComponent<ButtonDirtyTag>(button.entity);
     }
 }
 
 void UISystem::processTextChanges()
 {
-    for (auto &pack : scene->query<PanelComponent, TextComponent, TextDirtyTag>())
+    for (auto &pack : scene->query<PanelComponent, TextComponent>())
     {
         TextComponent &text = pack.getDeprecated<TextComponent &>();
-        TextDirtyTag &tag = pack.getDeprecated<TextDirtyTag &>();
+        ErrorOrType<Ogre::OverlayElement *> elementResult = HUGO::OgreOverlayUtils::getElement(text.textAreaName, true);
+        if (elementResult.isError())
+            return;
+
+        Ogre::TextAreaOverlayElement *area = dynamic_cast<Ogre::TextAreaOverlayElement *>(elementResult.getValue());
+        if (!area)
+            return;
+        
+        UIElementCache *cache = getCache(text.entity);
+        if (cache)
+            cache->element = area;
+
         syncText(text);
-        scene->removeComponent<TextDirtyTag>(tag.entity);
     }
 }
 
 void UISystem::processInput()
 {
     std::shared_ptr<HUGO::IInput> input = scene->getInput();
+            // get normalized mouse position
+
+    const HUGO::IInput::MouseRelativePosition& mouse = input->getMouseRelativePosition();
 
     bool anyFieldActive = false; // flag to control SDL text input
     // handle mouse click: activate/deactivate input fields
@@ -412,9 +381,7 @@ void UISystem::processInput()
             TextComponent& text = pack.getDeprecated<TextComponent&>();
             InputFieldComponent& field = pack.getDeprecated<InputFieldComponent&>();
 
-            // get normalized mouse position
-            HUGO::IInput::MouseRelativePosition mp = input->getMouseRelativePosition();
-            if (isMouseOverPanel(panel, mp.x, mp.y)) {
+            if (isMouseOverPanel(panel, mouse.x, mouse.y)) {
                 if (!field.isActive){
                     // activate this field
                     field.isActive = true;
@@ -426,7 +393,6 @@ void UISystem::processInput()
 
                         field.fullText.clear();
                         field.cursorPos = 0;
-                        scene->addComponent<TextDirtyTag>(text.entity);
                     }
                 }
             }
@@ -441,11 +407,9 @@ void UISystem::processInput()
             PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
             ButtonComponent& button = pack.getDeprecated<ButtonComponent&>();
 
-            HUGO::IInput::MouseRelativePosition mouse = input->getMouseRelativePosition();
             if (isMouseOverPanel(panel, mouse.x, mouse.y))
             {
                 button.state = HUGO::BS_DOWN;
-                scene->addComponent<ButtonDirtyTag>(button.entity);
                 break;
             }
         }
@@ -456,27 +420,22 @@ void UISystem::processInput()
         {
             PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
             ButtonComponent& button = pack.getDeprecated<ButtonComponent&>();
-
-            HUGO::IInput::MouseRelativePosition mouse = input->getMouseRelativePosition();
             bool isOver = isMouseOverPanel(panel, mouse.x, mouse.y);
-
             if (isOver){
                 if (button.onClickCallback) button.onClickCallback();
                 button.state = HUGO::BS_OVER;
             }
             else 
                 button.state = HUGO::BS_UP;
-            
-            scene->addComponent<ButtonDirtyTag>(panel.entity);
         }
     }
+
 
     for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
     {
         PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
         ButtonComponent& button = pack.getDeprecated<ButtonComponent&>();
 
-        HUGO::IInput::MouseRelativePosition mouse = input->getMouseRelativePosition();
         bool isOver = isMouseOverPanel(panel, mouse.x, mouse.y);
         if (isOver && button.state != HUGO::BS_DOWN)
         {
@@ -486,115 +445,8 @@ void UISystem::processInput()
         {
             button.state = HUGO::BS_UP;
         }
-        scene->addComponent<ButtonDirtyTag>(button.entity);
     }
-
-    // process text for the active input field using SDL text buffer
-    const HUGO::String& textInput = input->getTextInput();
-    for (auto &pack : scene->query<InputFieldComponent, TextComponent, PanelComponent>()) {
-        InputFieldComponent& field = pack.getDeprecated<InputFieldComponent&>();
-        if (!field.isActive) continue;
-
-        TextComponent& text = pack.getDeprecated<TextComponent&>();
-        PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
-        bool changed = false;
-
-        // append new text input from SDL
-        if (!textInput.empty()) {
-            int c = static_cast<int>(textInput[0]);
-            //only english printable ascii codes are accepted
-            if (c > 32 && c < 127){
-                field.fullText.insert(field.cursorPos, 1, textInput[0]);
-                field.cursorPos++;
-                changed = true;
-            }
-        }
-
-        // backspace -> remove last character
-        if (input->wasKeyJustPressed(SDLK_BACKSPACE) && field.cursorPos > 0) {
-            field.fullText.erase(field.cursorPos - 1, 1);
-            field.cursorPos--;
-            changed = true;
-        }
-
-        // enter -> save result and deactivate
-        if (input->wasActionJustPressed("SubmitInput")) {
-            field.isActive = false;
-            field.result = field.fullText;
-
-            if (field.onChangeCallback)
-                field.onChangeCallback(field.fullText);
-
-            // recover the original text
-            text.text = field.originalText;
-            field.originalText.clear();
-
-            scene->addComponent<TextDirtyTag>(text.entity);
-            continue;
-        }
-        // update visible text
-        if (changed) {
-            UIElementCache* cache = getCache(text.entity);
-            if (!cache || !cache->element) continue;
-
-            Ogre::TextAreaOverlayElement* area =
-                dynamic_cast<Ogre::TextAreaOverlayElement*>(cache->element);
-            if (!area) continue;
-
-            const HUGO::String& full = field.fullText;
-            HUGO::Float panelWidth = panel.width;
-
-            HUGO::String visible;
-            HUGO::Float width = 0.0f;
-
-            // show only the part that fits from the end
-            for (int i = static_cast<int>(full.size() - 1); i >= 0; --i) {
-                char c = full[i];
-                HUGO::Float w = area->getFont()->getGlyphAspectRatio(c) * text.characterHeight;
-
-                if (width + w > panelWidth)
-                    break;
-
-                visible.insert(visible.begin(), c);
-                width += w;
-            }
-            text.text = visible;
-            scene->addComponent<TextDirtyTag>(text.entity);
-        }
-    }
-
-    // clear SDL text input buffer
-    input->clearTextInput();
-
-    // toggle SDL text input if any field is active
-    anyFieldActive = false;
-    for (auto& pack : scene->query<InputFieldComponent>()) {
-        if (pack.getDeprecated<InputFieldComponent&>().isActive) {
-            anyFieldActive = true;
-            break;
-        }
-    }
-    input->toggleTextInput(anyFieldActive);
-}
-
-void UISystem::processProgressBarChanges()
-{
-    for (auto &pack : scene->query<PanelComponent, ProgressBarComponent, ProgressBarDirtyTag>())
-    {
-        PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
-        ProgressBarComponent& pr = pack.getDeprecated<ProgressBarComponent&>();
-        //ProgressBarDirtyTag& tag = pack.get<ProgressBarDirtyTag &>();
-        //pr.currentValue = std::min(pr.maxValue, pr.currentValue + 0.1f);
-        syncProgressBar(panel, pr);
-        //scene->removeComponent<ProgressBarDirtyTag>(tag.entity);
-    }
-}
-
-void UISystem::processSliderInput()
-{
-    std::shared_ptr<HUGO::IInput> input = scene->getInput();
-
-    const HUGO::IInput::MouseRelativePosition& mouse = input->getMouseRelativePosition();
+    
 
     for (auto &pack : scene->query<SliderComponent, PanelComponent>())
     {
@@ -673,10 +525,104 @@ void UISystem::processSliderInput()
             }
         }
     }
+
+    // process text for the active input field using SDL text buffer
+    const HUGO::String& textInput = input->getTextInput();
+    for (auto &pack : scene->query<InputFieldComponent, TextComponent, PanelComponent>()) {
+        InputFieldComponent& field = pack.getDeprecated<InputFieldComponent&>();
+        if (!field.isActive) continue;
+
+        TextComponent& text = pack.getDeprecated<TextComponent&>();
+        PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
+        bool changed = false;
+
+        // append new text input from SDL
+        if (!textInput.empty()) {
+            int c = static_cast<int>(textInput[0]);
+            //only english printable ascii codes are accepted
+            if (c > 32 && c < 127){
+                field.fullText.insert(field.cursorPos, 1, textInput[0]);
+                field.cursorPos++;
+                changed = true;
+            }
+        }
+
+        // backspace -> remove last character
+        if (input->wasKeyJustPressed(SDLK_BACKSPACE) && field.cursorPos > 0) {
+            field.fullText.erase(field.cursorPos - 1, 1);
+            field.cursorPos--;
+            changed = true;
+        }
+
+        // enter -> save result and deactivate
+        if (input->wasActionJustPressed("SubmitInput")) {
+            field.isActive = false;
+            field.result = field.fullText;
+
+            if (field.onChangeCallback)
+                field.onChangeCallback(field.fullText);
+
+            // recover the original text
+            text.text = field.originalText;
+            field.originalText.clear();
+            continue;
+        }
+        // update visible text
+        if (changed) {
+            UIElementCache* cache = getCache(text.entity);
+            if (!cache || !cache->element) continue;
+
+            Ogre::TextAreaOverlayElement* area = dynamic_cast<Ogre::TextAreaOverlayElement*>(cache->element);
+            if (!area) continue;
+
+            const HUGO::String& full = field.fullText;
+            HUGO::Float panelWidth = panel.width;
+
+            HUGO::String visible;
+            HUGO::Float width = 0.0f;
+
+            // show only the part that fits from the end
+            for (int i = static_cast<int>(full.size() - 1); i >= 0; --i) {
+                char c = full[i];
+                HUGO::Float w = area->getFont()->getGlyphAspectRatio(c) * text.characterHeight;
+
+                if (width + w > panelWidth)
+                    break;
+
+                visible.insert(visible.begin(), c);
+                width += w;
+            }
+            text.text = visible;
+        }
+    }
+
+    // clear SDL text input buffer
+    input->clearTextInput();
+
+    // toggle SDL text input if any field is active
+    anyFieldActive = false;
+    for (auto& pack : scene->query<InputFieldComponent>()) {
+        if (pack.getDeprecated<InputFieldComponent&>().isActive) {
+            anyFieldActive = true;
+            break;
+        }
+    }
+    input->toggleTextInput(anyFieldActive);
 }
+
+void UISystem::processProgressBarChanges()
+{
+    for (auto &pack : scene->query<PanelComponent, ProgressBarComponent>())
+    {
+        PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
+        ProgressBarComponent& pr = pack.getDeprecated<ProgressBarComponent&>();
+        syncProgressBar(panel, pr);
+    }
+}
+
 void UISystem::processSliderChanges()
 {
-   for (auto &pack : scene->query<PanelComponent, SliderComponent, SliderDirtyTag>())
+   for (auto &pack : scene->query<PanelComponent, SliderComponent>())
     {
         PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
         SliderComponent& slider = pack.getDeprecated<SliderComponent&>();
@@ -706,18 +652,12 @@ void UISystem::onLoad() {}
 
 void UISystem::update(double)
 {
-    ErrorOrVoid e = processComponentCreations();
-    if(e.isError()){
-        std::cerr<<e.getError().errorMessage;
-    }
+    processPanelChanges();
+    processTextChanges();
 
     processInput();
     processProgressBarChanges();
-    processSliderInput();
     processSliderChanges();
-    processPanelChanges();
-    processTextChanges();
-    processVisibility();
     processButtonChanges();
 }
 
@@ -755,10 +695,6 @@ EntityID UISystem::createPanel(const HUGO::String& overlayName)
 
     panel.isVisible = true;
     panel.material = "test/UI";
-    // mark dirty for sync
-    scene->addComponent<VisibilityDirtyTag>(ent);
-    scene->addComponent<PanelDirtyTag>(ent);
-
     return ent;
 }
 
@@ -799,8 +735,6 @@ EntityID UISystem::createText(const HUGO::String& overlayName)
     text.colour       = {c.r,  c.g,  c.b,  c.a};
     text.colourTop    = {ct.r, ct.g, ct.b, ct.a};
     text.colourBottom = {cb.r, cb.g, cb.b, cb.a};
-
-    scene->addComponent<TextDirtyTag>(ent);
 
     return ent;
 }
@@ -845,11 +779,6 @@ EntityID UISystem::createProgressBar(const HUGO::String& overlayName)
     
     pr.fillWidth = cache->element->getWidth();
     pr.fillHeight = cache->element->getHeight();
-
-    // mark dirty
-    scene->addComponent<PanelDirtyTag>(ent);
-    scene->addComponent<VisibilityDirtyTag>(ent);
-    scene->addComponent<ProgressBarDirtyTag>(ent);
 
     return ent;
 }
@@ -912,11 +841,6 @@ EntityID UISystem::createSlider(const HUGO::String& overlayName)
     //to use colors, the material fields must be blank.
     slider.trackMaterial = "UI/Track";
     slider.knobMaterial = "UI/Knob"; 
-
-    // dirty tags
-    scene->addComponent<PanelDirtyTag>(ent);
-    scene->addComponent<VisibilityDirtyTag>(ent);
-    scene->addComponent<SliderDirtyTag>(ent);
 
     return ent;
 }

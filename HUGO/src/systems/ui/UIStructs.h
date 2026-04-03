@@ -21,12 +21,6 @@ struct UIElementCache
     virtual void setVisible(bool visible);
 };
 
-struct UIButtonCache : public UIElementCache
-{
-    //Ogre::BorderPanelOverlayElement* panel = nullptr;
-    Ogre::TextAreaOverlayElement* textArea = nullptr;
-};
-
 struct UISliderCache : public UIElementCache
 {
     Ogre::OverlayContainer* knob = nullptr;

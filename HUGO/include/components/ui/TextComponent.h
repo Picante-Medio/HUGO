@@ -8,16 +8,15 @@ HCOMPONENT(TextComponent)
 
     // text content
     HUGO::String text = "";              // text to display
-    HUGO::Float characterHeight = 0.05f; // height in relative units
+    HUGO::String textFont = "Roboto";              // font name
+    HUGO::Float characterHeight = 0.04f; // height in relative units
+    HUGO::Float spaceWidth = 0.025f; // width in relative units
 
     // appearance
     HUGO::Vector4 colour = HUGO::Vector4(-1.0f);
     HUGO::Vector4 colourTop = HUGO::Vector4(-1.0f); 
     HUGO::Vector4 colourBottom = HUGO::Vector4(-1.0f);
-        
-    // space width
-    HUGO::Float spaceWidth = 0.03f;  
-
+   
     HUGO::Float left = 0.0f;
     HUGO::Float top = 0.0f;
 END_HCOMPONENT()

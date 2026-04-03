@@ -4,7 +4,6 @@
 #include "HugoSystemMacros.h"
 #include "HugoTypes.h"
 #include "UIStructs.h"
-#include "UITags.h"
 
 #include <unordered_map>
 #include <memory>
@@ -63,10 +62,6 @@ void syncText(const TextComponent& t);
 void syncButton(const ButtonComponent& b, PanelComponent& p);
 void syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr);
 void syncSlider(const PanelComponent& p, const SliderComponent& s);
-// void syncPanel(const PanelComponent& p, const PanelDirtyTag& tag);
-// void syncText(const PanelComponent& p, const TextComponent& t, const TextDirtyTag& tag);
-// void syncButton(const ButtonComponent& b, const ButtonDirtyTag& tag);
-// void syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr, const TextDirtyTag& tag);
 
 //====================================================
 // PROCESSING
@@ -76,10 +71,9 @@ void processPanelChanges();
 void processTextChanges();
 void processButtonChanges();
 void processProgressBarChanges();
-void processInput();
-void processSliderInput();
 void processSliderChanges();
-ErrorOrVoid processComponentCreations();
+
+void processInput();
 //====================================================
 // CACHE
 //====================================================

@@ -1,5 +1,4 @@
 #include "ConsoleSystem.h"
-#include "UITags.h"
 #include "LuaBinder.h"
 #include "PanelComponent.h"
 #include "TextComponent.h"
@@ -114,13 +113,11 @@ void ConsoleSystem::handleKeyInput(){
         HUGO::String next = getNextHistoric();
         scene->getComponent<InputFieldComponent>(consoleInput).fullText = next;
         scene->getComponent<TextComponent>(consoleInput).text = next;
-        scene->addComponent<TextDirtyTag>(consoleInput);
     }
     if(scene->getInput()->wasKeyJustPressed(SDLK_DOWN)){
         HUGO::String prev = getPreviousHistoric();
         scene->getComponent<InputFieldComponent>(consoleInput).fullText = prev;
         scene->getComponent<TextComponent>(consoleInput).text = prev;
-        scene->addComponent<TextDirtyTag>(consoleInput);
     }
 }
 
@@ -142,8 +139,6 @@ void ConsoleSystem::update(double){
     //consoleTextCmp.colourTop = HUGO::Vector4(1.f, 0.f, 0.f, 1.f);
     //consoleTextCmp.colourBottom = HUGO::Vector4(1.f, 0.f, 0.f, 1.f);
     printErrors(consoleTextCmp);
-
-    scene->addComponent<TextDirtyTag>(consoleText);
 
     handleKeyInput();
 }
@@ -173,13 +168,12 @@ void ConsoleSystem::init(){
     panel.left =0.5f;
     panel.top = 0.2f;
 
-    scene->addComponent<CreatePanelDirtyTag>(consoleInput);
 
     TextComponent& text = scene->addAndGetComponent<TextComponent>(consoleInput);
     text.textAreaName = panel.containerName + "/Text";
     text.left = 0.025f;
-    
-    scene->addComponent<CreateTextDirtyTag>(consoleInput);
+    text.colourTop = HUGO::Vector4(1.0f, 0.0f, 0.0f, 1.f);
+    text.colourBottom = HUGO::Vector4(1.0f, 0.0f, 1.0f, 1.f);
 
     InputFieldComponent& input = scene->addAndGetComponent<InputFieldComponent>(consoleInput);
     input.isActive = true;
@@ -187,8 +181,6 @@ void ConsoleSystem::init(){
     input.onChangeCallback = [this](const HUGO::String& input){
         receiveInput(input);
     };
-
-    scene->addComponent<CreateInputFieldDirtyTag>(consoleInput);
 
     //---------------------------------------Console text
 
@@ -203,10 +195,7 @@ void ConsoleSystem::init(){
     panel2.left =0.01f;
     panel2.top =0.01f;
 
-    scene->addComponent<CreatePanelDirtyTag>(consoleText);
 
     TextComponent& text2 = scene->addAndGetComponent<TextComponent>(consoleText);
     text2.textAreaName = panel2.containerName + "/Text";
-
-    scene->addComponent<CreateTextDirtyTag>(consoleText);
 }
