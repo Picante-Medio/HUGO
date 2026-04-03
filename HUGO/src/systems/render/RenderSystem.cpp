@@ -95,8 +95,10 @@ void RenderSystem::init(){
     // Camera and viewport creation for testing
     EntityID CamEntity = scene->createEntity();
     
-    TransformComponent& transform = scene->addAndGetComponent<TransformComponent>(CamEntity);
-    transform.position = HUGO::Vector3(0, 0, 50);
+    scene->addComponent<TransformComponent>(CamEntity, [](TransformComponent& transform){
+        transform.position = HUGO::Vector3(0, 0, 50);
+    });
+
     scene->addComponent<CameraComponent>(CamEntity);
     
     registerCameraEntity(CamEntity);
