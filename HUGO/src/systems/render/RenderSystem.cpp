@@ -90,7 +90,7 @@ void RenderSystem::init(){
     EntityID CamEntity = scene->createEntity();
     
     scene->addComponent<TransformComponent>(CamEntity, [](TransformComponent& transform){
-        transform.position = HUGO::Vector3(0, 0, 50);
+        transform.setPosition(HUGO::Vector3(0, 0, 50));
     });
 
     scene->addComponent<CameraComponent>(CamEntity);
@@ -147,11 +147,11 @@ void RenderSystem::handleTag()
         auto it = lightMap.find(entity);
         if (it != lightMap.end()) {
             // update position
-            it->second.node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.position));
+            it->second.node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getPosition()));
             
             // for dirrectonal light
             if (light.getLightType() == HUGO::LightType::LT_DIRECTIONAL) {
-                it->second.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.rotation));
+                it->second.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getRotation()));
             }
 
             // update diffuse and specular
@@ -358,8 +358,8 @@ void RenderSystem::update(double dt)
         }
         else{
             //update node transform
-            it->second.node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.position));
-            it->second.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.rotation));
+            it->second.node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getPosition()));
+            it->second.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getRotation()));
             
             // update projection parameters
             if (camera.getProjectionType() == HUGO::ProjectionType::Perspective) {
@@ -541,8 +541,8 @@ ErrorOrVoid RenderSystem::createOgreCamera(EntityID entity)
     // create node and attach camera
     res.node = sceneManager->getRootSceneNode()->createChildSceneNode(nodeName);
     res.node->attachObject(res.ogreCamera);
-    res.node->setPosition(HUGO::OgreUtils::vector3ToOgre(transformComp->position));
-    res.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(transformComp->rotation));
+    res.node->setPosition(HUGO::OgreUtils::vector3ToOgre(transformComp->getPosition()));
+    res.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(transformComp->getRotation()));
     
     cameraMap[entity] = res;
 
@@ -615,11 +615,11 @@ ErrorOrVoid RenderSystem::createOgreLight(EntityID entity)
 
     res.node = sceneManager->getRootSceneNode()->createChildSceneNode(nodeName);
     res.node->attachObject(res.ogreLight);
-    res.node->setPosition(HUGO::OgreUtils::vector3ToOgre(transformComp->position));
+    res.node->setPosition(HUGO::OgreUtils::vector3ToOgre(transformComp->getPosition()));
 
     // for dirrectonal light
     if (lightComp->getLightType() == HUGO::LightType::LT_DIRECTIONAL) {
-        res.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(transformComp->rotation));
+        res.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(transformComp->getRotation()));
     }
 
     lightMap[entity] = res;

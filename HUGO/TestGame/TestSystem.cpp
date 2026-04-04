@@ -35,8 +35,8 @@ TestSystem::init() {
 
     e1 = scene->createEntity();
     scene->addComponent<TransformComponent>(e1, [](TransformComponent& t1) {
-        t1.position = HUGO::Vector3(0, 0, 0);
-        t1.scale = HUGO::Vector3(2.f, 2.f, 2.f);
+        t1.setPosition(HUGO::Vector3(0, 0, 0));
+        t1.setScale(HUGO::Vector3(2.f, 2.f, 2.f));
     });
     scene->addComponent<RenderComponent>(e1, [](RenderComponent& rc) {
         rc.setMeshName("cube.mesh");
@@ -45,7 +45,7 @@ TestSystem::init() {
 
     e2 = scene->createEntity();
     scene->addComponent<TransformComponent>(e2, [](TransformComponent& t2) {
-        t2.position = HUGO::Vector3(-2, 2, 0);
+        t2.setWorldPosition(HUGO::Vector3(2, -4, 0));
     });
     scene->addComponent<RenderComponent>(e2, [](RenderComponent& rc2) {
         rc2.setMeshName("cube.mesh");
@@ -54,7 +54,7 @@ TestSystem::init() {
 
     e3 = scene->createEntity(); 
     scene->addComponent<TransformComponent>(e3, [](TransformComponent& t3) {
-        t3.position = HUGO::Vector3(-2, 4, 0);
+        t3.setPosition(HUGO::Vector3(-2, 4, 0));
     });
     scene->addComponent<RenderComponent>(e3, [](RenderComponent& rc3) {
         rc3.setMeshName("cube.mesh");
@@ -83,9 +83,8 @@ TestSystem::init() {
 
     EntityID ui = scene->createEntity();
     scene->addComponent<TransformComponent>(ui, [](TransformComponent& tr){
-        tr.position =  HUGO::Vector3(0, 100, 100);
-        //tr.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(0)), HUGO::Vector3(0,0,0));
-        //tr.rotation.normalize();
+        tr.setPosition(HUGO::Vector3(0, 100, 100));
+        //tr.setRotation(HUGO::Quaternion(HUGO::Radian(HUGO::Degree(0)), HUGO::Vector3(0,0,0)));
     });
     scene->addComponent<LightComponent>(ui, [](LightComponent& lg){
         lg.setLightType(HUGO::LightType::LT_SPOTLIGHT);
@@ -166,18 +165,10 @@ TestSystem::update(double dt) {
 
     // ------------HierarchySystemTest----------
     TransformComponent& tr=scene->getComponent<TransformComponent>(e1);
-    // tr.position.x += dt * 4;
-    // tr.scale.x+= dt*0.03;
-    tr.rotation *= HUGO::Quaternion(HUGO::Radian(HUGO::Degree(1.0f)), HUGO::Vector3(0,1,0));
+    tr.setRotation( tr.getRotation()* HUGO::Quaternion(HUGO::Radian(HUGO::Degree(1.0f)), HUGO::Vector3(0,1,0)));
 
-    // timer += dt;
-
-    // if(timer >= 3 && !usedTimer){
-    //     usedTimer = true;
-    //     scene->removeEntity(e3);
-    //     std::cout<<"eliminado"<<"\n";
-    // }
-
+    TransformComponent& tr2=scene->getComponent<TransformComponent>(e2);
+    tr2.setPosition( tr2.getPosition() + HUGO::Vector3(dt*5, 0, 0 ));
     //----------------------------------------
 
 

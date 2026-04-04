@@ -283,11 +283,13 @@ void AudioSystem::set3DCone(ma_sound* s, HUGO::Float innerAngle, HUGO::Float out
 #pragma region synchronization
 void AudioSystem::updateListeners(const AudioListenerComponent& a, const TransformComponent& tr)
 {
-    const HUGO::Vector3& forward = tr.rotation.forward();
-    const HUGO::Vector3& up = tr.rotation.up();
-    
-    ma_engine_listener_set_position(engine.get(), 0, tr.position.x, tr.position.y, tr.position.z);
-    ma_engine_listener_set_direction(engine.get(), 0, forward.x, forward.y, forward.z);
+    const HUGO::Vector3& forward = tr.getRotation().forward();
+    const HUGO::Vector3& up = tr.getRotation().up();
+
+    ma_engine_listener_set_position(engine.get(), 0, tr.getPosition().x, tr.getPosition().y, tr.getPosition().z);
+
+    ma_engine_listener_set_direction(engine.get(), 0, forward.x, forward.y,forward.z);
+
     ma_engine_listener_set_world_up(engine.get(), 0, up.x, up.y, up.z);
     ma_engine_listener_set_velocity(engine.get(), 0, a.listenerVelocity.x, a.listenerVelocity.y, a.listenerVelocity.z);
 }
@@ -314,7 +316,7 @@ void AudioSystem::process3DChanges(AudioComponent& a, const Audio3DInfoComponent
     setDopplerFactor(s, c.dopplerFactor);
     set3DRollof(s, c.rolloff);
     set3DCone(s, c.coneInnerAngle, c.coneOuterAngle, c.coneOuterGain);
-    set3DPosition(s, tr.position);
+    set3DPosition(s, tr.getPosition());
 }
 #pragma endregion
 

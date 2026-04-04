@@ -89,7 +89,7 @@ void ParticleSystem::processCreations() {
     for (auto& pack : scene->query<TransformComponent, ParticleEmitterComponent, ParticleEmitterComponentTag>()) {
         TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
         ParticleEmitterComponent& pe = pack.getDeprecated<ParticleEmitterComponent&>();
-        createParticleSystem(tr.entity, pe.particleName, pe, tr.position);
+        createParticleSystem(tr.entity, pe.particleName, pe, tr.getPosition());
         scene->removeComponent<ParticleEmitterComponentTag>(tr.entity);
     }
 }
@@ -134,7 +134,7 @@ void ParticleSystem::processChanges() {
         if (!instance.node || !instance.ps) continue;
 
         // transform
-        instance.node->setPosition(tr.position.x+offset, tr.position.y, tr.position.z);
+        instance.node->setPosition(tr.getPosition().x+offset, tr.getPosition().y, tr.getPosition().z);
 
         // active and visibility
         instance.ps->setVisible(pe.active);

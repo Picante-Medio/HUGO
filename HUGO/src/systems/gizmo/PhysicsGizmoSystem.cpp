@@ -36,7 +36,7 @@ ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity
     }
 
     scene->modifyComponent<TransformComponent>(entity, [&colliderInfo](TransformComponent& gizmoTransform){
-        gizmoTransform.scale = colliderInfo.halfExtents * 2;
+        gizmoTransform.setScale(colliderInfo.halfExtents * 2);
     });
 
     return ErrorOrVoid();
@@ -55,7 +55,7 @@ ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity
     }
 
     scene->modifyComponent<TransformComponent>(entity, [&colliderInfo](TransformComponent& gizmoTransform){
-        gizmoTransform.scale = colliderInfo.r * 2;
+        gizmoTransform.setScale(colliderInfo.r * 2);
     });
 
     return ErrorOrVoid();
@@ -74,7 +74,7 @@ ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity
     }
 
     scene->modifyComponent<TransformComponent>(entity, [&colliderInfo](TransformComponent& gizmoTransform){
-        gizmoTransform.scale = colliderInfo.halfExtents * 2;
+        gizmoTransform.setScale(colliderInfo.halfExtents * 2);
     });
 
     return ErrorOrVoid();
@@ -93,7 +93,7 @@ ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity
     }
 
     scene->modifyComponent<TransformComponent>(entity, [&colliderInfo](TransformComponent& gizmoTransform){
-        gizmoTransform.scale = HUGO::Vector3(colliderInfo.r * 2, colliderInfo.height, colliderInfo.r * 2);
+        gizmoTransform.setScale(HUGO::Vector3(colliderInfo.r * 2, colliderInfo.height, colliderInfo.r * 2));
     });
 
     return ErrorOrVoid();
@@ -112,7 +112,7 @@ ErrorOrVoid createGizmoMesh<CapsuleColliderInfo>(std::shared_ptr<HUGO::IScene> s
     }
 
     scene->modifyComponent<TransformComponent>(entity, [&colliderInfo](TransformComponent& gizmoTransform){
-        gizmoTransform.scale = HUGO::Vector3(colliderInfo.r * 2, colliderInfo.height, colliderInfo.r * 2);
+        gizmoTransform.setScale(HUGO::Vector3(colliderInfo.r * 2, colliderInfo.height, colliderInfo.r * 2));
     });
 
     return ErrorOrVoid();
@@ -167,8 +167,8 @@ void PhysicsGizmoSystem::update(double){
         entVisited.visited = true;
 
         scene->modifyComponent<TransformComponent>(entVisited.entityID, [&transform](TransformComponent& gizmoTr){
-            gizmoTr.position = transform.position;
-            gizmoTr.rotation = transform.rotation;
+            gizmoTr.setPosition(transform.getPosition());
+            gizmoTr.setRotation(transform.getRotation());
         });
     }
 
