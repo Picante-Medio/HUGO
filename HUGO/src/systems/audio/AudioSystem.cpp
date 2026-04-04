@@ -1,10 +1,8 @@
 #include "AudioSystem.h"
-
 #include "AudioComponent.h"
 #include "AudioListenerComponent.h"
 #include "AudioTags.h"
 #include "Audio3DInfoComponent.h"
-
 #include "HugoError.h"
 #include "HugoTypes.h"
 #include "Scene.h"
@@ -12,6 +10,7 @@
 #include "LuaBinder.h"
 
 #include "MiniaudioModule.h"
+#include "AudioAssetsModule.h"
 
 #include <fstream>
 #include <memory>
@@ -19,20 +18,24 @@
 
 ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id)
 {
+    StringError e;
+    AudioAssetInfo* asset = AudioAssetsModule::Instance().getAsset(id);
+    if (!asset) {       
+        e.errorMessage = "[AudioSystem]: Audio ID not found";
+        return ErrorOrType<AudioInfo>(e);
+    }
+    
     AudioInfo info;
     info.ptr = std::make_shared<Audio>();
-
-    std::string fullPath = path + "/" + audios[id].filename;
-
-    if (!info.ptr->init(engine.get(), fullPath.c_str(), 0))
+    
+    if (!info.ptr->init(engine.get(), asset->fullPath.c_str(), 0))
     {
-        StringError err;
-        err.errorMessage = "Failed loading audio";
-        return ErrorOrType<AudioInfo>(err);
+        e.errorMessage = "Failed loading audio: " + asset->fullPath;
+        return ErrorOrType<AudioInfo>(e);
     }
-
-    // configuration according to their type
-    if (audios[id].type == HUGO::SOUND3D)
+    
+    // configuration
+    if (asset->type == HUGO::SOUND3D)
     {
         ma_sound_set_spatialization_enabled(info.ptr->get(), MA_TRUE);
         ma_sound_set_attenuation_model(info.ptr->get(), ma_attenuation_model_inverse);
@@ -41,11 +44,17 @@ ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id)
     {
         ma_sound_set_spatialization_enabled(info.ptr->get(), MA_FALSE);
     }
-
+    
     return ErrorOrType<AudioInfo>(std::move(info));
 }
 
-// voice pool functions
+void AudioSystem::ensurePoolSize()
+{
+    size_t assetCount = AudioAssetsModule::Instance().size();
+    if (pools.size() < assetCount) {
+        pools.resize(assetCount);
+    }
+}
 
 /**
  * @brief get an available sound instance from the pool.
@@ -61,71 +70,72 @@ ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id)
 ma_sound* AudioSystem::getSound(HUGO::AudioID id)
 {
     AudioPool& pool = pools[id];
-
+    
     // STEP 1 : try reusing an existing free voice
-    // O(N), but N is small (queueSize)
     for (auto& voice : pool.voices)
     {
         if (!voice.inUse)
         {
             voice.inUse = true;
-            // reset playback to the beginning
             ma_sound_seek_to_pcm_frame(voice.ptr->get(), 0);
             return voice.ptr->get();
         }
     }
-
-     // STEP 2 : create a new voice if we haven't reached the pool limit yet
+    
+    // STEP 2 : create a new voice if we haven't reached the pool limit yet
     if (pool.voices.size() < static_cast<size_t>(queueSize))
     {   
-        // try to create a new voice
         ErrorOrType<AudioInfo> result = createVoice(id);
-
+        
         if (result.isError())
             return nullptr;
-
-        // add the new voice to the pool (movement)
+        
         pool.voices.emplace_back(std::move(result.getValue()));
-
-        // reference to the newly created voice
+        
         AudioInfo& v = pool.voices.back();
         v.inUse = true;
-
+        
         ma_sound_set_end_callback(
             v.ptr->get(),
             AudioSystem::endCallback,
             &v);
-
+        
         return v.ptr->get();
     }
-
+    
+    // STEP 3 : steal an existing voice
     AudioInfo& stolen = pool.voices[pool.stealIndex];
     pool.stealIndex = (pool.stealIndex + 1) % pool.voices.size();
-
+    
     ma_sound_stop(stolen.ptr->get());
     ma_sound_seek_to_pcm_frame(stolen.ptr->get(), 0);
-
+    
     stolen.inUse = true;
-
+    
+    // Reconfigure for new audio type
+    HUGO::AudioTypes type = AudioAssetsModule::Instance().getAsset(id)->type;
+    if (type == HUGO::SOUND3D) {
+        ma_sound_set_spatialization_enabled(stolen.ptr->get(), MA_TRUE);
+        ma_sound_set_attenuation_model(stolen.ptr->get(), ma_attenuation_model_inverse);
+    } else {
+        ma_sound_set_spatialization_enabled(stolen.ptr->get(), MA_FALSE);
+    }
+    
     return stolen.ptr->get();
 }
 
-// ensures a component has a valid voice
-// only creates one if it doesn't exist yet
-ma_sound *AudioSystem::acquireVoice(AudioComponent &c)
+ma_sound* AudioSystem::acquireVoice(AudioComponent &c)
 {
-    if (c.activePtr == nullptr) 
+    if (c.activePtr == nullptr) {
         c.activePtr = getSound(c.audioId);
+    }
     return c.activePtr;
 }
 
-// CALLBACK
 void AudioSystem::endCallback(void* data, ma_sound*)
 {
     if (!data) return;
-
     AudioInfo& voice = *reinterpret_cast<AudioInfo*>(data);
-
     voice.inUse = false;
 }
 
@@ -141,14 +151,13 @@ void AudioSystem::playAudio(HUGO::AudioID id)
     playAudio(s);
 }
 
-
 void AudioSystem::playAudioLUA(int id) {
     playAudio(static_cast<HUGO::AudioID>(id));
 }
 
 void AudioSystem::stopAudio(ma_sound* s)
 {
-    if (s) ma_sound_stop(s);
+    ma_sound_stop(s);
 }
 
 void AudioSystem::resumeAudio(ma_sound* s)
@@ -170,24 +179,24 @@ void AudioSystem::setVolume(ma_sound* s, HUGO::Float vol)
 
 void AudioSystem::setGroupVolume(HUGO::AudioTypes type, HUGO::Float volume)
 {
-    // store the group volume
     if (type == HUGO::AudioTypes::MUSIC)
         musicsGroupVolume = volume;
     else   
         soundsGroupVolume = volume;
-
-    // iterate over all audio pools
-    for (size_t id = 0; id < audios.size(); ++id)
+    
+    for (HUGO::Int id = 0; id < pools.size(); ++id)
     {
-        if (audios[id].type != type)
+        // skip if no asset for this ID
+        if (!AudioAssetsModule::Instance().exists(id)) continue;
+        
+        if (AudioAssetsModule::Instance().getAsset(id)->type != type)
             continue;
-
+        
         AudioPool& pool = pools[id];
         for (auto& voice : pool.voices)
         {
             if (voice.ptr)
             {
-                // apply group volume multiplied by individual volume
                 HUGO::Float vol = ma_sound_get_volume(voice.ptr->get());
                 ma_sound_set_volume(voice.ptr->get(), vol * volume);
             }
@@ -201,33 +210,30 @@ void AudioSystem::setPitch(ma_sound* s, HUGO::Float pitch)
 }
 
 void AudioSystem::setAudioPosition(ma_sound* s, double seconds)
-{
-    if (seconds < 0.0)
-        seconds = 0.0;
-
+{   
+    if (seconds < 0.0) seconds = 0.0;
+    
     ma_uint32 sr = ma_engine_get_sample_rate(engine.get());
     ma_uint64 frame = static_cast<ma_uint64>(seconds * sr);
-
+    
     ma_uint64 totalFrames = 0;
-
-    if (ma_sound_get_length_in_pcm_frames(s, &totalFrames) == MA_SUCCESS &&
-        frame > totalFrames)
+    if (ma_sound_get_length_in_pcm_frames(s, &totalFrames) == MA_SUCCESS && frame > totalFrames)
     {
         frame = totalFrames;
     }
-
+    
     ma_sound_seek_to_pcm_frame(s, frame);
 }
 
 double AudioSystem::getAudioPosition(ma_sound* s)
 {
+    if (!s) return -1.0;
+    
     ma_uint64 cursor = 0;
-
     if (ma_sound_get_cursor_in_pcm_frames(s, &cursor) != MA_SUCCESS)
         return -1.0;
-
+    
     ma_uint32 sr = ma_engine_get_sample_rate(engine.get());
-
     return static_cast<double>(cursor) / sr;
 }
 #pragma endregion
@@ -279,19 +285,15 @@ void AudioSystem::updateListeners(const AudioListenerComponent& a, const Transfo
 {
     const HUGO::Vector3& forward = tr.rotation.forward();
     const HUGO::Vector3& up = tr.rotation.up();
-
+    
     ma_engine_listener_set_position(engine.get(), 0, tr.position.x, tr.position.y, tr.position.z);
-
-    ma_engine_listener_set_direction(engine.get(), 0, forward.x, forward.y,forward.z);
-
+    ma_engine_listener_set_direction(engine.get(), 0, forward.x, forward.y, forward.z);
     ma_engine_listener_set_world_up(engine.get(), 0, up.x, up.y, up.z);
-
-    ma_engine_listener_set_velocity(engine.get(), 0, a.listenerVelocity.x, a.listenerVelocity.y,a.listenerVelocity.z);
+    ma_engine_listener_set_velocity(engine.get(), 0, a.listenerVelocity.x, a.listenerVelocity.y, a.listenerVelocity.z);
 }
 
 void AudioSystem::processChanges(AudioComponent &c)
 {
-    // get the pointer to the currently active voice (if it has)
     ma_sound* s = acquireVoice(c);
     setLooping(s, c.loop);
     setVolume(s, c.volume);
@@ -316,74 +318,6 @@ void AudioSystem::process3DChanges(AudioComponent& a, const Audio3DInfoComponent
 }
 #pragma endregion
 
-#pragma region HELPERS
-ErrorOrVoid AudioSystem::loadAudiosFromFile(const HUGO::String& fileName)
-{
-    // build full path using the system audio directory
-    HUGO::String fullPath = path + fileName;
-    std::ifstream file(fullPath);
-
-    if (!file.is_open())
-    {
-        StringError error;
-        error.errorMessage = "Could not open audio file list";
-        return ErrorOrVoid(error);
-    }
-
-    std::string line;
-
-    while (std::getline(file, line))
-    {
-        if (line.empty() || line[0] == '#')
-            continue;
-
-        std::stringstream ss(line);
-
-        std::string audioName;
-        std::string filename;
-        std::string typeStr;
-
-        std::getline(ss, audioName, ';');
-        std::getline(ss, filename, ';');
-        std::getline(ss, typeStr, ';');
-
-        HUGO::AudioTypes type =
-            static_cast<HUGO::AudioTypes>(std::stoi(typeStr));
-
-        HUGO::AudioID id = nextID++;
-
-        audios.push_back({audioName, filename, type});
-        nameToID[audioName] = id;
-
-        pools.emplace_back();
-    }
-
-    return ErrorOrVoid();
-}
-
-ErrorOrVoid AudioSystem::addAudio(const char* n,
-                                  HUGO::AudioTypes type)
-{
-    HUGO::String audioName = n;
-
-    if (nameToID.find(audioName) != nameToID.end())
-    {
-        StringError error;
-        error.errorMessage = "Audio already registered";
-        return ErrorOrVoid(error);
-    }
-
-    HUGO::AudioID id = nextID++;
-
-    audios.push_back({audioName, audioName, type});
-    nameToID[audioName] = id;
-
-    pools.emplace_back();
-
-    return ErrorOrVoid();
-}
-#pragma endregion
-
 #pragma region UPDATES
 void AudioSystem::update(double)
 {
@@ -391,59 +325,53 @@ void AudioSystem::update(double)
     for (auto& pack : scene->query<AudioListenerComponent, TransformComponent>())
     {
         AudioListenerComponent& listener = pack.getDeprecated<AudioListenerComponent&>();
-        TransformComponent& tr   = pack.getDeprecated<TransformComponent&>();
+        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
         updateListeners(listener, tr);
     }
-
+    
     // 3D changes
     for (auto& pack: scene->query<AudioComponent, Audio3DInfoComponent, TransformComponent>())
     {
         AudioComponent& a = pack.getDeprecated<AudioComponent&>();
         Audio3DInfoComponent& info = pack.getDeprecated<Audio3DInfoComponent&>();
         TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
-
         process3DChanges(a, info, tr);
     }
-
+    
     // general changes
     for (auto& pack: scene->query<AudioComponent>())
     {
-        AudioComponent& c   = pack.getDeprecated<AudioComponent&>();
+        AudioComponent& c = pack.getDeprecated<AudioComponent&>();
         processChanges(c);
     }
-
+    
     // play events
     for (auto& pack: scene->query<AudioComponent, AudioPlayTag>())
     {
         AudioComponent& c = pack.getDeprecated<AudioComponent&>();
-
         ma_sound* s = acquireVoice(c);
         playAudio(s);
-
         c.isPlaying = true;
-
         scene->removeComponent<AudioPlayTag>(c.entity);
     }
-
+    
     // stop events
     for (auto& pack :scene->query<AudioComponent, AudioStopTag>())
     {
         AudioComponent& c = pack.getDeprecated<AudioComponent&>();
-
         if (c.activePtr)
         {
             stopAudio(c.activePtr);
             c.activePtr = nullptr;
         }
-
         c.isPlaying = false;
         scene->removeComponent<AudioStopTag>(c.entity);
     }
-
+    
+    // cleanup finished voices
     for (auto& pack : scene->query<AudioComponent>())
     {
         AudioComponent& c = pack.getDeprecated<AudioComponent&>();
-
         if (c.activePtr && !ma_sound_is_playing(c.activePtr))
         {
             c.activePtr = nullptr;
@@ -459,15 +387,12 @@ void AudioSystem::fixedUpdate(double)
 void AudioSystem::onLoad(){
     std::shared_ptr<LuaBinder> luaBinder = LuaBinder::getInstance();
     luaBinder->registerMethod<AudioSystem, void, int>(*this, &AudioSystem::playAudioLUA, "playAudio");
-    luaBinder->registerMethod<AudioSystem, ErrorOrVoid, const HUGO::String&>(*this, &AudioSystem::loadAudiosFromFile, "loadAudiosFromFile");
 }
 
 void AudioSystem::init(){
     engine = MiniaudioModule::Instance().getMiniaudioEngine();
-    nextID = 0;
     
-    //TEST
-    loadAudiosFromFile("AudioList.txt");
-    
+    // Ensure pools are sized correctly
+    ensurePoolSize();
 }
 #pragma endregion

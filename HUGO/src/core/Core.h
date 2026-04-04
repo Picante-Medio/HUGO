@@ -6,6 +6,7 @@
 #include "miniaudio.h"
 #include "OgreModule.h"
 #include "MiniaudioModule.h"
+#include "AudioAssetsModule.h"
 #include "IPhysicsModule.h"
 #include "HugoError.h"
 
@@ -23,6 +24,7 @@ namespace HUGO {
         const int FRAME_RATE = 10;
         void initModules();
         void initLua();
+        void initAudioAssets();
 
         //Ogre
         //std::shared_ptr<OgreModule> m_ogreModule;

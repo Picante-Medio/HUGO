@@ -69,6 +69,8 @@ void HUGO::Core::initModules()
 {
     //MiniaudioModule init
     MiniaudioModule::Instance();
+    //Audio assets init
+    initAudioAssets();
 
     //OgreModule init
     OgreModule::Instance();
@@ -127,4 +129,15 @@ Core::initLua() {
         std::filesystem::path("..") / "src" / "lua" / "scripts"
     );
     LuaBinder::getInstance()->requireFolder(luaPath.string());
+}
+
+void HUGO::Core::initAudioAssets()
+{
+    auto& assets = AudioAssetsModule::Instance();
+    
+    // set base path
+    assets.setBasePath("test_media/audios/");
+    
+    // automatically scan and register all audio files
+    assets.scanAndRegisterAll();
 }
