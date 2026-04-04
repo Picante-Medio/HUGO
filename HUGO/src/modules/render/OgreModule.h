@@ -29,12 +29,14 @@ class OgreModule{
     Ogre::RenderWindow* m_ogreRenderWindow = nullptr;
     SDL_Window* m_sdlWindow = nullptr;
     
-    //Initializes Ogre Singletons and SDL window
-    OgreModule();
 
     std::unordered_map<HUGO::String, Ogre::SceneManager*> m_sceneManagers;
 
     Ogre::SceneManager* m_currentSceneManager;
+
+    //Initializes Ogre Singletons and SDL window
+    OgreModule();
+    void loadResources();
 public:
 
     static OgreModule& Instance();

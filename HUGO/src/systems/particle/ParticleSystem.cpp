@@ -61,20 +61,20 @@ void ParticleSystem::createParticleSystem(EntityID id, const HUGO::String& parti
 
     node->attachObject(ps);
 
-    //get the emitter
-    Ogre::ParticleEmitter* e =  ps->getEmitter(0);
+    // // //get the emitter
+    // Ogre::ParticleEmitter* e =  ps->getEmitter(0);
 
-    // read the datas
-    HUGO::Float emissionRate = e->getEmissionRate();
-    Ogre::Vector3 direction = e->getDirection();
-    Ogre::ColourValue colour = e->getColour();
-    HUGO::Float timeToLive = e->getTimeToLive();
+    // // read the datas
+    // HUGO::Float emissionRate = e->getEmissionRate();
+    // Ogre::Vector3 direction = e->getDirection();
+    // Ogre::ColourValue colour = e->getColour();
+    // HUGO::Float timeToLive = e->getTimeToLive();
 
-    // store
-    pe.emissionRate = emissionRate;
-    pe.direction = HUGO::Vector3(direction.x, direction.y, direction.z);
-    pe.colour = HUGO::Vector4(colour.r, colour.g, colour.b, colour.a);
-    pe.timeToLive = timeToLive;
+    // // store
+    // pe.emissionRate = emissionRate;
+    // pe.direction = HUGO::Vector3(direction.x, direction.y, direction.z);
+    // pe.colour = HUGO::Vector4(colour.r, colour.g, colour.b, colour.a);
+    // pe.timeToLive = timeToLive;
 
     node->setPosition({iniPos.x, iniPos.y, iniPos.z});
 

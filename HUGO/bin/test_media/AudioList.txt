@@ -1,5 +1,0 @@
-# each line is an audio
-# type -> 0: 2D sound 1: 3D sound 2: music
-# format: {name};{path};{type}
-bgm;lucky.mp3;2
-laugh;risa.wav;1

@@ -9,6 +9,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
 
+#include <iostream>
 #pragma region Resource Helper Functions
 
 void locateResources()
@@ -29,8 +30,16 @@ void locateResources()
         }
     }
 }
-void loadResources()
+void OgreModule::loadResources()
 {
+    auto renderers = m_ogreRoot->getAvailableRenderers();
+    if (renderers.empty()) {
+        throw std::runtime_error("No renderers found! Check plugins.cfg and plugin paths.");
+    }
+
+    for (auto r : renderers) {
+        std::cout << "Renderer available: " << r->getName() << std::endl;
+    }
     Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
 
@@ -62,9 +71,6 @@ OgreModule::OgreModule(){
 
     m_ogreRoot->initialise(false);
 
-    locateResources();
-    loadResources();
-
     #ifdef __linux__
         SDL_setenv("SDL_VIDEODRIVER", "x11", 1);
     #endif
@@ -92,6 +98,9 @@ OgreModule::OgreModule(){
     
     params["externalWindowHandle"] = Ogre::StringConverter::toString(windowHandle);
     m_ogreRenderWindow = m_ogreRoot->createRenderWindow(OGRE_WINDOW_NAME, 1000, 800, false, &params);
+
+    locateResources();
+    loadResources();
 }
 
 OgreModule::~OgreModule(){

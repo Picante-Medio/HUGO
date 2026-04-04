@@ -81,7 +81,7 @@ void BulletSimulation::destroySimulation() {
     delete overlappingPairCache;
     delete dispatcher;
     delete collisionConfig;
-    delete debugDrawer;
+    //delete debugDrawer;
 }
 
 void BulletSimulation::performSimulation(double dt) {
