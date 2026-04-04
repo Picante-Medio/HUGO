@@ -11,7 +11,7 @@ class IPhysicsModule;
 namespace HUGO {
     class IInput;
 
-    class SceneManager {
+    class SceneManager : public std::enable_shared_from_this<SceneManager> {
 
         HUGO::ChatParser m_chatParser;
         //Scene map that stores created game scenes.

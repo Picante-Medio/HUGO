@@ -14,15 +14,16 @@
 
 #include "EntityTable.h"
 #include "ComponentDenseTable.h"
-
+#include "SceneManager.h"
 #include "ComponentFactory.h"
 #include "GameLibraryLoader.h"
-
 #include "StringUtils.h"
 #include "ParentComponent.h"
 #include "ChildrenComponent.h"
 
-Scene::Scene(std::shared_ptr<HUGO::IInput> input) : input(input) {
+Scene::Scene(std::shared_ptr<HUGO::IInput> input, HUGO::SceneManager& sceneManager) 
+    : input(input), sceneManager(sceneManager)
+{
 	entityTable = std::make_unique<EntityTable>();
 	componentTable = std::make_unique<ComponentDenseTable>();
 	messenger = HUGO::Messenger();
@@ -244,4 +245,9 @@ Scene::removeComponentAux(EntityID entity, ComponentID componentID, DenseListInd
 
     // Updating the index of the moved component upon deletion
     if(needsUpdate) entityTable->updateDenseListIndex(toUpdate, componentID, index);
+}
+
+void 
+Scene::changeScene(const HUGO::String& sceneName) {
+    sceneManager.setCurrentScene(sceneName);
 }

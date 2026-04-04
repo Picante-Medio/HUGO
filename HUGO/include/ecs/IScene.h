@@ -23,7 +23,6 @@ protected:
 	std::unique_ptr<IEntityTable> entityTable;
   	std::unique_ptr<IComponentDenseTable> componentTable;
 	Messenger messenger;
-	std::shared_ptr<IInput> input;
 
 public:
 	// Entity handling
@@ -200,6 +199,11 @@ public:
 
 	// Input handling
 	virtual std::shared_ptr<IInput> getInput() = 0;
+
+    /** Scene changing
+     * ERROR POSSIBLE: If the scene to change does not exist, logs an error to debug console
+     */
+    virtual void changeScene(const HUGO::String& sceneName) = 0;
 };
 
 }

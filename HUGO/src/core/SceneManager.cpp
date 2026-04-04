@@ -9,6 +9,7 @@
 #include "OgreModule.h"
 
 #include "GameLibraryLoader.h"
+#include <memory>
 
 using namespace HUGO;
 
@@ -41,7 +42,7 @@ ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
 
     -> Create entities with components
     */
-    m_sceneMap[sceneName] = std::make_shared<Scene>(m_input);
+    m_sceneMap[sceneName] = std::make_shared<Scene>(m_input, *this);
 
     for(auto systemName : sceneData.getValue().systems){
         ErrorOrType<std::shared_ptr<HUGO::System>> value = HUGO::SystemFactory::makeSystem(m_sceneMap[sceneName], systemName);

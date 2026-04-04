@@ -1,0 +1,10 @@
+SCENE SecondScene
+
+SYSTEM AudioSystem
+SYSTEM RenderSystem
+SYSTEM PhysicsTestSystem
+SYSTEM ConsoleSystem
+SYSTEM TweenSystem
+SYSTEM HierarchySystem
+SYSTEM CameraMovementSystem
+SYSTEM PhysicsGizmoSystem

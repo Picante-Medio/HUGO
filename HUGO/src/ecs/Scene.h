@@ -12,6 +12,9 @@
 #include "IInput.h"
 
 class Input;
+namespace HUGO {
+    class SceneManager;
+}
 class Scene : public HUGO::IScene, public std::enable_shared_from_this<Scene>
 {
     std::vector<std::shared_ptr<HUGO::System>> systems;
@@ -19,10 +22,11 @@ class Scene : public HUGO::IScene, public std::enable_shared_from_this<Scene>
     std::queue<HUGO::String> stringsToLog;
 
     std::shared_ptr<HUGO::IInput> input;
+    HUGO::SceneManager& sceneManager;
 
     void removeComponentAux(EntityID entity, ComponentID componentID, DenseListIndex index);
 public:
-    Scene(std::shared_ptr<HUGO::IInput> input);
+    Scene(std::shared_ptr<HUGO::IInput> input, HUGO::SceneManager& sceneManager);
 
     void load();
 
@@ -59,4 +63,6 @@ public:
     void dispatchMessages() override;
 
     std::shared_ptr<HUGO::IInput> getInput() override;
+
+    void changeScene(const HUGO::String& sceneName) override;
 };

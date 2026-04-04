@@ -5,9 +5,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL_video.h>
-#include <cstddef>
 #include <filesystem>
-#include <iostream>
 #include <Ogre.h>
 #include <OgreOverlaySystem.h>
 #include <memory>

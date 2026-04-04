@@ -1,11 +1,12 @@
 #include "MessagesTestSystem.h"
-#include "TestMessage.h"
+#include "ChangeSceneMessage.h"
+#include <memory>
 
 void MessagesTestSystem::init() {
-    scene->subscribe<TestMessage>([](std::shared_ptr<HUGO::Message> msg){
-        std::shared_ptr<TestMessage> m = std::static_pointer_cast<TestMessage>(msg);
-        std::cout << m->s << '\n';
-    });
+    // scene->subscribe<ChangeSceneMessage>([this](std::shared_ptr<HUGO::Message> msg) {
+    //     std::shared_ptr<ChangeSceneMessage> m = std::static_pointer_cast<ChangeSceneMessage>(msg);
+    //     scene->changeScene(m->sceneName);
+    // });
 }
 
 void MessagesTestSystem::onLoad() {
@@ -17,9 +18,6 @@ void MessagesTestSystem::fixedUpdate(double dt) {
 void MessagesTestSystem::update(double dt) {
     currT += dt;
     if(currT >= nextT ) {
-        scene->sendMessage(TestMessage());
-
-        currT = 0.f;
-        nextT = 3.0f;
+        scene->sendMessage<ChangeSceneMessage>(ChangeSceneMessage{});
     }
 }
