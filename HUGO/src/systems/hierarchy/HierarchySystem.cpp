@@ -56,7 +56,7 @@ HierarchySystem::addParentToChild(EntityID child, EntityID parent){
 void 
 HierarchySystem::removeParentFromChild(EntityID child){
     if(scene->hasComponent<ParentComponent>(child)){
-        scene->getComponent<ParentComponent>(child).parent.reset();
+        scene->getComponent<ParentComponent>(child).parent.reset();   
     }
 }
 
@@ -148,6 +148,45 @@ HierarchySystem::updateHierarchy(){
     }
 }
 
+
+void 
+HierarchySystem::setWorldTransform(TransformComponent &transform){
+    transform.position = transform.worldPosition;
+    transform.rotation = transform.worldRotation;
+    transform.scale = transform.worldScale; 
+}
+
+void 
+HierarchySystem::updateLocalTransform(TransformComponent &transform){
+    EntityID entity = transform.entity;
+
+    // if the entity does not has parent, set it's world transform
+    if(!scene->hasComponent<ParentComponent>(entity)){
+        setWorldTransform(transform);
+        return;
+    }
+
+    ParentComponent& parentComp = scene->getComponent<ParentComponent>(entity);
+    if(!parentComp.parent){ //parent does not exist
+        setWorldTransform(transform);
+        return;
+    }
+
+    //if entity has a parent, the transform changes according to the parent
+    TransformComponent& parentTransform = getFullTransform(parentComp.parent.value());
+
+    //rotation/orientation
+    transform.rotation = parentTransform.worldRotation.inverse() * transform.worldRotation;
+
+    //scale
+    transform.scale = transform.worldScale / parentTransform.worldScale;
+    
+    //position
+
+    transform.position = parentTransform.worldRotation.inverse() * (transform.worldPosition - parentTransform.worldPosition) / parentTransform.worldScale;
+}
+
+
 void 
 HierarchySystem::setLocalTransform(TransformComponent &transform){
     transform.worldPosition = transform.position;
@@ -189,14 +228,43 @@ HierarchySystem::getFullTransform(EntityID entity){
 
     TransformComponent& tr = scene->getComponent<TransformComponent>(entity);
     
-    //check if it needs update
-    if (!scene->hasComponent<WorldTransformDirtyTag>(entity))
-        return tr;
-
-    updateWorldTransform(tr);
+    //check if the entity needs update
+     if(tr.needUpdateLocal){
+        updateLocalTransform(tr);
+        tr.needUpdateLocal = false;
+    }
     
-    scene->removeComponent<WorldTransformDirtyTag>(entity);
+    if(tr.needUpdateWorld){
+        updateWorldTransform(tr);
+        tr.needUpdateWorld = false;
+    }
+    
     return tr;
+}
+
+void HierarchySystem::propagateNeedUpdateToChildren(EntityID parent)
+{
+    std::vector<EntityID> needPropagate; //list of entities that need to propagate the tag
+    needPropagate.push_back(parent);
+
+    while(!needPropagate.empty())
+    {
+        EntityID current = needPropagate.back(); 
+        needPropagate.pop_back();
+        
+        //if entity has children --> the children needUpdate
+        if (scene->hasComponent<ChildrenComponent>(current)) {
+            
+            const std::unordered_set<EntityID>& children = scene->getComponent<ChildrenComponent>(current).children;
+            for (EntityID child : children) {
+                TransformComponent& tr = scene->getComponent<TransformComponent>(child);
+                if(!tr.needUpdateWorld){
+                    tr.needUpdateWorld = true;
+                    needPropagate.push_back(child);
+                }
+            }
+        }
+    }
 }
 
 void 
@@ -204,14 +272,16 @@ HierarchySystem::update(double){
 
     updateHierarchy();
     
-    //add WorldTransformDirty Tag
+    //update needUpdate state
     for (auto& pack : scene->query<TransformComponent>()) {
-        EntityID e = pack.getDeprecated<TransformComponent&>().entity;
-        scene->addComponent<WorldTransformDirtyTag>(e);
+        TransformComponent& tr= pack.getDeprecated<TransformComponent&>();
+        if(tr.needUpdateWorld){
+            propagateNeedUpdateToChildren(tr.entity);
+        }
     }
 
-    //process dirty tag: update worldTranforms
-    for (auto& pack : scene->query<WorldTransformDirtyTag, TransformComponent>()) {
+    //update worldTranforms
+    for (auto& pack : scene->query<TransformComponent>()) {
         TransformComponent& tr= pack.getDeprecated<TransformComponent&>();
         getFullTransform(tr.entity);
     }

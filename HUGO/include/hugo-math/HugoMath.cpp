@@ -73,10 +73,23 @@ namespace HUGO {
 		return {x * other.x, y * other.y, z * other.z};
 	}
 
-	Vector3 Vector3::operator* (float scalar) const {
+    Vector3 Vector3::operator* (float scalar) const {
 		return { x * scalar, y * scalar, z * scalar };
 	}
 
+	    Vector3 Vector3::operator/(float scalar) const
+    {
+		if(scalar != 0) return {x/scalar, y/scalar, z/scalar};
+		else Vector3();
+    }
+
+    Vector3 Vector3::operator/(const Vector3 &other) const
+    {
+		float nx = other.x != 0.0f? x / other.x : x;
+		float ny = other.y != 0.0f? y / other.y : x;
+		float nz = other.z != 0.0f? z / other.z : x;
+        return {nx, ny, nz};
+    }
     Vector3 Vector3::cross(const Vector3 &other) const
     {
         float cx = y * other.z - z * other.y;

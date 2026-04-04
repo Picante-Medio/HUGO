@@ -2,7 +2,7 @@
 #include "HugoError.h"
 #include "HugoSystemMacros.h"
 #include "HugoTypes.h"
-
+#include <unordered_map>
 struct TransformComponent;
 struct ParentComponent;
 
@@ -17,9 +17,14 @@ private:
     void updateHierarchy();
     
     //functions to update transform
+    //world-->local
+    void setWorldTransform(TransformComponent& transform);
+    void updateLocalTransform(TransformComponent& transform);
+    //local --> world
     void setLocalTransform(TransformComponent& transform);
     void updateWorldTransform(TransformComponent& transform);
     TransformComponent& getFullTransform(EntityID entity);
+    void propagateNeedUpdateToChildren(EntityID parent);
 public:
     virtual ~HierarchySystem(){};
 
