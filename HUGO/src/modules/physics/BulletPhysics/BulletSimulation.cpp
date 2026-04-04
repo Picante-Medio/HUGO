@@ -24,6 +24,7 @@ BulletSimulation::BulletSimulation(std::shared_ptr<Scene> scene)
 
     // We are using single-thread dispatcher (narrowphase)
     dispatcher = new HUGODispatcher(collisionConfig);
+    // dispatcher = new btCollisionDispatcher(collisionConfig);
 
     // We set the broadphase as a DBVT (tree/hierarchy broadphase)
     overlappingPairCache = new btDbvtBroadphase();
@@ -206,6 +207,15 @@ HUGO::CollisionObjectID BulletSimulation::createColliderObject(ColliderComponent
     btCollisionObject* obj = new btCollisionObject();
     obj->setCollisionShape(shape);
 
+    btTransform bodyTransform;
+    bodyTransform.setIdentity();
+    btQuaternion q = BulletUtils::quaternionToBullet(scene->getComponent<TransformComponent>(hgCol.entity).rotation);
+    q.normalize();
+    bodyTransform.setRotation(q);
+    bodyTransform.setOrigin(BulletUtils::vector3ToBullet(scene->getComponent<TransformComponent>(hgCol.entity).position));
+    
+    obj->setWorldTransform(bodyTransform);
+
     HUGO::CollisionObjectID id;
     //reuse id
     if(!freeBulletRBObjectId.empty()){ 
@@ -244,18 +254,31 @@ HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderCompo
         removeColliderObject(hgCol.objectID);
     }
 
-    // Create state
-    HUGOMotionState* state = new HUGOMotionState(btTransform(), scene, hgRb.entity);
-    state->updateBulletTransform();
-
+    // if it's not dynamic mass should be 0
+    hgRb.mass = type == HUGO::DYNAMIC? hgRb.mass : 0.0f;
+    
     // Get Shape
     btCollisionShape* shape = getorCreateShape(hgCol.shapeID, hgCol);
-    btVector3 startingInertia = btVector3();
-    shape->calculateLocalInertia(hgRb.mass, startingInertia);
+    
+    btTransform bodyTransform;
+    bodyTransform.setIdentity();
+    btVector3 startingInertia(0, 0, 0);
+    if(hgRb.mass > 0) shape->calculateLocalInertia(hgRb.mass, startingInertia);
 
+    btQuaternion q = BulletUtils::quaternionToBullet(scene->getComponent<TransformComponent>(hgCol.entity).rotation);
+    q.normalize();
+    bodyTransform.setRotation(q);
+    bodyTransform.setOrigin(BulletUtils::vector3ToBullet(scene->getComponent<TransformComponent>(hgRb.entity).position));
+    
+    // Create state
+    HUGOMotionState* state = new HUGOMotionState(bodyTransform, scene, hgRb.entity);
+    // btDefaultMotionState* state = new btDefaultMotionState(bodyTransform);
+    
     // Set bullet rb parameters
-    btRigidBody* rb = new btRigidBody(hgRb.mass, state, shape, startingInertia);
-
+    btRigidBody::btRigidBodyConstructionInfo info = btRigidBody::btRigidBodyConstructionInfo(hgRb.mass, state, shape, startingInertia);
+    btRigidBody* rb = new btRigidBody(info);
+    //rb->setRollingFriction(0.02f);
+    
     // Set flags for static, dynamic or kinematic
     switch(type){
         case HUGO::BodyType::STATIC:
@@ -266,7 +289,7 @@ HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderCompo
         rb->setActivationState(DISABLE_DEACTIVATION);
         break;
         case HUGO::BodyType::DYNAMIC:
-        rb->setCollisionFlags(btCollisionObject::CF_DYNAMIC_OBJECT);
+        rb->setCollisionFlags(rb->getCollisionFlags() | btCollisionObject::CF_DYNAMIC_OBJECT);
         break;
         default:
         break;
@@ -295,9 +318,7 @@ HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderCompo
     //store object
     std::size_t index = rigidBodies.push_back(std::move(colObj));
     rbIdToIndex[id] = index;
-
-    rb->setRollingFriction(0.5);
-    rb->setAngularFactor(0.5);
+    
     //add to simulation
     btWorld->addRigidBody(rb);
 

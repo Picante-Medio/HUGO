@@ -21,26 +21,29 @@ void HUGOMotionState::updateBulletTransform()
 
     TransformComponent& hugoTransform = hugoScene->getComponent<TransformComponent>(entityID);
 
+    btQuaternion q = BulletUtils::quaternionToBullet(hugoTransform.rotation);
+    q.normalize();
+
     // Uses associated HUGO::TransformComponent to update itself
     btTransform auxTransform = btTransform(
-                               BulletUtils::quaternionToBullet(hugoTransform.getRotation()), 
-                               BulletUtils::vector3ToBullet(hugoTransform.getPosition()));
+                               q, 
+                               BulletUtils::vector3ToBullet(hugoTransform.position));
 
-    btTransformRegister = auxTransform * centerOfMassOffset;
+    btTransformRegister = auxTransform;
 }
 
 void HUGOMotionState::getWorldTransform(btTransform& worldTrans) const
 {
-    worldTrans = btTransformRegister * centerOfMassOffset;
+    worldTrans = btTransformRegister;
 }
     
 void HUGOMotionState::setWorldTransform(const btTransform& worldTrans)
 {
-    btTransformRegister = worldTrans * centerOfMassOffset;
+    btTransformRegister = worldTrans;
     // if(hugoTransform.use_count() == 0){
     //     return;
     // }
-    
+
     TransformComponent& hugoTransform = hugoScene->getComponent<TransformComponent>(entityID);
         
     btQuaternion rot = btTransformRegister.getRotation();

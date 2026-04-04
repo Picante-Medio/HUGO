@@ -1,20 +1,24 @@
 AUDIO ASSETS DEBUG
 ========================================
+<<<<<<< HEAD
 Generated: Apr  4 2026 21:14:54
+=======
+Generated: Apr  4 2026 18:24:27
+>>>>>>> 284103a (mejorada simulacion fisica y avances con bug)
 Base Path: test_media/audios/
 Total Assets: 2
 ========================================
 
-1. music_lucky
-   ID: 0
-   Type: MUSIC
-   Path: test_media/audios//music\lucky.mp3
-   SUCCESS
-
-2. sfx_risa
+1. sfx_risa
    ID: 1
    Type: SOUND2D
-   Path: test_media/audios//sfx\risa.wav
+   Path: test_media/audios//sfx/risa.wav
+   SUCCESS
+
+2. music_lucky
+   ID: 0
+   Type: MUSIC
+   Path: test_media/audios//music/lucky.mp3
    SUCCESS
 
 ========================================
