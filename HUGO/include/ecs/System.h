@@ -3,29 +3,25 @@
 #include <memory>
 namespace HUGO {
 
-class IScene;
+	class IScene;
 
-// Systems are only functionality
-class System {
-protected:
-	std::shared_ptr<HUGO::IScene> scene = nullptr;
+	// Systems are only functionality
+	class System {
+	protected:
+		std::shared_ptr<HUGO::IScene> scene = nullptr;
 
-public:
-	explicit System(std::shared_ptr<HUGO::IScene> scene): scene(scene) {}
-	virtual ~System() {}
+	public:
+		explicit System(std::shared_ptr<HUGO::IScene> scene): scene(scene) {}
+		virtual ~System() {}
 
-	//Called when the System is created
-	virtual void init() = 0;
+		//Called when the System is created
+		virtual void init() = 0;
 
-	//Called every time the scene is loaded
-	virtual void onLoad() = 0;
+		//Called every time the scene is loaded
+		virtual void onLoad() = 0;
 
-	virtual void fixedUpdate(double dt) = 0;
-	virtual void update(double dt) = 0;
-
-	// Implement this method per type of message to be subscribed to
-	template <typename TMessage>
-	void receiveMessage(TMessage message) {}
-};
+		virtual void fixedUpdate(double dt) = 0;
+		virtual void update(double dt) = 0;
+	};
 
 }
