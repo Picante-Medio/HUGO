@@ -80,15 +80,6 @@ void processInput();
 
 void clearEntityCache(EntityID entity);
 void clearAllCaches();
-
-//====================================================
-// TEST UI
-//====================================================
-EntityID createPanel(const HUGO::String& overlayName);
-EntityID createText(const HUGO::String& overlayName);
-EntityID createButton();
-EntityID createProgressBar(const HUGO::String& overlayName);
-EntityID createSlider(const HUGO::String& overlayName);
 public:
 
 virtual ~UISystem();
