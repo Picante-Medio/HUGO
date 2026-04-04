@@ -3,7 +3,6 @@
 #include "CameraMovementSystem.h"
 #include "CameraComponent.h"
 #include "TransformComponent.h"
-#include "RenderTags.h"
 
 
 void CameraMovementSystem::init() {

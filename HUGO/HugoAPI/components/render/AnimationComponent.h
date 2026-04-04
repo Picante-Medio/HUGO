@@ -38,6 +38,3 @@ HCOMPONENT(AnimationComponent)
 
 END_HCOMPONENT()
 
-HCOMPONENT(AnimationDirtyTag)
-END_HCOMPONENT()
-

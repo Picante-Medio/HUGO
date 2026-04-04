@@ -3,7 +3,6 @@
 #include "TransformComponent.h"
 #include "HugoError.h"
 #include "RenderComponent.h"
-#include "RenderTags.h"
 
 void PhysicsGizmoSystem::init(){
 
@@ -32,7 +31,6 @@ ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity
             gizmoRender.setMeshName("cube.mesh");
             gizmoRender.setMaterialName("debug/WireframeMaterial");
         });
-        scene->addComponent<MaterialDirtyTag>(entity);
     }
 
     scene->modifyComponent<TransformComponent>(entity, [&colliderInfo](TransformComponent& gizmoTransform){
@@ -51,7 +49,6 @@ ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity
             gizmoRender.setMeshName("sphere.mesh");
             gizmoRender.setMaterialName("debug/WireframeMaterial");
         });
-        scene->addComponent<MaterialDirtyTag>(entity);
     }
 
     scene->modifyComponent<TransformComponent>(entity, [&colliderInfo](TransformComponent& gizmoTransform){
@@ -70,7 +67,6 @@ ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity
             gizmoRender.setMeshName("cylinder.mesh");
             gizmoRender.setMaterialName("debug/WireframeMaterial");
         });
-        scene->addComponent<MaterialDirtyTag>(entity);
     }
 
     scene->modifyComponent<TransformComponent>(entity, [&colliderInfo](TransformComponent& gizmoTransform){
@@ -89,7 +85,6 @@ ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity
             gizmoRender.setMeshName("cone.mesh");
             gizmoRender.setMaterialName("debug/WireframeMaterial");
         });
-        scene->addComponent<MaterialDirtyTag>(entity);
     }
 
     scene->modifyComponent<TransformComponent>(entity, [&colliderInfo](TransformComponent& gizmoTransform){
@@ -108,7 +103,6 @@ ErrorOrVoid createGizmoMesh<CapsuleColliderInfo>(std::shared_ptr<HUGO::IScene> s
             gizmoRender.setMeshName("capsule.mesh");
             gizmoRender.setMaterialName("debug/WireframeMaterial");
         });
-        scene->addComponent<MaterialDirtyTag>(entity);
     }
 
     scene->modifyComponent<TransformComponent>(entity, [&colliderInfo](TransformComponent& gizmoTransform){
@@ -176,9 +170,7 @@ void PhysicsGizmoSystem::update(double){
     for(auto it = m_gizmoEntities.begin(); it != m_gizmoEntities.end();){
         if(!it->second.visited) 
         {
-            auto auxIt = it;
-            it++;
-            m_gizmoEntities.erase(auxIt);
+            it = m_gizmoEntities.erase(it);
         }
         else {
             it->second.visited = false;

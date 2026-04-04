@@ -11,7 +11,9 @@ HierarchySystem::init()
 {
     scene->onAddComponent<ChildrenComponent>().connect(this, &HierarchySystem::onUpdateChildrenComponent);
     scene->onAddComponent<ParentComponent>().connect(this, &HierarchySystem::onUpdateParentComponent);
+    scene->onAddComponent<TransformComponent>().connect(this, &HierarchySystem::onAddTransformComponent);
     
+
     scene->onUpdateComponent<ChildrenComponent>().connect(this, &HierarchySystem::onUpdateChildrenComponent);
     scene->onUpdateComponent<ParentComponent>().connect(this, &HierarchySystem::onUpdateParentComponent);
 
@@ -228,6 +230,12 @@ HierarchySystem::update(double){
 
 void 
 HierarchySystem::fixedUpdate(double) {}
+
+
+void 
+HierarchySystem::onAddTransformComponent(TransformComponent& tr){
+    getFullTransform(tr.entity);
+}
 
 void 
 HierarchySystem::onUpdateChildrenComponent(ChildrenComponent& childrenComp)

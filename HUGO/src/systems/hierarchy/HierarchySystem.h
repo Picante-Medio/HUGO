@@ -16,6 +16,8 @@ private:
     void removeChildFromParent(EntityID child, EntityID parent);
     bool hasCycle(EntityID child, EntityID newParent);
 
+    void onAddTransformComponent(TransformComponent& tr);
+    
     void onUpdateChildrenComponent(ChildrenComponent& childrenComp);
     void onUpdateParentComponent(ParentComponent& parentComp);
 

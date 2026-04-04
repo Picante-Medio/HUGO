@@ -10,13 +10,13 @@
 #include "PanelComponent.h"
 #include "ButtonComponent.h"
 #include "TextComponent.h"
-#include "RenderTags.h"
 #include "InputFieldComponent.h"
 #include "LightComponent.h"
 #include "SliderComponent.h"
 #include "ParticleEmitterComponent.h"
 #include "ParticleEmitterComponentTag.h"
 
+#include "AnimationComponent.h"
 #include "AudioComponent.h"
 
 void
@@ -35,11 +35,15 @@ TestSystem::init() {
     e1 = scene->createEntity();
     scene->addComponent<TransformComponent>(e1, [](TransformComponent& t1) {
         t1.setPosition(HUGO::Vector3(0, 0, 0));
-        t1.setScale(HUGO::Vector3(2.f, 2.f, 2.f));
+        t1.setScale(HUGO::Vector3(0.5f, 0.5f, 0.5f));
     });
     scene->addComponent<RenderComponent>(e1, [](RenderComponent& rc) {
-        rc.setMeshName("cube.mesh");
-        rc.setMaterialName("prueba/ColorRosa");
+        rc.setMeshName("Sinbad.mesh");
+    });
+    scene->addComponent<AnimationComponent>(e1, [](AnimationComponent& rc) {
+        rc.addAnimation("Dance");
+        rc.setEnabled("Dance", true);
+        rc.setLoop("Dance", true);
     });
 
     e2 = scene->createEntity();
@@ -89,8 +93,6 @@ TestSystem::init() {
         lg.setDiffuse(HUGO::Vector4(0.8f, 1.8f, 0.8f, 1.0f));
         lg.setSpecular(HUGO::Vector4(0.8f, 0.8f, 0.8f, 1.0f));
     });
-    scene->addComponent<LightCreateDirtyTag>(ui);
-    scene->addComponent<LightDirtyTag>(ui);
 
     EntityID boton = scene->createEntity();
     scene->addComponent<PanelComponent>(boton, [](PanelComponent& panel){
@@ -161,14 +163,13 @@ TestSystem::update(double dt) {
     //     }
     // }
 
-    // ------------HierarchySystemTest----------
-    TransformComponent& tr=scene->getComponent<TransformComponent>(e1);
-    tr.setRotation( tr.getRotation()* HUGO::Quaternion(HUGO::Radian(HUGO::Degree(1.0f)), HUGO::Vector3(0,1,0)));
+    // // ------------HierarchySystemTest----------
+    // TransformComponent& tr=scene->getComponent<TransformComponent>(e1);
+    // tr.setRotation( tr.getRotation()* HUGO::Quaternion(HUGO::Radian(HUGO::Degree(1.0f)), HUGO::Vector3(0,1,0)));
 
-    TransformComponent& tr2=scene->getComponent<TransformComponent>(e2);
-    tr2.setPosition( tr2.getPosition() + HUGO::Vector3(dt*5, 0, 0 ));
-    //----------------------------------------
-
+    // TransformComponent& tr2=scene->getComponent<TransformComponent>(e2);
+    // tr2.setPosition( tr2.getPosition() + HUGO::Vector3(dt*5, 0, 0 ));
+    // //----------------------------------------
 
     // for(auto& pack : scene->query<LightComponent, TransformComponent>()) {
     //     TransformComponent& tr = pack.get<TransformComponent&>();

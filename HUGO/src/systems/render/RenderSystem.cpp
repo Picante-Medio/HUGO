@@ -18,51 +18,31 @@
 #include "ViewportComponent.h"
 #include "LightComponent.h"
 
-#include "RenderTags.h"
-
 #pragma region Destructor
 RenderSystem::~RenderSystem()
 {
     //detroy all viewports
     for(auto& v: viewportMap){
-        if(v.second.ogreViewport){
-            OgreModule::Instance().getOgreRenderWindow()->removeViewport(v.second.ogreViewport->getZOrder());
-            v.second.ogreViewport = nullptr;
-        }
+        unregisterViewportEntity(v.first);
     }
     viewportMap.clear();
 
     //destroy all cameras
     for(auto& c: cameraMap){
-        if(c.second.node){
-            c.second.node->detachAllObjects();
-            sceneManager->destroySceneNode(c.second.node);
-            c.second.node = nullptr;
-        }
-        if(c.second.ogreCamera){
-            sceneManager->destroyCamera(c.second.ogreCamera);
-            c.second.ogreCamera = nullptr;
-        }
+        unregisterCameraEntity(c.first);
     }
     cameraMap.clear();
 
     //destroy all lights
     for(auto& l: lightMap){
-        if(l.second.node){
-            l.second.node->detachAllObjects();
-            sceneManager->destroySceneNode(l.second.node);
-            l.second.node = nullptr;
-        }
-        if(l.second.ogreLight){
-            sceneManager->destroyLight(l.second.ogreLight);
-            l.second.ogreLight = nullptr;
-        }
+        unregisterLightEntity(l.first);
     }
     lightMap.clear();
 
     // Destroy all renderable Ogre objects
     for(auto& obj : ogreObjects){
         destroyOgreObject(obj.second);
+        clearAnimationStates(obj.second);
     }
     ogreObjects.clear();
 
@@ -82,6 +62,24 @@ void RenderSystem::init(){
 
     sceneManager->addRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
 
+    //components events
+    scene->onAddComponent<RenderComponent>().connect(this, &RenderSystem::onAddRenderComponet);
+    scene->onAddComponent<LightComponent>().connect(this, &RenderSystem::onAddLightComponent);
+    scene->onAddComponent<ViewportComponent>().connect(this, &RenderSystem::onAddViewportComponent);
+    scene->onAddComponent<CameraComponent>().connect(this, &RenderSystem::onAddCameraComponent);
+    scene->onAddComponent<AnimationComponent>().connect(this, &RenderSystem::onUpdateAnimationComponet);
+
+    scene->onUpdateComponent<RenderComponent>().connect(this, &RenderSystem::onUpdateRenderComponet);
+    scene->onUpdateComponent<AnimationComponent>().connect(this, &RenderSystem::onUpdateAnimationComponet);
+    scene->onUpdateComponent<LightComponent>().connect(this, &RenderSystem::onUpdateLightComponent);
+    scene->onUpdateComponent<ViewportComponent>().connect(this, &RenderSystem::onUpdateViewportComponent);
+
+    scene->onRemoveComponent<RenderComponent>().connect(this, &RenderSystem::onRemoveRenderComponet); 
+    scene->onRemoveComponent<AnimationComponent>().connect(this, &RenderSystem::onRemoveAnimationComponet);
+    scene->onRemoveComponent<LightComponent>().connect(this, &RenderSystem::onRemoveLightComponent); 
+    scene->onRemoveComponent<ViewportComponent>().connect(this, &RenderSystem::onRemoveViewportComponent);
+    scene->onRemoveComponent<CameraComponent>().connect(this, &RenderSystem::onRemoveCameraComponent); 
+    
     // Basic light
     setAmbientLight(0.6f, 0.6f, 0.6f);
     sceneManager->setDisplaySceneNodes(true);
@@ -111,187 +109,6 @@ void RenderSystem::init(){
 void RenderSystem::onLoad(){
     LuaBinder::getInstance()->registerMethod<RenderSystem, void, float, float, float>(*this, &RenderSystem::setAmbientLight, "SetAmbientLight");
 }
-#pragma endregion
-
-#pragma region Tags
-void RenderSystem::handleTag()
-{
-    for(auto& pack : scene->query<LightCreateDirtyTag, TransformComponent, LightComponent>()) {
-        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
-        EntityID entity = tr.entity;
-        auto it = lightMap.find(entity);
-        if (it == lightMap.end()) {
-           registerLightEntity(entity);
-        }
-        // eliminate the tag
-        scene->removeComponent<LightCreateDirtyTag>(entity);
-    }
-
-     for(auto& pack : scene->query<ViewportCreateDirtyTag, ViewportComponent>()) {
-        ViewportComponent& view = pack.getDeprecated<ViewportComponent&>();
-        EntityID entity = view.entity;
-        auto it = viewportMap.find(entity);
-        if (it == viewportMap.end()) {
-           registerViewportEntity(entity);
-        }
-        // eliminate the tag
-        scene->removeComponent<ViewportCreateDirtyTag>(entity);
-    }
-    // Light update
-    for(auto&pack : scene->query<LightDirtyTag, LightComponent, TransformComponent>()){
-        LightDirtyTag& tag = pack.getDeprecated<LightDirtyTag&>();
-        LightComponent& light = pack.getDeprecated<LightComponent&>();
-        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
-        EntityID entity = tag.entity;
-
-        auto it = lightMap.find(entity);
-        if (it != lightMap.end()) {
-            // update position
-            it->second.node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getPosition()));
-            
-            // for dirrectonal light
-            if (light.getLightType() == HUGO::LightType::LT_DIRECTIONAL) {
-                it->second.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getRotation()));
-            }
-
-            // update diffuse and specular
-            it->second.ogreLight->setDiffuseColour(Ogre::ColourValue(light.getDiffuse().x, light.getDiffuse().y, light.getDiffuse().z, light.getDiffuse().w));
-            it->second.ogreLight->setSpecularColour(Ogre::ColourValue(light.getSpecular().x, light.getSpecular().y, light.getSpecular().z, light.getSpecular().w));
-            
-            // update attenuation
-            it->second.ogreLight->setAttenuation(light.getAttenuation().x ,light.getAttenuation().w, light.getAttenuation().y, light.getAttenuation().z);
-            
-            if (light.getLightType() == HUGO::LightType::LT_SPOTLIGHT) {
-                it->second.ogreLight->setSpotlightRange(Ogre::Radian(light.getSpotInner().valueRadians())
-                    , Ogre::Radian(light.getSpotOuter().valueRadians()), light.getSpotFallOff());
-
-                if (light.getSpotNearClip() > 0) {
-                    it->second.ogreLight->setSpotlightNearClipDistance(light.getSpotNearClip());
-                }
-            }
-            
-            // parameters for directional light
-            if (light.getLightType() != HUGO::LightType::LT_DIRECTIONAL) {
-                it->second.ogreLight->setAttenuation( light.getAttenuation().w, light.getAttenuation().x,  
-                                            light.getAttenuation().y, light.getAttenuation().z);
-            }
-
-            // shadows
-            if(light.getShadowFarDistance() > 0){
-                it->second.ogreLight->setShadowFarDistance(light.getShadowFarDistance());
-            }
-        }
-        // eliminate the tag
-        scene->removeComponent<LightDirtyTag>(entity);
-    }
-
-    // Viewport update
-    for(auto& pack : scene->query<ViewportDirtyTag, ViewportComponent>()) {
-        ViewportDirtyTag& tag = pack.getDeprecated<ViewportDirtyTag&>();
-        ViewportComponent& viewport = pack.getDeprecated<ViewportComponent&>();
-        EntityID entity = tag.entity;
-        
-        auto it = viewportMap.find(entity);
-        if (it != viewportMap.end() && it->second.ogreViewport) {
-            // update dimensions
-            it->second.ogreViewport->setDimensions(viewport.getLeft(), viewport.getTop(), viewport.getWidth(), viewport.getHeight());
-            
-            // update color
-            it->second.ogreViewport->setBackgroundColour(Ogre::ColourValue(
-                viewport.getClearColor().x, viewport.getClearColor().y, 
-                viewport.getClearColor().z, viewport.getClearColor().w
-            ));
-
-            // update the camera if it has changed
-            if (viewport.getCameraEntity() != it->second.lastCameraEntity) {
-                auto camIt = cameraMap.find(viewport.getCameraEntity());
-                if (camIt != cameraMap.end()) {
-                    it->second.ogreViewport->setCamera(camIt->second.ogreCamera);
-                    it->second.lastCameraEntity = viewport.getCameraEntity();
-                }
-            }
-        }
-        // eliminate the tag
-        scene->removeComponent<ViewportDirtyTag>(entity);
-    }
-
-    //Material Update
-    for(auto& pack : scene->query<MaterialDirtyTag, RenderComponent>()) {
-        MaterialDirtyTag& material = pack.getDeprecated<MaterialDirtyTag&>();
-        RenderComponent& rc = pack.getDeprecated<RenderComponent&>();
-
-        if(ogreObjects.find(rc.entity) != ogreObjects.end()){
-            OgreObject& obj = ogreObjects[rc.entity];
-            obj.ogreEntity->setMaterialName(rc.materialName);
-
-            scene->removeComponent<MaterialDirtyTag>(rc.entity);
-        }
-    }
-
-    //Animation Update
-    for(auto& pack : scene->query<AnimationComponent,AnimationDirtyTag,RenderComponent>())
-    {
-        AnimationComponent& animComp = pack.getDeprecated<AnimationComponent&>();
-        RenderComponent& rc = pack.getDeprecated<RenderComponent&>();
-
-        if(ogreObjects.find(rc.entity) == ogreObjects.end()) continue;
-        
-        OgreObject& ogreObj = ogreObjects[rc.entity];
-        Ogre::Entity* ogre_ent = ogreObj.ogreEntity;
-
-        //remove animations that does exist in the Component
-        for(auto it = ogreObj.animationStates.begin(); it != ogreObj.animationStates.end(); )
-        {
-            //If does not exist animation, remove it
-            if(animComp.anims.find(it->first) == animComp.anims.end())
-                it = ogreObj.animationStates.erase(it);
-            else
-                ++it;
-        }
-
-        //Update or create animations that are in the component
-        for(auto& anim : animComp.anims){
-            const HUGO::String& animName = anim.first;
-            const AnimationInfo& animInfo = anim.second;
-
-            Ogre::AnimationState* animState = nullptr;
-
-            auto it = ogreObj.animationStates.find(animName);
-
-            //if animation does not exist in the current AnimationStates
-            if(it == ogreObj.animationStates.end())
-            {
-                if(!ogre_ent->hasAnimationState(animName))
-                {
-                    std::cerr << "[RenderSystem] Animation " << animName << " does not exist in entity " << rc.entity << "\n";
-                    continue;
-                }
-                //get a new AnimationSate from ogre
-                animState = ogre_ent->getAnimationState(animName);
-                ogreObj.animationStates[animName] = animState;
-            }
-            else
-            {
-                //get the AnimationSate
-                animState = it->second;
-            }
-
-            //Update animation status with AnimationComponent information
-            if(animInfo.enable != animState->getEnabled()) 
-                animState->setEnabled(animInfo.enable);
-
-            if(animInfo.loop != animState->getLoop()) 
-                animState->setLoop(animInfo.loop);
-                        
-            if(animInfo.weight != animState->getWeight()) 
-                animState->setWeight(animInfo.weight);
-            }
-
-        scene->removeComponent<AnimationDirtyTag>(animComp.entity);
-    }
-
-}
-
 #pragma endregion
 
 #pragma region Updates
@@ -326,25 +143,18 @@ void RenderSystem::fixedUpdate(double){}
 // ==================== Update ====================
 void RenderSystem::update(double dt)
 { 
-    handleTag();
     updateAnimations(dt);
 
     //Update transform of entity with renderComponent
     for(auto& pack : scene->query<TransformComponent,RenderComponent>()) {
-        RenderComponent& rc = pack.getDeprecated<RenderComponent&>();
         TransformComponent& tr=pack.getDeprecated<TransformComponent&>();
-
-        if (ogreObjects.find(rc.entity) == ogreObjects.end()) {
-            //create a new ogreObject
-            ErrorOrVoid e = createOgreObject(rc.entity, rc.meshName,rc.materialName);
-            if (e.isError()) continue;
+        OgreObject& obj = ogreObjects[tr.entity];
+        if(obj.ogreSceneNode){
+            //update transform
+            obj.ogreSceneNode->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getWorldPosition()));
+            obj.ogreSceneNode->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getWorldRotation()));
+            obj.ogreSceneNode->setScale(HUGO::OgreUtils::vector3ToOgre(tr.getWorldScale()));
         } 
-        OgreObject& obj = ogreObjects[rc.entity];
-
-        //update transform
-        obj.ogreSceneNode->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getWorldPosition()));
-        obj.ogreSceneNode->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getWorldRotation()));
-        obj.ogreSceneNode->setScale(HUGO::OgreUtils::vector3ToOgre(tr.getWorldScale()));
     }
 
     // Camera update
@@ -353,11 +163,8 @@ void RenderSystem::update(double dt)
         CameraComponent& camera = pack.getDeprecated<CameraComponent&>();
         
         auto it = cameraMap.find(camera.entity);
-        if (it == cameraMap.end()) {
-            registerCameraEntity(camera.entity);
-        }
-        else{
-            //update node transform
+        if (it != cameraMap.end()) {
+           //update node transform
             it->second.node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getPosition()));
             it->second.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getRotation()));
             
@@ -410,6 +217,7 @@ ErrorOrVoid RenderSystem::createOgreObject(EntityID id, const std::string &meshN
     
     //create OgreObject
     OgreObject obj = {ent, node};
+    obj.meshName = meshName;
 
     //store object
     ogreObjects[id] = std::move(obj);
@@ -438,6 +246,12 @@ void RenderSystem::destroyOgreObject(OgreObject &obj)
         sceneManager->destroyEntity(obj.ogreEntity);
         obj.ogreEntity = nullptr;
     }
+}
+
+
+void RenderSystem::clearAnimationStates(OgreObject &obj)
+{
+    obj.animationStates.clear();
 }
 #pragma endregion
 
@@ -483,9 +297,22 @@ void RenderSystem::registerLightEntity(EntityID entity)
 // ==================== Unregister Camera Entity ====================
 void RenderSystem::unregisterCameraEntity(EntityID entity)
 {
-    //destroyOgreCamera(entity);
-    cameraMap.erase(entity);
-    
+    //remove camera and destroy Ogre Camera
+    auto it = cameraMap.find(entity);
+    if (it != cameraMap.end()) {
+        if(it->second.node){
+            it->second.node->detachAllObjects();
+            sceneManager->destroySceneNode(it->second.node);
+            it->second.node = nullptr;
+        }
+        if(it->second.ogreCamera){
+            sceneManager->destroyCamera(it->second.ogreCamera);
+            it->second.ogreCamera = nullptr;
+        }
+        cameraMap.erase(it);
+    }
+
+    //change the main Camera
     if (mainCameraEntity == entity) {
         mainCameraEntity = 0;
     }
@@ -493,11 +320,36 @@ void RenderSystem::unregisterCameraEntity(EntityID entity)
 // ==================== Unregister ViewPort Entity ====================
 void RenderSystem::unregisterViewportEntity(EntityID entity)
 {
-    //destroyOgreViewport(entity);
-    viewportMap.erase(entity);
-    
+    //remove viewport
+    auto it = viewportMap.find(entity);
+    if (it != viewportMap.end()) {
+        if(it->second.ogreViewport){
+            OgreModule::Instance().getOgreRenderWindow()->removeViewport(it->second.ogreViewport->getZOrder());
+            it->second.ogreViewport = nullptr;
+        }
+        viewportMap.erase(it);
+    }
+
     if (mainViewportEntity == entity) {
         mainViewportEntity = 0;
+    }
+}
+
+// ==================== Unregister Light Entity ====================
+void RenderSystem::unregisterLightEntity(EntityID entity)
+{
+    auto it = lightMap.find(entity);
+    if (it != lightMap.end()) {
+        if(it->second.node){
+            it->second.node->detachAllObjects();
+            sceneManager->destroySceneNode(it->second.node);
+            it->second.node = nullptr;
+        }
+        if(it->second.ogreLight){
+            sceneManager->destroyLight(it->second.ogreLight);
+            it->second.ogreLight = nullptr;
+        }
+        lightMap.erase(it);
     }
 }
 #pragma endregion
@@ -685,7 +537,6 @@ ErrorOrVoid RenderSystem::createOgreViewport(EntityID entity)
     
     viewportMap[entity] = res;
 
-    scene->addComponent<ViewportDirtyTag>(entity);
     return ErrorOrVoid();
 }
 #pragma endregion
@@ -734,3 +585,239 @@ Ogre::SceneManager *RenderSystem::getSM() const
 {
     return sceneManager;
 }
+
+#pragma region RenderComponentEvents
+void RenderSystem::onAddRenderComponet(RenderComponent &rc)
+{
+    EntityID entity = rc.entity;
+    if (ogreObjects.find(entity) == ogreObjects.end()) {
+        //create a new ogreObject
+        ErrorOrVoid e = createOgreObject(entity, rc.meshName,rc.materialName);
+        if (e.isError()) return;
+    } 
+}
+
+void RenderSystem::onUpdateRenderComponet(RenderComponent &rc)
+{
+    auto it = ogreObjects.find(rc.entity);
+    if(it != ogreObjects.end()){
+        OgreObject& obj = it->second;
+
+        //check if change the mesh
+        if(obj.meshName != rc.meshName){
+            //destroy OgreEntity
+            Ogre::SceneNode* node = obj.ogreSceneNode;
+            node->detachAllObjects();
+            sceneManager->destroyEntity(obj.ogreEntity);
+            
+            //create a new OgreEntity with new current mesh
+            obj.ogreEntity = sceneManager->createEntity(rc.meshName);
+            node->attachObject(obj.ogreEntity);
+            
+            //update mesh name
+            obj.meshName = rc.meshName;
+
+            //clear animations
+            if(scene->hasComponent<AnimationComponent>(rc.entity))
+            {
+                auto& animComp = scene->getComponent<AnimationComponent>(rc.entity);
+                animComp.anims.clear();
+                clearAnimationStates(obj);
+            }
+        }
+
+        obj.ogreEntity->setMaterialName(rc.materialName);
+    }
+}
+
+void RenderSystem::onRemoveRenderComponet(RenderComponent &rc)
+{
+    auto it = ogreObjects.find(rc.entity);
+    if(it != ogreObjects.end()){
+        OgreObject& obj = it->second;
+        destroyOgreObject(obj);
+        ogreObjects.erase(it);
+    }        
+}
+#pragma endregion
+
+#pragma region AnimarionComponentEvents
+void RenderSystem::onUpdateAnimationComponet(AnimationComponent &animComp)
+{
+    EntityID entity = animComp.entity;
+    if(!scene->hasComponent<RenderComponent>(entity)) return;
+    
+    RenderComponent& rc = scene->getComponent<RenderComponent>(entity);
+    if(ogreObjects.find(rc.entity) == ogreObjects.end()) return;
+    
+    OgreObject& ogreObj = ogreObjects[rc.entity];
+    Ogre::Entity* ogre_ent = ogreObj.ogreEntity;
+
+    //remove animations that does exist in the Component
+    for(auto it = ogreObj.animationStates.begin(); it != ogreObj.animationStates.end(); )
+    {
+        //If does not exist animation, remove it
+        if(animComp.anims.find(it->first) == animComp.anims.end())
+            it = ogreObj.animationStates.erase(it);
+        else
+            ++it;
+    }
+
+    //Update or create animations that are in the component
+    for(auto& anim : animComp.anims){
+        const HUGO::String& animName = anim.first;
+        const AnimationInfo& animInfo = anim.second;
+
+        Ogre::AnimationState* animState = nullptr;
+
+        auto it = ogreObj.animationStates.find(animName);
+
+        //if animation does not exist in the current AnimationStates
+        if(it == ogreObj.animationStates.end())
+        {
+            if(!ogre_ent->hasAnimationState(animName))
+            {
+                std::cerr << "[RenderSystem] Animation " << animName << " does not exist in entity " << rc.entity << "\n";
+                continue;
+            }
+            //get a new AnimationSate from ogre
+            animState = ogre_ent->getAnimationState(animName);
+            ogreObj.animationStates[animName] = animState;
+        }
+        else
+        {
+            //get the AnimationSate
+            animState = it->second;
+        }
+
+        //Update animation status with AnimationComponent information
+        if(animInfo.enable != animState->getEnabled()) 
+            animState->setEnabled(animInfo.enable);
+
+        if(animInfo.loop != animState->getLoop()) 
+            animState->setLoop(animInfo.loop);
+                    
+        if(animInfo.weight != animState->getWeight()) 
+            animState->setWeight(animInfo.weight);
+    }
+
+}
+
+void RenderSystem::onRemoveAnimationComponet(AnimationComponent &animComp)
+{
+    auto it = ogreObjects.find(animComp.entity);
+    if(it != ogreObjects.end())
+        clearAnimationStates(it->second);
+}
+#pragma endregion
+
+#pragma region LightComponentEvents
+void RenderSystem::onAddLightComponent(LightComponent &light)
+{
+    registerLightEntity(light.entity);
+}
+
+void RenderSystem::onUpdateLightComponent(LightComponent &light)
+{
+    EntityID entity = light.entity;
+    if(!scene->hasComponent<TransformComponent>(entity)){
+        std::cerr<<"[RenderSystem] Light "<<entity<<" has not trasnform\n";
+        return;
+    }
+    TransformComponent& tr =scene->getComponent<TransformComponent>(entity);
+    
+    auto it = lightMap.find(entity);
+    if (it != lightMap.end()) {
+        // update position
+        it->second.node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getPosition()));
+        
+        // for dirrectonal light
+        if (light.getLightType() == HUGO::LightType::LT_DIRECTIONAL) {
+            it->second.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getRotation()));
+        }
+
+        // update diffuse and specular
+        it->second.ogreLight->setDiffuseColour(Ogre::ColourValue(light.getDiffuse().x, light.getDiffuse().y, light.getDiffuse().z, light.getDiffuse().w));
+        it->second.ogreLight->setSpecularColour(Ogre::ColourValue(light.getSpecular().x, light.getSpecular().y, light.getSpecular().z, light.getSpecular().w));
+        
+        // update attenuation
+        it->second.ogreLight->setAttenuation(light.getAttenuation().x ,light.getAttenuation().w, light.getAttenuation().y, light.getAttenuation().z);
+        
+        if (light.getLightType() == HUGO::LightType::LT_SPOTLIGHT) {
+            it->second.ogreLight->setSpotlightRange(Ogre::Radian(light.getSpotInner().valueRadians())
+                , Ogre::Radian(light.getSpotOuter().valueRadians()), light.getSpotFallOff());
+
+            if (light.getSpotNearClip() > 0) {
+                it->second.ogreLight->setSpotlightNearClipDistance(light.getSpotNearClip());
+            }
+        }
+        
+        // parameters for directional light
+        if (light.getLightType() != HUGO::LightType::LT_DIRECTIONAL) {
+            it->second.ogreLight->setAttenuation( light.getAttenuation().w, light.getAttenuation().x,  
+                                        light.getAttenuation().y, light.getAttenuation().z);
+        }
+
+        // shadows
+        if(light.getShadowFarDistance() > 0){
+            it->second.ogreLight->setShadowFarDistance(light.getShadowFarDistance());
+        }
+    }
+}
+
+void RenderSystem::onRemoveLightComponent(LightComponent &light)
+{
+    unregisterLightEntity(light.entity);
+}
+#pragma endregion
+
+#pragma region ViewportComponentEvents
+void RenderSystem::onAddViewportComponent(ViewportComponent &viewport)
+{
+    registerViewportEntity(viewport.entity);
+}
+
+void RenderSystem::onUpdateViewportComponent(ViewportComponent &viewport)
+{
+    EntityID entity = viewport.entity;
+    
+    auto it = viewportMap.find(entity);
+    if (it != viewportMap.end() && it->second.ogreViewport) {
+        // update dimensions
+        it->second.ogreViewport->setDimensions(viewport.getLeft(), viewport.getTop(), viewport.getWidth(), viewport.getHeight());
+        
+        // update color
+        it->second.ogreViewport->setBackgroundColour(Ogre::ColourValue(
+            viewport.getClearColor().x, viewport.getClearColor().y, 
+            viewport.getClearColor().z, viewport.getClearColor().w
+        ));
+
+        // update the camera if it has changed
+        if (viewport.getCameraEntity() != it->second.lastCameraEntity) {
+            auto camIt = cameraMap.find(viewport.getCameraEntity());
+            if (camIt != cameraMap.end()) {
+                it->second.ogreViewport->setCamera(camIt->second.ogreCamera);
+                it->second.lastCameraEntity = viewport.getCameraEntity();
+            }
+        }
+    }
+}
+
+void RenderSystem::onRemoveViewportComponent(ViewportComponent &view)
+{
+    unregisterViewportEntity(view.entity);
+}
+
+#pragma endregion
+
+#pragma region CameraComponentEvents
+void RenderSystem::onAddCameraComponent(CameraComponent &camComp)
+{
+    registerCameraEntity(camComp.entity);    
+}
+
+void RenderSystem::onRemoveCameraComponent(CameraComponent &camComp)
+{
+    unregisterCameraEntity(camComp.entity);
+}
+#pragma endregion

@@ -11,6 +11,11 @@
 #include "HugoError.h"
 
 struct RenderComponent;
+struct AnimationComponent;
+struct ViewportComponent;
+struct LightComponent;
+struct CameraComponent;
+
 HSYSTEM(RenderSystem)
     // Ogre Camera Data
     struct CameraInfo {
@@ -36,6 +41,7 @@ HSYSTEM(RenderSystem)
         Ogre::Entity* ogreEntity = nullptr;
         Ogre::SceneNode* ogreSceneNode = nullptr;   // Scene node for transform
         std::unordered_map<HUGO::String, Ogre::AnimationState*> animationStates; //Stored animation states
+        HUGO::String meshName;
     };
 
     //Ogre References
@@ -77,6 +83,7 @@ HSYSTEM(RenderSystem)
     ErrorOrVoid createOgreObject(EntityID id, const std::string& meshName, const std::string& materialName="");
     void removeOgreObject(EntityID id);
     void destroyOgreObject(OgreObject& obj);
+    void clearAnimationStates(OgreObject &obj);
                    
     // Global light configuration
     void setAmbientLight(float r, float g, float b);
@@ -86,6 +93,25 @@ HSYSTEM(RenderSystem)
     
     void setMainViewport(EntityID viewportEntity);
       
+    //Component Events
+    void onAddRenderComponet(RenderComponent& rc);
+    void onUpdateRenderComponet(RenderComponent& rc);
+    void onRemoveRenderComponet(RenderComponent& rc);
+
+    void onUpdateAnimationComponet(AnimationComponent& animComp);
+    void onRemoveAnimationComponet(AnimationComponent& animComp);
+
+    void onAddLightComponent(LightComponent& light);
+    void onUpdateLightComponent(LightComponent& light);
+    void onRemoveLightComponent(LightComponent& light);
+
+    void onAddViewportComponent(ViewportComponent& viewport);
+    void onUpdateViewportComponent(ViewportComponent& viewport);
+    void onRemoveViewportComponent(ViewportComponent& viewport);
+
+    void onAddCameraComponent(CameraComponent& camComp);
+    void onRemoveCameraComponent(CameraComponent& camComp);
+
 public:
     ~RenderSystem() override;
 
