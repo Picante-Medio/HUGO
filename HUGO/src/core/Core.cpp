@@ -126,7 +126,7 @@ Core::initLua() {
     LuaBinder::setInstance(instance);
 
     std::filesystem::path luaPath = std::filesystem::absolute(
-        std::filesystem::path("..") / "src" / "lua" / "scripts"
+        std::filesystem::path("..") / "src" / "lua"
     );
     LuaBinder::getInstance()->requireFolder(luaPath.string());
 }
