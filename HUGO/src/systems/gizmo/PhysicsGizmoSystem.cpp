@@ -174,7 +174,12 @@ void PhysicsGizmoSystem::update(double){
 
     //If an entry was not visited, we remove that entry.
     for(auto it = m_gizmoEntities.begin(); it != m_gizmoEntities.end();){
-        if(!it->second.visited) m_gizmoEntities.erase(it);
+        if(!it->second.visited) 
+        {
+            auto auxIt = it;
+            it++;
+            m_gizmoEntities.erase(auxIt);
+        }
         else {
             it->second.visited = false;
             it++; 
