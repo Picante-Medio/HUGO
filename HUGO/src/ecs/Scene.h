@@ -28,7 +28,11 @@ class Scene : public HUGO::IScene, public std::enable_shared_from_this<Scene>
 public:
     Scene(std::shared_ptr<HUGO::IInput> input, HUGO::SceneManager& sceneManager);
 
+    //Calls load() on all systems. Must be used only by SceneManager
     void load();
+
+    //Calls init() on all systems. Must be used only by SceneManager
+    void init();
 
     inline void addSystem(std::shared_ptr<HUGO::System> system) { systems.push_back(system); }
 

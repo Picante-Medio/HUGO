@@ -40,6 +40,12 @@ void Scene::load() {
 	}
 }
 
+void Scene::init(){
+	for(std::shared_ptr<HUGO::System> system : systems) {
+		system->init();
+	}
+}
+
 void 
 Scene::update(double dt) {
 	for(std::shared_ptr<HUGO::System> system : systems) 

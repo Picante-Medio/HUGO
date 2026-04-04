@@ -39,10 +39,12 @@ BulletSimulation::BulletSimulation(std::shared_ptr<Scene> scene)
     numSubSteps = 0;
 
     // Set visual debugging if enabled 
+    /*
     debugDrawer = new OgreBulletDebugger();
     debugDrawer->setDebugMode(debugDrawer->getDebugMode() | btIDebugDraw::DebugDrawModes::DBG_DrawNormals);
     btWorld->setDebugDrawer(debugDrawer);
 
+    */
     PRINTER(btWorld);
 }
 

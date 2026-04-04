@@ -28,7 +28,7 @@ ParticleSystem::~ParticleSystem() {
     activeParticleSystems.clear();
 }
 void ParticleSystem::init() {
-    sm = Ogre::Root::getSingletonPtr()->_getCurrentSceneManager();
+    sm = OgreModule::Instance().getCurrentSceneManager();
 }
 
 void ParticleSystem::onLoad() {}

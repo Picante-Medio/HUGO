@@ -77,13 +77,9 @@ RenderSystem::~RenderSystem()
 void RenderSystem::init(){
 
     ogreRoot = Ogre::Root::getSingletonPtr();
-    try {
-        sceneManager = ogreRoot->createSceneManager();
-    }
-    catch (const Ogre::Exception& e) {
-        throw std::runtime_error("[RenderSystem] SceneManager creation failed: " + std::string(e.getDescription()));
-    }
-    ogreRoot->_setCurrentSceneManager(sceneManager);
+    
+    sceneManager = OgreModule::Instance().getCurrentSceneManager();
+
     sceneManager->addRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
 
     // Basic light

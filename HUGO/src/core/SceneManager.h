@@ -11,14 +11,19 @@ class IPhysicsModule;
 namespace HUGO {
     class IInput;
 
+    struct SceneBlock{
+        std::shared_ptr<Scene> scene;
+        bool needsInit;
+    };
+
     class SceneManager : public std::enable_shared_from_this<SceneManager> {
 
         HUGO::ChatParser m_chatParser;
         //Scene map that stores created game scenes.
-        std::unordered_map<HUGO::String, std::shared_ptr<Scene>> m_sceneMap;
+        std::unordered_map<HUGO::String, SceneBlock> m_sceneMap;
 
         //Pointer to a scene inside m_sceneMap. It is the scene that will be updated in the main loop.
-        std::shared_ptr<Scene> m_currentScene = nullptr;
+        std::weak_ptr<Scene> m_currentScene;
 
         //Reads chatParser, creates a scene based on the SceneData, and indexes it in m_sceneMap.
         ErrorOrVoid loadScene(const HUGO::String& sceneName);
