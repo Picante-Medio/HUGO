@@ -255,7 +255,7 @@ HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderCompo
 
     // Set bullet rb parameters
     btRigidBody* rb = new btRigidBody(hgRb.mass, state, shape, startingInertia);
-    
+
     // Set flags for static, dynamic or kinematic
     switch(type){
         case HUGO::BodyType::STATIC:
@@ -296,6 +296,8 @@ HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderCompo
     std::size_t index = rigidBodies.push_back(std::move(colObj));
     rbIdToIndex[id] = index;
 
+    rb->setRollingFriction(0.5);
+    rb->setAngularFactor(0.5);
     //add to simulation
     btWorld->addRigidBody(rb);
 
