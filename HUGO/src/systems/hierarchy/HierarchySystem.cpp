@@ -17,7 +17,6 @@ void
 HierarchySystem::addChildToParent(EntityID child, EntityID parent){
 
     if (!scene->hasComponent<ChildrenComponent>(parent)) {
-
         scene->addComponent<ChildrenComponent>(parent, [child](ChildrenComponent& childrenComponent) {
             childrenComponent.children.insert(child);
         });
@@ -42,7 +41,7 @@ void
 HierarchySystem::addParentToChild(EntityID child, EntityID parent){
 
     if (scene->hasComponent<ParentComponent>(child)) {
-        scene->addComponent<ParentComponent>(child, [parent](ParentComponent& parentComp){
+        scene->modifyComponent<ParentComponent>(child, [parent](ParentComponent& parentComp){
             parentComp.previousParent = parentComp.parent;
             parentComp.parent = parent;
         });
@@ -151,9 +150,9 @@ HierarchySystem::updateHierarchy(){
 
 void 
 HierarchySystem::setWorldTransform(TransformComponent &transform){
-    transform.position = transform.worldPosition;
-    transform.rotation = transform.worldRotation;
-    transform.scale = transform.worldScale; 
+    if(transform.needUpdateLocalPosition) transform.position = transform.worldPosition;
+    if(transform.needUpdateLocalRotation) transform.rotation = transform.worldRotation;
+    if(transform.needUpdateLocalScale) transform.scale = transform.worldScale;
 }
 
 void 
@@ -175,23 +174,25 @@ HierarchySystem::updateLocalTransform(TransformComponent &transform){
     //if entity has a parent, the transform changes according to the parent
     TransformComponent& parentTransform = getFullTransform(parentComp.parent.value());
 
+    //position
+    if(transform.needUpdateLocalPosition){
+        HUGO::Vector3 pos = transform.worldPosition - parentTransform.worldPosition;
+        transform.position = parentTransform.worldRotation.inverse() * pos / parentTransform.worldScale;
+    } 
+
     //rotation/orientation
-    transform.rotation = parentTransform.worldRotation.inverse() * transform.worldRotation;
+    if(transform.needUpdateLocalRotation) transform.rotation = parentTransform.worldRotation.inverse() * transform.worldRotation;
 
     //scale
-    transform.scale = transform.worldScale / parentTransform.worldScale;
-    
-    //position
-
-    transform.position = parentTransform.worldRotation.inverse() * (transform.worldPosition - parentTransform.worldPosition) / parentTransform.worldScale;
+    if(transform.needUpdateLocalScale) transform.scale = transform.worldScale / parentTransform.worldScale;
 }
 
 
 void 
 HierarchySystem::setLocalTransform(TransformComponent &transform){
-    transform.worldPosition = transform.position;
-    transform.worldRotation = transform.rotation;
-    transform.worldScale = transform.scale; 
+    if(transform.needUpdateWorldPosition) transform.worldPosition = transform.position;
+    if(transform.needUpdateWorldRotation) transform.worldRotation = transform.rotation;
+    if(transform.needUpdateWorldScale) transform.worldScale = transform.scale;
 }
 
 void
@@ -213,14 +214,17 @@ HierarchySystem::updateWorldTransform(TransformComponent& transform){
     TransformComponent& parentTransform = getFullTransform(parentComp.parent.value());
 
     //rotation/orientation
-    transform.worldRotation = parentTransform.worldRotation * transform.rotation;
+    if(transform.needUpdateWorldRotation) transform.worldRotation = parentTransform.worldRotation * transform.rotation;
 
     //scale
-    transform.worldScale = parentTransform.worldScale * transform.scale;
+    if(transform.needUpdateWorldScale) transform.worldScale = parentTransform.worldScale * transform.scale;
     
     //position
-    transform.worldPosition = parentTransform.worldRotation *( parentTransform.worldScale*transform.position);
-    transform.worldPosition += parentTransform.worldPosition;
+    if(transform.needUpdateWorldPosition) 
+    {
+        transform.worldPosition = parentTransform.worldRotation *( parentTransform.worldScale*transform.position);
+        transform.worldPosition += parentTransform.worldPosition;
+    }
 }
 
 TransformComponent& 
@@ -229,14 +233,18 @@ HierarchySystem::getFullTransform(EntityID entity){
     TransformComponent& tr = scene->getComponent<TransformComponent>(entity);
     
     //check if the entity needs update
-     if(tr.needUpdateLocal){
+     if(tr.needUpdateLocalPosition || tr.needUpdateLocalRotation || tr.needUpdateLocalScale){
         updateLocalTransform(tr);
-        tr.needUpdateLocal = false;
+        tr.needUpdateLocalPosition = false;
+        tr.needUpdateLocalRotation = false;
+        tr.needUpdateLocalScale = false;
     }
     
-    if(tr.needUpdateWorld){
+    if(tr.needUpdateWorldPosition || tr.needUpdateWorldRotation || tr.needUpdateWorldScale) {
         updateWorldTransform(tr);
-        tr.needUpdateWorld = false;
+        tr.needUpdateWorldPosition = false;
+        tr.needUpdateWorldRotation = false;
+        tr.needUpdateWorldScale = false;
     }
     
     return tr;
@@ -258,10 +266,10 @@ void HierarchySystem::propagateNeedUpdateToChildren(EntityID parent)
             const std::unordered_set<EntityID>& children = scene->getComponent<ChildrenComponent>(current).children;
             for (EntityID child : children) {
                 TransformComponent& tr = scene->getComponent<TransformComponent>(child);
-                if(!tr.needUpdateWorld){
-                    tr.needUpdateWorld = true;
-                    needPropagate.push_back(child);
-                }
+                if(!(tr.needUpdateWorldPosition || tr.needUpdateWorldRotation || tr.needUpdateWorldScale)) needPropagate.push_back(child);
+                tr.needUpdateWorldPosition = true;
+                tr.needUpdateWorldRotation = true;
+                tr.needUpdateWorldScale = true;
             }
         }
     }
@@ -275,7 +283,7 @@ HierarchySystem::update(double){
     //update needUpdate state
     for (auto& pack : scene->query<TransformComponent>()) {
         TransformComponent& tr= pack.getDeprecated<TransformComponent&>();
-        if(tr.needUpdateWorld){
+        if(tr.needUpdateWorldPosition || tr.needUpdateWorldRotation || tr.needUpdateWorldScale){
             propagateNeedUpdateToChildren(tr.entity);
         }
     }

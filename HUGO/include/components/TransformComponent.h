@@ -16,20 +16,24 @@ private:
     HUGO::Quaternion rotation = HUGO::Quaternion(1,0,0,0);
     HUGO::Vector3 scale = HUGO::Vector3(1, 1, 1);
 
-    bool needUpdateLocal = false;
-    bool needUpdateWorld = false;
+    bool needUpdateLocalPosition = false;
+    bool needUpdateWorldPosition = false;
+    bool needUpdateLocalRotation = false;
+    bool needUpdateWorldRotation = false;
+    bool needUpdateLocalScale = false;
+    bool needUpdateWorldScale = false;
 public:
     inline void setPosition(HUGO::Vector3 newPosition){
         position = newPosition;
-        needUpdateWorld = true;
+        needUpdateWorldPosition = true;
     }
     inline void setRotation(HUGO::Quaternion newRotation){
         rotation = newRotation;
-        needUpdateWorld = true;
+        needUpdateWorldRotation= true;
     }
     inline void setScale(HUGO::Vector3 newScale){
         scale = newScale;
-        needUpdateWorld = true;
+        needUpdateWorldScale = true;
     }
     inline HUGO::Vector3 getPosition() const{
         return position;
@@ -43,23 +47,23 @@ public:
 
     inline void setWorldPosition(HUGO::Vector3 newPosition){
         worldPosition = newPosition;
-        needUpdateLocal = true;
+        needUpdateLocalPosition = true;
     }
     inline void setWorldRotation(HUGO::Quaternion newRotation){
         worldRotation = newRotation;
-        needUpdateLocal = true;
+        needUpdateLocalRotation = true;
     }
     inline void setWorldScale(HUGO::Vector3 newScale){
         worldScale = newScale;
-        needUpdateLocal = true;
+        needUpdateLocalScale = true;
     }
-    inline const HUGO::Vector3 getWorldPosition() const{
+    inline HUGO::Vector3 getWorldPosition() const{
         return worldPosition;
     }
-    inline const HUGO::Quaternion getWorldRotation() const{
+    inline HUGO::Quaternion getWorldRotation() const{
         return worldRotation;
     }
-    inline const HUGO::Vector3 getWorldScale() const{
+    inline HUGO::Vector3 getWorldScale() const{
         return worldScale;
     }
 
