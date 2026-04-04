@@ -15,15 +15,8 @@ void PhysicsTestSystem::init(){
     EntityID e1 = scene->createEntity();
 
     scene->addComponent<TransformComponent>(e1, [](TransformComponent& transform){
-<<<<<<< HEAD
         transform.setPosition(HUGO::Vector3(1.f, 0.f, 40.f));
         transform.setScale(HUGO::Vector3(1., 1.f, 1.f));
-        transform.setRotation(HUGO::Quaternion(HUGO::Radian(HUGO::Degree(45.f)), HUGO::Vector3(0,0,1)));
-=======
-        transform.position = HUGO::Vector3(1.f, -3.f, 40.f);
-        transform.scale = HUGO::Vector3(1., 1.f, 1.f);
-        //transform.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(45.f)), HUGO::Vector3(0,0,1));
->>>>>>> 284103a (mejorada simulacion fisica y avances con bug)
     });
 
     scene->addComponent<ColliderComponent>(e1, [](ColliderComponent& collider){
@@ -42,14 +35,8 @@ void PhysicsTestSystem::init(){
     EntityID e2 = scene->createEntity();
 
     scene->addComponent<TransformComponent>(e2, [](TransformComponent& transform){
-<<<<<<< HEAD
         transform.setPosition(HUGO::Vector3(0.f, 5, 40.f));
         transform.setScale(HUGO::Vector3(1.f, 1.f, 1.f));
-=======
-        transform.position = HUGO::Vector3(1.25f, 15, 40.f);
-        transform.scale = HUGO::Vector3(1.f, 1.f, 1.f);
-        transform.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(45)), HUGO::Vector3(0, 0, 1));
->>>>>>> 284103a (mejorada simulacion fisica y avances con bug)
     });
     //scene->addComponent<TransformChangedTag>(e2);
 
@@ -66,7 +53,7 @@ void PhysicsTestSystem::init(){
     
     EntityID e3 = scene->createEntity();
     scene->addComponent<TransformComponent>(e3,[](TransformComponent& transform){
-        transform.position = HUGO::Vector3(0.f, 5, 40.f);
+        transform.setPosition(HUGO::Vector3(0.f, 5, 40.f));
     });
     
     scene->addComponent<ColliderComponent>(e3, [](ColliderComponent& col){

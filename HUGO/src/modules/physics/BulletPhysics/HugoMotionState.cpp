@@ -21,13 +21,13 @@ void HUGOMotionState::updateBulletTransform()
 
     TransformComponent& hugoTransform = hugoScene->getComponent<TransformComponent>(entityID);
 
-    btQuaternion q = BulletUtils::quaternionToBullet(hugoTransform.rotation);
+    btQuaternion q = BulletUtils::quaternionToBullet(hugoTransform.getRotation());
     q.normalize();
 
     // Uses associated HUGO::TransformComponent to update itself
     btTransform auxTransform = btTransform(
                                q, 
-                               BulletUtils::vector3ToBullet(hugoTransform.position));
+                               BulletUtils::vector3ToBullet(hugoTransform.getPosition()));
 
     btTransformRegister = auxTransform;
 }
