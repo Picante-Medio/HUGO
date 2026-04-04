@@ -1,5 +1,6 @@
 #include <cmath>
 #include "HugoMath.h"
+#include "HugoTypes.h"
 
 namespace HUGO {
 

@@ -1,10 +1,12 @@
 #pragma once
+
+#include <type_traits>
+
 #include "Component.h"
-#include "HugoMath.h"
+#include "HugoTypes.h"
 #include "HugoError.h"
 #include "IScene.h"
-#include <type_traits>
-#include <HugoEasings.h>
+#include "HugoEasings.h"
 
 namespace HUGO{
     //Base class for abstract pointer in TweenComponent

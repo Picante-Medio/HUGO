@@ -1,10 +1,9 @@
 #pragma once
 #include <cmath>
-#include "HugoMath.h"
-
+#include "HugoTypes.h"
 
 struct Easing{
-    virtual HUGO::Float easingFunction(HUGO::Float t) =0;
+    virtual HUGO::Float easingFunction(HUGO::Float t) = 0;
 };
 
 struct LinearTween: public Easing{

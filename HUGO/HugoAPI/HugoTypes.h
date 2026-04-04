@@ -7,6 +7,11 @@ namespace HUGO{
 
     using String = std::string;
 
+    using Int = int32_t;
+	using Float = float;
+
+	constexpr Float PI = 3.14159265358979323846f;
+
     // AUDIO TYPES
     using AudioID = int;
     using SceneID = int;

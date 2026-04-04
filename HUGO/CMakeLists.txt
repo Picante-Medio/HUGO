@@ -12,203 +12,14 @@ set(CMAKE_MESSAGE_LOG_LEVEL WARNING)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "" FORCE)
 set(CMAKE_WARN_DEPRECATED OFF)
 
-FetchContent_Declare(
-    miniaudio
-    GIT_REPOSITORY "https://github.com/mackron/miniaudio.git"
-    GIT_TAG "0.11.24"
-    GIT_SHALLOW TRUE
-)
-
-FetchContent_Declare(
-    bullet3
-    GIT_REPOSITORY "https://github.com/bulletphysics/bullet3.git"
-    GIT_TAG 3.25
-    GIT_SHALLOW TRUE
-)
-
-FetchContent_Declare(
-    lua
-    GIT_REPOSITORY "https://github.com/walterschell/Lua.git"
-    GIT_TAG "v5.4.5"
-    GIT_SHALLOW TRUE
-)
-
-if(WIN32)
-    FetchContent_Declare(
-        sdl2
-        GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
-        GIT_TAG "release-2.30.7"
-        GIT_SHALLOW TRUE
-        OVERRIDE_FIND_PACKAGE 
-    )
-elseif(LINUX)
-    find_package(SDL2 CONFIG REQUIRED)
-endif()
-
-FetchContent_Declare(
-    ogre
-    GIT_REPOSITORY "https://github.com/OGRECave/ogre.git"
-    GIT_TAG "v14.5.2"
-    GIT_SHALLOW TRUE
-    OVERRIDE_FIND_PACKAGE 
-)
-
-# miniaudio
-set(MINIAUDIO_NO_EXTRA_NODES ON CACHE BOOL "" FORCE)
-set(MINIAUDIO_FORCE_CXX ON CACHE BOOL "" FORCE)
-set(MINIAUDIO_INSTALL OFF CACHE BOOL "" FORCE)
-set(MINIAUDIO_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
-# Bullet3
-set(BUILD_BULLET2_DEMOS OFF CACHE BOOL "" FORCE)
-set(BUILD_CPU_DEMOS OFF CACHE BOOL "" FORCE)
-set(BUILD_OPENGL3_DEMOS OFF CACHE BOOL "" FORCE)
-set(BUILD_PYBULLET OFF CACHE BOOL "" FORCE)
-set(BUILD_EXTRAS OFF CACHE BOOL "" FORCE)
-set(BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
-set(INSTALL_LIBS OFF CACHE BOOL "" FORCE)
-set(INSTALL_CMAKE_FILES OFF CACHE BOOL "" FORCE)
-set(BUILD_CLSOCKET OFF CACHE BOOL "" FORCE)
-set(BUILD_ENET OFF CACHE BOOL "" FORCE)
-set(ENABLE_VHACD OFF CACHE BOOL "" FORCE)
-set(USE_GLUT OFF CACHE BOOL "" FORCE)
-set(USE_GRAPHICAL_BENCHMARK OFF CACHE BOOL "" FORCE)
-set(USE_SOFT_BODY_MULTI_BODY_DYNAMICS_WORLD OFF CACHE BOOL "" FORCE)
-
-set(CMAKE_RELWITHDEBINFO_POSTFIX "" CACHE STRING "")
-set(CMAKE_DEBUG_POSTFIX "" CACHE STRING "")
-set(USE_MSVC_RUNTIME_LIBRARY_DLL ON CACHE BOOL "" FORCE)
-
-# Lua 
-set(LUA_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
-set(LUA_BUILD_BINARY OFF CACHE BOOL "" FORCE)
-set(LUA_BUILD_COMPILER OFF CACHE BOOL "" FORCE)
-# Poniendo esta opción que sale en el cmake toplevel de lua compila y linkea correctamente
-set(LUA_BUILD_AS_CXX ON CACHE BOOL "" FORCE) 
-
-# SDL2
-set(SDL_SHARED ON CACHE BOOL "" FORCE)
-set(SDL2_DISABLE_INSTALL ON CACHE BOOL "" FORCE)
-set(SDL2_DISABLE_UNINSTALL ON CACHE BOOL "" FORCE)
-
-# Ogre
-# Opciones desactivadas
-set(OGRE_BITES_NATIVE_DIALOG OFF CACHE BOOL "" FORCE)
-set(OGRE_BITES_STATIC_PLUGINS OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_COMPONENT_BITES OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_COMPONENT_BULLET OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_COMPONENT_MESHLODGENERATOR OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_COMPONENT_PAGING OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_COMPONENT_PROPERTY OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_COMPONENT_TERRAIN OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_COMPONENT_VOLUME OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_DEPENDENCIES OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_PLUGIN_ASSIMP OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_PLUGIN_BSP OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_PLUGIN_DOT_SCENE OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_PLUGIN_GLSLANG OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_PLUGIN_RSIMAGE OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_RENDERSYSTEM_D3D11 OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_RENDERSYSTEM_GLES2 OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_RENDERSYSTEM_D3D9 OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_RENDERSYSTEM_TINY OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_RENDERSYSTEM_VULKAN OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_SAMPLES OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(OGRE_BUILD_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
-set(OGRE_CONFIG_ENABLE_QUAD_BUFFER_STEREO OFF CACHE BOOL "" FORCE)
-set(OGRE_INSTALL_DEPENDENCIES OFF CACHE BOOL "" FORCE)
-set(OGRE_INSTALL_DOCS OFF CACHE BOOL "" FORCE)
-set(OGRE_INSTALL_SAMPLES OFF CACHE BOOL "" FORCE)
-set(OGRE_INSTALL_TOOLS OFF CACHE BOOL "" FORCE)
-set(OGRE_INSTALL_VSPROPS OFF CACHE BOOL "" FORCE)
-set(OGRE_NODELESS_POSITIONING OFF CACHE BOOL "" FORCE)
-set(OGRE_STATIC OFF CACHE BOOL "" FORCE)
-
-# Opciones activadas
-set(OGRE_BUILD_COMPONENT_OVERLAY ON CACHE BOOL "" FORCE)
-set(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM ON CACHE BOOL "" FORCE)
-set(OGRE_BUILD_PLUGIN_OCTREE ON CACHE BOOL "" FORCE)
-set(OGRE_BUILD_PLUGIN_PCZ ON CACHE BOOL "" FORCE)
-set(OGRE_BUILD_PLUGIN_PFX ON CACHE BOOL "" FORCE)
-set(OGRE_BUILD_PLUGIN_STBI ON CACHE BOOL "" FORCE)
-set(OGRE_BUILD_RENDERSYSTEM_GL3PLUS ON CACHE BOOL "" FORCE)
-set(OGRE_BUILD_RTSHADERSYSTEM_SHADERS ON CACHE BOOL "" FORCE)
-set(OGRE_CONFIG_FILESYSTEM_UNICODE ON CACHE BOOL "" FORCE)
-set(OGRE_COPY_DEPENDENCIES ON CACHE BOOL "" FORCE)
-set(OGRE_ENABLE_PRECOMPILED_HEADERS ON CACHE BOOL "" FORCE)
-set(OGRE_INSTALL_PDB ON CACHE BOOL "" FORCE)
-set(OGRE_PROJECT_FOLDERS ON CACHE BOOL "" FORCE)
-
-FetchContent_MakeAvailable(miniaudio bullet3 lua)
-
-if(WIN32)
-    FetchContent_MakeAvailable(sdl2)
-endif()
-# despues
-FetchContent_MakeAvailable(ogre)
-
-set(HUGO_LINKED_LIBRARIES
-    lua_static
-    BulletDynamics
-    BulletCollision
-    Bullet3Common
-    Bullet3Dynamics
-    Bullet3Collision
-    LinearMath
-    OgreMain
-    OgreOverlay
-    RenderSystem_GL3Plus
-    RenderSystem_GL
-    Codec_STBI
-    SDL2::SDL2
-    SDL2::SDL2main
-    miniaudio)
-
-set(HUGO_DEPS_INCLUDE_DIRS
-    ${bullet3_SOURCE_DIR}/src)
-
-# necesario porque bullet es antiguo y no exporta correctamente sus directorios de inclusion
-file(GLOB_RECURSE BULLET_SRC_DIRS CONFIGURE_DEPENDS LIST_DIRECTORIES true ${bullet3_SOURCE_DIR}/src/*)
-foreach(path ${BULLET_SRC_DIRS})
-    if(IS_DIRECTORY "${path}")
-        list(APPEND HUGO_DEPS_INCLUDE_DIRS "${path}")
-    endif()
-endforeach()
-
-function(enable_warnings target)
-    if(MSVC)
-        target_compile_options(${target} PRIVATE /W4 /permissive-)
-    else()
-        target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic
-        )
-    endif()
-endfunction()
+include(cmake/Dependencies.cmake)
+include(cmake/Functions.cmake)
 
 ################################## HugoLib
 
-file(GLOB_RECURSE HUGOLIB_DIRS CONFIGURE_DEPENDS LIST_DIRECTORIES true ${CMAKE_SOURCE_DIR}/include/*)
-set(HUGOLIB_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include)
-
-foreach(path ${HUGOLIB_DIRS})
-    if(IS_DIRECTORY "${path}")
-        list(APPEND HUGOLIB_INCLUDE_DIRS "${path}")
-    endif()
-endforeach()
-
-file(GLOB_RECURSE HugoLib_SRC_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/include/*.cpp)
-
-add_library(HugoLib STATIC ${HugoLib_SRC_FILES})
-enable_warnings(HugoLib)
-
-set_target_properties(HugoLib PROPERTIES
-    DEBUG_POSTFIX "d"
-    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
-    ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/lib
-    ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/lib)
-
-target_include_directories(HugoLib PUBLIC ${HUGOLIB_INCLUDE_DIRS})
+include(cmake/HugoAPI.cmake)
+include(cmake/HugoUtils.cmake)
+include(cmake/LuaBinder.cmake)
 
 ################################## Aquí empieza el proyecto principal
 
@@ -251,7 +62,9 @@ target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     ${HUGO_LINKED_LIBRARIES}
-    HugoLib)
+    HugoAPI
+    HugoUtils
+    LuaBinder)
 
 set(CMAKE_SKIP_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
@@ -282,24 +95,6 @@ else()
     endforeach()
 endif ()
 
+########################################
 
-
-################## Juego de prueba
-
-file(GLOB_RECURSE TestGame_SRC_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/TestGame/*.cpp)
-
-add_library(TestGame MODULE ${TestGame_SRC_FILES})
-enable_warnings(TestGame)
-
-set_target_properties(TestGame PROPERTIES
-    DEBUG_POSTFIX "d"
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
-    LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin
-    LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin)
-
-target_include_directories(TestGame PRIVATE ${CMAKE_SOURCE_DIR}/TestGame)
-
-target_link_libraries(TestGame PRIVATE
-    HugoLib
-    SDL2::SDL2
-    SDL2::SDL2main)
+include(cmake/TestGame.cmake)

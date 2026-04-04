@@ -119,7 +119,7 @@ public:
     */
     template<typename ReturnType, typename ...ArgTypes>
     void registerFunc(ReturnType(*function)(ArgTypes...), HUGO::String luaName) {
-         using Function = ReturnType(*)(ArgTypes...);
+        using Function = ReturnType(*)(ArgTypes...);
 
         // Create the function pointer in cpp
         lua_pushlightuserdata(lua, reinterpret_cast<void*>(function));

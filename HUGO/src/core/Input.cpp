@@ -1,7 +1,7 @@
 #include "Input.h"
 #include <SDL_events.h>
 #include <SDL_mouse.h>
-#include "HugoMath.h"
+#include "HugoTypes.h"
 namespace HUGO
 {
     Input::Input() : keyState(), toChange(), keysOfAction(), textInputBuffer(),
