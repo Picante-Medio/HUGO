@@ -7,7 +7,6 @@
 #include "TweenComponent.h"
 #include "ParentComponent.h"
 #include "ChildrenComponent.h"
-#include "HierarchyTags.h"
 #include "PanelComponent.h"
 #include "ButtonComponent.h"
 #include "TextComponent.h"
@@ -65,7 +64,6 @@ TestSystem::init() {
         childrenComp.addChild(e3);
     });
 
-    scene->addComponent<ChildrenCompDirtyTag>(e1);
     // //----------------------------------------
 
     // EntityID ui = scene->createEntity();

@@ -2,9 +2,10 @@
 #include "HugoError.h"
 #include "HugoSystemMacros.h"
 #include "HugoTypes.h"
-#include <unordered_map>
+
 struct TransformComponent;
 struct ParentComponent;
+struct ChildrenComponent;
 
 HSYSTEM(HierarchySystem)
 private:
@@ -14,7 +15,12 @@ private:
     void addChildToParent(EntityID child, EntityID parent);
     void removeChildFromParent(EntityID child, EntityID parent);
     bool hasCycle(EntityID child, EntityID newParent);
-    void updateHierarchy();
+
+    void onUpdateChildrenComponent(ChildrenComponent& childrenComp);
+    void onUpdateParentComponent(ParentComponent& parentComp);
+
+    void onRemoveChildrenComponent(ChildrenComponent& childrenComp);
+    void onRemoveParentComponent(ParentComponent& parentComp);
     
     //functions to update transform
     //world-->local

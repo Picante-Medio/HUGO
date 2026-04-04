@@ -12,6 +12,10 @@ public:
     std::optional<EntityID> getParent() const{
         return parent;
     }
+    void removeParent() {
+        parent.reset();
+    }
+    
     friend class HierarchySystem;
 END_HCOMPONENT()
 

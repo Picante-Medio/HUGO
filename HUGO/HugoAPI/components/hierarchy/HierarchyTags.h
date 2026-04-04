@@ -1,9 +1,0 @@
-#pragma once
-#include "HugoComponentMacros.h"
-
-HCOMPONENT(ParentCompDirtyTag)
-END_HCOMPONENT()
-
-HCOMPONENT(ChildrenCompDirtyTag)
-END_HCOMPONENT()
-

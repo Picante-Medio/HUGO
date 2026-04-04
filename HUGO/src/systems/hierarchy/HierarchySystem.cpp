@@ -5,10 +5,19 @@
 #include "TransformComponent.h"
 #include "ParentComponent.h"
 #include "ChildrenComponent.h"
-#include "HierarchyTags.h"
 
 void 
-HierarchySystem::init(){}
+HierarchySystem::init()
+{
+    scene->onAddComponent<ChildrenComponent>().connect(this, &HierarchySystem::onUpdateChildrenComponent);
+    scene->onAddComponent<ParentComponent>().connect(this, &HierarchySystem::onUpdateParentComponent);
+    
+    scene->onUpdateComponent<ChildrenComponent>().connect(this, &HierarchySystem::onUpdateChildrenComponent);
+    scene->onUpdateComponent<ParentComponent>().connect(this, &HierarchySystem::onUpdateParentComponent);
+
+    scene->onRemoveComponent<ChildrenComponent>().connect(this, &HierarchySystem::onRemoveChildrenComponent); 
+    scene->onRemoveComponent<ParentComponent>().connect(this, &HierarchySystem::onRemoveParentComponent);
+}
 
 void 
 HierarchySystem::onLoad(){}
@@ -41,10 +50,9 @@ void
 HierarchySystem::addParentToChild(EntityID child, EntityID parent){
 
     if (scene->hasComponent<ParentComponent>(child)) {
-        scene->modifyComponent<ParentComponent>(child, [parent](ParentComponent& parentComp){
-            parentComp.previousParent = parentComp.parent;
-            parentComp.parent = parent;
-        });
+        ParentComponent& parentComp= scene->getComponent<ParentComponent>(child);
+        parentComp.previousParent = parentComp.parent;
+        parentComp.parent = parent;
     }
     else {
         scene->addComponent<ParentComponent>(child, [parent](ParentComponent& parentComp){
@@ -71,82 +79,6 @@ HierarchySystem::hasCycle(EntityID child,EntityID newParent){
 
     return false;
 }
-
-void 
-HierarchySystem::updateHierarchy(){    
-
-    //update changes in ChildrenComponent
-    for(auto& pack: scene->query<ChildrenCompDirtyTag,ChildrenComponent>()){
-        ChildrenComponent& childrenComp = pack.getDeprecated<ChildrenComponent&>();
-        EntityID parent = childrenComp.entity;
-        std::vector<EntityID>& toAdd = childrenComp.addedChildren;
-        std::vector<EntityID>& toRemove = childrenComp.removedChildren;
-
-        //child added
-        if(!toAdd.empty()){
-            for(EntityID& child: toAdd){
-                //check if child is valid and does not create cycle
-                if(child == parent || hasCycle(child, parent)){
-                    std::cerr << "[HierarchySystem] Cannot add child "<< child <<" for entity " << parent << '\n';
-                    std::unordered_set<EntityID>& children = childrenComp.children;
-                    children.erase(child);
-                    continue;
-                } 
-                //add parentComponent to child
-                addParentToChild(child, parent);  
-            }
-            toAdd.clear();
-        }
-
-        //child removed
-        if(!toRemove.empty()){
-            for(EntityID& child: toRemove){
-                //check if child is valid
-                if(child == parent){
-                    std::cerr << "[HierarchySystem] Cannot remove child "<< child <<" for entity " << parent << '\n';
-                    continue;
-                } 
-                
-                //remove the parent
-                removeParentFromChild(child); 
-            }
-            toRemove.clear();
-        }
-        
-        scene->removeComponent<ChildrenCompDirtyTag>(parent);
-    }
-
-    //update changes in ParentComponent
-    for (auto& pack : scene->query<ParentCompDirtyTag, ParentComponent>()){
-        ParentComponent& parentComp = pack.getDeprecated<ParentComponent&>();
-        
-        if(!parentComp.parent) 
-            continue;
-        EntityID child = parentComp.entity;
-        EntityID newParent= parentComp.parent.value();
-        std::optional<EntityID> oldParent= parentComp.previousParent;
-
-        if (newParent == child || hasCycle(child, newParent)) {
-            if(oldParent)parentComp.parent = oldParent;
-            scene->removeComponent<ParentCompDirtyTag>(child);
-            std::cerr << "[HierarchySystem] Cannot set parent "<< newParent << " for entity "<< child<<'\n';
-            continue;
-        }
-
-         //remove child from old parent
-        if(oldParent){
-            removeChildFromParent(child, oldParent.value());
-        }
-
-        //add child in new parent
-        addChildToParent(child, newParent);
-
-        //update parentComponent
-        parentComp.previousParent = newParent;
-        scene->removeComponent<ParentCompDirtyTag>(child);
-    }
-}
-
 
 void 
 HierarchySystem::setWorldTransform(TransformComponent &transform){
@@ -278,12 +210,11 @@ void HierarchySystem::propagateNeedUpdateToChildren(EntityID parent)
 void 
 HierarchySystem::update(double){
 
-    updateHierarchy();
-    
     //update needUpdate state
     for (auto& pack : scene->query<TransformComponent>()) {
         TransformComponent& tr= pack.getDeprecated<TransformComponent&>();
-        if(tr.needUpdateWorldPosition || tr.needUpdateWorldRotation || tr.needUpdateWorldScale){
+        if(tr.needUpdateWorldPosition || tr.needUpdateWorldRotation || tr.needUpdateWorldScale
+            ||tr.needUpdateLocalPosition || tr.needUpdateLocalRotation || tr.needUpdateLocalScale){
             propagateNeedUpdateToChildren(tr.entity);
         }
     }
@@ -297,3 +228,90 @@ HierarchySystem::update(double){
 
 void 
 HierarchySystem::fixedUpdate(double) {}
+
+void 
+HierarchySystem::onUpdateChildrenComponent(ChildrenComponent& childrenComp)
+{
+    EntityID parent = childrenComp.entity;
+    std::vector<EntityID>& toAdd = childrenComp.addedChildren;
+    std::vector<EntityID>& toRemove = childrenComp.removedChildren;
+
+    //child added
+    if(!toAdd.empty()){
+        for(EntityID& child: toAdd){
+            //check if child is valid and does not create cycle
+            if(child == parent || hasCycle(child, parent)){
+                std::cerr << "[HierarchySystem] Cannot add child "<< child <<" for entity " << parent << '\n';  
+                childrenComp.children.erase(child);
+                return;
+            } 
+            //add parentComponent to child
+            addParentToChild(child, parent);  
+        }
+        toAdd.clear();
+    }
+
+    //child removed
+    if(!toRemove.empty()){
+        for(EntityID& child: toRemove){
+            //check if child is valid
+            if(child == parent){
+                std::cerr << "[HierarchySystem] Cannot remove child "<< child <<" for entity " << parent << '\n';
+                return;
+            } 
+            
+            //remove the parent
+            removeParentFromChild(child); 
+        }
+        toRemove.clear();
+    }
+}
+
+void 
+HierarchySystem::onUpdateParentComponent(ParentComponent& parentComp)
+{
+    if(!parentComp.parent)
+         return;
+    EntityID child = parentComp.entity;
+    EntityID newParent= parentComp.parent.value();
+    std::optional<EntityID> oldParent= parentComp.previousParent;
+
+    if (newParent == child || hasCycle(child, newParent)) {
+        if(oldParent)parentComp.parent = oldParent;
+        std::cerr << "[HierarchySystem] Cannot set parent "<< newParent << " for entity "<< child<<'\n';
+        return;
+    }
+
+    //remove child from old parent
+    if(oldParent){
+        removeChildFromParent(child, oldParent.value());
+    }
+
+    //add child in new parent
+    addChildToParent(child, newParent);
+
+    //update parentComponent
+    parentComp.previousParent = newParent;
+}
+
+void 
+HierarchySystem::onRemoveChildrenComponent(ChildrenComponent& childrenComp)
+{
+    std::unordered_set<EntityID>& children = childrenComp.children;
+    while(!children.empty()){
+        auto it = children.begin();
+        EntityID child = *it;
+        children.erase(it);
+        
+        //remove the parent from the child
+        removeParentFromChild(child); 
+    }
+}
+
+void 
+HierarchySystem::onRemoveParentComponent(ParentComponent& parentComp)
+{
+    EntityID child = parentComp.entity;
+    std::optional<EntityID> parent = parentComp.parent;
+    if(parent)removeChildFromParent(child, parent.value());
+}

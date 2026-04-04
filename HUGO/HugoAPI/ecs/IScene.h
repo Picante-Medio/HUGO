@@ -150,7 +150,7 @@ public:
 		queryMask.set(id);
 
 		// Get the smallest list of possible entities
-		int smallestListIndex = 0;
+		size_t smallestListIndex = 0;
 		DenseListIndex smallestSize = componentTable->getCount(ids[0]);
 		for (size_t i = 1; i < ids.size(); ++i) {
 			DenseListIndex size = componentTable->getCount(ids[i]);
