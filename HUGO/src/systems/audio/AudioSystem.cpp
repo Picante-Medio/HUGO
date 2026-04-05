@@ -295,7 +295,7 @@ void AudioSystem::processChanges(AudioComponent &c)
     }
 }
 
-void AudioSystem::process3DChanges(AudioComponent& a, const Audio3DInfoComponent &c, const TransformComponent& tr)
+void AudioSystem::process3DChanges(AudioComponent& a, const Audio3DInfoComponent &c)
 {
     set3DMinDistance(a.activePtr, c.minDistance);
     set3DMaxDistance(a.activePtr, c.maxDistance);
@@ -304,36 +304,36 @@ void AudioSystem::process3DChanges(AudioComponent& a, const Audio3DInfoComponent
     setDopplerFactor(a.activePtr, c.dopplerFactor);
     set3DRollof(a.activePtr, c.rolloff);
     set3DCone(a.activePtr, c.coneInnerAngle, c.coneOuterAngle, c.coneOuterGain);
-    set3DPosition(a.activePtr, tr.getPosition());
 }
 #pragma endregion
 
 #pragma region UPDATES
 void AudioSystem::update(double)
 {
-    // sync audio listeners
-    for (auto& pack : scene->query<AudioListenerComponent, TransformComponent>())
-    {
-        AudioListenerComponent& listener = pack.getDeprecated<AudioListenerComponent&>();
-        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
-        updateListeners(listener, tr);
-    }
+    // REPLACED BY EVENTS OF COMPONENTS
+    // // sync audio listeners
+    // for (auto& pack : scene->query<AudioListenerComponent, TransformComponent>())
+    // {
+    //     AudioListenerComponent& listener = pack.getDeprecated<AudioListenerComponent&>();
+    //     TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
+    //     updateListeners(listener, tr);
+    // }
     
-    // 3D changes
-    for (auto& pack: scene->query<AudioComponent, Audio3DInfoComponent, TransformComponent>())
-    {
-        AudioComponent& a = pack.getDeprecated<AudioComponent&>();
-        Audio3DInfoComponent& info = pack.getDeprecated<Audio3DInfoComponent&>();
-        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
-        process3DChanges(a, info, tr);
-    }
+    // // 3D changes
+    // for (auto& pack: scene->query<AudioComponent, Audio3DInfoComponent, TransformComponent>())
+    // {
+    //     AudioComponent& a = pack.getDeprecated<AudioComponent&>();
+    //     Audio3DInfoComponent& info = pack.getDeprecated<Audio3DInfoComponent&>();
+    //     TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
+    //     process3DChanges(a, info, tr);
+    // }
     
-    // general changes
-    for (auto& pack: scene->query<AudioComponent>())
-    {
-        AudioComponent& c = pack.getDeprecated<AudioComponent&>();
-        processChanges(c);
-    }
+    // // general changes
+    // for (auto& pack: scene->query<AudioComponent>())
+    // {
+    //     AudioComponent& c = pack.getDeprecated<AudioComponent&>();
+    //     processChanges(c);
+    // }
     
     // cleanup finished voices
     for (auto& pack : scene->query<AudioComponent>())
@@ -361,6 +361,17 @@ void AudioSystem::init(){
     
     // Ensure pools are sized correctly
     ensurePoolSize();
+
+    
+    //components events
+    scene->onAddComponent<AudioComponent>().connect(this, &AudioSystem::onAddAudioComponent);
+    scene->onAddComponent<Audio3DInfoComponent>().connect(this, &AudioSystem::onAdd3DAudioComponent);
+
+    scene->onUpdateComponent<AudioComponent>().connect(this, &AudioSystem::onUpdateAudioComponent);
+    scene->onUpdateComponent<Audio3DInfoComponent>().connect(this, &AudioSystem::onUpdate3DAudioComponent);
+    scene->onUpdateComponent<AudioListenerComponent>().connect(this, &AudioSystem::onUpdateAudioListener);
+    scene->onUpdateComponent<TransformComponent>().connect(this, &AudioSystem::onAn3DAudioMove);
+
 }
 #pragma endregion
 
@@ -370,3 +381,42 @@ void AudioSystem::onAddAudioComponent(AudioComponent &c)
     acquireVoice(c);
 }
 #pragma endregion
+
+void AudioSystem::onUpdateAudioComponent(AudioComponent &c)
+{
+    processChanges(c);
+}
+
+void AudioSystem::onUpdate3DAudioComponent(Audio3DInfoComponent &c)
+{
+    EntityID id = c.entity;
+    if (!scene->hasComponent<AudioComponent>(id)) return;
+
+    AudioComponent& a = scene->getComponent<AudioComponent>(id);
+    process3DChanges(a, c);
+}
+
+void AudioSystem::onUpdateAudioListener(AudioListenerComponent &l)
+{
+    EntityID id = l.entity;
+    if (scene->hasComponent<TransformComponent>(id)){
+        TransformComponent& tr = scene->getComponent<TransformComponent>(id);
+        updateListeners(l, tr);
+    }
+}
+
+void AudioSystem::onAdd3DAudioComponent(Audio3DInfoComponent &c)
+{
+    // just to be sure the type is correctly chosen
+    scene->modifyComponent<AudioComponent>(c.entity, [](AudioComponent& a){
+        a.type = HUGO::AudioTypes::SOUND3D;
+    });
+}
+
+void AudioSystem::onAn3DAudioMove(TransformComponent &tr)
+{
+    EntityID id = tr.entity;
+    if (!scene->hasComponent<Audio3DInfoComponent>(id) || !scene->hasComponent<AudioComponent>(id)) return;
+    AudioComponent& a = scene->getComponent<AudioComponent>(id);
+    set3DPosition(a.activePtr, tr.getPosition());
+}

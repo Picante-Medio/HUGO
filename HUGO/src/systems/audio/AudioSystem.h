@@ -67,7 +67,7 @@ private:
 
    void processChanges(AudioComponent& c);
 
-   void process3DChanges(AudioComponent& a, const Audio3DInfoComponent& c, const TransformComponent& tr);
+   void process3DChanges(AudioComponent& a, const Audio3DInfoComponent& c);
 
    /* ================
       playback control
@@ -112,6 +112,13 @@ private:
 
    // component events
    void onAddAudioComponent(AudioComponent& c);
+   void onAdd3DAudioComponent(Audio3DInfoComponent& c);
+
+   void onUpdateAudioComponent(AudioComponent& c);
+   void onUpdate3DAudioComponent(Audio3DInfoComponent& c);
+   void onUpdateAudioListener(AudioListenerComponent& l);
+   void onAn3DAudioMove(TransformComponent& tr);
+   
 public:
 
    virtual ~AudioSystem() = default;
