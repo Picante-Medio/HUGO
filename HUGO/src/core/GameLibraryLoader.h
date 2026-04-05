@@ -7,6 +7,7 @@
 #include "IScene.h"
 #include "HugoParsingVariant.h"
 #include "System.h"
+#include "LuaBinder.h"
 
 #if defined(_WIN32) || defined(_WIN64)
     #include <windows.h>
@@ -26,7 +27,7 @@ namespace HUGO {
 
 class GameLibraryLoader {
 
-    typedef void (*InitializeGameFn)(std::shared_ptr<HUGO::ComponentRegistry>);
+    typedef void (*InitializeGameFn)(std::shared_ptr<HUGO::ComponentRegistry>, std::shared_ptr<LuaBinder>);
 
     typedef bool (*GenerateComponentFn)(std::shared_ptr<HUGO::IScene>, EntityID, const std::string&,
         const std::unordered_map<std::string, HVariant>&);

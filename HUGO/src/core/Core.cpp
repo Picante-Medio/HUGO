@@ -38,10 +38,13 @@ Core::Core(): input(std::make_shared<Input>()), sceneManager(input)
 //Initialization of HUGO modules and loading of games dynamic lib
 ErrorOrVoid Core::init(){
 
-    // Inicializar registro de componentes
+    // Initialize component registry
     ComponentRegistry::setInstance(std::make_shared<ComponentRegistryInitializer>());
 
-    // Carga del juego como biblioteca dinamica
+    //LuaBinder initialization
+    initLua();
+
+    // Load game as dll
     GameLibraryLoader::init("TestGame");
 
     vt.reset();
@@ -78,8 +81,6 @@ void HUGO::Core::initModules()
     //BulletoModule init
     physicsModule = std::make_shared<BulletModule>();
 
-    //LuaBinder initialization
-    initLua();
 
     // Input
     input->setSDLWindow(OgreModule::Instance().getSDLWindow());

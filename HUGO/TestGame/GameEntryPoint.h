@@ -1,6 +1,7 @@
 #pragma once
 
 #include "HUGO.h"
+#include "LuaBinder.h"
 #include <string>
 #include <unordered_map>
 
@@ -12,7 +13,7 @@
 
 #include <memory>
 
-EXPORT void InitializeGame(std::shared_ptr<HUGO::ComponentRegistry> registry);
+EXPORT void InitializeGame(std::shared_ptr<HUGO::ComponentRegistry> registry, std::shared_ptr<LuaBinder> luaBinder);
 
 EXPORT bool GenerateComponent(std::shared_ptr<HUGO::IScene>, EntityID ent, const std::string& component, 
     const std::unordered_map<std::string, HVariant>& componentMembers);

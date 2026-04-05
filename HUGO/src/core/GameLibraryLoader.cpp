@@ -1,6 +1,7 @@
 #include "GameLibraryLoader.h"
 
 #include "ComponentRegistryInitializer.h"
+#include "LuaBinder.h"
 
 HUGO::GameLibraryLoader::GameLibraryLoader(const std::string& gameLibraryName) {
 
@@ -40,7 +41,7 @@ HUGO::GameLibraryLoader::GameLibraryLoader(const std::string& gameLibraryName) {
             "EntityID, const std::string&, std::shared_ptr<System>&)  not found in " + gameLibraryName);
     }
 
-    initializeGameFnPointer(ComponentRegistryInitializer::getInstance());
+    initializeGameFnPointer(ComponentRegistryInitializer::getInstance(), LuaBinder::getInstance());
 }
 
 HUGO::GameLibraryLoader::~GameLibraryLoader() {
