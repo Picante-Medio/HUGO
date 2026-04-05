@@ -11,4 +11,4 @@ set_target_properties(LuaBinder PROPERTIES
 target_include_directories(LuaBinder PUBLIC ${CMAKE_SOURCE_DIR}/LuaBinder)
 target_link_libraries(LuaBinder PUBLIC 
     HugoUtils
-    lua_static)
+    lua_shared)
