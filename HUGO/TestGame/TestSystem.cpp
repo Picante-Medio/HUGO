@@ -18,7 +18,6 @@
 
 #include "AnimationComponent.h"
 #include "AudioComponent.h"
-#include "AudioTags.h"
 
 void
 TestSystem::init() {
