@@ -53,7 +53,7 @@ private:
    ma_sound* getSound(HUGO::AudioID id, HUGO::AudioTypes type);
 
    // obtains a playable sound for the component
-   ma_sound* acquireVoice(AudioComponent& c);
+   void acquireVoice(AudioComponent& c);
 
    void ensurePoolSize();
    void prewarmVoices(size_t voicesPerSound = 2);
@@ -110,6 +110,8 @@ private:
    // internal callback
    static void endCallback(void* data, ma_sound*);
 
+   // component events
+   void onAddAudioComponent(AudioComponent& c);
 public:
 
    virtual ~AudioSystem() = default;

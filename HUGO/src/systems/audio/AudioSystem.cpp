@@ -1,7 +1,6 @@
 #include "AudioSystem.h"
 #include "AudioComponent.h"
 #include "AudioListenerComponent.h"
-#include "AudioTags.h"
 #include "Audio3DInfoComponent.h"
 #include "HugoError.h"
 #include "HugoTypes.h"
@@ -124,12 +123,11 @@ ma_sound* AudioSystem::getSound(HUGO::AudioID id, HUGO::AudioTypes type)
     return stolen.ptr->get();
 }
 
-ma_sound* AudioSystem::acquireVoice(AudioComponent &c)
+void AudioSystem::acquireVoice(AudioComponent &c)
 {
     if (c.activePtr == nullptr) {
         c.activePtr = getSound(c.audioId, c.type);
     }
-    return c.activePtr;
 }
 
 void AudioSystem::endCallback(void* data, ma_sound*)
@@ -280,28 +278,33 @@ void AudioSystem::updateListeners(const AudioListenerComponent& a, const Transfo
 
 void AudioSystem::processChanges(AudioComponent &c)
 {
-    ma_sound* s = acquireVoice(c);
-    setLooping(s, c.loop);
+    setLooping(c.activePtr, c.loop);
     HUGO::Float mult = c.type != HUGO::AudioTypes::MUSIC ? soundsGroupVolume : musicsGroupVolume;
-    setVolume(s, c.volume*mult);
-    setPitch(s, c.pitch);
+    setVolume(c.activePtr, c.volume*mult);
+    setPitch(c.activePtr, c.pitch);
     if (c.startTime >= 0.0){
-        setAudioPosition(s, c.startTime);
+        setAudioPosition(c.activePtr, c.startTime);
         c.startTime = -1.0;
+    }
+
+    if (c.isPlaying && !ma_sound_is_playing(c.activePtr)){
+        playAudio(c.activePtr);
+    }
+    else if (!c.isPlaying && ma_sound_is_playing(c.activePtr)){
+        stopAudio(c.activePtr);
     }
 }
 
 void AudioSystem::process3DChanges(AudioComponent& a, const Audio3DInfoComponent &c, const TransformComponent& tr)
 {
-    ma_sound* s = acquireVoice(a);
-    set3DMinDistance(s, c.minDistance);
-    set3DMaxDistance(s, c.maxDistance);
-    setVelocity(s, c.velocity); 
-    setDirection(s, c.direction);
-    setDopplerFactor(s, c.dopplerFactor);
-    set3DRollof(s, c.rolloff);
-    set3DCone(s, c.coneInnerAngle, c.coneOuterAngle, c.coneOuterGain);
-    set3DPosition(s, tr.getPosition());
+    set3DMinDistance(a.activePtr, c.minDistance);
+    set3DMaxDistance(a.activePtr, c.maxDistance);
+    setVelocity(a.activePtr, c.velocity); 
+    setDirection(a.activePtr, c.direction);
+    setDopplerFactor(a.activePtr, c.dopplerFactor);
+    set3DRollof(a.activePtr, c.rolloff);
+    set3DCone(a.activePtr, c.coneInnerAngle, c.coneOuterAngle, c.coneOuterGain);
+    set3DPosition(a.activePtr, tr.getPosition());
 }
 #pragma endregion
 
@@ -332,29 +335,6 @@ void AudioSystem::update(double)
         processChanges(c);
     }
     
-    // play events
-    for (auto& pack: scene->query<AudioComponent, AudioPlayTag>())
-    {
-        AudioComponent& c = pack.getDeprecated<AudioComponent&>();
-        ma_sound* s = acquireVoice(c);
-        playAudio(s);
-        c.isPlaying = true;
-        scene->removeComponent<AudioPlayTag>(c.entity);
-    }
-    
-    // stop events
-    for (auto& pack :scene->query<AudioComponent, AudioStopTag>())
-    {
-        AudioComponent& c = pack.getDeprecated<AudioComponent&>();
-        if (c.activePtr)
-        {
-            stopAudio(c.activePtr);
-            c.activePtr = nullptr;
-        }
-        c.isPlaying = false;
-        scene->removeComponent<AudioStopTag>(c.entity);
-    }
-    
     // cleanup finished voices
     for (auto& pack : scene->query<AudioComponent>())
     {
@@ -381,5 +361,12 @@ void AudioSystem::init(){
     
     // Ensure pools are sized correctly
     ensurePoolSize();
+}
+#pragma endregion
+
+#pragma region events
+void AudioSystem::onAddAudioComponent(AudioComponent &c)
+{
+    acquireVoice(c);
 }
 #pragma endregion

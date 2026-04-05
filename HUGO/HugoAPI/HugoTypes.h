@@ -24,27 +24,6 @@ namespace HUGO{
         LAST_TYPE
     };
 
-    enum AudioDirtyFlags
-    {
-        LOOP = 0,
-        VOLUME = 1 << 0,
-        PITCH = 1 << 1,
-        STARTTIME = 1 << 2,
-        NONE_2D = 1 << 3
-    };
-
-    enum Audio3DDirtyFlags
-    {
-        MINDISTANCE = 0,
-        MAXDISTANCE = 1 << 0,
-        VELOCITY = 1 << 1,
-        DIRECTION = 1 << 2,
-        DOPPLER = 1 << 3,
-        ROLLOF = 1 << 4,
-        CONE = 1 << 5,
-        MOVED = 1 << 6,
-        NONE_3D = 1 << 7
-    };
 
     using AudioEndCallback = std::function<void(HUGO::AudioID)>;
 
