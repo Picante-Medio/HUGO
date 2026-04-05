@@ -93,5 +93,5 @@ public:
     // debug
     // ========================================================================
     // save all registered audio assets to a text file for debugging
-    bool saveToDebugFile(const HUGO::String& filename = "AudioAssetsDebug.txt") const;
+    bool saveToDebugFile(const HUGO::String& filename = "AudioAssetsDebug.log") const;
 };
