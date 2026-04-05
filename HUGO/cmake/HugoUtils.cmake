@@ -13,6 +13,7 @@ add_library(HugoUtils STATIC ${HugoUtils_SRC_FILES})
 enable_warnings(HugoUtils)
 
 set_target_properties(HugoUtils PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
     DEBUG_POSTFIX "d"
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
     ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/lib
