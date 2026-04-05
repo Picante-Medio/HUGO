@@ -58,7 +58,7 @@ class BulletSimulation : public IPhysicsSimulation {
     btCollisionShape* getorCreateShape(HUGO::CollisionShapeID& id, ColliderComponent& hgCol);
 
     HUGO::CollisionObjectID createColliderObject(ColliderComponent& hgCol);
-    HUGO::CollisionObjectID upgradeToRigidBodyObject(ColliderComponent& hgCol, RigidBodyComponent& hgRb, HUGO::BodyType type);
+    HUGO::CollisionObjectID upgradeToRigidBodyObject(ColliderComponent& hgCol, RigidBodyComponent& hgRb);
     CollisionObject& getCollisionObject(const HUGO::CollisionObjectID id);
     void removeRigidBodyObject(HUGO::CollisionObjectID& id);
     void removeColliderObject(HUGO::CollisionObjectID& id);

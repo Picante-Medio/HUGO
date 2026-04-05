@@ -6,7 +6,6 @@
 #include "HugoComponentMacros.h"
 
 HCOMPONENT(RigidBodyComponent)
-
     // ----------------------Attributes----------------------
     enum UpdateFlags{
         MASS_UPDATED = 1,
@@ -40,8 +39,16 @@ HCOMPONENT(RigidBodyComponent)
     float angularSleepingThreshold = 1.f;
 
     HUGO::CollisionObjectID objectID = HUGO::INVALID_COL_OBJ_ID;
+    HUGO::BodyType type = HUGO::BodyType::DYNAMIC;
 
     // ----------------------Setters----------------------
+
+    // must be declared on initialization. Otherwise setting this will do nothing at best and
+    // will have un unpredictable outcome at worst
+    void setBodyType(HUGO::BodyType nType){
+        type = nType;
+    }
+
     void setMass(float nMass){
         mass = nMass;
         flags = flags | UpdateFlags::MASS_UPDATED;
@@ -107,6 +114,7 @@ HCOMPONENT(RigidBodyComponent)
     }
 
     // ----------------------Getters----------------------
+    inline HUGO::BodyType getBodyType() const { return type; }
     inline float getMass() const { return mass; }
     inline float getLinearDamping() const { return linearDamping; }
     inline float getAngularDamping() const { return angularDamping; }

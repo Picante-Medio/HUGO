@@ -1,5 +1,4 @@
 ﻿#include "PhysicsTestSystem.h"
-#include "PhysicsTags.h"
 #include "RigidBodyComponent.h"
 #include "ColliderComponent.h"
 #include "TransformComponent.h"
@@ -24,12 +23,11 @@ void PhysicsTestSystem::init(){
     });
 
     scene->addComponent<RigidBodyComponent>(e1, [](RigidBodyComponent& rb){
+        rb.setBodyType(HUGO::BodyType::STATIC);
         // rb->setShape()
         // rb.setMass(5.f);
     });
     // scene->addComponent<DynamicRBTag>(e1);
-
-    scene->addComponent<StaticRBTag>(e1);
 
     // Entidad 2: Cuerpo dinámico
     EntityID e2 = scene->createEntity();
@@ -46,11 +44,10 @@ void PhysicsTestSystem::init(){
 
     scene->addComponent<RigidBodyComponent>(e2, [](RigidBodyComponent& rb){
         rb.setMass(5.f);
+        rb.setBodyType(HUGO::BodyType::DYNAMIC);
         // rb->setShape()
     });
 
-    scene->addComponent<DynamicRBTag>(e2);
-    
     EntityID e3 = scene->createEntity();
     scene->addComponent<TransformComponent>(e3,[](TransformComponent& transform){
         transform.setPosition(HUGO::Vector3(0.f, 5, 40.f));
@@ -63,8 +60,6 @@ void PhysicsTestSystem::init(){
     scene->addComponent<RigidBodyComponent>(e3, [](RigidBodyComponent& rb){
         rb.setMass(5.f);
     });
-
-    scene->addComponent<DynamicRBTag>(e3);
 }
 
 void PhysicsTestSystem::onLoad(){

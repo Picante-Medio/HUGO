@@ -3,7 +3,6 @@
 #include "HugoMotionState.h"
 #include "RigidBodyComponent.h"
 #include "ColliderComponent.h"
-#include "PhysicsTags.h"
 #include "BulletUtils.h"
 #include "HugoDispatcher.h"
 #include "TransformComponent.h"
@@ -247,7 +246,7 @@ HUGO::CollisionObjectID BulletSimulation::createColliderObject(ColliderComponent
     return id;
 }
 
-HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderComponent& hgCol, RigidBodyComponent& hgRb, HUGO::BodyType type)
+HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderComponent& hgCol, RigidBodyComponent& hgRb)
 {
     // If the collider doesn't exist return invalid ID
     if(hgCol.objectID != HUGO::INVALID_COL_OBJ_ID){
@@ -255,7 +254,7 @@ HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderCompo
     }
 
     // if it's not dynamic mass should be 0
-    hgRb.mass = type == HUGO::DYNAMIC? hgRb.mass : 0.0f;
+    hgRb.setMass(hgRb.getBodyType() == HUGO::DYNAMIC? hgRb.getMass() : 0.0f);
     
     // Get Shape
     btCollisionShape* shape = getorCreateShape(hgCol.shapeID, hgCol);
@@ -263,7 +262,7 @@ HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderCompo
     btTransform bodyTransform;
     bodyTransform.setIdentity();
     btVector3 startingInertia(0, 0, 0);
-    if(hgRb.mass > 0) shape->calculateLocalInertia(hgRb.mass, startingInertia);
+    if(hgRb.getMass() > 0) shape->calculateLocalInertia(hgRb.getMass(), startingInertia);
 
     btQuaternion q = BulletUtils::quaternionToBullet(scene->getComponent<TransformComponent>(hgCol.entity).getRotation());
     q.normalize();
@@ -275,12 +274,12 @@ HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderCompo
     // btDefaultMotionState* state = new btDefaultMotionState(bodyTransform);
     
     // Set bullet rb parameters
-    btRigidBody::btRigidBodyConstructionInfo info = btRigidBody::btRigidBodyConstructionInfo(hgRb.mass, state, shape, startingInertia);
+    btRigidBody::btRigidBodyConstructionInfo info = btRigidBody::btRigidBodyConstructionInfo(hgRb.getMass(), state, shape, startingInertia);
     btRigidBody* rb = new btRigidBody(info);
     //rb->setRollingFriction(0.02f);
     
     // Set flags for static, dynamic or kinematic
-    switch(type){
+    switch(hgRb.getBodyType()){
         case HUGO::BodyType::STATIC:
         rb->setCollisionFlags(rb->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
         break;
@@ -467,43 +466,18 @@ void BulletSimulation::checkColliderFlags(ColliderComponent& hgCol)
 void BulletSimulation::syncBodiesToBullet() {
     
     // Add new rigidBodies to simulation and Update kinematic bodies
-    // Static rigidBodies 
-    for(auto& pack: scene->query<ColliderComponent, StaticRBTag, RigidBodyComponent, TransformComponent>()) {
+    for(auto& pack: scene->query<ColliderComponent, RigidBodyComponent, TransformComponent>()) {
         RigidBodyComponent& rb = pack.getDeprecated<RigidBodyComponent&>();
         ColliderComponent& col = pack.getDeprecated<ColliderComponent&>();
 
         if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
             //create a new CollisionObject
-            rb.objectID = upgradeToRigidBodyObject(col, rb, HUGO::BodyType::STATIC);
+            rb.objectID = upgradeToRigidBodyObject(col, rb);
         }
-        
-        checkRigidBodyFlags(rb);
-    }
-    
-    // Kinematic rigidBodies (creation and update)
-    for(auto& pack: scene->query<ColliderComponent, KinematicRBTag, RigidBodyComponent, TransformComponent>()) {
-        RigidBodyComponent& rb = pack.getDeprecated<RigidBodyComponent&>();
-        ColliderComponent& col = pack.getDeprecated<ColliderComponent&>();
-        
-        if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
-            //create a new CollisionObject
-            rb.objectID = upgradeToRigidBodyObject(col, rb, HUGO::BodyType::KINEMATIC);
-        }
-        
-        HUGOMotionState* motionState = static_cast<HUGOMotionState*>(btRigidBody::upcast(getCollisionObject(rb.objectID).bulletRB)->getMotionState());
-        motionState->updateBulletTransform();
-        
-        checkRigidBodyFlags(rb);
-    }
-    
-    // Dynamic rigidBodies
-    for(auto& pack: scene->query<ColliderComponent, DynamicRBTag, RigidBodyComponent, TransformComponent>()) {
-        RigidBodyComponent& rb = pack.getDeprecated<RigidBodyComponent&>();
-        ColliderComponent& col = pack.getDeprecated<ColliderComponent&>();
-        
-        if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
-            //create a new CollisionObject
-            rb.objectID = upgradeToRigidBodyObject(col, rb, HUGO::BodyType::DYNAMIC);
+
+        if(rb.getBodyType() == HUGO::BodyType::KINEMATIC){
+            HUGOMotionState* motionState = static_cast<HUGOMotionState*>(btRigidBody::upcast(getCollisionObject(rb.objectID).bulletRB)->getMotionState());
+            motionState->updateBulletTransform();
         }
         
         checkRigidBodyFlags(rb);
@@ -511,13 +485,13 @@ void BulletSimulation::syncBodiesToBullet() {
 
     // Add colliders to simulation
      for(auto& pack: scene->query<ColliderComponent, TransformComponent>()){
-         ColliderComponent& col = pack.getDeprecated<ColliderComponent&>();
+        ColliderComponent& col = pack.getDeprecated<ColliderComponent&>();
     
-         if(col.objectID == HUGO::INVALID_COL_OBJ_ID){
-             col.objectID = createColliderObject(col);
-         }
+        if(col.objectID == HUGO::INVALID_COL_OBJ_ID){
+            col.objectID = createColliderObject(col);
+        }
     
-         checkColliderFlags(col);
+        checkColliderFlags(col);
     }
 }
 
