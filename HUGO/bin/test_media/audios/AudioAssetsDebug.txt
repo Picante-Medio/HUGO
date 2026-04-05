@@ -1,29 +1,24 @@
 AUDIO ASSETS DEBUG
 ========================================
-Generated: Apr  4 2026 23:09:46
+Generated: Apr  5 2026 02:29:48
 Base Path: test_media/audios/
 Total Assets: 2
 ========================================
 
-1. sfx_risa
-   ID: 1
-   Type: SOUND2D
-   Path: test_media/audios//sfx/risa.wav
+1. lucky
+   ID: 0
+   Path: test_media/audios//music\lucky.mp3
    SUCCESS
 
-2. music_lucky
-   ID: 0
-   Type: MUSIC
-   Path: test_media/audios//music/lucky.mp3
+2. risa
+   ID: 1
+   Path: test_media/audios//sfx\risa.wav
    SUCCESS
 
 ========================================
 SUMMARY
 ========================================
 Total Assets: 2
-  - MUSIC: 1
-  - SOUND2D: 1
-  - SOUND3D: 0
 Files Found: 2
 Files Missing: 0
 ========================================

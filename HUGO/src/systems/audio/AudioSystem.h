@@ -47,10 +47,10 @@ private:
       =================*/
 
    // create a ma_sound ptr
-   ErrorOrType<AudioInfo> createVoice(HUGO::AudioID id);
+   ErrorOrType<AudioInfo> createVoice(HUGO::AudioID id, HUGO::AudioTypes type);
 
    // acquire reusable voice (reuse/create/steal)
-   ma_sound* getSound(HUGO::AudioID id);
+   ma_sound* getSound(HUGO::AudioID id, HUGO::AudioTypes type);
 
    // obtains a playable sound for the component
    ma_sound* acquireVoice(AudioComponent& c);
@@ -74,8 +74,8 @@ private:
       ================ */
 
    void playAudio(ma_sound* s);
-   void playAudio(HUGO::AudioID id);
-   void playAudioLUA(int id);
+   void playAudio(HUGO::AudioID id, HUGO::AudioTypes type);
+   void playAudioLUA(int id, int type);
 
    void stopAudio(ma_sound* s);
    void resumeAudio(ma_sound* s);

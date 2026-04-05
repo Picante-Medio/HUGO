@@ -63,33 +63,6 @@ HUGO::String AudioAssetsModule::generateName(const HUGO::String& relativePath) c
     return filename;
 }
 
-HUGO::AudioTypes AudioAssetsModule::determineTypeFromPath(const HUGO::String& relativePath) const
-{
-    HUGO::String pathLower = relativePath;
-    std::transform(pathLower.begin(), pathLower.end(), pathLower.begin(), ::tolower);
-    
-    // music folder
-    if (pathLower.find("music/") != std::string::npos || 
-        pathLower.find("music\\") != std::string::npos) {
-        return HUGO::MUSIC;
-    }
-    
-    // 3D sounds folder
-    if (pathLower.find("3dsfx/") != std::string::npos || 
-        pathLower.find("3dsfx\\") != std::string::npos) {
-        return HUGO::SOUND3D;
-    }
-    
-    // regular SFX folder (2D)
-    if (pathLower.find("sfx/") != std::string::npos || 
-        pathLower.find("sfx\\") != std::string::npos) {
-        return HUGO::SOUND2D;
-    }
-    
-    // default to SOUND2D
-    return HUGO::SOUND2D;
-}
-
 void AudioAssetsModule::scanDirectoryRecursive(const std::string& currentPath, const std::string& relativeRoot)
 {
     try {
@@ -105,38 +78,15 @@ void AudioAssetsModule::scanDirectoryRecursive(const std::string& currentPath, c
                     // get relative path from base directory
                     HUGO::String relativePath = fs::relative(entry.path(), relativeRoot).string();
                     
-                    // get filename without extension
-                    HUGO::String fileNameOnly = filename;
-                    size_t dotPos = fileNameOnly.find_last_of('.');
-                    if (dotPos != std::string::npos) {
-                        fileNameOnly = fileNameOnly.substr(0, dotPos);
-                    }
+                    // generate name
+                    HUGO::String name = generateName(relativePath);
                     
-                    // determine the folder name (sfx, 3dsfx, or music)
-                    HUGO::String folderName;
-                    HUGO::AudioTypes type = determineTypeFromPath(relativePath);
-                    
-                    if (type == HUGO::MUSIC) {
-                        folderName = "music";
-                    } else if (type == HUGO::SOUND3D) {
-                        folderName = "3dsfx";
-                    } else {
-                        folderName = "sfx";
-                    }
-                    
-                    // combine folder name + filename
-                    HUGO::String name = folderName + "_" + fileNameOnly;
-                    
-                    // convert to lowercase for consistency
-                    std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-                    
-                    // register the audio
-                    registerAudio(name, relativePath.c_str(), type);
+                    // register audio
+                    registerAudio(name, relativePath.c_str());
                     
                     // debug output
-                    const char* typeStr = (type == HUGO::MUSIC) ? "MUSIC" : 
-                                         ((type == HUGO::SOUND3D) ? "SOUND3D" : "SOUND2D");
-                    std::cout << "Registered: " << name << " [" << typeStr << "] -> " << relativePath << "\n";
+                    std::cout << "Registered: " << name 
+                              << " -> " << relativePath << "\n";
                 }
             }
         }
@@ -148,7 +98,7 @@ void AudioAssetsModule::scanDirectoryRecursive(const std::string& currentPath, c
 
 #pragma region PUBLIC API
 // Registration
-HUGO::AudioID AudioAssetsModule::registerAudio(const HUGO::String& name, const HUGO::String& filepath, HUGO::AudioTypes type)
+HUGO::AudioID AudioAssetsModule::registerAudio(const HUGO::String& name, const HUGO::String& filepath)
 {
     auto it = nameToAsset.find(name);
     if (it != nameToAsset.end()) {
@@ -160,7 +110,6 @@ HUGO::AudioID AudioAssetsModule::registerAudio(const HUGO::String& name, const H
     std::shared_ptr<AudioAssetInfo> asset = std::make_shared<AudioAssetInfo>();
     asset->fullPath = fullPath;
     asset->id = nextID++;
-    asset->type = type;
 
     nameToAsset[name] = asset;
     idToName[asset->id] = name;
@@ -216,6 +165,18 @@ AudioAssetInfo* AudioAssetsModule::getAsset(HUGO::AudioID id) const
 
     auto it2 = nameToAsset.find(it->second);
     return (it2 != nameToAsset.end()) ? it2->second.get() : nullptr;
+}
+
+HUGO::AudioID AudioAssetsModule::getID(const HUGO::String &name) const
+{
+    auto it = nameToAsset.find(name);
+    
+    if (it != nameToAsset.end()) {
+        return it->second->id;
+    }
+    
+    // not found
+    return -1;
 }
 
 std::vector<HUGO::String> AudioAssetsModule::getAllNames() const
@@ -278,12 +239,8 @@ bool AudioAssetsModule::saveToDebugFile(const HUGO::String& filename) const
         const HUGO::String& name = pair.first;
         const AudioAssetInfo* info = pair.second.get();
         
-        const char* typeStr = (info->type == HUGO::MUSIC) ? "MUSIC" : 
-                              ((info->type == HUGO::SOUND3D) ? "SOUND3D" : "SOUND2D");
-        
         file << index++ << ". " << name << "\n";
         file << "   ID: " << info->id << "\n";
-        file << "   Type: " << typeStr << "\n";
         file << "   Path: " << info->fullPath << "\n";
         
         if (fs::exists(info->fullPath.c_str())) {
@@ -300,26 +257,14 @@ bool AudioAssetsModule::saveToDebugFile(const HUGO::String& filename) const
     file << "========================================\n";
     
     int missingCount = 0;
-    int musicCount = 0;
-    int sound2DCount = 0;
-    int sound3DCount = 0;
     
     for (const auto& pair : nameToAsset) {
         if (!fs::exists(pair.second->fullPath.c_str())) {
             missingCount++;
         }
-        
-        switch (pair.second->type) {
-            case HUGO::MUSIC: musicCount++; break;
-            case HUGO::SOUND3D: sound3DCount++; break;
-            default: sound2DCount++; break;
-        }
     }
     
     file << "Total Assets: " << nameToAsset.size() << "\n";
-    file << "  - MUSIC: " << musicCount << "\n";
-    file << "  - SOUND2D: " << sound2DCount << "\n";
-    file << "  - SOUND3D: " << sound3DCount << "\n";
     file << "Files Found: " << (nameToAsset.size() - missingCount) << "\n";
     file << "Files Missing: " << missingCount << "\n";
     file << "========================================\n";

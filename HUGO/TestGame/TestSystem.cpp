@@ -18,6 +18,7 @@
 
 #include "AnimationComponent.h"
 #include "AudioComponent.h"
+#include "AudioTags.h"
 
 void
 TestSystem::init() {
@@ -120,6 +121,15 @@ TestSystem::init() {
     scene->modifyComponent<PanelComponent>(boton, [buttonNormalMaterial](PanelComponent& panel){
         panel.material = buttonNormalMaterial;
     });
+
+    // EntityID audio = scene->createEntity();
+    // scene->addComponent<AudioComponent>(audio, [](AudioComponent& a){
+    //     a.isPlaying = true;
+    //     a.type = HUGO::AudioTypes::MUSIC;
+    //     a.audioName = "lucky";
+    //     a.audioId = 0;
+    // });
+    // scene->addComponent<AudioPlayTag>(audio);
 
     // EntityID emmiter = scene->createEntity();
     // scene->addComponent<TransformComponent>(emmiter, [](TransformComponent& transform){

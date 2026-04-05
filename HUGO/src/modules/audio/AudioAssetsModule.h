@@ -12,7 +12,6 @@
 struct AudioAssetInfo {
     HUGO::String fullPath;     // full path for loading
     HUGO::AudioID id;          // unique id
-    HUGO::AudioTypes type;     // SOUND2D, SOUND3D, or MUSIC
 };
 
 // module for managing all audio assets globally
@@ -25,7 +24,7 @@ private:
     HUGO::AudioID nextID = 0;
 
     HUGO::Float soundsGroupVolume = 1.0f;
-   HUGO::Float musicsGroupVolume = 1.0f;
+    HUGO::Float musicsGroupVolume = 1.0f;
     
     // supported audio extensions
     std::vector<HUGO::String> supportedExtensions = {".wav", ".mp3", ".flac"};
@@ -33,7 +32,6 @@ private:
     // Private helper functions
     bool isSupportedAudioFile(const HUGO::String& filename) const;
     HUGO::String generateName(const HUGO::String& relativePath) const;
-    HUGO::AudioTypes determineTypeFromPath(const std::string& relativePath) const;
     void scanDirectoryRecursive(const std::string& currentPath, const std::string& relativeRoot);
     
     AudioAssetsModule();
@@ -50,8 +48,8 @@ public:
     // registry
     // ========================================================================
     
-    // register an audio file manually (with explicit type)
-    HUGO::AudioID registerAudio(const HUGO::String& name, const HUGO::String& filepath, HUGO::AudioTypes type);
+    // register an audio file manually
+    HUGO::AudioID registerAudio(const HUGO::String& name, const HUGO::String& filepath);
     
     // scan base directory and register all audio files automatically (type auto-detected)
     size_t scanAndRegisterAll();
@@ -63,9 +61,11 @@ public:
     // getters
     // ========================================================================
     
-    // get name by ID
+    // get asset
     AudioAssetInfo* getAsset(const HUGO::String& name) const;
     AudioAssetInfo* getAsset(HUGO::AudioID id) const;
+    // get id by name
+    HUGO::AudioID getID(const HUGO::String& name) const;
 
     // get all registered names
     std::vector<HUGO::String> getAllNames() const;

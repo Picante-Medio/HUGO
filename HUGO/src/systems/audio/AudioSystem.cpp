@@ -16,10 +16,11 @@
 #include <memory>
 #include <sstream>
 
-ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id)
+ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id, HUGO::AudioTypes type)
 {
     StringError e;
     AudioAssetInfo* asset = AudioAssetsModule::Instance().getAsset(id);
+    
     if (!asset) {       
         e.errorMessage = "[AudioSystem]: Audio ID not found";
         return ErrorOrType<AudioInfo>(e);
@@ -30,12 +31,12 @@ ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id)
     
     if (!info.ptr->init(engine.get(), asset->fullPath.c_str(), 0))
     {
-        e.errorMessage = "Failed loading audio: " + asset->fullPath;
+        e.errorMessage = "[AudioSystem] Failed loading audio: " + asset->fullPath;
         return ErrorOrType<AudioInfo>(e);
     }
     
     // configuration
-    if (asset->type == HUGO::SOUND3D)
+    if (type == HUGO::SOUND3D)
     {
         ma_sound_set_spatialization_enabled(info.ptr->get(), MA_TRUE);
         ma_sound_set_attenuation_model(info.ptr->get(), ma_attenuation_model_inverse);
@@ -67,11 +68,11 @@ void AudioSystem::ensurePoolSize()
  * @param id Audio identifier used to select the corresponding audio pool.
  * @return Pointer to the acquired ma_sound instance.
  */
-ma_sound* AudioSystem::getSound(HUGO::AudioID id)
+ma_sound* AudioSystem::getSound(HUGO::AudioID id, HUGO::AudioTypes type)
 {
     AudioPool& pool = pools[id];
     
-    // STEP 1 : try reusing an existing free voice
+    // STEP 1: reuse
     for (auto& voice : pool.voices)
     {
         if (!voice.inUse)
@@ -82,10 +83,10 @@ ma_sound* AudioSystem::getSound(HUGO::AudioID id)
         }
     }
     
-    // STEP 2 : create a new voice if we haven't reached the pool limit yet
+    // STEP 2: create new
     if (pool.voices.size() < static_cast<size_t>(queueSize))
     {   
-        ErrorOrType<AudioInfo> result = createVoice(id);
+        ErrorOrType<AudioInfo> result = createVoice(id, type);
         
         if (result.isError())
             return nullptr;
@@ -103,7 +104,7 @@ ma_sound* AudioSystem::getSound(HUGO::AudioID id)
         return v.ptr->get();
     }
     
-    // STEP 3 : steal an existing voice
+    // STEP 3: steal
     AudioInfo& stolen = pool.voices[pool.stealIndex];
     pool.stealIndex = (pool.stealIndex + 1) % pool.voices.size();
     
@@ -112,8 +113,7 @@ ma_sound* AudioSystem::getSound(HUGO::AudioID id)
     
     stolen.inUse = true;
     
-    // Reconfigure for new audio type
-    HUGO::AudioTypes type = AudioAssetsModule::Instance().getAsset(id)->type;
+    // reconfig using the type
     if (type == HUGO::SOUND3D) {
         ma_sound_set_spatialization_enabled(stolen.ptr->get(), MA_TRUE);
         ma_sound_set_attenuation_model(stolen.ptr->get(), ma_attenuation_model_inverse);
@@ -127,7 +127,7 @@ ma_sound* AudioSystem::getSound(HUGO::AudioID id)
 ma_sound* AudioSystem::acquireVoice(AudioComponent &c)
 {
     if (c.activePtr == nullptr) {
-        c.activePtr = getSound(c.audioId);
+        c.activePtr = getSound(c.audioId, c.type);
     }
     return c.activePtr;
 }
@@ -145,14 +145,17 @@ void AudioSystem::playAudio(ma_sound* s)
     ma_sound_start(s);
 }
 
-void AudioSystem::playAudio(HUGO::AudioID id)
+void AudioSystem::playAudio(HUGO::AudioID id, HUGO::AudioTypes type)
 {
-    ma_sound* s = getSound(id);
+    ma_sound* s = getSound(id, type);
     playAudio(s);
 }
 
-void AudioSystem::playAudioLUA(int id) {
-    playAudio(static_cast<HUGO::AudioID>(id));
+void AudioSystem::playAudioLUA(int id, int type) {
+    if (type >= HUGO::AudioTypes::LAST_TYPE){
+        return;
+    }
+    playAudio(static_cast<HUGO::AudioID>(id), static_cast<HUGO::AudioTypes>(type));
 }
 
 void AudioSystem::stopAudio(ma_sound* s)
@@ -183,25 +186,6 @@ void AudioSystem::setGroupVolume(HUGO::AudioTypes type, HUGO::Float volume)
         musicsGroupVolume = volume;
     else   
         soundsGroupVolume = volume;
-    
-    for (HUGO::Int id = 0; id < pools.size(); ++id)
-    {
-        // skip if no asset for this ID
-        if (!AudioAssetsModule::Instance().exists(id)) continue;
-        
-        if (AudioAssetsModule::Instance().getAsset(id)->type != type)
-            continue;
-        
-        AudioPool& pool = pools[id];
-        for (auto& voice : pool.voices)
-        {
-            if (voice.ptr)
-            {
-                HUGO::Float vol = ma_sound_get_volume(voice.ptr->get());
-                ma_sound_set_volume(voice.ptr->get(), vol * volume);
-            }
-        }
-    }
 }
 
 void AudioSystem::setPitch(ma_sound* s, HUGO::Float pitch)
@@ -298,7 +282,8 @@ void AudioSystem::processChanges(AudioComponent &c)
 {
     ma_sound* s = acquireVoice(c);
     setLooping(s, c.loop);
-    setVolume(s, c.volume);
+    HUGO::Float mult = c.type != HUGO::AudioTypes::MUSIC ? soundsGroupVolume : musicsGroupVolume;
+    setVolume(s, c.volume*mult);
     setPitch(s, c.pitch);
     if (c.startTime >= 0.0){
         setAudioPosition(s, c.startTime);
@@ -388,7 +373,7 @@ void AudioSystem::fixedUpdate(double)
 
 void AudioSystem::onLoad(){
     std::shared_ptr<LuaBinder> luaBinder = LuaBinder::getInstance();
-    luaBinder->registerMethod<AudioSystem, void, int>(*this, &AudioSystem::playAudioLUA, "playAudio");
+    luaBinder->registerMethod<AudioSystem, void, int, int>(*this, &AudioSystem::playAudioLUA, "playAudio");
 }
 
 void AudioSystem::init(){
