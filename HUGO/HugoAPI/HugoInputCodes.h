@@ -116,11 +116,16 @@ namespace HUGO{
         F9,
         F10,
         F11,
-        F12,
-        MOUSE_WHEEL_UP,
-        MOUSE_WHEEL_DOWN,
-        MOUSE_BUTTON_0,
-        MOUSE_BUTTON_1,
-        MOUSE_BUTTON_2
+        F12
+    };
+
+    enum MouseCode{
+        MOUSE_UNKNOWN,
+        MOUSE_LEFT,
+        MOUSE_MIDDLE,
+        MOUSE_RIGHT,
+        MOUSE_BUTTON_X1,
+        MOUSE_BUTTON_X2
+        // Wheel motions are not implemented
     };
 }

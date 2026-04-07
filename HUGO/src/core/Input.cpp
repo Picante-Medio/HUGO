@@ -62,22 +62,22 @@ namespace HUGO
     }
 
     void Input::registerAction(std::string actionName,
-                               std::vector<SDL_Keycode> keys)
+                               std::vector<HUGO::KeyCode> keys)
     {
         keysOfAction[actionName] = keys;
     }
 
-    void Input::registerAction(std::string actionName, SDL_Keycode key)
+    void Input::registerAction(std::string actionName, HUGO::KeyCode key)
     {
         keysOfAction[actionName] = {key};
     }
 
-    void Input::addKeyToAction(std::string actionName, SDL_Keycode key)
+    void Input::addKeyToAction(std::string actionName, HUGO::KeyCode key)
     {
         keysOfAction[actionName].push_back(key);
     }
 
-    void Input::removeKeyFromAction(std::string actionName, SDL_Keycode key)
+    void Input::removeKeyFromAction(std::string actionName, HUGO::KeyCode key)
     {
         for (auto it = keysOfAction[actionName].begin();
              it != keysOfAction[actionName].end();)
@@ -89,15 +89,18 @@ namespace HUGO
         }
     }
 
-    bool Input::isKeyPressed(SDL_Keycode key)
+    bool Input::isKeyPressed(HUGO::KeyCode key)
     {
-        return keyState[key] == JUST_PRESSED || keyState[key] == PRESSED;
+        SDL_Keycode SDLKey = hugoKeyToSDLKey(key);
+        return keyState[SDLKey] == JUST_PRESSED || keyState[SDLKey] == PRESSED;
     }
 
     bool Input::isActionPressed(std::string action)
     {
-        for (SDL_Keycode key : keysOfAction[action])
+
+        for (HUGO::KeyCode key : keysOfAction[action])
         {
+
             if (isKeyPressed(key))
                 return true;
         }
@@ -109,14 +112,15 @@ namespace HUGO
         return windowChanged;
     }
 
-    bool Input::wasKeyJustPressed(SDL_Keycode key)
+    bool Input::wasKeyJustPressed(HUGO::KeyCode key)
     {
-        return keyState[key] == JUST_PRESSED;
+        SDL_Keycode SDLKey = hugoKeyToSDLKey(key);
+        return keyState[SDLKey] == JUST_PRESSED;
     }
 
     bool Input::wasActionJustPressed(std::string action)
     {
-        for (SDL_Keycode key : keysOfAction[action])
+        for (HUGO::KeyCode key : keysOfAction[action])
         {
             if (wasKeyJustPressed(key))
                 return true;
@@ -124,14 +128,15 @@ namespace HUGO
         return false;
     }
 
-    bool Input::wasKeyJustReleased(SDL_Keycode key)
+    bool Input::wasKeyJustReleased(HUGO::KeyCode key)
     {
-        return keyState[key] == JUST_RELEASED;
+        SDL_Keycode SDLKey = hugoKeyToSDLKey(key);
+        return keyState[SDLKey] == JUST_RELEASED;
     }
 
     bool Input::wasActionJustReleased(std::string action)
     {
-        for (SDL_Keycode key : keysOfAction[action])
+        for (HUGO::KeyCode key : keysOfAction[action])
         {
             if (wasKeyJustReleased(key))
                 return true;
@@ -139,19 +144,22 @@ namespace HUGO
         return false;
     }
 
-    bool Input::isMouseButtonPressed(int button)
+    bool Input::isMouseButtonPressed(HUGO::MouseCode button)
     {
-        return mouseState[button] == JUST_PRESSED || mouseState[button] == PRESSED;
+        int SDLButton = hugoMouseInputToSDLMouseInput(button);
+        return mouseState[SDLButton] == JUST_PRESSED || mouseState[SDLButton] == PRESSED;
     }
 
-    bool Input::wasMouseButtonJustPressed(int button)
+    bool Input::wasMouseButtonJustPressed(HUGO::MouseCode button)
     {
-        return mouseState[button] == JUST_PRESSED;
+        int SDLButton = hugoMouseInputToSDLMouseInput(button);
+        return mouseState[SDLButton] == JUST_PRESSED;
     }
 
-    bool Input::wasMouseButtonJustReleased(int button)
+    bool Input::wasMouseButtonJustReleased(HUGO::MouseCode button)
     {
-        return mouseState[button] == JUST_RELEASED;
+        int SDLButton = hugoMouseInputToSDLMouseInput(button);
+        return mouseState[SDLButton] == JUST_RELEASED;
     }
 
     Input::MousePosition Input::getMousePosition()
@@ -220,6 +228,34 @@ namespace HUGO
             else if (mouseState[button] == JUST_RELEASED)
                 mouseState[button] = NOT_PRESSED;
         }
+    }
+
+    int Input::hugoMouseInputToSDLMouseInput(HUGO::MouseCode button)
+    {
+        int sdlButton;
+
+        switch(button){
+        case(MOUSE_LEFT):
+            sdlButton = SDL_BUTTON_LEFT;
+            break;
+        case(MOUSE_MIDDLE):
+            sdlButton = SDL_BUTTON_MIDDLE;
+            break;
+        case(MOUSE_RIGHT):
+            sdlButton = SDL_BUTTON_RIGHT;
+            break;
+        case(MOUSE_BUTTON_X1):
+            sdlButton = SDL_BUTTON_X1;
+            break;
+        case(MOUSE_BUTTON_X2):
+            sdlButton = SDL_BUTTON_X2;
+            break;
+        default:
+            sdlButton = 0;
+            break;
+        }
+
+        return sdlButton;
     }
 
     SDL_Keycode Input::hugoKeyToSDLKey(HUGO::KeyCode key)

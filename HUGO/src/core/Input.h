@@ -6,8 +6,10 @@
 #include <vector>
 #include <memory>
 
+#include <SDL.h>
+
 #include "IInput.h"
-#include "HugoKeycodes.h"
+#include "HugoInputCodes.h"
 
 namespace HUGO {
 
@@ -26,7 +28,7 @@ namespace HUGO {
     std::unordered_map<int, KeyState> mouseState;
     std::queue<int> mouseToChange;
     
-    std::unordered_map<std::string, std::vector<SDL_Keycode>> keysOfAction;
+    std::unordered_map<std::string, std::vector<HUGO::KeyCode>> keysOfAction;
     
     std::string textInputBuffer;
     bool textInputActive;
@@ -39,6 +41,8 @@ namespace HUGO {
     void processKeyQueue();
     void processMouseQueue();
 
+    // Translators from hugo codes to SDL codes
+    int hugoMouseInputToSDLMouseInput(HUGO::MouseCode button);
     SDL_Keycode hugoKeyToSDLKey(HUGO::KeyCode key);
     
     public:
@@ -51,26 +55,26 @@ namespace HUGO {
     bool isQuitPressed() const;
 
     // Action adition and elimination
-    void registerAction(std::string actionName, std::vector<SDL_Keycode> keys);
-    void registerAction(std::string actionName, SDL_Keycode key);
-    void addKeyToAction(std::string actionName, SDL_Keycode key);
+    void registerAction(std::string actionName, std::vector<HUGO::KeyCode> keys);
+    void registerAction(std::string actionName, HUGO::KeyCode key);
+    void addKeyToAction(std::string actionName, HUGO::KeyCode key);
     
     //!!Linear in the number of actions
-    void removeKeyFromAction(std::string actionName, SDL_Keycode key);
+    void removeKeyFromAction(std::string actionName, HUGO::KeyCode key);
     
     // Accessors for input state
-    bool isKeyPressed(SDL_Keycode key);
-    bool isMouseButtonPressed(int button);
+    bool isKeyPressed(HUGO::KeyCode key);
+    bool isMouseButtonPressed(HUGO::MouseCode button);
     
     bool isActionPressed(std::string action);
     bool windowHasChanged() const;
     
-    bool wasKeyJustPressed(SDL_Keycode key);
-    bool wasMouseButtonJustPressed(int button);
+    bool wasKeyJustPressed(HUGO::KeyCode key);
+    bool wasMouseButtonJustPressed(HUGO::MouseCode button);
     bool wasActionJustPressed(std::string action);
     
-    bool wasKeyJustReleased(SDL_Keycode key);
-    bool wasMouseButtonJustReleased(int button);
+    bool wasKeyJustReleased(HUGO::KeyCode key);
+    bool wasMouseButtonJustReleased(HUGO::MouseCode button);
     bool wasActionJustReleased(std::string action);
     
     MousePosition getMousePosition();
