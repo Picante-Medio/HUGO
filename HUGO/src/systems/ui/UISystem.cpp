@@ -559,7 +559,6 @@ void UISystem::processInput()
 
         // enter -> save result and deactivate
         if (input->wasActionJustPressed("SubmitInput")) {
-            field.isActive = false;
             field.result = field.fullText;
 
             if (field.onChangeCallback)
@@ -568,6 +567,8 @@ void UISystem::processInput()
             // recover the original text
             text.text = field.originalText;
             field.originalText.clear();
+            field.fullText.clear();
+            field.cursorPos = 0;
             continue;
         }
         // update visible text
