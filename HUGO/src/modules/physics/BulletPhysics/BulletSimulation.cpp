@@ -6,6 +6,7 @@
 #include "BulletUtils.h"
 #include "HugoDispatcher.h"
 #include "TransformComponent.h"
+#include "ParentComponent.h"
 
 #include "OgreBulletDebugger.h"
 #include <cstddef>

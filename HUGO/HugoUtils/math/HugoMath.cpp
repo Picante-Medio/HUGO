@@ -91,6 +91,12 @@ namespace HUGO {
 		float nz = other.z != 0.0f? z / other.z : x;
         return {nx, ny, nz};
     }
+
+	bool Vector3::operator!=(const Vector3 &other) const
+	{
+		return x != other.x && y != other.y && z != other.z;
+	}
+
     Vector3 Vector3::cross(const Vector3 &other) const
     {
         float cx = y * other.z - z * other.y;
