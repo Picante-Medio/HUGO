@@ -14,7 +14,7 @@ void PhysicsTestSystem::init(){
     // EntityID e1 = scene->createEntity();
 
     // scene->addComponent<TransformComponent>(e1, [](TransformComponent& transform){
-    //     transform.setPosition(HUGO::Vector3(1.f, 0.f, 40.f));
+    //     transform.setPosition(HUGO::Vector3(1.f, -3.f, 40.f));
     //     transform.setScale(HUGO::Vector3(1., 1.f, 1.f));
     // });
 
