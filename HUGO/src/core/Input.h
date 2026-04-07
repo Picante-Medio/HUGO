@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "IInput.h"
+#include "HugoKeycodes.h"
 
 namespace HUGO {
 
@@ -37,6 +38,8 @@ namespace HUGO {
     
     void processKeyQueue();
     void processMouseQueue();
+
+    SDL_Keycode hugoKeyToSDLKey(HUGO::KeyCode key);
     
     public:
     Input();
