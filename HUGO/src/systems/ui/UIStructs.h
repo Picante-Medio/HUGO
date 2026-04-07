@@ -29,9 +29,9 @@ struct UISliderCache : public UIElementCache
 
 namespace HUGO {
     struct Rect {
-        Float left;
-        Float top;
-        Float width;
-        Float height;
+        Float left =0.0f;
+        Float top = 0.0f;
+        Float width = 1.0f;
+        Float height= 1.0f;
     };
 }

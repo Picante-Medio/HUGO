@@ -122,7 +122,7 @@ void RenderSystem::updateAnimations(double dt)
         if(ogreObjects.find(rc.entity) == ogreObjects.end()) continue;
         
         OgreObject& ogreObj = ogreObjects[rc.entity];
-        Ogre::Real time = static_cast<Ogre::Real>(dt);
+        Ogre::Real time = static_cast<Ogre::Real>(dt/1000.0f);//ms->s
 
         //updates all enable animations
         for(auto& a: animComp.anims){

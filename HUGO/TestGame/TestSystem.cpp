@@ -41,9 +41,7 @@ TestSystem::init() {
         rc.setMeshName("Sinbad.mesh");
     });
     scene->addComponent<AnimationComponent>(e1, [](AnimationComponent& rc) {
-        rc.addAnimation("Dance");
-        rc.setEnabled("Dance", true);
-        rc.setLoop("Dance", true);
+        rc.addAnimation("Dance", true, true);
     });
 
     e2 = scene->createEntity();
@@ -178,6 +176,15 @@ TestSystem::update(double dt) {
 
     // TransformComponent& tr2=scene->getComponent<TransformComponent>(e2);
     // tr2.setPosition( tr2.getPosition() + HUGO::Vector3(dt*5, 0, 0 ));
+
+    // timer += dt;
+
+    // if(timer >= 3 && !usedTimer){
+    //     usedTimer = true;
+    //     scene->removeEntity(e1);
+    //     scene->removeEntity(e2);
+    // }
+
     // //----------------------------------------
 
     // for(auto& pack : scene->query<LightComponent, TransformComponent>()) {

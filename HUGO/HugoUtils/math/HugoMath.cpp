@@ -81,7 +81,7 @@ namespace HUGO {
 	    Vector3 Vector3::operator/(float scalar) const
     {
 		if(scalar != 0) return {x/scalar, y/scalar, z/scalar};
-		else Vector3();
+		else return Vector3();
     }
 
     Vector3 Vector3::operator/(const Vector3 &other) const
