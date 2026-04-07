@@ -87,34 +87,33 @@ void HUGO::Core::initModules()
 }
 //HUGO main loop
 void Core::run(){
-  bool exit = false;
+    bool exit = false;
+
+    int32_t accumulator = 0;
 
 	while (!exit) {
         vt.update();
 
-        uint32_t startTime = vt.getDeltaTime(); //ms
+        uint32_t frameTime = vt.getDeltaTime(); //ms
+        accumulator += frameTime;
+
+        sceneManager.sceneChangeRequested();
+
+        while(accumulator > FIXED_STEP) {
+            sceneManager.fixedUpdateCurrentScene(FIXED_STEP);
+            physicsModule->performSimulations(FIXED_STEP);
+            accumulator -= FIXED_STEP;
+        }
 
         input->handleInput();
         if(input->isQuitPressed()) {
             exit = true;
         }
 
-        sceneManager.sceneChangeRequested();
-
-        sceneManager.fixedUpdateCurrentScene(startTime);
-        physicsModule->performSimulations(startTime);
-        sceneManager.updateCurrentScene(startTime);
+        sceneManager.updateCurrentScene(frameTime);
         sceneManager.dispatchMessagesCurrentScene();
-
-        //physicsModule->debugDraw();
         
-        //m_ogreModule->renderOneFrame();
         OgreModule::Instance().renderOneFrame();
-
-        double frameTime = vt.getDeltaTime() - startTime;
-        if (frameTime < FRAME_RATE) {
-            SDL_Delay(static_cast<Uint32>(FRAME_RATE-frameTime));
-        }
 	}
 }
 
