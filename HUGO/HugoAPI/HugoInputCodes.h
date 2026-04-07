@@ -1,11 +1,5 @@
 #pragma once
 
-#include "SDL2/SDL_keycode.h"
-
-// SDL scancodes to assign same codes and ease translation
-#define SDLK_SCANCODE_MASK (1<<30)
-#define SDL_SCANCODE_TO_KEYCODE(X)  (X | SDLK_SCANCODE_MASK)
-
 namespace HUGO{
 
     enum KeyCode{
