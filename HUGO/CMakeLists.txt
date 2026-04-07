@@ -88,7 +88,7 @@ if (WIN32)
         COMMAND_EXPAND_LISTS
     )
 else()
-    foreach(lib lua_shared OgreMain OgreOverlay RenderSystem_GL3Plus RenderSystem_GL Codec_STBI)
+    foreach(lib lua_shared OgreMain OgreOverlay RenderSystem_GL3Plus RenderSystem_GL Codec_STBI Codec_Assimp)
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             $<TARGET_FILE:${lib}>
