@@ -92,7 +92,7 @@ void Core::run(){
 	while (!exit) {
         vt.update();
 
-        double startTime = vt.getDeltaTime()/1000.0; //ms->s
+        uint32_t startTime = vt.getDeltaTime(); //ms
 
         input->handleInput();
         if(input->isQuitPressed()) {

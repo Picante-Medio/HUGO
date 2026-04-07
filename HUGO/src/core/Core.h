@@ -21,7 +21,7 @@ namespace HUGO {
     class ResourceManager;
 
     class Core {
-        const int FRAME_RATE = 10;
+        const uint32_t FRAME_RATE = 1000/60;
         void initModules();
         void initLua();
         void initAudioAssets();
