@@ -50,7 +50,7 @@ void PhysicsTestSystem::init(){
 
     EntityID e3 = scene->createEntity();
     scene->addComponent<TransformComponent>(e3,[](TransformComponent& transform){
-        transform.setPosition(HUGO::Vector3(0.f, 5, 40.f));
+        transform.setPosition(HUGO::Vector3(5.f, 5, 40.f));
     });
     
     scene->addComponent<ColliderComponent>(e3, [](ColliderComponent& col){
