@@ -6,7 +6,6 @@
 [ext_resource type="Script" uid="uid://bnjt3w18hk2gs" path="res://addons/HugosChatPlugin/NativeComponents/RenderComponent.gd" id="4_d4yc1"]
 [ext_resource type="SphereMesh" uid="uid://citadnjn16yba" path="res://sphere.tres" id="4_ssasw"]
 [ext_resource type="Script" uid="uid://dcc6b5sxl6c7u" path="res://addons/HugosChatPlugin/Entities/entity.gd" id="5_d4yc1"]
-[ext_resource type="Script" uid="uid://jpokl8dqfveb" path="res://Components/AudioComponent.gd" id="6_77l53"]
 
 [node name="Escena" type="Node3D" unique_id=1674858039 groups=["SCENE_TRACKER"]]
 script = ExtResource("1_865ah")
@@ -16,10 +15,8 @@ entities = Dictionary[String, Dictionary]({
 "value": "INT 2"
 },
 "RenderComponent": Dictionary[String, Variant]({
-"materialName": "STRING 
-",
-"mesh": "STRING 
-res://sphere.tres",
+"materialName": "STRING materialName ",
+"mesh": "STRING mesh res://sphere.tres",
 "objectID": "INT 0"
 })
 },
@@ -30,27 +27,20 @@ res://sphere.tres",
 },
 "Entity": {},
 "Guille": {
-"AudioComponent": Dictionary[String, Variant]({
-"audioId": "INT 0",
-"pitch": "FLOAT 0.0",
-"volume": "FLOAT 0.0"
-}),
 "ParentComponent": {
 "value": "INT 0"
 },
 "RenderComponent": Dictionary[String, Variant]({
-"materialName": "STRING 
-",
-"mesh": "STRING 
-res://sphere.tres",
+"materialName": "STRING materialName ",
+"mesh": "STRING mesh res://sphere.tres",
 "objectID": "INT 0"
 })
 },
 "Juan": {
 "TransformComponent": Dictionary[String, Variant]({
-"position": "VECTOR_3 0.56475341320038 0.0 0.0",
-"rotation": "VECTOR_3 0.0 0.0 0.0",
-"scale": "VECTOR_3 1.0 1.0 1.0"
+"position": "VECTOR_3 position 0.56475341320038 0.0 0.0",
+"rotation": "VECTOR_3 rotation 0.0 0.0 0.0",
+"scale": "VECTOR_3 scale 1.0 1.0 1.0"
 })
 }
 })
@@ -69,9 +59,6 @@ metadata/_custom_type_script = "uid://dcc6b5sxl6c7u"
 mesh = ExtResource("4_ssasw")
 script = ExtResource("4_d4yc1")
 metadata/_custom_type_script = "uid://bnjt3w18hk2gs"
-
-[node name="AudioComponent" type="Node" parent="Juan/Guille" unique_id=146731479]
-script = ExtResource("6_77l53")
 
 [node name="Entity" type="Node3D" parent="." unique_id=402391702]
 script = ExtResource("5_d4yc1")

@@ -2,13 +2,10 @@
 extends EditorScript
 class_name ScriptsSyncronizer
 
-const components_path = "../../HUGO/include/components"
 const output_components_path = "Components"
 const HUGO_TYPES_PATH = "../../HUGO/include/utils/HugoTypes.h"
 
-const CHATS_PATH = "../../HUGO/chats/"
 const PREFABS_PATH = "res://Prefabs/"
-
 const OUTPUT_ENUMS_PATH = "Enums.gd"
 
 static var enums_dictionary:Dictionary
@@ -28,7 +25,7 @@ static func sync():
 	
 	parse_hugo_types()
 	write_enums()
-	parse_components(components_path)
+	parse_components(HugoConfig.COMPONENTS_PATH)
 	create_prefabs(PREFABS_PATH)
 	write_components()
 	EditorInterface.get_resource_filesystem().scan_sources()
@@ -120,6 +117,8 @@ static func hugo_check_line(line: String) -> void:
 
 static func parse_hugo_types() -> void:
 	var file := FileAccess.open(HUGO_TYPES_PATH, FileAccess.READ)
+	
+	if not file: return
 
 	while not file.eof_reached():
 		var line := file.get_line().strip_edges()
@@ -168,23 +167,20 @@ static func hugo_parse_component(path: String) -> void:
 	while not file.eof_reached():
 		line = file.get_line().strip_edges()
 		
-		if not line.contains("@export"): continue
-		else: line = file.get_line().strip_edges()
-
-		var cleaned_parameter:String = line.split("::")[1] if line.split("::").size() > 1 else line.split("::")[0]
-		cleaned_parameter = cleaned_parameter.split(";")[0]
-		cleaned_parameter = cleaned_parameter.split("=")[0]
-		
-		cleaned_parameter = cleaned_parameter.strip_edges()
+		var cleaned_parameters:PackedStringArray
 		var parameter_default_value
-		if cleaned_parameter[1]: parameter_default_value = cleaned_parameter[1]
-
-		var parameter:PackedStringArray = cleaned_parameter.split(" ")
-		if parameter.size() != 2: continue
-		var parameter_type := parameter[0].strip_edges()
-		var parameter_name := parameter[1].strip_edges()
-		if parameter_name.contains("(") or not complete_whitelist.has(parameter_type): continue
-
+		if line.contains("SERIALIZED_MEMBER("):
+			cleaned_parameters = line.split("SERIALIZED_MEMBER(")[1].split(")")[0].split(",")
+		elif line.contains("DEFAULT_SERIALIZED_MEMBER("):
+			cleaned_parameters = line.split("DEFAULT_SERIALIZED_MEMBER(")[1].split(")")[0].split(",")
+			parameter_default_value = cleaned_parameters[2].strip_edges()
+		else: continue
+		
+		var parameter_type = cleaned_parameters[0].strip_edges()
+		var parameter_name = cleaned_parameters[1].strip_edges()
+		
+		if parameter_type.contains("::"): parameter_type = parameter_type.split("::")[1].strip_edges()
+		
 		if parameter_type == "string": parameter_type = "String"
 		elif types_dictionary.has(parameter_type): parameter_type = types_dictionary[parameter_type]
 		elif enums_dictionary.has(parameter_type): parameter_type = "ENUMS." + parameter_type
