@@ -366,6 +366,9 @@ void UISystem::processTextChanges()
     }
 }
 
+constexpr HUGO::Int MIN_ACSII = 32;
+constexpr HUGO::Int MAX_ACSII = 126;  
+
 void UISystem::processInput()
 {
     std::shared_ptr<HUGO::IInput> input = scene->getInput();
@@ -540,7 +543,7 @@ void UISystem::processInput()
         if (!textInput.empty()) {
             int c = static_cast<int>(textInput[0]);
             //only english printable ascii codes are accepted
-            if (c > 32 && c < 127){
+            if (c >= MIN_ACSII && c <= MAX_ACSII){
                 field.fullText.insert(field.cursorPos, 1, textInput[0]);
                 field.cursorPos++;
                 changed = true;

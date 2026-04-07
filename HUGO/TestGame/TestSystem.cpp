@@ -127,15 +127,15 @@ TestSystem::init() {
     // });
     // scene->addComponent<AudioPlayTag>(audio);
 
-    EntityID emmiter = scene->createEntity();
-    scene->addComponent<TransformComponent>(emmiter, [](TransformComponent& transform){
-        transform.setPosition(HUGO::Vector3(10.f, 0.0f, 0.0f));
-    });
-    scene->addComponent<ParticleEmitterComponent>(emmiter, [](ParticleEmitterComponent& pe){
-        pe.particleName = "Particle/Smoke";
-        pe.emitting = true;
-        pe.active = true;
-    });
+    // EntityID emmiter = scene->createEntity();
+    // scene->addComponent<TransformComponent>(emmiter, [](TransformComponent& transform){
+    //     transform.setPosition(HUGO::Vector3(10.f, 0.0f, 0.0f));
+    // });
+    // scene->addComponent<ParticleEmitterComponent>(emmiter, [](ParticleEmitterComponent& pe){
+    //     pe.particleName = "Particle/Smoke";
+    //     pe.emitting = true;
+    //     pe.active = true;
+    // });
 }
 
 
