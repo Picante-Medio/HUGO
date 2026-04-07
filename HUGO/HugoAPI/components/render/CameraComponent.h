@@ -6,6 +6,10 @@
 HCOMPONENT(CameraComponent)
 
 private:
+
+    /*
+        =========== CAMERA PARAMETERS =================
+    */
     HUGO::ProjectionType projectionType = HUGO::ProjectionType::Perspective;
     
     // Perspective parameters
@@ -23,11 +27,27 @@ private:
 
     bool active = true;
     int priority = 0; // for multiple cameras, lower priority renders first
+
+    /*
+        =========== VIEWPORT PARAMETERS ===============
+    */
+    // Coordinates reletad to the window (0-1)
+    float left = 0.0f;
+    float top = 0.0f;
+    float width = 1.0f;
+    float height = 1.0f;
     
-    // Mode
-    HUGO::PolygonMode polygonMode = HUGO::PolygonMode::SOLID;
+    // Render order (lower renders first)
+    int zOrder = 0;
+    
+    // Background color and clear options
+    HUGO::Vector4 clearColor = HUGO::Vector4(0.3f, 0.3f, 0.5f, 1.0f);
   
 public:
+
+    /*
+        =========== CAMERA METHODS ============
+    */
     // Setters
     inline void setProjectionType(HUGO::ProjectionType type) { projectionType = type; }
     inline void setFOVY(float fov) { fovY = fov; }
@@ -38,7 +58,6 @@ public:
     inline void setAutoAspectRatio(bool autoAspR) { autoAspectRatio = autoAspR; }
     inline void setActive(bool act) { active = act; }
     inline void setPriority(int prio) { priority = prio; }
-    inline void setPolygonMode(HUGO::PolygonMode mode) { polygonMode = mode; }
     // Getters
     inline HUGO::ProjectionType getProjectionType() const { return projectionType; }
     inline float getFOVY() const { return fovY; }
@@ -49,7 +68,24 @@ public:
     inline bool getAutoAspectRatio() const { return autoAspectRatio; }
     inline bool isActive() const { return active; }
     inline int getPriority() const { return priority; }
-    inline HUGO::PolygonMode getPolygonMode() const { return polygonMode; }
+
+    /*
+        =========== VIEWPORT METHODS ============
+    */
+    // Setters
+    inline void setLeft(float l) { left = l; }
+    inline void setTop(float t) { top = t; }
+    inline void setWidth(float w) { width = w; }
+    inline void setHeight(float h) { height = h; }
+    inline void setZOrder(int z) { zOrder = z; }
+    inline void setClearColor(const HUGO::Vector4& color) { clearColor = color; }
+    // Getters
+    inline float getLeft() const { return left; }
+    inline float getTop() const { return top; }
+    inline float getWidth() const { return width; }
+    inline float getHeight() const { return height; }
+    inline int getZOrder() const { return zOrder; }
+    inline HUGO::Vector4 getClearColor() const { return clearColor; }
 
 END_HCOMPONENT()
 

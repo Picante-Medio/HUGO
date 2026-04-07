@@ -15,27 +15,20 @@
 #include "AnimationComponent.h"
 #include "TransformComponent.h"
 #include "CameraComponent.h"
-#include "ViewportComponent.h"
 #include "LightComponent.h"
 
 #pragma region Destructor
 RenderSystem::~RenderSystem()
 {
-    //detroy all viewports
-    for(auto& v: viewportMap){
-        unregisterViewportEntity(v.first);
-    }
-    viewportMap.clear();
-
     //destroy all cameras
     for(auto& c: cameraMap){
-        unregisterCameraEntity(c.first);
+        unregisterCameraEntity(scene->getComponent<CameraComponent>(c.first));
     }
     cameraMap.clear();
 
     //destroy all lights
     for(auto& l: lightMap){
-        unregisterLightEntity(l.first);
+        unregisterLightEntity(scene->getComponent<LightComponent>(l.first));
     }
     lightMap.clear();
 
@@ -64,21 +57,18 @@ void RenderSystem::init(){
 
     //components events
     scene->onAddComponent<RenderComponent>().connect(this, &RenderSystem::onAddRenderComponet);
-    scene->onAddComponent<LightComponent>().connect(this, &RenderSystem::onAddLightComponent);
-    scene->onAddComponent<ViewportComponent>().connect(this, &RenderSystem::onAddViewportComponent);
-    scene->onAddComponent<CameraComponent>().connect(this, &RenderSystem::onAddCameraComponent);
+    scene->onAddComponent<LightComponent>().connect(this, &RenderSystem::registerLightEntity);
+    scene->onAddComponent<CameraComponent>().connect(this, &RenderSystem::registerCameraEntity);
     scene->onAddComponent<AnimationComponent>().connect(this, &RenderSystem::onUpdateAnimationComponet);
 
     scene->onUpdateComponent<RenderComponent>().connect(this, &RenderSystem::onUpdateRenderComponet);
     scene->onUpdateComponent<AnimationComponent>().connect(this, &RenderSystem::onUpdateAnimationComponet);
     scene->onUpdateComponent<LightComponent>().connect(this, &RenderSystem::onUpdateLightComponent);
-    scene->onUpdateComponent<ViewportComponent>().connect(this, &RenderSystem::onUpdateViewportComponent);
 
     scene->onRemoveComponent<RenderComponent>().connect(this, &RenderSystem::onRemoveRenderComponet); 
     scene->onRemoveComponent<AnimationComponent>().connect(this, &RenderSystem::onRemoveAnimationComponet);
-    scene->onRemoveComponent<LightComponent>().connect(this, &RenderSystem::onRemoveLightComponent); 
-    scene->onRemoveComponent<ViewportComponent>().connect(this, &RenderSystem::onRemoveViewportComponent);
-    scene->onRemoveComponent<CameraComponent>().connect(this, &RenderSystem::onRemoveCameraComponent); 
+    scene->onRemoveComponent<LightComponent>().connect(this, &RenderSystem::unregisterLightEntity);
+    scene->onRemoveComponent<CameraComponent>().connect(this, &RenderSystem::unregisterCameraEntity); 
     
     // Basic light
     setAmbientLight(0.6f, 0.6f, 0.6f);
@@ -92,16 +82,6 @@ void RenderSystem::init(){
     });
 
     scene->addComponent<CameraComponent>(CamEntity);
-    
-    registerCameraEntity(CamEntity);
-    setMainCamera(CamEntity);
-
-    EntityID ViewEntity = scene->createEntity();
-    
-    scene->addComponent<ViewportComponent>(ViewEntity);
-    
-    registerViewportEntity(ViewEntity);  
-    setMainViewport(ViewEntity);
 }
 #pragma endregion
 
@@ -257,8 +237,9 @@ void RenderSystem::clearAnimationStates(OgreObject &obj)
 
 #pragma region Registering
 // ==================== Register Camera Entity ====================
-void RenderSystem::registerCameraEntity(EntityID entity)
+void RenderSystem::registerCameraEntity(CameraComponent& comp)
 {
+    EntityID entity = comp.entity;
     // check if its already registered
     if (cameraMap.find(entity) != cameraMap.end()) {
         return;
@@ -269,22 +250,11 @@ void RenderSystem::registerCameraEntity(EntityID entity)
         std::cerr<<e.getError().errorMessage;
     }
 }
-// ==================== Register ViewPort Entity ====================
-void RenderSystem::registerViewportEntity(EntityID entity)
-{
-    //check if its already registered
-    if (viewportMap.find(entity) != viewportMap.end()) {
-        return;
-    }
-    
-    ErrorOrVoid e = createOgreViewport(entity);
-    if(e.isError()){
-        std::cerr<<e.getError().errorMessage;
-    }
-}
+
 // ==================== Register Light Entity ====================
-void RenderSystem::registerLightEntity(EntityID entity)
+void RenderSystem::registerLightEntity(LightComponent& comp)
 {
+    EntityID entity = comp.entity;
     if (lightMap.find(entity) != lightMap.end()) {
         return;
     }
@@ -295,8 +265,9 @@ void RenderSystem::registerLightEntity(EntityID entity)
     }
 }
 // ==================== Unregister Camera Entity ====================
-void RenderSystem::unregisterCameraEntity(EntityID entity)
+void RenderSystem::unregisterCameraEntity(CameraComponent& comp)
 {
+    EntityID entity = comp.entity;
     //remove camera and destroy Ogre Camera
     auto it = cameraMap.find(entity);
     if (it != cameraMap.end()) {
@@ -311,33 +282,12 @@ void RenderSystem::unregisterCameraEntity(EntityID entity)
         }
         cameraMap.erase(it);
     }
-
-    //change the main Camera
-    if (mainCameraEntity == entity) {
-        mainCameraEntity = 0;
-    }
-}
-// ==================== Unregister ViewPort Entity ====================
-void RenderSystem::unregisterViewportEntity(EntityID entity)
-{
-    //remove viewport
-    auto it = viewportMap.find(entity);
-    if (it != viewportMap.end()) {
-        if(it->second.ogreViewport){
-            OgreModule::Instance().getOgreRenderWindow()->removeViewport(it->second.ogreViewport->getZOrder());
-            it->second.ogreViewport = nullptr;
-        }
-        viewportMap.erase(it);
-    }
-
-    if (mainViewportEntity == entity) {
-        mainViewportEntity = 0;
-    }
 }
 
 // ==================== Unregister Light Entity ====================
-void RenderSystem::unregisterLightEntity(EntityID entity)
+void RenderSystem::unregisterLightEntity(LightComponent& comp)
 {
+    EntityID entity = comp.entity;
     auto it = lightMap.find(entity);
     if (it != lightMap.end()) {
         if(it->second.node){
@@ -354,7 +304,7 @@ void RenderSystem::unregisterLightEntity(EntityID entity)
 }
 #pragma endregion
 
-#pragma region  OgreCamera and ViewPort Creation 
+#pragma region  OgreCamera Creation 
 // ==================== Create Ogre Camera ====================
 ErrorOrVoid RenderSystem::createOgreCamera(EntityID entity)
 {
@@ -477,68 +427,7 @@ ErrorOrVoid RenderSystem::createOgreLight(EntityID entity)
     lightMap[entity] = res;
     return ErrorOrVoid();
 }
-// ==================== Create Ogre Viewport ====================
-ErrorOrVoid RenderSystem::createOgreViewport(EntityID entity)
-{
-    ViewportInfo res;    
-    const ViewportComponent* viewportComp = nullptr;
-    try{
-        viewportComp = &scene->getComponent<ViewportComponent>(entity);
-    }
-    catch(...){
-        return ErrorOrVoid("[RenderSystem] Viewport entity "+ std::to_string(entity) + "missing required components");
-    }
 
-    Ogre::Camera* cam = nullptr;
-    
-    if (viewportComp->getCameraEntity() != 0) {
-        auto camIt = cameraMap.find(viewportComp->getCameraEntity());
-        if (camIt != cameraMap.end()) {
-            cam = camIt->second.ogreCamera;
-            res.lastCameraEntity = viewportComp->getCameraEntity();
-        }
-    }
-    
-    // if it has no camera asigned, use the main one
-    if (!cam && mainCameraEntity != 0) {
-        
-        auto camIt = cameraMap.find(mainCameraEntity);
-        if (camIt != cameraMap.end()) {
-            cam = camIt->second.ogreCamera;
-        }
-    }
-
-    // if the viewport doesnt have a camera, asign the firts avaible
-    if (!cam && !cameraMap.empty()) {
-        cam = cameraMap.begin()->second.ogreCamera;
-    }
-
-    // create ogre viewport
-    res.ogreViewport = OgreModule::Instance().getOgreRenderWindow()->addViewport(
-        cam,
-        viewportComp->getZOrder(),
-        viewportComp->getLeft(),
-        viewportComp->getTop(),
-        viewportComp->getWidth(),
-        viewportComp->getHeight()
-    );
-    
-    // background color
-    res.ogreViewport->setBackgroundColour(Ogre::ColourValue(
-        viewportComp->getClearColor().x,
-        viewportComp->getClearColor().y,
-        viewportComp->getClearColor().z,
-        viewportComp->getClearColor().w
-    ));
-    
-    res.ogreViewport->setDimensions(0.0f, 0.0f, 1.0f, 1.0f);
-    
-    cam->setAspectRatio(float(res.ogreViewport->getActualWidth()) / float(res.ogreViewport->getActualHeight()));
-    
-    viewportMap[entity] = res;
-
-    return ErrorOrVoid();
-}
 #pragma endregion
 
 #pragma region  Screen Changes
@@ -559,26 +448,6 @@ void RenderSystem::updateViewportDimensions()
 void RenderSystem::setAmbientLight(float r, float g, float b)
 {
     sceneManager->setAmbientLight(Ogre::ColourValue(r, g, b));
-}
-
-void RenderSystem::setMainCamera(EntityID cameraEntity)
-{
-    if (cameraMap.find(cameraEntity) != cameraMap.end()) {
-        mainCameraEntity = cameraEntity;
-    
-        for (auto& [entity, res] : viewportMap) {
-            if (res.ogreViewport) {
-                res.ogreViewport->setCamera(cameraMap[cameraEntity].ogreCamera);
-            }
-        }
-    }
-}
-
-void RenderSystem::setMainViewport(EntityID viewportEntity)
-{
-    if (viewportMap.find(viewportEntity) != viewportMap.end()) {
-        mainViewportEntity = viewportEntity;
-    }
 }
 
 Ogre::SceneManager *RenderSystem::getSM() const
@@ -712,11 +581,6 @@ void RenderSystem::onRemoveAnimationComponet(AnimationComponent &animComp)
 #pragma endregion
 
 #pragma region LightComponentEvents
-void RenderSystem::onAddLightComponent(LightComponent &light)
-{
-    registerLightEntity(light.entity);
-}
-
 void RenderSystem::onUpdateLightComponent(LightComponent &light)
 {
     EntityID entity = light.entity;
@@ -763,61 +627,5 @@ void RenderSystem::onUpdateLightComponent(LightComponent &light)
             it->second.ogreLight->setShadowFarDistance(light.getShadowFarDistance());
         }
     }
-}
-
-void RenderSystem::onRemoveLightComponent(LightComponent &light)
-{
-    unregisterLightEntity(light.entity);
-}
-#pragma endregion
-
-#pragma region ViewportComponentEvents
-void RenderSystem::onAddViewportComponent(ViewportComponent &viewport)
-{
-    registerViewportEntity(viewport.entity);
-}
-
-void RenderSystem::onUpdateViewportComponent(ViewportComponent &viewport)
-{
-    EntityID entity = viewport.entity;
-    
-    auto it = viewportMap.find(entity);
-    if (it != viewportMap.end() && it->second.ogreViewport) {
-        // update dimensions
-        it->second.ogreViewport->setDimensions(viewport.getLeft(), viewport.getTop(), viewport.getWidth(), viewport.getHeight());
-        
-        // update color
-        it->second.ogreViewport->setBackgroundColour(Ogre::ColourValue(
-            viewport.getClearColor().x, viewport.getClearColor().y, 
-            viewport.getClearColor().z, viewport.getClearColor().w
-        ));
-
-        // update the camera if it has changed
-        if (viewport.getCameraEntity() != it->second.lastCameraEntity) {
-            auto camIt = cameraMap.find(viewport.getCameraEntity());
-            if (camIt != cameraMap.end()) {
-                it->second.ogreViewport->setCamera(camIt->second.ogreCamera);
-                it->second.lastCameraEntity = viewport.getCameraEntity();
-            }
-        }
-    }
-}
-
-void RenderSystem::onRemoveViewportComponent(ViewportComponent &view)
-{
-    unregisterViewportEntity(view.entity);
-}
-
-#pragma endregion
-
-#pragma region CameraComponentEvents
-void RenderSystem::onAddCameraComponent(CameraComponent &camComp)
-{
-    registerCameraEntity(camComp.entity);    
-}
-
-void RenderSystem::onRemoveCameraComponent(CameraComponent &camComp)
-{
-    unregisterCameraEntity(camComp.entity);
 }
 #pragma endregion
