@@ -5,7 +5,7 @@
 
 HSYSTEM(MessagesTestSystem) 
     double currT = 0.;
-    double nextT = 3.;
+    double nextT = 8000.;
 
 public:
     void init() override;
