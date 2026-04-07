@@ -23,12 +23,6 @@ HSYSTEM(RenderSystem)
         Ogre::Viewport* ogreViewport = nullptr;
     };
 
-    // Ogre Light Data
-    struct LightInfo {
-        Ogre::Light* ogreLight = nullptr;  // Pointer to the Ogre light
-        Ogre::SceneNode* node = nullptr;   // Scene node that controls light transform
-    };
-
     // OgreObject Data
     // Represents an Ogre renderable entity.
     struct OgreObject{
@@ -44,7 +38,6 @@ HSYSTEM(RenderSystem)
 
     //Mapping ECS entities with their corresponding Ogre data
     std::unordered_map<EntityID, CameraInfo> cameraMap; 
-    std::unordered_map<EntityID, LightInfo> lightMap;
 
     std::unordered_map<EntityID, OgreObject> ogreObjects;
 
@@ -54,10 +47,6 @@ HSYSTEM(RenderSystem)
     void updateAnimations(double dt);
     
     // Register and unregister for cameras created outside the RenderSystem
-    void registerLightEntity(LightComponent& comp);
-    ErrorOrVoid createOgreLight(EntityID entity);
-    void unregisterLightEntity(LightComponent& comp);
-    
     void registerCameraEntity(CameraComponent& comp);
     void unregisterCameraEntity(CameraComponent& comp);
 
@@ -75,8 +64,6 @@ HSYSTEM(RenderSystem)
 
     void onUpdateAnimationComponet(AnimationComponent& animComp);
     void onRemoveAnimationComponet(AnimationComponent& animComp);
-
-    void onUpdateLightComponent(LightComponent& light);
 
 public:
     ~RenderSystem() override;
