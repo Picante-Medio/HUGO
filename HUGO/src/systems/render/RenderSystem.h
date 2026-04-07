@@ -50,33 +50,28 @@ HSYSTEM(RenderSystem)
 
     void updateViewportDimensions();
 
-    ErrorOrVoid createOgreCamera(EntityID entity);
-    ErrorOrVoid createOgreLight(EntityID entity);
-    // void destroyOgreCamera(EntityID entity);
-    // void destroyOgreViewport(EntityID entity);
-
-    void updateAnimations(double dt);
-
-    // Register and unregister for cameras created outside the RenderSystem
-    void registerCameraEntity(CameraComponent& comp);
-    void registerLightEntity(LightComponent& comp);
     
-    void unregisterCameraEntity(CameraComponent& comp);
+    void updateAnimations(double dt);
+    
+    // Register and unregister for cameras created outside the RenderSystem
+    void registerLightEntity(LightComponent& comp);
+    ErrorOrVoid createOgreLight(EntityID entity);
     void unregisterLightEntity(LightComponent& comp);
+    
+    void registerCameraEntity(CameraComponent& comp);
+    void unregisterCameraEntity(CameraComponent& comp);
 
-    //OgreObjects
-    ErrorOrVoid createOgreObject(EntityID id, const std::string& meshName, const std::string& materialName="");
-    void removeOgreObject(EntityID id);
-    void destroyOgreObject(OgreObject& obj);
+    //Register/Unregister render entities
+    void registerRenderEntity(RenderComponent& comp);
+    void unregisterRenderEntity(RenderComponent& comp);
+
     void clearAnimationStates(OgreObject &obj);
                    
     // Global light configuration
     void setAmbientLight(float r, float g, float b);
-      
+
     //Component Events
-    void onAddRenderComponet(RenderComponent& rc);
     void onUpdateRenderComponet(RenderComponent& rc);
-    void onRemoveRenderComponet(RenderComponent& rc);
 
     void onUpdateAnimationComponet(AnimationComponent& animComp);
     void onRemoveAnimationComponet(AnimationComponent& animComp);

@@ -34,7 +34,7 @@ RenderSystem::~RenderSystem()
 
     // Destroy all renderable Ogre objects
     for(auto& obj : ogreObjects){
-        destroyOgreObject(obj.second);
+        unregisterRenderEntity(scene->getComponent<RenderComponent>(obj.first));
         clearAnimationStates(obj.second);
     }
     ogreObjects.clear();
@@ -56,7 +56,7 @@ void RenderSystem::init(){
     sceneManager->addRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
 
     //components events
-    scene->onAddComponent<RenderComponent>().connect(this, &RenderSystem::onAddRenderComponet);
+    scene->onAddComponent<RenderComponent>().connect(this, &RenderSystem::registerRenderEntity);
     scene->onAddComponent<LightComponent>().connect(this, &RenderSystem::registerLightEntity);
     scene->onAddComponent<CameraComponent>().connect(this, &RenderSystem::registerCameraEntity);
     scene->onAddComponent<AnimationComponent>().connect(this, &RenderSystem::onUpdateAnimationComponet);
@@ -65,7 +65,7 @@ void RenderSystem::init(){
     scene->onUpdateComponent<AnimationComponent>().connect(this, &RenderSystem::onUpdateAnimationComponet);
     scene->onUpdateComponent<LightComponent>().connect(this, &RenderSystem::onUpdateLightComponent);
 
-    scene->onRemoveComponent<RenderComponent>().connect(this, &RenderSystem::onRemoveRenderComponet); 
+    scene->onRemoveComponent<RenderComponent>().connect(this, &RenderSystem::unregisterRenderEntity); 
     scene->onRemoveComponent<AnimationComponent>().connect(this, &RenderSystem::onRemoveAnimationComponet);
     scene->onRemoveComponent<LightComponent>().connect(this, &RenderSystem::unregisterLightEntity);
     scene->onRemoveComponent<CameraComponent>().connect(this, &RenderSystem::unregisterCameraEntity); 
@@ -170,8 +170,13 @@ void RenderSystem::update(double dt)
 
 #pragma region OgreObject
 // ==================== Create OgreObject ====================
-ErrorOrVoid RenderSystem::createOgreObject(EntityID id, const std::string &meshName, const std::string &materialName)
+void RenderSystem::registerRenderEntity(RenderComponent& comp)
 {
+    EntityID id = comp.entity;
+
+    std::string meshName= comp.getMeshName();
+    std::string materialName = comp.getMaterialName();
+
     Ogre::Entity* ent = nullptr;
     Ogre::SceneNode* node = nullptr;
 
@@ -192,7 +197,8 @@ ErrorOrVoid RenderSystem::createOgreObject(EntityID id, const std::string &meshN
         if (ent) sceneManager->destroyEntity(ent);
         if (node) sceneManager->destroySceneNode(node);
         
-        return ErrorOrVoid(err);
+        scene->log(std::make_shared<StringError>(err));
+        return;
     }
     
     //create OgreObject
@@ -201,22 +207,13 @@ ErrorOrVoid RenderSystem::createOgreObject(EntityID id, const std::string &meshN
 
     //store object
     ogreObjects[id] = std::move(obj);
-    
-    return ErrorOrVoid();
-}
-// ==================== Remove OgreObject ====================
-void RenderSystem::removeOgreObject(EntityID id)
-{
-    if (ogreObjects.find(id) != ogreObjects.end()){
-
-        destroyOgreObject(ogreObjects[id]);
-
-        ogreObjects.erase(id);
-    }
 }
 // ==================== Destroy OgreObject ====================
-void RenderSystem::destroyOgreObject(OgreObject &obj)
+void RenderSystem::unregisterRenderEntity(RenderComponent& comp)
 {
+    EntityID id = comp.entity;
+    OgreObject& obj = ogreObjects[id];
+
     if(obj.ogreSceneNode){
         
         sceneManager->destroySceneNode(obj.ogreSceneNode);
@@ -228,7 +225,6 @@ void RenderSystem::destroyOgreObject(OgreObject &obj)
     }
 }
 
-
 void RenderSystem::clearAnimationStates(OgreObject &obj)
 {
     obj.animationStates.clear();
@@ -236,21 +232,6 @@ void RenderSystem::clearAnimationStates(OgreObject &obj)
 #pragma endregion
 
 #pragma region Registering
-// ==================== Register Camera Entity ====================
-void RenderSystem::registerCameraEntity(CameraComponent& comp)
-{
-    EntityID entity = comp.entity;
-    // check if its already registered
-    if (cameraMap.find(entity) != cameraMap.end()) {
-        return;
-    }
-    
-    ErrorOrVoid e = createOgreCamera(entity);
-    if(e.isError()){
-        std::cerr<<e.getError().errorMessage;
-    }
-}
-
 // ==================== Register Light Entity ====================
 void RenderSystem::registerLightEntity(LightComponent& comp)
 {
@@ -306,20 +287,17 @@ void RenderSystem::unregisterLightEntity(LightComponent& comp)
 
 #pragma region  OgreCamera Creation 
 // ==================== Create Ogre Camera ====================
-ErrorOrVoid RenderSystem::createOgreCamera(EntityID entity)
+void RenderSystem::registerCameraEntity(CameraComponent& cameraComp)
 {
+    EntityID entity = cameraComp.entity;
     CameraInfo res;
     // Get the transformComponent and CameraComponent of the camera to set the initial configuration
-    const TransformComponent* transformComp = nullptr;
-    const CameraComponent* cameraComp = nullptr;
 
-    try{
-        transformComp = &scene->getComponent<TransformComponent>(entity);
-        cameraComp = &scene->getComponent<CameraComponent>(entity);
+    if(!scene->hasComponent<TransformComponent>(entity)){
+        scene->log(std::make_shared<StringError>("[RenderSystem] Camera entity " + std::to_string(entity) + " missing required components"));
+        return;
     }
-    catch(...){
-        return ErrorOrVoid("[RenderSystem] Camera entity " + std::to_string(entity) + " missing required components");
-    }
+    TransformComponent& transformComp = scene->getComponent<TransformComponent>(entity);
 
     // Unique name for the camera
     std::string camName = "Camera_" + std::to_string(entity);
@@ -328,27 +306,47 @@ ErrorOrVoid RenderSystem::createOgreCamera(EntityID entity)
     res.ogreCamera = sceneManager->createCamera(camName);
 
     // Default parameters
-    res.ogreCamera->setNearClipDistance(cameraComp->getNearClip());
-    res.ogreCamera->setFarClipDistance(cameraComp->getFarClip());
-    res.ogreCamera->setAutoAspectRatio(cameraComp->getAutoAspectRatio());
+    res.ogreCamera->setNearClipDistance(cameraComp.getNearClip());
+    res.ogreCamera->setFarClipDistance(cameraComp.getFarClip());
+    res.ogreCamera->setAutoAspectRatio(cameraComp.getAutoAspectRatio());
 
-    if (cameraComp->getProjectionType() == HUGO::ProjectionType::Perspective) {
+    if (cameraComp.getProjectionType() == HUGO::ProjectionType::Perspective) {
         res.ogreCamera->setProjectionType(Ogre::PT_PERSPECTIVE);
-        res.ogreCamera->setFOVy(Ogre::Degree(cameraComp->getFOVY()));
+        res.ogreCamera->setFOVy(Ogre::Degree(cameraComp.getFOVY()));
     } else {
         res.ogreCamera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
-        res.ogreCamera->setOrthoWindow(cameraComp->getOrthographicDimensions().first, cameraComp->getOrthographicDimensions().second);
+        res.ogreCamera->setOrthoWindow(cameraComp.getOrthographicDimensions().first, cameraComp.getOrthographicDimensions().second);
     }
 
     // create node and attach camera
     res.node = sceneManager->getRootSceneNode()->createChildSceneNode(nodeName);
     res.node->attachObject(res.ogreCamera);
-    res.node->setPosition(HUGO::OgreUtils::vector3ToOgre(transformComp->getPosition()));
-    res.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(transformComp->getRotation()));
+    res.node->setPosition(HUGO::OgreUtils::vector3ToOgre(transformComp.getPosition()));
+    res.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(transformComp.getRotation()));
+
+    // create ogre viewport
+    res.ogreViewport = OgreModule::Instance().getOgreRenderWindow()->addViewport(
+        res.ogreCamera,
+        cameraComp.getZOrder(),
+        cameraComp.getLeft(),
+        cameraComp.getTop(),
+        cameraComp.getWidth(),
+        cameraComp.getHeight()
+    );
+    
+    // background color
+    res.ogreViewport->setBackgroundColour(Ogre::ColourValue(
+        cameraComp.getClearColor().x,
+        cameraComp.getClearColor().y,
+        cameraComp.getClearColor().z,
+        cameraComp.getClearColor().w
+    ));
+    
+    res.ogreViewport->setDimensions(0.0f, 0.0f, 1.0f, 1.0f);
+    
+    cameraComp.setAspectRatio(float(res.ogreViewport->getActualWidth()) / float(res.ogreViewport->getActualHeight()));
     
     cameraMap[entity] = res;
-
-    return ErrorOrVoid();
 }
 // ==================== Create Ogre Light ====================
 ErrorOrVoid RenderSystem::createOgreLight(EntityID entity)
@@ -456,15 +454,6 @@ Ogre::SceneManager *RenderSystem::getSM() const
 }
 
 #pragma region RenderComponentEvents
-void RenderSystem::onAddRenderComponet(RenderComponent &rc)
-{
-    EntityID entity = rc.entity;
-    if (ogreObjects.find(entity) == ogreObjects.end()) {
-        //create a new ogreObject
-        ErrorOrVoid e = createOgreObject(entity, rc.meshName,rc.materialName);
-        if (e.isError()) return;
-    } 
-}
 
 void RenderSystem::onUpdateRenderComponet(RenderComponent &rc)
 {
@@ -497,16 +486,6 @@ void RenderSystem::onUpdateRenderComponet(RenderComponent &rc)
 
         obj.ogreEntity->setMaterialName(rc.materialName);
     }
-}
-
-void RenderSystem::onRemoveRenderComponet(RenderComponent &rc)
-{
-    auto it = ogreObjects.find(rc.entity);
-    if(it != ogreObjects.end()){
-        OgreObject& obj = it->second;
-        destroyOgreObject(obj);
-        ogreObjects.erase(it);
-    }        
 }
 #pragma endregion
 
