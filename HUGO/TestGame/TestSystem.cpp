@@ -14,7 +14,6 @@
 #include "LightComponent.h"
 #include "SliderComponent.h"
 #include "ParticleEmitterComponent.h"
-#include "ParticleEmitterComponentTag.h"
 
 #include "AnimationComponent.h"
 #include "AudioComponent.h"
@@ -92,32 +91,32 @@ TestSystem::init() {
         lg.setSpecular(HUGO::Vector4(0.8f, 0.8f, 0.8f, 1.0f));
     });
 
-    EntityID boton = scene->createEntity();
-    scene->addComponent<PanelComponent>(boton, [](PanelComponent& panel){
-        panel.overlayName = "testCanvas/SimpleTest";
-        panel.containerName = panel.overlayName + "/Container";
-        panel.material = "UI/Background";
-        panel.left = 400.0f;
-        panel.top = 550.0f;
-        panel.width = 64.0f;
-        panel.height = 64.0f;
-        panel.metricsMode = HUGO::UIMetricsMode::GMM_PIXELS;
-    });
+    // EntityID boton = scene->createEntity();
+    // scene->addComponent<PanelComponent>(boton, [](PanelComponent& panel){
+    //     panel.overlayName = "testCanvas/SimpleTest";
+    //     panel.containerName = panel.overlayName + "/Container";
+    //     panel.material = "UI/Background";
+    //     panel.left = 400.0f;
+    //     panel.top = 550.0f;
+    //     panel.width = 64.0f;
+    //     panel.height = 64.0f;
+    //     panel.metricsMode = HUGO::UIMetricsMode::GMM_PIXELS;
+    // });
 
-    scene->addComponent<ButtonComponent>(boton, [](ButtonComponent& bt){
-        bt.onClickCallback = []() {
-        std::cout << "Button Clicked!" << std::endl;
-        };
-        bt.hoverMaterial = "UI/KnobHover";
-        bt.pressedMaterial = "UI/KnobPressed";
-        bt.normalMaterial = "UI/Knob";
-    });
+    // scene->addComponent<ButtonComponent>(boton, [](ButtonComponent& bt){
+    //     bt.onClickCallback = []() {
+    //     std::cout << "Button Clicked!" << std::endl;
+    //     };
+    //     bt.hoverMaterial = "UI/KnobHover";
+    //     bt.pressedMaterial = "UI/KnobPressed";
+    //     bt.normalMaterial = "UI/Knob";
+    // });
 
-    const HUGO::String& buttonNormalMaterial = scene->getComponent<ButtonComponent>(boton).normalMaterial;
+    // const HUGO::String& buttonNormalMaterial = scene->getComponent<ButtonComponent>(boton).normalMaterial;
 
-    scene->modifyComponent<PanelComponent>(boton, [buttonNormalMaterial](PanelComponent& panel){
-        panel.material = buttonNormalMaterial;
-    });
+    // scene->modifyComponent<PanelComponent>(boton, [buttonNormalMaterial](PanelComponent& panel){
+    //     panel.material = buttonNormalMaterial;
+    // });
 
     // EntityID audio = scene->createEntity();
     // scene->addComponent<AudioComponent>(audio, [](AudioComponent& a){
@@ -128,16 +127,15 @@ TestSystem::init() {
     // });
     // scene->addComponent<AudioPlayTag>(audio);
 
-    // EntityID emmiter = scene->createEntity();
-    // scene->addComponent<TransformComponent>(emmiter, [](TransformComponent& transform){
-    //     transform.position = HUGO::Vector3(0, 0, 0);
-    // });
-    // scene->addComponent<ParticleEmitterComponent>(emmiter, [](ParticleEmitterComponent& pe){
-    //     pe.particleName = "Particle/SmokeBomb";
-    //     pe.emitting = true;
-    //     pe.active = true;
-    // });
-    // scene->addComponent<ParticleEmitterComponentTag>(emmiter);
+    EntityID emmiter = scene->createEntity();
+    scene->addComponent<TransformComponent>(emmiter, [](TransformComponent& transform){
+        transform.setPosition(HUGO::Vector3(10.f, 0.0f, 0.0f));
+    });
+    scene->addComponent<ParticleEmitterComponent>(emmiter, [](ParticleEmitterComponent& pe){
+        pe.particleName = "Particle/Smoke";
+        pe.emitting = true;
+        pe.active = true;
+    });
 }
 
 

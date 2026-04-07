@@ -164,6 +164,7 @@ set(HUGO_LINKED_LIBRARIES
     RenderSystem_GL3Plus
     RenderSystem_GL
     Codec_STBI
+    Plugin_ParticleFX
     SDL2::SDL2
     SDL2::SDL2main
     miniaudio)

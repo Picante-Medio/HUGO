@@ -1,6 +1,5 @@
 #include "ParticleSystem.h"
 #include "ParticleEmitterComponent.h"
-#include "ParticleEmitterComponentTag.h"
 #include "TransformComponent.h"
 
 #include <OgreParticleSystemManager.h> 
@@ -29,30 +28,14 @@ ParticleSystem::~ParticleSystem() {
 }
 void ParticleSystem::init() {
     sm = OgreModule::Instance().getCurrentSceneManager();
+
+    scene->onAddComponent<ParticleEmitterComponent>().connect(this, &ParticleSystem::onAddParticleEmitterComponent);
+    scene->onUpdateComponent<ParticleEmitterComponent>().connect(this, &ParticleSystem::onUpdateParticleEmitterComponent);
 }
 
 void ParticleSystem::onLoad() {}
 
 void ParticleSystem::createParticleSystem(EntityID id, const HUGO::String& particleName, ParticleEmitterComponent& pe, const HUGO::Vector3& iniPos) {
-
-    //TEMPORAL PARA VER SI SE CARGA EL SISTEMA DE PARTICULAS
-    // Ogre::ParticleSystemManager* psManager = Ogre::ParticleSystemManager::getSingletonPtr();
-    // if (!psManager) {
-    //     std::cerr << "ParticleSystem: ParticleSystemManager is null!" << std::endl;
-    //     return;
-    // }
-    // if (!psManager->getTemplate(particleName)) {
-    //     std::cerr << "ParticleSystem: Template '" << particleName << "' not found!" << std::endl;
-        
-    //     Ogre::ParticleSystemManager::ParticleSystemTemplateIterator it = psManager->getTemplateIterator();
-    //     std::cout << "Available particle templates:" << std::endl;
-    //     while (it.hasMoreElements()) {
-    //         std::cout << "  - " << it.peekNextKey() << std::endl;
-    //         it.moveNext();
-    //     }
-    //     return;
-    // }
-
     HUGO::String n = "ps" + std::to_string(id);
 
     Ogre::ParticleSystem* ps = sm->createParticleSystem(n, particleName);
@@ -61,20 +44,20 @@ void ParticleSystem::createParticleSystem(EntityID id, const HUGO::String& parti
 
     node->attachObject(ps);
 
-    // // //get the emitter
-    // Ogre::ParticleEmitter* e =  ps->getEmitter(0);
+    // //get the emitter
+    Ogre::ParticleEmitter* e =  ps->getEmitter(0);
 
-    // // read the datas
-    // HUGO::Float emissionRate = e->getEmissionRate();
-    // Ogre::Vector3 direction = e->getDirection();
-    // Ogre::ColourValue colour = e->getColour();
-    // HUGO::Float timeToLive = e->getTimeToLive();
+    // read the datas
+    HUGO::Float emissionRate = e->getEmissionRate();
+    Ogre::Vector3 direction = e->getDirection();
+    Ogre::ColourValue colour = e->getColour();
+    HUGO::Float timeToLive = e->getTimeToLive();
 
-    // // store
-    // pe.emissionRate = emissionRate;
-    // pe.direction = HUGO::Vector3(direction.x, direction.y, direction.z);
-    // pe.colour = HUGO::Vector4(colour.r, colour.g, colour.b, colour.a);
-    // pe.timeToLive = timeToLive;
+    // store
+    pe.emissionRate = emissionRate;
+    pe.direction = HUGO::Vector3(direction.x, direction.y, direction.z);
+    pe.colour = HUGO::Vector4(colour.r, colour.g, colour.b, colour.a);
+    pe.timeToLive = timeToLive;
 
     node->setPosition({iniPos.x, iniPos.y, iniPos.z});
 
@@ -83,15 +66,6 @@ void ParticleSystem::createParticleSystem(EntityID id, const HUGO::String& parti
     instance.node = node;
     
     activeParticleSystems[id] = instance;
-}
-
-void ParticleSystem::processCreations() {
-    for (auto& pack : scene->query<TransformComponent, ParticleEmitterComponent, ParticleEmitterComponentTag>()) {
-        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
-        ParticleEmitterComponent& pe = pack.getDeprecated<ParticleEmitterComponent&>();
-        createParticleSystem(tr.entity, pe.particleName, pe, tr.getPosition());
-        scene->removeComponent<ParticleEmitterComponentTag>(tr.entity);
-    }
 }
 
 void ParticleSystem::destroyParticleSystem(EntityID id) {
@@ -115,79 +89,85 @@ void ParticleSystem::destroyParticleSystem(EntityID id) {
     activeParticleSystems.erase(it);
 }
 
-void ParticleSystem::processChanges() {
-    static float offset = 0.5f;
-    for (auto& pack : scene->query<TransformComponent, ParticleEmitterComponent>()) {
-        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
-        ParticleEmitterComponent& pe = pack.getDeprecated<ParticleEmitterComponent&>();
-        
-        // get the specific particle system
-        EntityID id = tr.entity;
-        auto it = activeParticleSystems.find(id);
-        if (it == activeParticleSystems.end()){
-            std::cout << "[Particle System]: couldn not find a particle system with entityID: " << id<<"\n";
-            continue;
-        }
-
-        ParticleInstance& instance = it->second;
-
-        if (!instance.node || !instance.ps) continue;
-
-        // transform
-        instance.node->setPosition(tr.getPosition().x+offset, tr.getPosition().y, tr.getPosition().z);
-
-        // active and visibility
-        instance.ps->setVisible(pe.active);
-        instance.ps->setEmitting(pe.emitting);
-
-        // update emitter
-        if (instance.ps->getNumEmitters() > 0) {
-            Ogre::ParticleEmitter* e = instance.ps->getEmitter(0);
-
-            // direction
-            e->setDirection(Ogre::Vector3(
-                pe.direction.x,
-                pe.direction.y,
-                pe.direction.z
-            ));
-            // emission rate
-            e->setEmissionRate(pe.emissionRate);
-
-            // time to live
-            e->setTimeToLive(pe.timeToLive);
-
-            // velocity
-            e->setParticleVelocity(pe.velocityMin, pe.velocityMax);
-
-            // colour
-            e->setColour(Ogre::ColourValue(
-                pe.colour.x,
-                pe.colour.y,
-                pe.colour.z,
-                pe.colour.w
-            ));
-
-            // duration
-            e->setDuration(pe.duration);
-            
-        }
-
-        // quota amount
-        instance.ps->setParticleQuota(pe.quota);
-        // update pivot
-        instance.ps->setMaterialName(pe.pivot.material);
-        instance.ps->setDefaultWidth(pe.pivot.width);
-        instance.ps->setDefaultHeight(pe.pivot.height);
-        //sorting
-        instance.ps->setSortingEnabled(pe.sorted);
-
+void ParticleSystem::processChanges(const ParticleEmitterComponent& pe, const TransformComponent& tr) {
+    // get the specific particle system
+    EntityID id = tr.entity;
+    auto it = activeParticleSystems.find(id);
+    if (it == activeParticleSystems.end()){
+        std::cout << "[Particle System]: couldn not find a particle system with entityID: " << id<<"\n";
+        return;
     }
-    offset += 0.5f;
+
+    ParticleInstance& instance = it->second;
+
+    if (!instance.node || !instance.ps) return;
+
+    // transform
+    instance.node->setPosition(tr.getPosition().x, tr.getPosition().y, tr.getPosition().z);
+
+    // active and visibility
+    instance.ps->setVisible(pe.active);
+    instance.ps->setEmitting(pe.emitting);
+
+    // update emitter
+    if (instance.ps->getNumEmitters() > 0) {
+        Ogre::ParticleEmitter* e = instance.ps->getEmitter(0);
+
+        // direction
+        e->setDirection(Ogre::Vector3(
+            pe.direction.x,
+            pe.direction.y,
+            pe.direction.z
+        ));
+        // emission rate
+        e->setEmissionRate(pe.emissionRate);
+
+        // time to live
+        e->setTimeToLive(pe.timeToLive);
+
+        // velocity
+        e->setParticleVelocity(pe.velocityMin, pe.velocityMax);
+
+        // colour
+        e->setColour(Ogre::ColourValue(
+            pe.colour.x,
+            pe.colour.y,
+            pe.colour.z,
+            pe.colour.w
+        ));
+
+        // duration
+        e->setDuration(pe.duration);
+        
+    }
+
+    // quota amount
+    instance.ps->setParticleQuota(pe.quota);
+    // update pivot
+    instance.ps->setMaterialName(pe.pivot.material);
+    instance.ps->setDefaultWidth(pe.pivot.width);
+    instance.ps->setDefaultHeight(pe.pivot.height);
+    //sorting
+    instance.ps->setSortingEnabled(pe.sorted);
 }
 
-void ParticleSystem::fixedUpdate(double dt) {}
+void ParticleSystem::fixedUpdate(double) {}
 
-void ParticleSystem::update(double dt) {
-    processCreations();
-    processChanges();
+void ParticleSystem::update(double) {
+}
+
+void ParticleSystem::onAddParticleEmitterComponent(ParticleEmitterComponent &pe)
+{
+    if (scene->hasComponent<TransformComponent>(pe.entity)) {
+        TransformComponent& tr = scene->getComponent<TransformComponent>(pe.entity);
+        createParticleSystem(tr.entity, pe.particleName, pe, tr.getPosition());
+    }
+}
+
+void ParticleSystem::onUpdateParticleEmitterComponent(ParticleEmitterComponent &pe)
+{
+    if (scene->hasComponent<TransformComponent>(pe.entity)) {
+        TransformComponent& tr = scene->getComponent<TransformComponent>(pe.entity);
+        processChanges(pe, tr);
+    }
 }
