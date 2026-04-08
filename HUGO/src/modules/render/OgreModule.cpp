@@ -99,6 +99,14 @@ OgreModule::OgreModule(){
     params["externalWindowHandle"] = Ogre::StringConverter::toString(windowHandle);
     m_ogreRenderWindow = m_ogreRoot->createRenderWindow(OGRE_WINDOW_NAME, 1000, 800, false, &params);
 
+    //--------------- VIEWPORT -------------------
+    m_defaultCameraSceneManager = m_ogreRoot->createSceneManager();
+    m_defaultCamera = m_defaultCameraSceneManager->createCamera("Default_camera");
+    m_viewport = m_ogreRenderWindow->addViewport(m_defaultCamera, 0, 0.f, 0.f, 1.f, 1.f); 
+    // default BackgroundColor is black
+    m_viewport->setBackgroundColour(Ogre::ColourValue(0.3f,0.3f,0.5f,1.f));
+    m_viewport->setDimensions(0.0f, 0.0f, 1.0f, 1.0f);
+
     locateResources();
     loadResources();
 }
@@ -125,6 +133,14 @@ void OgreModule::setCurrentSceneManager(HUGO::String sceneName){
 
 Ogre::SceneManager* OgreModule::getCurrentSceneManager(){
     return m_currentSceneManager;
+}
+
+Ogre::Viewport* OgreModule::getViewport(){
+    return m_viewport;
+}
+
+void OgreModule::viewportToDefaultCamera(){
+    m_viewport->setCamera(m_defaultCamera);
 }
 
 void OgreModule::createSceneManager(HUGO::String sceneName){

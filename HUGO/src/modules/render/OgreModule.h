@@ -34,6 +34,12 @@ class OgreModule{
 
     Ogre::SceneManager* m_currentSceneManager;
 
+
+    //Things required for creating default viewport
+    Ogre::Viewport* m_viewport;
+    Ogre::Camera* m_defaultCamera;
+    Ogre::SceneManager* m_defaultCameraSceneManager;
+
     //Initializes Ogre Singletons and SDL window
     OgreModule();
     void loadResources();
@@ -51,6 +57,8 @@ public:
     void destroySceneManager(HUGO::String sceneName);
 
     Ogre::SceneManager* getCurrentSceneManager();
+    Ogre::Viewport* getViewport();
+    void viewportToDefaultCamera();
 
     //Destroys Ogre Singletons and removes SDL window
     ~OgreModule();

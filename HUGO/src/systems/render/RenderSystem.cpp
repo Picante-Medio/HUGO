@@ -54,7 +54,7 @@ void RenderSystem::init(){
     
     // Basic light
     setAmbientLight(0.6f, 0.6f, 0.6f);
-    sceneManager->setDisplaySceneNodes(true);
+    //sceneManager->setDisplaySceneNodes(true);
 }
 #pragma endregion
 

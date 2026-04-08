@@ -11,13 +11,15 @@ HSYSTEM(CameraSystem)
     struct CameraInfo {
         Ogre::Camera* ogreCamera = nullptr; // Pointer to the Ogre camera object
         Ogre::SceneNode* node = nullptr;    // Scene node that controls camera transform
-        Ogre::Viewport* ogreViewport = nullptr;
     };
 
     Ogre::Root* ogreRoot;
     Ogre::SceneManager* sceneManager;
 
     std::unordered_map<EntityID, CameraInfo> cameraMap; 
+
+    EntityID m_mainCamera = NULL;
+    void setMainCamera(CameraComponent& camComp);
 
     // Register and unregister for cameras created outside the RenderSystem
     void registerCameraEntity(CameraComponent& comp);

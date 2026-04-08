@@ -11,35 +11,35 @@ void CameraSystem::init(){
 
     scene->onAddComponent<CameraComponent>().connect(this, &CameraSystem::registerCameraEntity);
     scene->onRemoveComponent<CameraComponent>().connect(this, &CameraSystem::unregisterCameraEntity); 
-
-    //From the moment
-    EntityID CamEntity = scene->createEntity();
-    
-    scene->addComponent<TransformComponent>(CamEntity, [](TransformComponent& transform){
-        transform.setPosition(HUGO::Vector3(0, 0, 50));
-    });
-    scene->addComponent<CameraComponent>(CamEntity);
 }
 
 void CameraSystem::update(double dt){
+    //If there are no cameras, throw error
+    if(cameraMap.size() == 0){
+        scene->log(std::make_shared<StringError>("[CameraSystem] No cameras in scene"));
+    }
+    if(m_mainCamera == NULL){
+        scene->log(std::make_shared<StringError>("[CameraSystem] Main camera is not set"));
+    }
+
     // Camera update
     for(auto& pack : scene->query<TransformComponent, CameraComponent>()) {
         TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
         CameraComponent& camera = pack.getDeprecated<CameraComponent&>();
-        
-        auto it = cameraMap.find(camera.entity);
-        if (it != cameraMap.end()) {
-           //update node transform
-            it->second.node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getPosition()));
-            it->second.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getRotation()));
-            
-            // update projection parameters
-            if (camera.getProjectionType() == HUGO::ProjectionType::Perspective) {
-                it->second.ogreCamera->setFOVy(Ogre::Degree(camera.getFOVY()));
-            }
-            it->second.ogreCamera->setNearClipDistance(camera.getNearClip());
-            it->second.ogreCamera->setFarClipDistance(camera.getFarClip());
+
+        cameraMap[camera.entity].node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getPosition()));
+        cameraMap[camera.entity].node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getRotation()));
+
+        // update projection parameters
+        if (camera.getProjectionType() == HUGO::ProjectionType::Perspective) {
+            cameraMap[camera.entity].ogreCamera->setFOVy(Ogre::Degree(camera.getFOVY()));
         }
+        cameraMap[camera.entity].ogreCamera->setNearClipDistance(camera.getNearClip());
+        cameraMap[camera.entity].ogreCamera->setFarClipDistance(camera.getFarClip());
+
+
+        //Check if it is a different mainCamera tham the actual one. If it is, then change it
+        if(camera.isMain() && camera.entity != m_mainCamera) setMainCamera(camera);
     }
 }
 
@@ -87,45 +87,40 @@ void CameraSystem::registerCameraEntity(CameraComponent& cameraComp){
     res.node->setPosition(HUGO::OgreUtils::vector3ToOgre(transformComp.getPosition()));
     res.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(transformComp.getRotation()));
 
-    // create ogre viewport
-    res.ogreViewport = OgreModule::Instance().getOgreRenderWindow()->addViewport(
-        res.ogreCamera,
-        cameraComp.getZOrder(),
-        cameraComp.getLeft(),
-        cameraComp.getTop(),
-        cameraComp.getWidth(),
-        cameraComp.getHeight()
-    );
-    
-    // background color
-    res.ogreViewport->setBackgroundColour(Ogre::ColourValue(
-        cameraComp.getClearColor().x,
-        cameraComp.getClearColor().y,
-        cameraComp.getClearColor().z,
-        cameraComp.getClearColor().w
-    ));
-    
-    res.ogreViewport->setDimensions(0.0f, 0.0f, 1.0f, 1.0f);
-    
-    cameraComp.setAspectRatio(float(res.ogreViewport->getActualWidth()) / float(res.ogreViewport->getActualHeight()));
-    
     cameraMap[entity] = res;
+
+
+    if(cameraComp.isMain()){
+        setMainCamera(cameraComp);
+    }
 }
 
 void CameraSystem::unregisterCameraEntity(CameraComponent& comp){
     EntityID entity = comp.entity;
+
     //remove camera and destroy Ogre Camera
-    auto it = cameraMap.find(entity);
-    if (it != cameraMap.end()) {
-        if(it->second.node){
-            it->second.node->detachAllObjects();
-            sceneManager->destroySceneNode(it->second.node);
-            it->second.node = nullptr;
-        }
-        if(it->second.ogreCamera){
-            sceneManager->destroyCamera(it->second.ogreCamera);
-            it->second.ogreCamera = nullptr;
-        }
-        cameraMap.erase(it);
+    cameraMap[entity].node->detachAllObjects();
+    sceneManager->destroySceneNode(cameraMap[entity].node);
+    sceneManager->destroyCamera(cameraMap[entity].ogreCamera);
+    cameraMap.erase(entity);
+
+    //If it was main cam, change it for the default blank camera. It is the user´s fault to not change the mainCamera before deleting the actual one
+    if(entity == m_mainCamera){
+        OgreModule::Instance().viewportToDefaultCamera();
     }
+}
+
+void CameraSystem::setMainCamera(CameraComponent& camComp){
+    EntityID camID = camComp.entity;
+    Ogre::Viewport* viewport = OgreModule::Instance().getViewport();
+    viewport->setCamera(cameraMap[camID].ogreCamera);
+
+    viewport->setBackgroundColour(Ogre::ColourValue(
+        camComp.getClearColor().x,
+        camComp.getClearColor().y,
+        camComp.getClearColor().z,
+        camComp.getClearColor().w
+    ));
+
+    m_mainCamera = camID;
 }
