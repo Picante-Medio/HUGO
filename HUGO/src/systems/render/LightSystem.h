@@ -21,7 +21,6 @@ HSYSTEM(LightSystem)
 
     void unregisterLightEntity(LightComponent& comp);
     void registerLightEntity(LightComponent& comp);
-    ErrorOrVoid createOgreLight(EntityID entity);
 
     void onUpdateLightComponent(LightComponent& light);
 

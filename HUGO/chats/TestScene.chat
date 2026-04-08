@@ -2,6 +2,8 @@ SCENE TestScene
 
 SYSTEM AudioSystem
 SYSTEM RenderSystem
+SYSTEM LightSystem
+SYSTEM CameraSystem
 SYSTEM PhysicsTestSystem
 SYSTEM ConsoleSystem
 SYSTEM TweenSystem
@@ -14,5 +16,3 @@ SYSTEM MessagesTestSystem
 SYSTEM EventTestSystem
 SYSTEM UISystem
 SYSTEM LuaTestSystem
-SYSTEM CameraSystem
-SYSTEM LightSystem
