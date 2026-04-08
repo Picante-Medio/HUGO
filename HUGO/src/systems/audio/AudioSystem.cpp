@@ -125,8 +125,9 @@ ma_sound* AudioSystem::getSound(HUGO::AudioID id, HUGO::AudioTypes type)
 
 void AudioSystem::acquireVoice(AudioComponent &c)
 {
+    if (c.type < 0 || c.type >= HUGO::AudioTypes::LAST_TYPE) return;
     if (c.activePtr == nullptr) {
-        c.activePtr = getSound(c.audioId, c.type);
+        c.activePtr = getSound(c.audioId, static_cast<HUGO::AudioTypes>(c.type));
     }
 }
 

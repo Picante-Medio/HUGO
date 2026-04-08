@@ -144,9 +144,9 @@ void ParticleSystem::processChanges(const ParticleEmitterComponent& pe, const Tr
     // quota amount
     instance.ps->setParticleQuota(pe.quota);
     // update pivot
-    instance.ps->setMaterialName(pe.pivot.material);
-    instance.ps->setDefaultWidth(pe.pivot.width);
-    instance.ps->setDefaultHeight(pe.pivot.height);
+    instance.ps->setMaterialName(pe.material);
+    instance.ps->setDefaultWidth(pe.width);
+    instance.ps->setDefaultHeight(pe.height);
     //sorting
     instance.ps->setSortingEnabled(pe.sorted);
 }
