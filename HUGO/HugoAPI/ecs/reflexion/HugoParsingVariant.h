@@ -10,5 +10,7 @@ using HVariant = std::variant<
     HUGO::Float,
     HUGO::String,
     HUGO::Vector3,
-    HUGO::Vector2
+    HUGO::Vector2,
+    HUGO::Quaternion,
+    HUGO::Bool
 >;
