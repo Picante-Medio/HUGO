@@ -40,6 +40,7 @@ HCOMPONENT(ColliderComponent)
 
     int flags = 0;
 
+
     float restitution = 0.f;
     float friction = 0.5f;
 
@@ -50,6 +51,18 @@ HCOMPONENT(ColliderComponent)
 
     bool useGizmo = true;
 
+    /*
+    DEFAULT_SERIALIZED_MEMBER(float, restitution, 0.f)
+    DEFAULT_SERIALIZED_MEMBER(float, friction, 0.5f)
+    
+    SERIALIZED_MEMBER(HUGO::Vector3, positionOffset)
+    SERIALIZED_MEMBER(HUGO::Quaternion, rotationOffset)
+    
+    DEFAULT_SERIALIZED_MEMBER(bool, active, true)
+    
+    DEFAULT_SERIALIZED_MEMBER(bool, useGizmo, true)
+    */
+    
     std::vector<EntityID> collisionInfo;
     std::vector<EntityID> collisionBuffer;
 

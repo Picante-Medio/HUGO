@@ -22,21 +22,21 @@ HCOMPONENT(RigidBodyComponent)
 
     int flags = 0;
 
-    float mass = 0.f;
-    float linearDamping = 0.f;
-    float angularDamping = 0.f;
-
-    HUGO::Vector3 linearVelocity = HUGO::Vector3();
-    HUGO::Vector3 angularVelocity = HUGO::Vector3();
-
+    DEFAULT_SERIALIZED_MEMBER(float, mass, 0.f)
+    DEFAULT_SERIALIZED_MEMBER(float, linearDamping, 0.f)
+    DEFAULT_SERIALIZED_MEMBER(float, angularDamping, 0.f)
+    
+    SERIALIZED_MEMBER(HUGO::Vector3, linearVelocity)
+    SERIALIZED_MEMBER(HUGO::Vector3, angularVelocity)
+    
     HUGO::Vector3 impulseApplied = HUGO::Vector3();
     HUGO::Vector3 torqueImpulseApplied = HUGO::Vector3();
     HUGO::Vector3 forceApplied = HUGO::Vector3();
     HUGO::Vector3 torqueApplied = HUGO::Vector3();
 
     bool asleep = false;
-    float linearSleepingThreshold = 0.8f;
-    float angularSleepingThreshold = 1.f;
+    DEFAULT_SERIALIZED_MEMBER(float, linearSleepingThreshold, 0.8f)
+    DEFAULT_SERIALIZED_MEMBER(float, angularSleepingThreshold, 1.f)
 
     HUGO::CollisionObjectID objectID = HUGO::INVALID_COL_OBJ_ID;
     HUGO::BodyType type = HUGO::BodyType::DYNAMIC;

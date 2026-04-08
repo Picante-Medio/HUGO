@@ -10,6 +10,6 @@ public:
     void init();
     void onLoad();
 
-    void fixedUpdate(double dt);
-    void update(double dt);
+    void fixedUpdate(double);
+    void update(double);
 END_HSYSTEM()

@@ -9,7 +9,7 @@ PhysicsTestSystem::~PhysicsTestSystem() {
 }
 
 void PhysicsTestSystem::init(){
-        
+      /*  
     // Entidad 1: Cuerpo estático
     EntityID e1 = scene->createEntity();
 
@@ -60,18 +60,17 @@ void PhysicsTestSystem::init(){
     scene->addComponent<RigidBodyComponent>(e3, [](RigidBodyComponent& rb){
         rb.setMass(5.f);
     });
+    */
 }
 
 void PhysicsTestSystem::onLoad(){
     
 }
 
-void PhysicsTestSystem::fixedUpdate(double dt) {
+void PhysicsTestSystem::fixedUpdate(double) {
     
 }
 
-float rate = 0.2f;
-float t = 0;
-void PhysicsTestSystem::update(double dt) {
+void PhysicsTestSystem::update(double) {
 
 }
