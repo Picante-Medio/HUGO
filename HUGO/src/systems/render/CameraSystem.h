@@ -1,0 +1,33 @@
+#pragma once
+
+#include "HugoSystemMacros.h"
+#include "Ogre.h"
+
+struct CameraComponent;
+
+HSYSTEM(CameraSystem)
+
+    // Ogre Camera Data
+    struct CameraInfo {
+        Ogre::Camera* ogreCamera = nullptr; // Pointer to the Ogre camera object
+        Ogre::SceneNode* node = nullptr;    // Scene node that controls camera transform
+        Ogre::Viewport* ogreViewport = nullptr;
+    };
+
+    Ogre::Root* ogreRoot;
+    Ogre::SceneManager* sceneManager;
+
+    std::unordered_map<EntityID, CameraInfo> cameraMap; 
+
+    // Register and unregister for cameras created outside the RenderSystem
+    void registerCameraEntity(CameraComponent& comp);
+    void unregisterCameraEntity(CameraComponent& comp);
+
+public:
+    void init() override;
+    void onLoad() override{}
+    void fixedUpdate(double) override {}
+    void update(double dt) override;
+    ~CameraSystem(); 
+
+END_HSYSTEM()

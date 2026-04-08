@@ -12,17 +12,8 @@
 
 struct RenderComponent;
 struct AnimationComponent;
-struct LightComponent;
-struct CameraComponent;
 
 HSYSTEM(RenderSystem)
-    // Ogre Camera Data
-    struct CameraInfo {
-        Ogre::Camera* ogreCamera = nullptr; // Pointer to the Ogre camera object
-        Ogre::SceneNode* node = nullptr;    // Scene node that controls camera transform
-        Ogre::Viewport* ogreViewport = nullptr;
-    };
-
     // OgreObject Data
     // Represents an Ogre renderable entity.
     struct OgreObject{
@@ -37,18 +28,12 @@ HSYSTEM(RenderSystem)
     Ogre::SceneManager* sceneManager = nullptr;
 
     //Mapping ECS entities with their corresponding Ogre data
-    std::unordered_map<EntityID, CameraInfo> cameraMap; 
 
     std::unordered_map<EntityID, OgreObject> ogreObjects;
 
     void updateViewportDimensions();
 
-    
     void updateAnimations(double dt);
-    
-    // Register and unregister for cameras created outside the RenderSystem
-    void registerCameraEntity(CameraComponent& comp);
-    void unregisterCameraEntity(CameraComponent& comp);
 
     //Register/Unregister render entities
     void registerRenderEntity(RenderComponent& comp);
@@ -61,7 +46,6 @@ HSYSTEM(RenderSystem)
 
     //Component Events
     void onUpdateRenderComponet(RenderComponent& rc);
-
     void onUpdateAnimationComponet(AnimationComponent& animComp);
     void onRemoveAnimationComponet(AnimationComponent& animComp);
 
