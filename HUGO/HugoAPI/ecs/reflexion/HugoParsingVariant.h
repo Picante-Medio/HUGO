@@ -14,7 +14,11 @@ using HVariant = std::variant<
     HUGO::Vector4,
     HUGO::Vector3,
     HUGO::Vector2,
-    HUGO::Quaternion,
     HUGO::Bool,
-    HUGO::ColliderInfo
+    HUGO::ColliderInfo,
+    HUGO::Quaternion,
+    HUGO::Radian,
+    HUGO::Degree,
+    HUGO::LightType,
+    HUGO::UIMetricsMode
 >;
