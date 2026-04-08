@@ -11,8 +11,8 @@ private:
 
     HUGO::Radian spotOuter = HUGO::Radian(0.7f);
     HUGO::Radian spotInner = HUGO::Radian(0.6f);
-    float spotFalloff = 1.0f;
-    float spotNearClip = 1.0f;
+    DEFAULT_SERIALIZED_MEMBER(float, spotFalloff, 1.0f);
+    DEFAULT_SERIALIZED_MEMBER(float, spotNearClip, 1.0f);
 
     // Ogre explanition, from the documentation reference:
     // range - The absolute upper range of the light in world units.
@@ -20,12 +20,12 @@ private:
     // linear - The linear factor in the attenuation formula: 1 means attenuate evenly over the distance.
     // quadratic - The quadratic factor in the attenuation formula: adds a curvature to the attenuation formula.
     HUGO::Vector4 attenuation = HUGO::Vector4(1.0f, 0.5f, 0.0f, 10000.0f); //range, constant, linear, quadratic
-    float shadowFarDist = 1.0f;
-    float shadowFarDistSquared = 1.0f;
+    DEFAULT_SERIALIZED_MEMBER(float, shadowFarDist, 1.0f);
+    DEFAULT_SERIALIZED_MEMBER(float, shadowFarDistSquared, 1.0f);
     size_t indexInFrame = 0;
 
-    float shadowNearClipDist = 0.1f;
-    float shadowFarClipDist = 300;
+    DEFAULT_SERIALIZED_MEMBER(float, shadowNearClipDist, 0.1f);
+    DEFAULT_SERIALIZED_MEMBER(float, shadowFarClipDist, 300.0f);
 
 public:
     // Setters

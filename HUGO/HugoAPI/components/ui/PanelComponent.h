@@ -4,17 +4,17 @@
 #include "HugoTypes.h"
 
 HCOMPONENT(PanelComponent)
-    HUGO::String overlayName = "";
-    HUGO::String containerName = "";
+    DEFAULT_SERIALIZED_MEMBER(HUGO::String, overlayName, "");
+    DEFAULT_SERIALIZED_MEMBER(HUGO::String, containerName, "");
 
-    bool isVisible = true;
+    DEFAULT_SERIALIZED_MEMBER(bool, isVisible, true);
 
     HUGO::UIMetricsMode metricsMode = HUGO::UIMetricsMode::GMM_RELATIVE;
 
-    HUGO::Float left = 0.0f;
-    HUGO::Float top = 0.0f;
-    HUGO::Float width = 0.1f;
-    HUGO::Float height = 0.1f;
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, left, 0.0f);
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, top, 0.0f);
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, width, 0.1f);
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, height, 0.1f);
 
     // HUGO::UIHorizontalAlignment alignmentX =
     //     HUGO::UIHorizontalAlignment::UHA_LEFT;
@@ -23,6 +23,6 @@ HCOMPONENT(PanelComponent)
     //     HUGO::UIVerticalAlignment::UVA_CENTER;
         
     // appearance
-    HUGO::String material = "";
+    DEFAULT_SERIALIZED_MEMBER(HUGO::String, material, "");
 END_HCOMPONENT()
 

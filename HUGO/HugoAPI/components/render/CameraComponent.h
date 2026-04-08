@@ -13,18 +13,19 @@ private:
     HUGO::ProjectionType projectionType = HUGO::ProjectionType::Perspective;
     
     // Perspective parameters
-    float fovY = 60.0f; // Field of view in the Y direction, in degrees
-    float nearClip = 1.0f;
-    float farClip = 10000.0f;
+    // Field of view in the Y direction, in degrees
+    DEFAULT_SERIALIZED_MEMBER(float, fovY, 60.0f) 
+    DEFAULT_SERIALIZED_MEMBER(float, nearClip, 1.0f)
+    DEFAULT_SERIALIZED_MEMBER(float, farClip, 10000.0f);
 
     // Orthographic parameters
-    float orthoWidth = 10.f;
-    float orthoHeight = 10.f;
+    DEFAULT_SERIALIZED_MEMBER(float, orthoWidth, 10.f);
+    DEFAULT_SERIALIZED_MEMBER(float, orthoHeight, 10.f);
 
     //Aspect ratio
-    bool autoAspectRatio = true;
+    DEFAULT_SERIALIZED_MEMBER(bool, autoAspectRatio, true);
 
-    bool mainCamera = false;
+    DEFAULT_SERIALIZED_MEMBER(bool, mainCamera, false);
 
     /*
         =========== VIEWPORT PARAMETERS ===============

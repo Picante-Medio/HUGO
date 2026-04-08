@@ -10,9 +10,9 @@ HCOMPONENT(ButtonComponent)
     std::function<void()> onClickCallback;
     
     // appearance - normal state
-    HUGO::String normalMaterial = "Button/Normal";
-    HUGO::String hoverMaterial = "Button/Hover";
-    HUGO::String pressedMaterial = "Button/Pressed";
-    HUGO::String disabledMaterial = "Button/Disabled";
+    DEFAULT_SERIALIZED_MEMBER(HUGO::String, normalMaterial, "Button/Normal");
+    DEFAULT_SERIALIZED_MEMBER(HUGO::String, hoverMaterial, "Button/Hover");
+    DEFAULT_SERIALIZED_MEMBER(HUGO::String, pressedMaterial, "Button/Pressed");
+    DEFAULT_SERIALIZED_MEMBER(HUGO::String, disabledMaterial, "Button/Disabled");
 END_HCOMPONENT()
 

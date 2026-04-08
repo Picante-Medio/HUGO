@@ -5,13 +5,13 @@
 HCOMPONENT(InputFieldComponent)
 
     // indicates whether this input field is currently focused and receiving input
-    bool isActive = false;
+    DEFAULT_SERIALIZED_MEMBER(bool, isActive, false);
 
     // full text entered by the user (source for the input)
     HUGO::String fullText; 
 
     // original text before entering input mode (used to restore UI after submit/cancel)
-    HUGO::String originalText; 
+    SERIALIZED_MEMBER(HUGO::String, originalText); 
 
     // current cursor position within fullText
     size_t cursorPos = 0; 

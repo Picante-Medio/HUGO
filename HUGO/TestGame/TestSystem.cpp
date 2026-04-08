@@ -91,33 +91,6 @@ TestSystem::init() {
         lg.setSpecular(HUGO::Vector4(0.8f, 0.8f, 0.8f, 1.0f));
     });
 
-    // EntityID boton = scene->createEntity();
-    // scene->addComponent<PanelComponent>(boton, [](PanelComponent& panel){
-    //     panel.overlayName = "testCanvas/SimpleTest";
-    //     panel.containerName = panel.overlayName + "/Container";
-    //     panel.material = "UI/Background";
-    //     panel.left = 400.0f;
-    //     panel.top = 550.0f;
-    //     panel.width = 64.0f;
-    //     panel.height = 64.0f;
-    //     panel.metricsMode = HUGO::UIMetricsMode::GMM_PIXELS;
-    // });
-
-    // scene->addComponent<ButtonComponent>(boton, [](ButtonComponent& bt){
-    //     bt.onClickCallback = []() {
-    //     std::cout << "Button Clicked!" << std::endl;
-    //     };
-    //     bt.hoverMaterial = "UI/KnobHover";
-    //     bt.pressedMaterial = "UI/KnobPressed";
-    //     bt.normalMaterial = "UI/Knob";
-    // });
-
-    // const HUGO::String& buttonNormalMaterial = scene->getComponent<ButtonComponent>(boton).normalMaterial;
-
-    // scene->modifyComponent<PanelComponent>(boton, [buttonNormalMaterial](PanelComponent& panel){
-    //     panel.material = buttonNormalMaterial;
-    // });
-
     // EntityID audio = scene->createEntity();
     // scene->addComponent<AudioComponent>(audio, [](AudioComponent& a){
     //     a.isPlaying = true;
