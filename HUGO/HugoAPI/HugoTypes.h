@@ -11,6 +11,7 @@ namespace HUGO{
 
     using Int = int32_t;
 	using Float = float;
+    using Double = double;
 
 	constexpr Float PI = 3.14159265358979323846f;
 

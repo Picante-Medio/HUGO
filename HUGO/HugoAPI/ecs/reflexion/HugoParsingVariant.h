@@ -9,7 +9,9 @@
 using HVariant = std::variant<
     HUGO::Int,
     HUGO::Float,
+    HUGO::Double,
     HUGO::String,
+    HUGO::Vector4,
     HUGO::Vector3,
     HUGO::Vector2,
     HUGO::Quaternion,
