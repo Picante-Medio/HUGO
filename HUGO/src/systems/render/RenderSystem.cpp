@@ -54,7 +54,6 @@ void RenderSystem::init(){
     
     // Basic light
     setAmbientLight(0.6f, 0.6f, 0.6f);
-    //sceneManager->setDisplaySceneNodes(true);
 }
 #pragma endregion
 
@@ -108,14 +107,6 @@ void RenderSystem::update(double dt)
             obj.ogreSceneNode->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getWorldRotation()));
             obj.ogreSceneNode->setScale(HUGO::OgreUtils::vector3ToOgre(tr.getWorldScale()));
         } 
-    }
-
-    // changes in window
-    std::shared_ptr<HUGO::IInput> input = scene->getInput();
-
-    if(input->windowHasChanged()){
-        updateViewportDimensions();
-        input->clearWindowFlag();
     }
 }
 
@@ -184,29 +175,9 @@ void RenderSystem::clearAnimationStates(OgreObject &obj)
 }
 #pragma endregion
 
-#pragma region  Screen Changes
-void RenderSystem::updateViewportDimensions()
-{
-    int w,h;
-    SDL_GetWindowSize(OgreModule::Instance().getSDLWindow(), &w, &h);
-    if (w > 0 && h > 0)
-    {
-        Ogre::RenderWindow* renderWindow = OgreModule::Instance().getOgreRenderWindow();
-        renderWindow->resize(w, h);
-        renderWindow->windowMovedOrResized();
-    }
-}
-
-#pragma endregion
-
 void RenderSystem::setAmbientLight(float r, float g, float b)
 {
     sceneManager->setAmbientLight(Ogre::ColourValue(r, g, b));
-}
-
-Ogre::SceneManager *RenderSystem::getSM() const
-{
-    return sceneManager;
 }
 
 #pragma region RenderComponentEvents
@@ -281,7 +252,7 @@ void RenderSystem::onUpdateAnimationComponet(AnimationComponent &animComp)
         {
             if(!ogre_ent->hasAnimationState(animName))
             {
-                std::cerr << "[RenderSystem] Animation " << animName << " does not exist in entity " << rc.entity << "\n";
+                scene->log(std::make_shared<StringError>("[RenderSystem] Animation "+ animName + " does not exist in entity " + std::to_string(rc.entity)));
                 continue;
             }
             //get a new AnimationSate from ogre

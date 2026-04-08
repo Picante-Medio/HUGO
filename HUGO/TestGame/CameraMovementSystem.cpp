@@ -14,6 +14,7 @@ void CameraMovementSystem::init() {
     cam1 = scene->createEntity();
 
     scene->addComponent<TransformComponent>(cam1, [](TransformComponent& comp){
+        comp.setPosition(HUGO::Vector3(0,0,30));
 
     });
 

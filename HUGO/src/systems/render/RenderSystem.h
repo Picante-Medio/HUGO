@@ -31,8 +31,6 @@ HSYSTEM(RenderSystem)
 
     std::unordered_map<EntityID, OgreObject> ogreObjects;
 
-    void updateViewportDimensions();
-
     void updateAnimations(double dt);
 
     //Register/Unregister render entities

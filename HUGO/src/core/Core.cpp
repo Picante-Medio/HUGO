@@ -109,7 +109,10 @@ void Core::run(){
         if(input->isQuitPressed()) {
             exit = true;
         }
-
+        if(input->windowHasChanged()){   
+            OgreModule::Instance().updateWindowDimensions();
+            input->clearWindowFlag();
+        }
         sceneManager.updateCurrentScene(frameTime);
         sceneManager.dispatchMessagesCurrentScene();
         

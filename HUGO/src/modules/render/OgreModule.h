@@ -65,6 +65,8 @@ public:
 
     void renderOneFrame();
 
+    void updateWindowDimensions();
+
     Ogre::RenderWindow* getOgreRenderWindow() const;
     SDL_Window* getSDLWindow() const;
 };

@@ -166,3 +166,14 @@ SDL_Window *OgreModule::getSDLWindow() const
 void OgreModule::renderOneFrame(){
     m_ogreRoot->renderOneFrame();
 }
+
+void OgreModule::updateWindowDimensions()
+{
+    int w,h;
+    SDL_GetWindowSize(OgreModule::Instance().getSDLWindow(), &w, &h);
+    if (w > 0 && h > 0)
+    {
+        m_ogreRenderWindow->resize(w, h);
+        m_ogreRenderWindow->windowMovedOrResized();
+    }
+}
