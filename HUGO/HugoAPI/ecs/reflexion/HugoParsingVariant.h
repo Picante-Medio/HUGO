@@ -4,6 +4,7 @@
 #include <string>
 #include "HugoTypes.h"
 #include "HugoMath.h"
+#include "HugoPhysics.h"
 
 using HVariant = std::variant<
     HUGO::Int,
@@ -12,5 +13,6 @@ using HVariant = std::variant<
     HUGO::Vector3,
     HUGO::Vector2,
     HUGO::Quaternion,
-    HUGO::Bool
+    HUGO::Bool,
+    HUGO::ColliderInfo
 >;

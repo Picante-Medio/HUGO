@@ -2,6 +2,7 @@
 
 #include "HugoTypes.h"
 #include "HugoMath.h"
+#include "HugoPhysics.h"
 
 #include "HugoComponentMacros.h"
 

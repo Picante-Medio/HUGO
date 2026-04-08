@@ -7,6 +7,7 @@
 #include "HugoDispatcher.h"
 #include "TransformComponent.h"
 #include "ParentComponent.h"
+#include "HugoPhysics.h"
 
 #include "OgreBulletDebugger.h"
 #include <cstddef>
@@ -100,21 +101,21 @@ HUGO::CollisionShapeID BulletSimulation::createShapeObject(ColliderComponent& co
 {
 
     btCollisionShape* resShape = nullptr;
-    if(std::holds_alternative<BoxColliderInfo>(col.info)){
-        resShape = new btBoxShape(BulletUtils::vector3ToBullet(std::get<BoxColliderInfo>(col.info).halfExtents));
+    if(std::holds_alternative<HUGO::BoxColliderInfo>(col.info)){
+        resShape = new btBoxShape(BulletUtils::vector3ToBullet(std::get<HUGO::BoxColliderInfo>(col.info).halfExtents));
     }
-    else if(std::holds_alternative<SphereColliderInfo>(col.info)){
-        resShape = new btSphereShape(std::get<SphereColliderInfo>(col.info).r);
+    else if(std::holds_alternative<HUGO::SphereColliderInfo>(col.info)){
+        resShape = new btSphereShape(std::get<HUGO::SphereColliderInfo>(col.info).r);
     }
-    else if(std::holds_alternative<CapsuleColliderInfo>(col.info)){
-        CapsuleColliderInfo aux = std::get<CapsuleColliderInfo>(col.info);
+    else if(std::holds_alternative<HUGO::CapsuleColliderInfo>(col.info)){
+        HUGO::CapsuleColliderInfo aux = std::get<HUGO::CapsuleColliderInfo>(col.info);
         resShape = new btCapsuleShape(aux.r, aux.height);
     }
-    else if(std::holds_alternative<CylinderColliderInfo>(col.info)){
-        resShape = new btCylinderShape(BulletUtils::vector3ToBullet(std::get<CylinderColliderInfo>(col.info).halfExtents));
+    else if(std::holds_alternative<HUGO::CylinderColliderInfo>(col.info)){
+        resShape = new btCylinderShape(BulletUtils::vector3ToBullet(std::get<HUGO::CylinderColliderInfo>(col.info).halfExtents));
     }
     else{ // Cone
-        ConeColliderInfo aux = std::get<ConeColliderInfo>(col.info);
+        HUGO::ConeColliderInfo aux = std::get<HUGO::ConeColliderInfo>(col.info);
         resShape = new btConeShape(aux.r, aux.height);
     }
 
@@ -198,7 +199,7 @@ btCollisionShape* BulletSimulation::getorCreateShape(HUGO::CollisionShapeID& id,
 HUGO::CollisionObjectID BulletSimulation::createColliderObject(ColliderComponent& hgCol)
 {
     // If shape isn't initialized doesn't create a colliderObject
-    if(std::holds_alternative<BoxColliderInfo>(hgCol.info) && std::get<BoxColliderInfo>(hgCol.info).halfExtents.x < 0) 
+    if(std::holds_alternative<HUGO::BoxColliderInfo>(hgCol.info) && std::get<HUGO::BoxColliderInfo>(hgCol.info).halfExtents.x < 0) 
         return HUGO::INVALID_COL_OBJ_ID;
 
     btCollisionShape* shape = getorCreateShape(hgCol.shapeID, hgCol);

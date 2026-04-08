@@ -1,8 +1,9 @@
 #include "PhysicsGizmoSystem.h"
 #include "ColliderComponent.h"
 #include "TransformComponent.h"
-#include "HugoError.h"
 #include "RenderComponent.h"
+#include "HugoError.h"
+#include "HugoPhysics.h"
 
 void PhysicsGizmoSystem::init(){
 
@@ -23,7 +24,7 @@ ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene>, EntityID entity, cons
 }
 
 template <>
-ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity, const BoxColliderInfo& colliderInfo) {
+ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity, const HUGO::BoxColliderInfo& colliderInfo) {
 
     if(scene->getComponent<RenderComponent>(entity).getMeshName() != "cube.mesh") {
 
@@ -41,7 +42,7 @@ ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity
 }
 
 template <>
-ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity, const SphereColliderInfo& colliderInfo) {
+ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity, const HUGO::SphereColliderInfo& colliderInfo) {
 
     if(scene->getComponent<RenderComponent>(entity).getMeshName() != "sphere.mesh") {
 
@@ -59,7 +60,7 @@ ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity
 }
 
 template <>
-ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity, const CylinderColliderInfo& colliderInfo){
+ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity, const HUGO::CylinderColliderInfo& colliderInfo){
 
     if(scene->getComponent<RenderComponent>(entity).getMeshName() != "cylinder.mesh") {
 
@@ -77,7 +78,7 @@ ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity
 }
 
 template <>
-ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity, const ConeColliderInfo& colliderInfo){
+ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity, const HUGO::ConeColliderInfo& colliderInfo){
 
     if(scene->getComponent<RenderComponent>(entity).getMeshName() != "cone.mesh") {
 
@@ -95,7 +96,7 @@ ErrorOrVoid createGizmoMesh(std::shared_ptr<HUGO::IScene> scene, EntityID entity
 }
 
 template <>
-ErrorOrVoid createGizmoMesh<CapsuleColliderInfo>(std::shared_ptr<HUGO::IScene> scene, EntityID entity, const CapsuleColliderInfo& colliderInfo){
+ErrorOrVoid createGizmoMesh<HUGO::CapsuleColliderInfo>(std::shared_ptr<HUGO::IScene> scene, EntityID entity, const HUGO::CapsuleColliderInfo& colliderInfo){
 
     if(scene->getComponent<RenderComponent>(entity).getMeshName() != "capsule.mesh") {
 

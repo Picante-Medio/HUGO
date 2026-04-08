@@ -1,32 +1,13 @@
 #pragma once
 
+#include <variant>
 #include "HugoMath.h"
 #include "HugoTypes.h"
-#include <variant>
+#include "HugoPhysics.h"
 
 #include "HugoComponentMacros.h"
 
-struct BoxColliderInfo {
-    HUGO::Vector3 halfExtents;
-};
 
-struct SphereColliderInfo {
-    float r;
-};
-
-struct CapsuleColliderInfo {
-    float r;
-    float height;
-};
-
-struct CylinderColliderInfo {
-    HUGO::Vector3 halfExtents;
-};
-
-struct ConeColliderInfo {
-    float r;
-    float height;
-};
 
 HCOMPONENT(ColliderComponent)
 
@@ -53,7 +34,8 @@ HCOMPONENT(ColliderComponent)
     std::vector<EntityID> collisionInfo;
     std::vector<EntityID> collisionBuffer;
 
-    std::variant<BoxColliderInfo, SphereColliderInfo, CapsuleColliderInfo, CylinderColliderInfo, ConeColliderInfo> info = BoxColliderInfo{HUGO::Vector3(-1.f, -1.f, -1.f)};
+    DEFAULT_SERIALIZED_MEMBER(HUGO::ColliderInfo, info, HUGO::BoxColliderInfo{HUGO::Vector3(-1.f, -1.f, -1.f)})
+
     HUGO::CollisionShapeID shapeID = HUGO::INVALID_SHAPE_ID;
     HUGO::CollisionObjectID objectID = HUGO::INVALID_COL_OBJ_ID;
 

@@ -124,19 +124,4 @@ namespace HUGO{
     using CollisionShapeID = int;
     constexpr CollisionShapeID INVALID_SHAPE_ID = std::numeric_limits<int>::max();
 
-    // -------- Collider Types --------
-    enum class ColliderType 
-    {
-        BOX,
-        SPHERE,
-        CAPSULE,
-        CYLINDER,
-        CONE
-    };
-
-    enum BodyType{
-        DYNAMIC,
-        STATIC,
-        KINEMATIC
-    };
 }
