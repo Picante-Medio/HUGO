@@ -22,7 +22,7 @@ LightSystem::~LightSystem(){
     lightMap.clear();
 }
 
-void LightSystem::update(double dt){
+void LightSystem::update(double){
     for(auto pack : scene->query<TransformComponent, LightComponent>()){
         TransformComponent transform = pack.getConst<TransformComponent>();
         LightComponent light = pack.getConst<LightComponent>();
@@ -33,8 +33,6 @@ void LightSystem::update(double dt){
         lightMap[entID].node->setPosition(HUGO::OgreUtils::vector3ToOgre(transform.getWorldPosition()));
         lightMap[entID].node->setOrientation(HUGO::OgreUtils::quaternionToOgre(transform.getWorldRotation()));
         lightMap[entID].node->setScale(HUGO::OgreUtils::vector3ToOgre(transform.getWorldScale()));
-
-        //Update lights parameters
     }
 }
 // ==================== Register Light Entity ====================
@@ -45,7 +43,7 @@ void LightSystem::registerLightEntity(LightComponent& lightComp)
     
     // Get the transformComponent and LightComponentof the light to set the initial configuration
     if(!scene->hasComponent<TransformComponent>(entity)){
-        scene->log(std::make_shared<StringError>("[RenderSystem] Light entity "+ std::to_string(entity) + "missing required components"));
+        scene->log(std::make_shared<StringError>("[LightSystem] Light entity "+ std::to_string(entity) + "missing required components"));
         return;
     }
 
@@ -153,9 +151,6 @@ void LightSystem::onUpdateLightComponent(LightComponent &light)
         // update diffuse and specular
         it->second.ogreLight->setDiffuseColour(Ogre::ColourValue(light.getDiffuse().x, light.getDiffuse().y, light.getDiffuse().z, light.getDiffuse().w));
         it->second.ogreLight->setSpecularColour(Ogre::ColourValue(light.getSpecular().x, light.getSpecular().y, light.getSpecular().z, light.getSpecular().w));
-        
-        // update attenuation
-        it->second.ogreLight->setAttenuation(light.getAttenuation().x ,light.getAttenuation().w, light.getAttenuation().y, light.getAttenuation().z);
         
         if (light.getLightType() == HUGO::LightType::LT_SPOTLIGHT) {
             it->second.ogreLight->setSpotlightRange(Ogre::Radian(light.getSpotInner().valueRadians())

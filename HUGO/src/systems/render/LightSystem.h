@@ -28,7 +28,7 @@ public:
     void init() override;
     void onLoad() override{}
     void fixedUpdate(double) override {}
-    void update(double dt) override;
+    void update(double) override;
     ~LightSystem();
 
 END_HSYSTEM()

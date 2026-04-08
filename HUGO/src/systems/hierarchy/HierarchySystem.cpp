@@ -13,7 +13,6 @@ HierarchySystem::init()
     scene->onAddComponent<ParentComponent>().connect(this, &HierarchySystem::onUpdateParentComponent);
     scene->onAddComponent<TransformComponent>().connect(this, &HierarchySystem::onAddTransformComponent);
     
-
     scene->onUpdateComponent<ChildrenComponent>().connect(this, &HierarchySystem::onUpdateChildrenComponent);
     scene->onUpdateComponent<ParentComponent>().connect(this, &HierarchySystem::onUpdateParentComponent);
 
@@ -249,7 +248,7 @@ HierarchySystem::onUpdateChildrenComponent(ChildrenComponent& childrenComp)
         for(EntityID& child: toAdd){
             //check if child is valid and does not create cycle
             if(child == parent || hasCycle(child, parent)){
-                std::cerr << "[HierarchySystem] Cannot add child "<< child <<" for entity " << parent << '\n';  
+                scene->log(std::make_shared<StringError>("[HierarchySystem] Cannot add child "+ std::to_string(child) + " for entity " + std::to_string(parent)));
                 childrenComp.children.erase(child);
                 return;
             } 
@@ -264,7 +263,7 @@ HierarchySystem::onUpdateChildrenComponent(ChildrenComponent& childrenComp)
         for(EntityID& child: toRemove){
             //check if child is valid
             if(child == parent){
-                std::cerr << "[HierarchySystem] Cannot remove child "<< child <<" for entity " << parent << '\n';
+                scene->log(std::make_shared<StringError>("[HierarchySystem] Cannot remove child "+ std::to_string(child) + " for entity " + std::to_string(parent)));
                 return;
             } 
             
@@ -286,7 +285,7 @@ HierarchySystem::onUpdateParentComponent(ParentComponent& parentComp)
 
     if (newParent == child || hasCycle(child, newParent)) {
         if(oldParent)parentComp.parent = oldParent;
-        std::cerr << "[HierarchySystem] Cannot set parent "<< newParent << " for entity "<< child<<'\n';
+        scene->log(std::make_shared<StringError>("[HierarchySystem] Cannot set parent "+ std::to_string(newParent) + " for entity " + std::to_string(child)));
         return;
     }
 

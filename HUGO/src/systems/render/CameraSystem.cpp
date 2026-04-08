@@ -13,7 +13,7 @@ void CameraSystem::init(){
     scene->onRemoveComponent<CameraComponent>().connect(this, &CameraSystem::unregisterCameraEntity); 
 }
 
-void CameraSystem::update(double dt){
+void CameraSystem::update(double){
     //If there are no cameras, throw error
     if(cameraMap.size() == 0){
         scene->log(std::make_shared<StringError>("[CameraSystem] No cameras in scene"));
@@ -57,7 +57,7 @@ void CameraSystem::registerCameraEntity(CameraComponent& cameraComp){
     // Get the transformComponent and CameraComponent of the camera to set the initial configuration
 
     if(!scene->hasComponent<TransformComponent>(entity)){
-        scene->log(std::make_shared<StringError>("[RenderSystem] Camera entity " + std::to_string(entity) + " missing required components"));
+        scene->log(std::make_shared<StringError>("[CameraSystem] Camera entity " + std::to_string(entity) + " missing required components"));
         return;
     }
     TransformComponent& transformComp = scene->getComponent<TransformComponent>(entity);
