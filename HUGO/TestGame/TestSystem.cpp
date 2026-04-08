@@ -108,6 +108,7 @@ TestSystem::init() {
     //     pe.particleName = "Particle/Smoke";
     //     pe.emitting = true;
     //     pe.active = true;
+    //     pe.material = "debug/Smoke";
     // });
 }
 

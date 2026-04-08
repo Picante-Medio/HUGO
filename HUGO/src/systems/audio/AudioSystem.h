@@ -117,7 +117,7 @@ private:
    void onUpdateAudioComponent(AudioComponent& c);
    void onUpdate3DAudioComponent(Audio3DInfoComponent& c);
    void onUpdateAudioListener(AudioListenerComponent& l);
-   void onAn3DAudioMove(TransformComponent& tr);
+   void onAn3DAudioMove(AudioComponent& a, TransformComponent& tr);
    
 public:
 

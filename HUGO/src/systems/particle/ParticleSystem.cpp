@@ -59,6 +59,7 @@ void ParticleSystem::createParticleSystem(EntityID id, const HUGO::String& parti
     pe.colour = HUGO::Vector4(colour.r, colour.g, colour.b, colour.a);
     pe.timeToLive = timeToLive;
 
+    ps->setMaterialName(pe.material);
     node->setPosition({iniPos.x, iniPos.y, iniPos.z});
 
     ParticleInstance instance;
@@ -89,7 +90,8 @@ void ParticleSystem::destroyParticleSystem(EntityID id) {
     activeParticleSystems.erase(it);
 }
 
-void ParticleSystem::processChanges(const ParticleEmitterComponent& pe, const TransformComponent& tr) {
+void ParticleSystem::processPosition(const TransformComponent &tr)
+{
     // get the specific particle system
     EntityID id = tr.entity;
     auto it = activeParticleSystems.find(id);
@@ -104,6 +106,20 @@ void ParticleSystem::processChanges(const ParticleEmitterComponent& pe, const Tr
 
     // transform
     instance.node->setPosition(tr.getPosition().x, tr.getPosition().y, tr.getPosition().z);
+}
+
+void ParticleSystem::processChanges(const ParticleEmitterComponent& pe, const TransformComponent& tr) {
+    // get the specific particle system
+    EntityID id = tr.entity;
+    auto it = activeParticleSystems.find(id);
+    if (it == activeParticleSystems.end()){
+        std::cout << "[Particle System]: couldn not find a particle system with entityID: " << id<<"\n";
+        return;
+    }
+
+    ParticleInstance& instance = it->second;
+
+    if (!instance.node || !instance.ps) return;
 
     // active and visibility
     instance.ps->setVisible(pe.active);
@@ -154,6 +170,11 @@ void ParticleSystem::processChanges(const ParticleEmitterComponent& pe, const Tr
 void ParticleSystem::fixedUpdate(double) {}
 
 void ParticleSystem::update(double) {
+    // set every particle system in their position correctly
+    for (auto pack: scene->query<ParticleEmitterComponent, TransformComponent>()){
+        TransformComponent& tr = pack.getDeprecated<TransformComponent>();
+        processPosition(tr);
+    }
 }
 
 void ParticleSystem::onAddParticleEmitterComponent(ParticleEmitterComponent &pe)
@@ -171,3 +192,4 @@ void ParticleSystem::onUpdateParticleEmitterComponent(ParticleEmitterComponent &
         processChanges(pe, tr);
     }
 }
+
