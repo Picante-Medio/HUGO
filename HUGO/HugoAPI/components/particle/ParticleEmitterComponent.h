@@ -15,9 +15,9 @@ HCOMPONENT(ParticleEmitterComponent)
 
     DEFAULT_SERIALIZED_MEMBER(HUGO::String, particleName, "");
     DEFAULT_SERIALIZED_MEMBER(HUGO::Int, quota, 10);
-    DEFAULT_SERIALIZED_MEMBER(bool, sorted, true);
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Bool, sorted, true);
 
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Vector3, direction, HUGO::Vector3(0.0f))
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Vector3, direction, HUGO::Vector3(0.0f));
     
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, emissionRate, 6.0f);
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, timeToLive, 1.0f);
@@ -30,8 +30,8 @@ HCOMPONENT(ParticleEmitterComponent)
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, width, 0.0f);
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, height, 0.0f);
 
-    DEFAULT_SERIALIZED_MEMBER(bool, emitting, false)
-    DEFAULT_SERIALIZED_MEMBER(bool, active, false)
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Bool, emitting, false)
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Bool, active, false)
 
 END_HCOMPONENT()
 

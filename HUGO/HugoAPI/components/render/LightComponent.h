@@ -5,23 +5,24 @@
 
 HCOMPONENT(LightComponent)
 private:
-    HUGO::Vector4 diffuse = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-    HUGO::Vector4 specular = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-    HUGO::LightType lightType = HUGO::LightType::LT_POINT;
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Vector4, diffuse, HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Vector4, specular, HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    DEFAULT_SERIALIZED_MEMBER(HUGO::LightType, lightType, HUGO::LightType::LT_POINT);
 
-    HUGO::Radian spotOuter = HUGO::Radian(0.7f);
-    HUGO::Radian spotInner = HUGO::Radian(0.6f);
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, spotFalloff, 1.0f);
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, spotNearClip, 1.0f);
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Radian, spotOuter, HUGO::Radian(0.7f));
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Radian, spotInner, HUGO::Radian(0.6f));
 
     // Ogre explanition, from the documentation reference:
     // range - The absolute upper range of the light in world units.
     // constant	- The constant factor in the attenuation formula: 1.0 means never attenuate, 0.0 is complete attenuation.
     // linear - The linear factor in the attenuation formula: 1 means attenuate evenly over the distance.
     // quadratic - The quadratic factor in the attenuation formula: adds a curvature to the attenuation formula.
-    HUGO::Vector4 attenuation = HUGO::Vector4(1.0f, 0.5f, 0.0f, 10000.0f); //range, constant, linear, quadratic
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, shadowFarDist, 1.0f);
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, shadowFarDistSquared, 1.0f);
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Vector4, attenuation, HUGO::Vector4(1.0f, 0.5f, 0.0f, 10000.0f)); //range, constant, linear, quadratic
+
     size_t indexInFrame = 0;
 
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, shadowNearClipDist, 0.1f);

@@ -7,9 +7,9 @@ HCOMPONENT(PanelComponent)
     DEFAULT_SERIALIZED_MEMBER(HUGO::String, overlayName, "");
     DEFAULT_SERIALIZED_MEMBER(HUGO::String, containerName, "");
 
-    DEFAULT_SERIALIZED_MEMBER(bool, isVisible, true);
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Bool, isVisible, true);
 
-    HUGO::UIMetricsMode metricsMode = HUGO::UIMetricsMode::GMM_RELATIVE;
+    DEFAULT_SERIALIZED_MEMBER(HUGO::UIMetricsMode, metricsMode, HUGO::UIMetricsMode::GMM_RELATIVE);
 
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, left, 0.0f);
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, top, 0.0f);
