@@ -235,19 +235,19 @@ namespace HUGO
         int sdlButton;
 
         switch(button){
-        case(MOUSE_LEFT):
+        case(MouseCode::MOUSE_LEFT):
             sdlButton = SDL_BUTTON_LEFT;
             break;
-        case(MOUSE_MIDDLE):
+        case(MouseCode::MOUSE_MIDDLE):
             sdlButton = SDL_BUTTON_MIDDLE;
             break;
-        case(MOUSE_RIGHT):
+        case(MouseCode::MOUSE_RIGHT):
             sdlButton = SDL_BUTTON_RIGHT;
             break;
-        case(MOUSE_BUTTON_X1):
+        case(MouseCode::MOUSE_BUTTON_X1):
             sdlButton = SDL_BUTTON_X1;
             break;
-        case(MOUSE_BUTTON_X2):
+        case(MouseCode::MOUSE_BUTTON_X2):
             sdlButton = SDL_BUTTON_X2;
             break;
         default:
@@ -263,328 +263,328 @@ namespace HUGO
         SDL_KeyCode sdlKey;
 
         switch(key){
-        case(UNKNOWN):
+        case(KeyCode::UNKNOWN):
             sdlKey = SDLK_UNKNOWN;
             break;
-        case(Q):
+        case(KeyCode::Q):
             sdlKey = SDLK_q;
             break;
-        case(W):
+        case(KeyCode::W):
             sdlKey = SDLK_w;
             break;
-        case(E):
+        case(KeyCode::E):
             sdlKey = SDLK_e;
             break;
-        case(R):
+        case(KeyCode::R):
             sdlKey = SDLK_r;
             break;
-        case(T):
+        case(KeyCode::T):
             sdlKey = SDLK_t;
             break;
-        case(Y):
+        case(KeyCode::Y):
             sdlKey = SDLK_y;
             break;
-        case(U):
+        case(KeyCode::U):
             sdlKey = SDLK_u;
             break;
-        case(I):
+        case(KeyCode::I):
             sdlKey = SDLK_i;
             break;
-        case(O):
+        case(KeyCode::O):
             sdlKey = SDLK_o;
             break;
-        case(P):
+        case(KeyCode::P):
             sdlKey = SDLK_p;
             break;
-        case(A):
+        case(KeyCode::A):
             sdlKey = SDLK_a;
             break;
-        case(S):
+        case(KeyCode::S):
             sdlKey = SDLK_s;
             break;
-        case(D):
+        case(KeyCode::D):
             sdlKey = SDLK_d;
             break;
-        case(F):
+        case(KeyCode::F):
             sdlKey = SDLK_f;
             break;
-        case(G):
+        case(KeyCode::G):
             sdlKey = SDLK_g;
             break;
-        case(H):
+        case(KeyCode::H):
             sdlKey = SDLK_h;
             break;
-        case(J):
+        case(KeyCode::J):
             sdlKey = SDLK_j;
             break;
-        case(K):
+        case(KeyCode::K):
             sdlKey = SDLK_k;
             break;
-        case(L):
+        case(KeyCode::L):
             sdlKey = SDLK_l;
             break;
-        case(Z):
+        case(KeyCode::Z):
             sdlKey = SDLK_z;
             break;
-        case(X):
+        case(KeyCode::X):
             sdlKey = SDLK_x;
             break;
-        case(C):
+        case(KeyCode::C):
             sdlKey = SDLK_c;
             break;
-        case(V):
+        case(KeyCode::V):
             sdlKey = SDLK_v;
             break;
-        case(B):
+        case(KeyCode::B):
             sdlKey = SDLK_b;
             break;
-        case(N):
+        case(KeyCode::N):
             sdlKey = SDLK_n;
             break;
-        case(M):
+        case(KeyCode::M):
             sdlKey = SDLK_m;
             break;
-        case(ONE):
+        case(KeyCode::ONE):
             sdlKey = SDLK_1;
             break;
-        case(TWO):
+        case(KeyCode::TWO):
             sdlKey = SDLK_2;
             break;
-        case(THREE):
+        case(KeyCode::THREE):
             sdlKey = SDLK_3;
             break;
-        case(FOUR):
+        case(KeyCode::FOUR):
             sdlKey = SDLK_4;
             break;
-        case(FIVE):
+        case(KeyCode::FIVE):
             sdlKey = SDLK_5;
             break;
-        case(SIX):
+        case(KeyCode::SIX):
             sdlKey = SDLK_6;
             break;
-        case(SEVEN):
+        case(KeyCode::SEVEN):
             sdlKey = SDLK_7;
             break;
-        case(EIGHT):
+        case(KeyCode::EIGHT):
             sdlKey = SDLK_8;
             break;
-        case(NINE):
+        case(KeyCode::NINE):
             sdlKey = SDLK_9;
             break;
-        case(ZERO):
+        case(KeyCode::ZERO):
             sdlKey = SDLK_0;
             break;
-        case(PANEL_ONE):
+        case(KeyCode::PANEL_ONE):
             sdlKey = SDLK_KP_1;
             break;
-        case(PANEL_TWO):
+        case(KeyCode::PANEL_TWO):
             sdlKey = SDLK_KP_2;
             break;
-        case(PANEL_THREE):
+        case(KeyCode::PANEL_THREE):
             sdlKey = SDLK_KP_3;
             break;
-        case(PANEL_FOUR):
+        case(KeyCode::PANEL_FOUR):
             sdlKey = SDLK_KP_4;
             break;
-        case(PANEL_FIVE):
+        case(KeyCode::PANEL_FIVE):
             sdlKey = SDLK_KP_5;
             break;
-        case(PANEL_SIX):
+        case(KeyCode::PANEL_SIX):
             sdlKey = SDLK_KP_6;
             break;
-        case(PANEL_SEVEN):
+        case(KeyCode::PANEL_SEVEN):
             sdlKey = SDLK_KP_7;
             break;
-        case(PANEL_EIGHT):
+        case(KeyCode::PANEL_EIGHT):
             sdlKey = SDLK_KP_8;
             break;
-        case(PANEL_NINE):
+        case(KeyCode::PANEL_NINE):
             sdlKey = SDLK_KP_9;
             break;
-        case(PANEL_ZERO):
+        case(KeyCode::PANEL_ZERO):
             sdlKey = SDLK_KP_0;
             break;
-        case(PANEL_DIVIDE):
+        case(KeyCode::PANEL_DIVIDE):
             sdlKey = SDLK_KP_DIVIDE;
             break;
-        case(PANEL_MULTIPLY):
+        case(KeyCode::PANEL_MULTIPLY):
             sdlKey = SDLK_KP_MULTIPLY;
             break;
-        case(PANEL_MINUS):
+        case(KeyCode::PANEL_MINUS):
             sdlKey = SDLK_KP_MINUS;
             break;
-        case(PANEL_PLUS):
+        case(KeyCode::PANEL_PLUS):
             sdlKey = SDLK_KP_PLUS;
             break;
-        case(PANEL_DECIMAL):
+        case(KeyCode::PANEL_DECIMAL):
             sdlKey = SDLK_KP_DECIMAL;
             break;
-        case(LCTRL):
+        case(KeyCode::LCTRL):
             sdlKey = SDLK_LCTRL;
             break;
-        case(RCTRL):
+        case(KeyCode::RCTRL):
             sdlKey = SDLK_RCTRL;
             break;
-        case(ALT):
+        case(KeyCode::ALT):
             sdlKey = SDLK_LALT;
             break;
-        case(ALTGR):
+        case(KeyCode::ALTGR):
             sdlKey = SDLK_RALT;
             break;
-        case(LMAYUS):
+        case(KeyCode::LMAYUS):
             sdlKey = SDLK_LSHIFT;
             break;
-        case(RMAYUS):
+        case(KeyCode::RMAYUS):
             sdlKey = SDLK_RSHIFT;
             break;
-        case(TAB):
+        case(KeyCode::TAB):
             sdlKey = SDLK_TAB;
             break;
-        case(ESC):
+        case(KeyCode::ESC):
             sdlKey = SDLK_ESCAPE;
             break;
-        case(SUPR):
+        case(KeyCode::SUPR):
             sdlKey = SDLK_DELETE;
             break;
-        case(SUPER):
+        case(KeyCode::SUPER):
             sdlKey = SDLK_HOME;
             break;
-        case(BACKLASH):
+        case(KeyCode::BACKLASH):
             sdlKey = SDLK_BACKSLASH;
             break;
-        case(SLASH):
+        case(KeyCode::SLASH):
             sdlKey = SDLK_SLASH;
             break;
-        case(RETURN):
+        case(KeyCode::RETURN):
             sdlKey = SDLK_RETURN;
             break;
-        case(BACKSPACE):
+        case(KeyCode::BACKSPACE):
             sdlKey = SDLK_BACKSPACE;
             break;
-        case(EXCLAMATION):
+        case(KeyCode::EXCLAMATION):
             sdlKey = SDLK_EXCLAIM;
             break;
-        case(DOUBLE_QUOTE):
+        case(KeyCode::DOUBLE_QUOTE):
             sdlKey = SDLK_QUOTEDBL;
             break;
-        case(SIMPLE_QUOTE):
+        case(KeyCode::SIMPLE_QUOTE):
             sdlKey = SDLK_QUOTE;
             break;
-        case(HASH):
+        case(KeyCode::HASH):
             sdlKey = SDLK_HASH;
             break;
-        case(PERCENT):
+        case(KeyCode::PERCENT):
             sdlKey = SDLK_HASH;
             break;
-        case(DOLLAR):
+        case(KeyCode::DOLLAR):
             sdlKey = SDLK_DOLLAR;
             break;
-        case(AMPERSAND):
+        case(KeyCode::AMPERSAND):
             sdlKey = SDLK_AMPERSAND;
             break;
-        case(LEFT_PARENTHESIS):
+        case(KeyCode::LEFT_PARENTHESIS):
             sdlKey = SDLK_LEFTPAREN;
             break;
-        case(RIGHT_PARENTHESIS):
+        case(KeyCode::RIGHT_PARENTHESIS):
             sdlKey = SDLK_RIGHTPAREN;
             break;
-        case(ASTERISK):
+        case(KeyCode::ASTERISK):
             sdlKey = SDLK_ASTERISK;
             break;
-        case(PLUS):
+        case(KeyCode::PLUS):
             sdlKey = SDLK_PLUS;
             break;
-        case(MINUS):
+        case(KeyCode::MINUS):
             sdlKey = SDLK_MINUS;
             break;
-        case(COMMA):
+        case(KeyCode::COMMA):
             sdlKey = SDLK_COMMA;
             break;
-        case(PERIOD):
+        case(KeyCode::PERIOD):
             sdlKey = SDLK_PERIOD;
             break;
-        case(COLON):
+        case(KeyCode::COLON):
             sdlKey = SDLK_COLON;
             break;
-        case(SEMICOLON):
+        case(KeyCode::SEMICOLON):
             sdlKey = SDLK_SEMICOLON;
             break;
-        case(LESS):
+        case(KeyCode::LESS):
             sdlKey = SDLK_LESS;
             break;
-        case(EQUALS):
+        case(KeyCode::EQUALS):
             sdlKey = SDLK_EQUALS;
             break;
-        case(GREATER):
+        case(KeyCode::GREATER):
             sdlKey = SDLK_GREATER;
             break;
-        case(QUESTION):
+        case(KeyCode::QUESTION):
             sdlKey = SDLK_QUESTION;
             break;
-        case(ARROBA):
+        case(KeyCode::ARROBA):
             sdlKey = SDLK_AT;
             break;
-        case(LEFT_BRACKET):
+        case(KeyCode::LEFT_BRACKET):
             sdlKey = SDLK_LEFTBRACKET;
             break;
-        case(RIGHT_BRACKET):
+        case(KeyCode::RIGHT_BRACKET):
             sdlKey = SDLK_RIGHTBRACKET;
             break;
-        case(CARET):
+        case(KeyCode::CARET):
             sdlKey = SDLK_CARET;
             break;
-        case(UNDERSCORE):
+        case(KeyCode::UNDERSCORE):
             sdlKey = SDLK_UNDERSCORE;
             break;
-        case(BACKQUOTE):
+        case(KeyCode::BACKQUOTE):
             sdlKey = SDLK_BACKQUOTE;
             break;
-        case(UP_ARROW):
+        case(KeyCode::UP_ARROW):
             sdlKey = SDLK_UP;
             break;
-        case(DOWN_ARROW):
+        case(KeyCode::DOWN_ARROW):
             sdlKey = SDLK_DOWN;
             break;
-        case(LEFT_ARROW):
+        case(KeyCode::LEFT_ARROW):
             sdlKey = SDLK_LEFT;
             break;
-        case(RIGHT_ARROW):
+        case(KeyCode::RIGHT_ARROW):
             sdlKey = SDLK_RIGHT;
             break;
-        case(F1):
+        case(KeyCode::F1):
             sdlKey = SDLK_F1;
             break;
-        case(F2):
+        case(KeyCode::F2):
             sdlKey = SDLK_F2;
             break;
-        case(F3):
+        case(KeyCode::F3):
             sdlKey = SDLK_F3;
             break;
-        case(F4):
+        case(KeyCode::F4):
             sdlKey = SDLK_F4;
             break;
-        case(F5):
+        case(KeyCode::F5):
             sdlKey = SDLK_F5;
             break;
-        case(F6):
+        case(KeyCode::F6):
             sdlKey = SDLK_F6;
             break;
-        case(F7):
+        case(KeyCode::F7):
             sdlKey = SDLK_F7;
             break;
-        case(F8):
+        case(KeyCode::F8):
             sdlKey = SDLK_F8;
             break;
-        case(F9):
+        case(KeyCode::F9):
             sdlKey = SDLK_F9;
             break;
-        case(F10):
+        case(KeyCode::F10):
             sdlKey = SDLK_F10;
             break;
-        case(F11):
+        case(KeyCode::F11):
             sdlKey = SDLK_F11;
             break;
-        case(F12):
+        case(KeyCode::F12):
             sdlKey = SDLK_F12;
             break;
         default:

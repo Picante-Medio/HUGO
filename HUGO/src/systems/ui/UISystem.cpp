@@ -378,7 +378,7 @@ void UISystem::processInput()
 
     bool anyFieldActive = false; // flag to control SDL text input
     // handle mouse click: activate/deactivate input fields
-    if (input->wasMouseButtonJustPressed(HUGO::MOUSE_LEFT)) {
+    if (input->wasMouseButtonJustPressed(HUGO::MouseCode::MOUSE_LEFT)) {
         for (auto& pack : scene->query<PanelComponent, TextComponent, InputFieldComponent>()) {
             PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
             TextComponent& text = pack.getDeprecated<TextComponent&>();
@@ -416,7 +416,7 @@ void UISystem::processInput()
                 break;
             }
         }
-    } else if (input->wasMouseButtonJustReleased(HUGO::MOUSE_LEFT))
+    } else if (input->wasMouseButtonJustReleased(HUGO::MouseCode::MOUSE_LEFT))
     {
     
         for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
@@ -467,7 +467,7 @@ void UISystem::processInput()
         bool mouseOverTrack = isMouseOverPanel(panel, mouse.x, mouse.y);
 
         // check for initial click to start dragging
-        if ((mouseOverKnob || mouseOverTrack) && input->wasMouseButtonJustPressed(HUGO::MOUSE_LEFT))
+        if ((mouseOverKnob || mouseOverTrack) && input->wasMouseButtonJustPressed(HUGO::MouseCode::MOUSE_LEFT))
         {
             slider.isDragging = true;
             
@@ -496,7 +496,7 @@ void UISystem::processInput()
         // handle active dragging
         if (slider.isDragging)
         {
-            if (input->wasMouseButtonJustPressed(HUGO::MOUSE_LEFT))
+            if (input->wasMouseButtonJustPressed(HUGO::MouseCode::MOUSE_LEFT))
             {
                 HUGO::Float percent = 0.0f;
                 
@@ -551,7 +551,7 @@ void UISystem::processInput()
         }
 
         // backspace -> remove last character
-        if (input->wasKeyJustPressed(HUGO::BACKSPACE) && field.cursorPos > 0) {
+        if (input->wasKeyJustPressed(HUGO::KeyCode::BACKSPACE) && field.cursorPos > 0) {
             field.fullText.erase(field.cursorPos - 1, 1);
             field.cursorPos--;
             changed = true;
@@ -649,7 +649,7 @@ void UISystem::clearAllCaches()
 void UISystem::init()
 {
     renderWindow = OgreModule::Instance().getOgreRenderWindow();
-    scene->getInput()->registerAction("SubmitInput", {HUGO::RETURN});
+    scene->getInput()->registerAction("SubmitInput", {HUGO::KeyCode::RETURN});
 }
 
 void UISystem::onLoad() {}

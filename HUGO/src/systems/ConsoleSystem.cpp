@@ -108,18 +108,18 @@ void ConsoleSystem::receiveInput(const HUGO::String& input){
 
 void ConsoleSystem::handleKeyInput(){
 
-    if(active && scene->getInput()->wasKeyJustPressed(HUGO::UP_ARROW)){
+    if(active && scene->getInput()->wasKeyJustPressed(HUGO::KeyCode::UP_ARROW)){
         HUGO::String next = getNextHistoric();
         scene->getComponent<InputFieldComponent>(consoleInput).fullText = next;
         scene->getComponent<TextComponent>(consoleInput).text = next;
     }
-    if(active && scene->getInput()->wasKeyJustPressed(HUGO::DOWN_ARROW)){
+    if(active && scene->getInput()->wasKeyJustPressed(HUGO::KeyCode::DOWN_ARROW)){
         HUGO::String prev = getPreviousHistoric();
         scene->getComponent<InputFieldComponent>(consoleInput).fullText = prev;
         scene->getComponent<TextComponent>(consoleInput).text = prev;
     }
-    if(scene->getInput()->isKeyPressed(HUGO::LCTRL) &&
-       scene->getInput()->wasKeyJustPressed(HUGO::T))
+    if(scene->getInput()->isKeyPressed(HUGO::KeyCode::LCTRL) &&
+       scene->getInput()->wasKeyJustPressed(HUGO::KeyCode::T))
     {
         active = !active;
         HUGO::Vector4 colour = {1.0, 1.0, 1.0, 1.0};

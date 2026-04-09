@@ -47,15 +47,15 @@ void CameraMovementSystem::update(double dt) {
 
         auto input = scene->getInput();
         float delta = static_cast<float>(dt);
-        if(input->isKeyPressed(HUGO::W)) tr.setPosition(tr.getPosition() + tr.getRotation().forward() * (-0.05f)* delta);
-        if(input->isKeyPressed(HUGO::A)) tr.setPosition(tr.getPosition() + tr.getRotation().right() *(-0.05f)* delta);
-        if(input->isKeyPressed(HUGO::S)) tr.setPosition(tr.getPosition() + tr.getRotation().forward() * (0.05f)* delta);
-        if(input->isKeyPressed(HUGO::D)) tr.setPosition(tr.getPosition() + tr.getRotation().right() *(0.05f)* delta);
+        if(input->isKeyPressed(HUGO::KeyCode::W)) tr.setPosition(tr.getPosition() + tr.getRotation().forward() * (-0.05f)* delta);
+        if(input->isKeyPressed(HUGO::KeyCode::A)) tr.setPosition(tr.getPosition() + tr.getRotation().right() *(-0.05f)* delta);
+        if(input->isKeyPressed(HUGO::KeyCode::S)) tr.setPosition(tr.getPosition() + tr.getRotation().forward() * (0.05f)* delta);
+        if(input->isKeyPressed(HUGO::KeyCode::D)) tr.setPosition(tr.getPosition() + tr.getRotation().right() *(0.05f)* delta);
 
         //std::cout << "CamPos = " << tr.position.x << " " << tr.position.y <<" " << tr.position.z << "\n";
     }
 
-    if(scene->getInput()->wasKeyJustPressed(HUGO::Q)){
+    if(scene->getInput()->wasKeyJustPressed(HUGO::KeyCode::Q)){
         if(settingCam1){
             scene->getComponent<CameraComponent>(cam1).setMain(true);
             scene->getComponent<CameraComponent>(cam2).setMain(false);

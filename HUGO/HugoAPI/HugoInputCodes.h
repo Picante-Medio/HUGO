@@ -2,7 +2,7 @@
 
 namespace HUGO{
 
-    enum KeyCode{
+    enum class KeyCode{
         UNKNOWN,
         Q,
         W,
@@ -113,7 +113,7 @@ namespace HUGO{
         F12
     };
 
-    enum MouseCode{
+    enum class MouseCode{
         MOUSE_UNKNOWN,
         MOUSE_LEFT,
         MOUSE_MIDDLE,
