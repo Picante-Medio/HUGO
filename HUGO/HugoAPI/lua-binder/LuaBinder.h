@@ -1,5 +1,7 @@
 #pragma once
 
+#include "UtilsAPI.h"
+
 #include "HugoError.h"
 #include "HugoMath.h"
 #include "HugoTypes.h"
@@ -63,13 +65,9 @@ struct LuaRuntimeError : Error {
 };
 #pragma endregion
 
-class LuaBinder {
+class UTILS_API LuaBinder {
     //pointer to the lua interpeter instance
     lua_State* lua;
-    HUGO::String basePath = "";
-
-    // Stores the instance to LuaBinder
-    inline static std::shared_ptr<LuaBinder> instance = nullptr;
 
     // private functions that relates a given lua name to a function pointer call
     template<typename ReturnType, typename ...ArgTypes, std::size_t... I>
@@ -101,16 +99,11 @@ class LuaBinder {
     void setLuaPath(HUGO::String path);
 public:
 
-    LuaBinder() = default;
+    LuaBinder();
     ~LuaBinder();
 
-    static std::shared_ptr<LuaBinder> getInstance();
-    static void setInstance(std::shared_ptr<LuaBinder>);
+    static LuaBinder& getInstance();
 
-    //Init must be called before using lua
-    void Init();
-
-    void setScriptPath(HUGO::String path);
     void setPrintFunction(lua_CFunction nPrint);
 
     /* Register a standalone cpp function to call it from lua.
@@ -157,10 +150,6 @@ public:
     }
 
     //Functions to call entire lua files
-    
-    // Call a lua script that returns nothing, or ignore its return value.
-    // it returns an error if the file is not found or lua rises an error
-    ErrorOrVoid runFile(HUGO::String path); 
 
     // Call a lua script and get its value as a T. If the value can't be converted to T.
     // it returns an error if the file is not found, lua rises an error or the value is not a T

@@ -5,41 +5,17 @@
 #include "HugoError.h"
 #include "HugoTypes.h"
 
+LuaBinder::LuaBinder() {
+    lua = luaL_newstate();
+    luaL_openlibs(lua);
+}
+
 LuaBinder::~LuaBinder() { lua_close(lua); }
 
-void 
-LuaBinder::setInstance(std::shared_ptr<LuaBinder> newInstance) {
-    instance = newInstance;
-}
-
-std::shared_ptr<LuaBinder> 
+LuaBinder&
 LuaBinder::getInstance() {
+    static LuaBinder instance = LuaBinder();
     return instance;
-}
-
-void LuaBinder::Init() {
-  lua = luaL_newstate();
-  luaL_openlibs(lua);
-}
-
-ErrorOrVoid LuaBinder::runFile(HUGO::String path) {
-    HUGO::String fullPath = basePath + path;
-  // If path is invalid
-    if (luaL_loadfile(lua, fullPath.c_str()) != LUA_OK) {
-        StringError error = StringError(HUGO::String(lua_tostring(lua, -1)));
-        lua_pop(lua, 1);
-        return ErrorOrVoid(error);
-    }
-
-    // If lua crashes on runtime
-    if (lua_pcall(lua, 0, 0, 0) != LUA_OK) {
-        StringError error = StringError(HUGO::String(lua_tostring(lua, -1)));
-        lua_pop(lua, 1);
-        return ErrorOrVoid(error);
-    }
-
-    // Otherwise
-    return ErrorOrVoid();
 }
 
 ErrorOrVoid
@@ -72,12 +48,6 @@ void LuaBinder::setLuaPath(HUGO::String path )
     lua_setfield(lua, -2, "path");
 
     lua_pop(lua, 1); // pop package
-}
-
-
-void 
-LuaBinder::setScriptPath(HUGO::String path) {
-    basePath = path;
 }
 
 void

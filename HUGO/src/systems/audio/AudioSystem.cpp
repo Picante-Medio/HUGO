@@ -361,8 +361,8 @@ void AudioSystem::fixedUpdate(double)
 }
 
 void AudioSystem::onLoad(){
-    std::shared_ptr<LuaBinder> luaBinder = LuaBinder::getInstance();
-    luaBinder->registerMethod<AudioSystem, void, int, int>(*this, &AudioSystem::playAudioLUA, "playAudio");
+    LuaBinder& luaBinder = LuaBinder::getInstance();
+    luaBinder.registerMethod<AudioSystem, void, int, int>(*this, &AudioSystem::playAudioLUA, "playAudio");
 }
 
 void AudioSystem::init(){

@@ -1,8 +1,12 @@
 #pragma once
+
+#include "UtilsAPI.h"
+
 namespace HUGO {
 	struct Radian;
 	struct Degree;
-	struct Vector2
+	
+	struct UTILS_API Vector2
 	{
 		float x, y;
 
@@ -27,9 +31,9 @@ namespace HUGO {
 	};
 
 	// Scalar multiplication from left
-	Vector2 operator*(float scalar, const Vector2& v);
+	Vector2 UTILS_API operator*(float scalar, const Vector2& v);
 
-	struct Vector3
+	struct UTILS_API Vector3
 	{
 		float x, y, z;
 		Vector3();
@@ -55,9 +59,9 @@ namespace HUGO {
 		Vector3 normalized() const;
 	};
 
-	Vector3 operator*(float scalar, const Vector3& v);
+	Vector3 UTILS_API operator*(float scalar, const Vector3& v);
 
-	struct Vector4
+	struct UTILS_API Vector4
 	{
 		float x, y, z, w;
 		Vector4();
@@ -78,7 +82,7 @@ namespace HUGO {
 		void normalize();
 	};
 
-	struct Quaternion
+	struct UTILS_API Quaternion
 	{
 		float w, x, y, z;
 
@@ -96,15 +100,15 @@ namespace HUGO {
 		void operator*=(const Quaternion& other);
 		void normalize();
 	};
-	Quaternion operator*(const Quaternion& a, const Quaternion& b);
+	Quaternion UTILS_API operator*(const Quaternion& a, const Quaternion& b);
 		// multiplying a quaternion
-	Vector3 operator*(const Quaternion& q, const Vector3& v);
+	Vector3 UTILS_API operator*(const Quaternion& q, const Vector3& v);
 
-	Quaternion operator+(const Quaternion& l, const Quaternion& r);
+	Quaternion UTILS_API operator+(const Quaternion& l, const Quaternion& r);
 
-	Quaternion operator* (const Quaternion& q, const float& f);
+	Quaternion UTILS_API operator* (const Quaternion& q, const float& f);
 	
-	struct Radian {
+	struct UTILS_API Radian {
         float rad;
 
         Radian(float r = 0);
@@ -133,7 +137,7 @@ namespace HUGO {
         bool operator >  ( const Radian& d ) const;
     };
 
-	struct Degree {
+	struct UTILS_API Degree {
 		float deg;
 
 		Degree(float d = 0);

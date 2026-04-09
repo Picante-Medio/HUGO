@@ -6,11 +6,6 @@
 
 #include <iostream>
 
-void InitializeGame(std::shared_ptr<HUGO::ComponentRegistry> registry, std::shared_ptr<LuaBinder> luaBinder) {
-    HUGO::ComponentRegistry::setInstance(registry);
-    LuaBinder::setInstance(luaBinder);
-}
-
 bool GenerateComponent(std::shared_ptr<HUGO::IScene> scene, EntityID ent, const std::string& component, 
     const std::unordered_map<std::string, HVariant>& componentMembers) {
 

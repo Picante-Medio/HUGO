@@ -7,17 +7,21 @@ foreach(path ${HugoAPI_DIRS})
     endif()
 endforeach()
 
-add_library(HugoAPI INTERFACE)
+file(GLOB_RECURSE HugoAPI_SRC_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/HugoAPI/*.cpp)
+
+add_library(HugoAPI SHARED ${HugoAPI_SRC_FILES})
+enable_warnings(HugoAPI)
 
 set_target_properties(HugoAPI PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
     DEBUG_POSTFIX "d"
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
     ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/lib
     ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/lib)
+target_compile_definitions(HugoAPI PRIVATE BUILD_UTILS_API)
 
-target_include_directories(HugoAPI INTERFACE ${HugoAPI_INCLUDE_DIRS})
+target_include_directories(HugoAPI PUBLIC ${HugoAPI_INCLUDE_DIRS})
+target_link_libraries(HugoAPI PUBLIC 
+    lua_shared)
 
-# Temporary
-target_link_libraries(HugoAPI INTERFACE 
-    SDL2::SDL2
-    SDL2::SDL2main)
+get_target_property(HUGO_INCLUDES HugoAPI INCLUDE_DIRECTORIES)

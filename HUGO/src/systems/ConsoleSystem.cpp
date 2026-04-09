@@ -83,25 +83,25 @@ void ConsoleSystem::receiveInput(const HUGO::String& input){
 
     if(expectsReturn){
         if(type == "int"){
-            ErrorOrType<HUGO::Int> returnedInfo = LuaBinder::getInstance()->getFromString<HUGO::Int>(command);
+            ErrorOrType<HUGO::Int> returnedInfo = LuaBinder::getInstance().getFromString<HUGO::Int>(command);
             handleReturn<HUGO::Int>(returnedInfo);
         }
         else if(type == "float"){
-            ErrorOrType<HUGO::Float> returnedInfo = LuaBinder::getInstance()->getFromString<HUGO::Float>(command);
+            ErrorOrType<HUGO::Float> returnedInfo = LuaBinder::getInstance().getFromString<HUGO::Float>(command);
             handleReturn<HUGO::Float>(returnedInfo);
         }
         else if (type == "bool"){
-            ErrorOrType<bool> returnedInfo = LuaBinder::getInstance()->getFromString<bool>(command);
+            ErrorOrType<bool> returnedInfo = LuaBinder::getInstance().getFromString<bool>(command);
             handleReturn<bool>(returnedInfo);
         }
         else if (type == "string"){
-            ErrorOrType<HUGO::String> returnedInfo = LuaBinder::getInstance()->getFromString<HUGO::String>(command);
+            ErrorOrType<HUGO::String> returnedInfo = LuaBinder::getInstance().getFromString<HUGO::String>(command);
             handleReturn<HUGO::String>(returnedInfo);
         }
         else scene->log(std::shared_ptr<Error>(new StringError("LUA: Invalid return type")));
     }
     else{
-        ErrorOrVoid error = LuaBinder::getInstance()->interpretString(command);
+        ErrorOrVoid error = LuaBinder::getInstance().interpretString(command);
         if(error.isError()) scene->log(std::make_shared<StringError>(error.getError()));
     }
 }
@@ -162,7 +162,7 @@ void ConsoleSystem::onLoad(){
 
 void ConsoleSystem::init(){
     
-    LuaBinder::getInstance()->setPrintFunction(consoleLuaPrint);
+    LuaBinder::getInstance().setPrintFunction(consoleLuaPrint);
     active = true;
     historyIndex = 0;
 

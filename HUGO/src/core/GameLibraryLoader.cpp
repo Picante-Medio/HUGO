@@ -1,6 +1,5 @@
 #include "GameLibraryLoader.h"
 
-#include "ComponentRegistryInitializer.h"
 #include "LuaBinder.h"
 
 HUGO::GameLibraryLoader::GameLibraryLoader(const std::string& gameLibraryName) {
@@ -25,11 +24,6 @@ HUGO::GameLibraryLoader::GameLibraryLoader(const std::string& gameLibraryName) {
     if (!gameHandle) {
         throw std::runtime_error("[GameLibraryLoader] Error loading " + gameLibraryName);
     }
-    initializeGameFnPointer = reinterpret_cast<InitializeGameFn>(GET_FUNC(gameHandle, "InitializeGame"));
-    if (!initializeGameFnPointer) {
-        throw std::runtime_error("[GameLibraryLoader] void InitializeGame(std::shared_ptr<ComponentRegistry> " 
-            "not found in " + gameLibraryName);
-    }
     generateComponentFnPointer = reinterpret_cast<GenerateComponentFn>(GET_FUNC(gameHandle, "GenerateComponent"));
     if (!generateComponentFnPointer) {
         throw std::runtime_error("[GameLibraryLoader] bool GenerateComponent(std::shared_ptr<HUGO::IScene>, EntityID, " 
@@ -40,8 +34,6 @@ HUGO::GameLibraryLoader::GameLibraryLoader(const std::string& gameLibraryName) {
         throw std::runtime_error("[GameLibraryLoader] bool GenerateAndGetSystemFn(std::shared_ptr<HUGO::IScene>, "
             "EntityID, const std::string&, std::shared_ptr<System>&)  not found in " + gameLibraryName);
     }
-
-    initializeGameFnPointer(ComponentRegistryInitializer::getInstance(), LuaBinder::getInstance());
 }
 
 HUGO::GameLibraryLoader::~GameLibraryLoader() {

@@ -14,6 +14,4 @@ set_target_properties(TestGame PROPERTIES
 target_include_directories(TestGame PRIVATE ${CMAKE_SOURCE_DIR}/TestGame)
 
 target_link_libraries(TestGame PRIVATE 
-    HugoAPI
-    HugoUtils
-    LuaBinder)
+    HugoAPI)

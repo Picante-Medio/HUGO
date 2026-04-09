@@ -27,8 +27,6 @@ namespace HUGO {
 
 class GameLibraryLoader {
 
-    typedef void (*InitializeGameFn)(std::shared_ptr<HUGO::ComponentRegistry>, std::shared_ptr<LuaBinder>);
-
     typedef bool (*GenerateComponentFn)(std::shared_ptr<HUGO::IScene>, EntityID, const std::string&,
         const std::unordered_map<std::string, HVariant>&);
 
@@ -41,7 +39,6 @@ class GameLibraryLoader {
     static inline std::unique_ptr<GameLibraryLoader> loaderInstance = nullptr;
 
     LIBRARY_HANDLE gameHandle = nullptr;
-    InitializeGameFn initializeGameFnPointer = nullptr;
     GenerateComponentFn generateComponentFnPointer = nullptr;    
     GenerateAndGetSystemFn generateAndGetSystemFnPointer = nullptr;
 

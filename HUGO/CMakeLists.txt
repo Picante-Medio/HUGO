@@ -17,11 +17,9 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE)
 include(cmake/Dependencies.cmake)
 include(cmake/Functions.cmake)
 
-################################## HugoLib
+################################## HugoAPI
 
 include(cmake/HugoAPI.cmake)
-include(cmake/HugoUtils.cmake)
-include(cmake/LuaBinder.cmake)
 
 ################################## Aquí empieza el proyecto principal
 
@@ -64,9 +62,7 @@ target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     ${HUGO_LINKED_LIBRARIES}
-    HugoAPI
-    HugoUtils
-    LuaBinder)
+    HugoAPI)
 
 set(CMAKE_SKIP_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)

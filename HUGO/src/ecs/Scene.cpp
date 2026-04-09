@@ -26,14 +26,13 @@ Scene::Scene(std::shared_ptr<HUGO::IInput> input, HUGO::SceneManager& sceneManag
 {
 	entityTable = std::make_unique<EntityTable>();
 	componentTable = std::make_unique<ComponentDenseTable>();
-	messenger = HUGO::Messenger();
 }
 
 //Load method is called when the scene is loaded so LUA methods are overwritten
 void Scene::load() {
-    std::shared_ptr<LuaBinder> luaBinder = LuaBinder::getInstance();
-	luaBinder->registerMethod<Scene, void, int>(*this, &Scene::removeEntityLUA, "RemoveEntity");
-	luaBinder->registerMethod<Scene, int>(*this, &Scene::createEntityLUA, "CreateEntity");
+    LuaBinder& luaBinder = LuaBinder::getInstance();
+	luaBinder.registerMethod<Scene, void, int>(*this, &Scene::removeEntityLUA, "RemoveEntity");
+	luaBinder.registerMethod<Scene, int>(*this, &Scene::createEntityLUA, "CreateEntity");
 
 	for(std::shared_ptr<HUGO::System> system : systems) {
 		system->onLoad();

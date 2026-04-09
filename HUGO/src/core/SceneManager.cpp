@@ -19,7 +19,7 @@ SceneManager::SceneManager(std::shared_ptr<HUGO::IInput> inputModule): m_chatPar
 ErrorOrVoid SceneManager::initializeParser(const HUGO::String& chatFolder, std::shared_ptr<IPhysicsModule> physicsModule){
 
     //Must be called after initialization of LuaBinder
-    LuaBinder::getInstance()->registerMethod<SceneManager, void, HUGO::String>(*this, &SceneManager::setCurrentSceneLUA, "SetCurrentScene");
+    LuaBinder::getInstance().registerMethod<SceneManager, void, HUGO::String>(*this, &SceneManager::setCurrentSceneLUA, "SetCurrentScene");
 
     m_physicsModule = physicsModule;
 

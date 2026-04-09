@@ -22,7 +22,6 @@
 //#include "ResourceManager.h"
 
 #include "ChatParser.h"
-#include "ComponentRegistryInitializer.h"
 
 #include "LuaBinder.h"
 
@@ -37,9 +36,6 @@ Core::Core(): input(std::make_shared<Input>()), sceneManager(input)
 
 //Initialization of HUGO modules and loading of games dynamic lib
 ErrorOrVoid Core::init(){
-
-    // Initialize component registry
-    ComponentRegistry::setInstance(std::make_shared<ComponentRegistryInitializer>());
 
     //LuaBinder initialization
     initLua();
@@ -124,14 +120,11 @@ void Core::run(){
 void 
 Core::initLua() {
     //LuaBinder init
-    std::shared_ptr<LuaBinder> instance = std::make_shared<LuaBinder>();
-    instance->Init();
-    LuaBinder::setInstance(instance);
 
     std::filesystem::path luaPath = std::filesystem::absolute(
         std::filesystem::path("..") / "src" / "lua"
     );
-    LuaBinder::getInstance()->requireFolder(luaPath.string());
+    LuaBinder::getInstance().requireFolder(luaPath.string());
 }
 
 void HUGO::Core::initAudioAssets()

@@ -9,7 +9,7 @@
 #define HCOMPONENT(COMPONENT_NAME) \
     struct COMPONENT_NAME: Component { \
         COMPONENT_NAME(EntityID ent): Component(ent) {} \
-        static inline const std::string name = #COMPONENT_NAME; \
+        static inline const char *name = #COMPONENT_NAME; \
         using ThisComponent = COMPONENT_NAME; \
         struct Reflection { \
             static std::unordered_map<std::string, std::unique_ptr<IFieldData<COMPONENT_NAME>>>& members() { \

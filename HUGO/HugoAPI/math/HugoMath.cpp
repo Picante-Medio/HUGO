@@ -46,10 +46,6 @@ namespace HUGO {
 		return Vector2(x / len, y / len);
 	}
 
-	// Scalar multiplication from left
-	Vector2 operator*(float scalar, const Vector2& v) {
-		return Vector2(v.x * scalar, v.y * scalar);
-	}
     Vector3::Vector3()
 		: x(0.0f), y(0.0f), z(0.0f) {}
     Vector3::Vector3(float n)
