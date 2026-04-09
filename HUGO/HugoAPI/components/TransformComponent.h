@@ -6,15 +6,15 @@
 
 HCOMPONENT(TransformComponent)
 private:
+    //Local transform
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Vector3, position, HUGO::Vector3())
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Quaternion, rotation, HUGO::Quaternion())
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Vector3, scale, HUGO::Vector3())
+    
     //world transform
     HUGO::Vector3 worldPosition = HUGO::Vector3(0, 0, 0);
     HUGO::Quaternion worldRotation = HUGO::Quaternion(1,0,0,0);
     HUGO::Vector3 worldScale = HUGO::Vector3(1, 1, 1);
-
-    //Local transform
-    HUGO::Vector3 position = HUGO::Vector3(0, 0, 0);
-    HUGO::Quaternion rotation = HUGO::Quaternion(1,0,0,0);
-    HUGO::Vector3 scale = HUGO::Vector3(1, 1, 1);
 
     bool needUpdateLocalPosition = false;
     bool needUpdateWorldPosition = false;
@@ -22,6 +22,7 @@ private:
     bool needUpdateWorldRotation = false;
     bool needUpdateLocalScale = false;
     bool needUpdateWorldScale = false;
+
 public:
     inline void setPosition(HUGO::Vector3 newPosition){
         position = newPosition;
@@ -68,8 +69,5 @@ public:
     }
 
     friend class HierarchySystem;
-END_HCOMPONENT()
-
-HCOMPONENT(TransformDirtyTag)
 END_HCOMPONENT()
 

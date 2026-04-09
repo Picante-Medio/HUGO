@@ -3,11 +3,9 @@
 #include "HugoComponentMacros.h"
 
 HCOMPONENT(RenderComponent)
+    DEFAULT_SERIALIZED_MEMBER(HUGO::String, meshName, "cube.mesh")
+    DEFAULT_SERIALIZED_MEMBER(HUGO::String, materialName, "")
 
-private:
-    HUGO::String meshName="cube.mesh";
-    HUGO::String materialName="";
-public:
     // Setter
     inline void setMeshName(const HUGO::String& newMeshName) { meshName = newMeshName; }
     inline void setMaterialName(const HUGO::String& newMaterialName) { materialName = newMaterialName; }
@@ -15,7 +13,5 @@ public:
     inline HUGO::String getMeshName() const { return meshName; }
     inline HUGO::String getMaterialName() const { return materialName; }
     
-    friend class RenderSystem;
-
 END_HCOMPONENT()
 
