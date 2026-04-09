@@ -155,6 +155,28 @@ void UISystem::syncPanel(const PanelComponent &p)
     if (!p.material.empty()) cache->container->setMaterialName(p.material);
 }
 
+HUGO::String UISystem::formatText(const HUGO::String & text, Ogre::TextAreaOverlayElement *textArea, HUGO::Float maxWidth, HUGO::Float characterHeight)
+{
+    if (!textArea || !textArea->getFont() || text.empty())
+        return text;
+
+    HUGO::String result;
+    HUGO::Float charWidth, currentWidth = 0.0f;
+
+    for(char c : text){
+        if(c == '\n' || currentWidth >= maxWidth){
+            result += '\n';
+            currentWidth = 0.0f;
+        }
+        else{
+            charWidth = textArea->getFont()->getGlyphAspectRatio(c) * characterHeight;
+            currentWidth += charWidth;
+            result += c;
+        }
+    }
+    return result;
+}
+
 void UISystem::syncText(const TextComponent &t)
 {
     UIElementCache *cache = getCache(t.entity);
@@ -164,8 +186,12 @@ void UISystem::syncText(const TextComponent &t)
     Ogre::TextAreaOverlayElement *textArea = dynamic_cast<Ogre::TextAreaOverlayElement *>(cache->element);
     if (!textArea)
         return;
+   
+    if(t.maxWidth >= 0){
+        textArea->setCaption(formatText(t.text, textArea, t.maxWidth, t.characterHeight));
+    }
+    else textArea->setCaption(t.text);
 
-    textArea->setCaption(t.text);
     textArea->setCharHeight(t.characterHeight);
     textArea->setColour(Ogre::ColourValue(
         t.colour.x,
@@ -187,6 +213,7 @@ void UISystem::syncText(const TextComponent &t)
     textArea->setSpaceWidth(t.spaceWidth);
     textArea->setCharHeight(t.characterHeight);
     textArea->setLeft(t.left);
+
 }
 
 void UISystem::syncButton(const ButtonComponent &button, PanelComponent &panel)

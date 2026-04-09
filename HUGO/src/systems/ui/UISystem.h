@@ -59,6 +59,7 @@ bool isMouseOverPanel(const PanelComponent& panel, HUGO::Float mouseX, HUGO::Flo
 
 void syncPanel(const PanelComponent& p);
 void syncText(const TextComponent& t);
+HUGO::String formatText(const HUGO::String& text, Ogre::TextAreaOverlayElement* textArea,HUGO::Float maxWidth, HUGO::Float characterHeight);
 void syncButton(const ButtonComponent& b, PanelComponent& p);
 void syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr);
 void syncSlider(const PanelComponent& p, const SliderComponent& s);
