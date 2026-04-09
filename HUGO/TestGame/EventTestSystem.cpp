@@ -37,7 +37,7 @@ EventTestSystem::update(double dt) {
                 //testCmp.stringDePrueba = "Prueba modificada";
             });
 
-            scene->removeComponent<TestComponent>(elem.getConst<TestComponent>().entity);
+            //scene->removeComponent<TestComponent>(elem.getConst<TestComponent>().entity);
         }
 
         timer -= 5.0;

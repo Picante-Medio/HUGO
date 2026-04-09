@@ -4,6 +4,8 @@
 
 HSYSTEM(PhysicsTestSystem)
 
+    EntityID staticBase = 0;
+
 public:
     ~PhysicsTestSystem();
 
