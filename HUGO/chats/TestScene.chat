@@ -15,4 +15,3 @@ SYSTEM TestSystem
 SYSTEM MessagesTestSystem
 SYSTEM EventTestSystem
 SYSTEM UISystem
-SYSTEM LuaTestSystem

@@ -2,9 +2,15 @@ SCENE SecondScene
 
 SYSTEM AudioSystem
 SYSTEM RenderSystem
+SYSTEM LightSystem
+SYSTEM CameraSystem
 SYSTEM PhysicsTestSystem
 SYSTEM ConsoleSystem
 SYSTEM TweenSystem
 SYSTEM HierarchySystem
+SYSTEM ParticleSystem
 SYSTEM CameraMovementSystem
 SYSTEM PhysicsGizmoSystem
+SYSTEM TestSystem
+SYSTEM EventTestSystem
+SYSTEM UISystem

@@ -34,7 +34,7 @@ EventTestSystem::update(double dt) {
 
         for(auto& elem : scene->query<TestComponent>()){ 
             elem.modify<TestComponent>([](TestComponent& testCmp) {
-                testCmp.stringDePrueba = "Prueba modificada";
+                //testCmp.stringDePrueba = "Prueba modificada";
             });
 
             scene->removeComponent<TestComponent>(elem.getConst<TestComponent>().entity);
