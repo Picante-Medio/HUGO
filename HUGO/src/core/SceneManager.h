@@ -11,19 +11,15 @@ class IPhysicsModule;
 namespace HUGO {
     class IInput;
 
-    struct SceneBlock{
-        std::shared_ptr<Scene> scene;
-        bool needsInit;
-    };
-
     class SceneManager : public std::enable_shared_from_this<SceneManager> {
 
         HUGO::ChatParser m_chatParser;
         //Scene map that stores created game scenes.
-        std::unordered_map<HUGO::String, SceneBlock> m_sceneMap;
+        std::unordered_map<HUGO::String, std::shared_ptr<Scene>> m_sceneMap;
 
         //Pointer to a scene inside m_sceneMap. It is the scene that will be updated in the main loop.
         std::weak_ptr<Scene> m_currentScene;
+        HUGO::String m_currentSceneName;
 
         //Reads chatParser, creates a scene based on the SceneData, and indexes it in m_sceneMap.
         ErrorOrVoid loadScene(const HUGO::String& sceneName);
@@ -37,8 +33,13 @@ namespace HUGO {
         std::shared_ptr<HUGO::IInput> m_input;
 
         //Checkers for scene-changing requests
-        bool needsSceneChanged = false;
-        HUGO::String nextSceneName;
+        struct SceneChangeInfo{
+            bool needsSceneChanged = false;
+            HUGO::String nextSceneName;
+            bool destroyPreviousScene = false;
+        };
+
+        SceneChangeInfo m_sceneChangeInfo;
     public:
         //initializeParser() must be called after this.
         SceneManager(std::shared_ptr<HUGO::IInput> inputModule);
@@ -51,6 +52,8 @@ namespace HUGO {
         It requests it because the current update cycle needs to finish before m_currentScene can change.
         */
         void setCurrentScene(const HUGO::String& sceneName);
+        void setCurrentSceneAndDestroyPrevious(const HUGO::String& sceneName);
+        
         void setCurrentSceneLUA(const HUGO::String sceneName);
 
         //Called by HUGO::Core. If there is a request for a scene change, change m_currentScene

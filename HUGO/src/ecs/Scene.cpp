@@ -257,3 +257,8 @@ void
 Scene::changeScene(const HUGO::String& sceneName) {
     sceneManager.setCurrentScene(sceneName);
 }
+
+void 
+Scene::changeAndDestroyPreviousScene(const HUGO::String& sceneName) {
+    sceneManager.setCurrentSceneAndDestroyPrevious(sceneName);
+}

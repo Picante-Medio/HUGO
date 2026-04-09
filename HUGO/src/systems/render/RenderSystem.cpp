@@ -40,8 +40,6 @@ void RenderSystem::init(){
     
     sceneManager = OgreModule::Instance().getCurrentSceneManager();
 
-    sceneManager->addRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
-
     //components events
     scene->onAddComponent<RenderComponent>().connect(this, &RenderSystem::registerRenderEntity);
     scene->onAddComponent<AnimationComponent>().connect(this, &RenderSystem::onUpdateAnimationComponet);

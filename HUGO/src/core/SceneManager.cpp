@@ -35,6 +35,9 @@ ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
 
     OgreModule::Instance().createSceneManager(sceneName);
 
+    //Momentarialy sets Ogre::SceneManager to the loaded scene, then it is returned to the currentSceneManager
+    OgreModule::Instance().setCurrentSceneManager(sceneName);
+
     /*
     -> Create scene
 
@@ -42,32 +45,32 @@ ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
 
     -> Create entities with components
     */
-    m_sceneMap[sceneName].scene = std::make_shared<Scene>(m_input, *this);
-    m_sceneMap[sceneName].needsInit = true;
+    m_sceneMap[sceneName] = std::make_shared<Scene>(m_input, *this);
 
     for(auto systemName : sceneData.getValue().systems){
-        ErrorOrType<std::shared_ptr<HUGO::System>> value = HUGO::SystemFactory::makeSystem(m_sceneMap[sceneName].scene, systemName);
+        ErrorOrType<std::shared_ptr<HUGO::System>> value = HUGO::SystemFactory::makeSystem(m_sceneMap[sceneName], systemName);
 
         if(value.isError()) {
-            value = HUGO::GameLibraryLoader::instance().GenerateAndGetSystem(m_sceneMap[sceneName].scene, systemName);
+            value = HUGO::GameLibraryLoader::instance().GenerateAndGetSystem(m_sceneMap[sceneName], systemName);
             if (value.isError()) {
                 return ErrorOrVoid(value.getError());
             }
         }
 
-        m_sceneMap[sceneName].scene->addSystem(value.getValue());
+        m_sceneMap[sceneName]->addSystem(value.getValue());
+        value.getValue()->init();
     }
 
     
     for(auto entityData: sceneData.getValue().entities){
-        EntityID currEntity = m_sceneMap[sceneName].scene->createEntity();
+        EntityID currEntity = m_sceneMap[sceneName]->createEntity();
 
         for(auto componentData : entityData){
-            ErrorOrVoid compResult = HUGO::ComponentFactory::makeComponent(m_sceneMap[sceneName].scene, currEntity, 
+            ErrorOrVoid compResult = HUGO::ComponentFactory::makeComponent(m_sceneMap[sceneName], currEntity, 
                 componentData.componentName, componentData.parameters);
 
             if (compResult.isError()) {
-                compResult = HUGO::GameLibraryLoader::instance().GenerateComponent(m_sceneMap[sceneName].scene, currEntity, 
+                compResult = HUGO::GameLibraryLoader::instance().GenerateComponent(m_sceneMap[sceneName], currEntity, 
                     componentData.componentName, componentData.parameters);
                 if (compResult.isError()) {
                     return ErrorOrVoid(compResult.getError());
@@ -77,9 +80,11 @@ ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
         }
     }
 
+    OgreModule::Instance().setCurrentSceneManager(m_currentSceneName);
+
 
     //When no errors occurred, we add the scene to the physics simulation
-    m_physicsModule->createSceneSimulation(sceneName, m_sceneMap[sceneName].scene);
+    m_physicsModule->createSceneSimulation(sceneName, m_sceneMap[sceneName]);
 
     return ErrorOrVoid();
 }
@@ -101,35 +106,40 @@ void SceneManager::setCurrentSceneLUA(const HUGO::String sceneName){
 }
 
 void SceneManager::setCurrentScene(const HUGO::String& sceneName){
-    needsSceneChanged = true;
-    nextSceneName = sceneName;
+    m_sceneChangeInfo.needsSceneChanged = true;
+    m_sceneChangeInfo.nextSceneName = sceneName;
+    m_sceneChangeInfo.destroyPreviousScene = false;
+}
+
+void SceneManager::setCurrentSceneAndDestroyPrevious(const HUGO::String& sceneName){
+     m_sceneChangeInfo.needsSceneChanged = true;
+    m_sceneChangeInfo.nextSceneName = sceneName;
+    m_sceneChangeInfo.destroyPreviousScene = true;
 }
 
 void SceneManager::sceneChangeRequested(){
     //If not requested, return.
-    if(!needsSceneChanged) return;
-    needsSceneChanged = false;
+    if(!m_sceneChangeInfo.needsSceneChanged) return;
+        m_sceneChangeInfo.needsSceneChanged = false;
+    if(m_sceneChangeInfo.destroyPreviousScene) unloadScene(m_currentSceneName);
 
     //If requested scene is not loaded in the map, load it
-    if(m_sceneMap.find(nextSceneName) == m_sceneMap.end()){
-        ErrorOrVoid err = loadScene(nextSceneName);
+    if(m_sceneMap.find(m_sceneChangeInfo.nextSceneName) == m_sceneMap.end()){
+        ErrorOrVoid err = loadScene(m_sceneChangeInfo.nextSceneName);
 
         //Print error in lua console
         if(err.isError()){
             /* It should call Lua console to show the error */
-            m_currentScene.lock()->log(std::shared_ptr<Error>(new StringError(err.getError())));
+            if(!m_currentScene.expired())
+                m_currentScene.lock()->log(std::shared_ptr<Error>(new StringError(err.getError())));
         }
     }
 
     //Sets current sceneManager for the new one.
-    OgreModule::Instance().setCurrentSceneManager(nextSceneName);
+    OgreModule::Instance().setCurrentSceneManager(m_sceneChangeInfo.nextSceneName);
 
-    m_currentScene = m_sceneMap[nextSceneName].scene;
-
-    if(m_sceneMap[nextSceneName].needsInit){
-        m_currentScene.lock()->init();
-        m_sceneMap[nextSceneName].needsInit = false;
-    }
+    m_currentScene = m_sceneMap[m_sceneChangeInfo.nextSceneName];
+    m_currentSceneName = m_sceneChangeInfo.nextSceneName;
     
     m_currentScene.lock()->load();
 }

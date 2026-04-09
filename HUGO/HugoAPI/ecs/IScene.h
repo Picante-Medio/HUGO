@@ -204,6 +204,7 @@ public:
      * ERROR POSSIBLE: If the scene to change does not exist, logs an error to debug console
      */
     virtual void changeScene(const HUGO::String& sceneName) = 0;
+	virtual void changeAndDestroyPreviousScene(const HUGO::String& sceneName) = 0;
 };
 
 }

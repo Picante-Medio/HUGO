@@ -17,6 +17,7 @@
 #include "OgreUtils.h"
 
 #include "OgreTextAreaOverlayElement.h"
+#include "OgreOverlaySystem.h"
 
 //====================================================
 // DESTRUCTOR
@@ -649,6 +650,7 @@ void UISystem::clearAllCaches()
 void UISystem::init()
 {
     renderWindow = OgreModule::Instance().getOgreRenderWindow();
+    OgreModule::Instance().getCurrentSceneManager()->addRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
     scene->getInput()->registerAction("SubmitInput", {HUGO::KeyCode::RETURN});
 }
 
