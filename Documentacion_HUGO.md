@@ -324,7 +324,7 @@ Para gestionar las entidades renderizables, se ha utilizado un TAD propio, llama
 Faltan los mensajes de cuando se crean las entidades del render system desde fuera.
 
 ## Simulación de físicas
-El caso de las físicas es distinto. Debido a la naturaleza de la librería física es necesario establecer un orden de ejecución muy concreto que no es posible garantizar si se tratan las físicas desde un sistema de ECS. Por esa misma razón hemos decidido implementarlas con una clase abstracta **Simulación**. 
+El módulo de físicas se carga junto con el resto de módulos en el core del motor. Se encarga de cargar una simulación física por escena y almacenarlas para intercambiarlas y simular la escena activa en el momento.
 
 ### Implementación
 
@@ -333,16 +333,9 @@ El caso de las físicas es distinto. Debido a la naturaleza de la librería fís
 - IphysicsSimulation
 
 **Estructuras**
-- BulletUtils
-- Shape
-    - BoxColliderInfo
-    - SphereColliderInfo
-    - CapsuleColliderInfo
-    - CylinderColliderInfo
-    - ConeColliderInfo
+- HugoPhysics
+- ColliderComponent
 - RigidBodyComponent
-- StaticRBTag
-- KinematicRBTag
 
 **Clases**
 - BulletModule
@@ -350,26 +343,40 @@ El caso de las físicas es distinto. Debido a la naturaleza de la librería fís
 - HUGOMotionState
 - HUGODispatcher
 
-### RigidbodyComponent
+### HugoPhysics
 
-Un **Rigidbody**, o un cuerpo rígido, es la forma que tiene **HUGO** y otros muchos motores de definir la forma y las propiedades de objetos que tienen que ser afectados por el sistema de físicas (gravedad, colisiones, velocidad, fuerzas, etc.). En nuestro motor un **Rigidbody** define las siguientes propiedades físicas:
+Archivo que define en enumerados y structs tanto las formas que puede tener un objeto físico en **HUGO** y su información (**structs** con el sufijo "``ColliderInfo``") como los tipos posibles de cuerpos rígidos (**dinámico**, **estático** y **kinemático**).
+
+### ColliderComponent
+
+El ``ColliderComponent`` es el componente de las físicas de **HUGO** que se usa para definir la forma de un objeto físico. Al ser inicializado debe definirse su forma accediendo a su parámetro ``info`` o de lo contrario no se cargará ninguna forma. Un objeto físico no puede cambiar de forma, por lo que **la forma de un collider se tiene que definir obligatoriamente al añadir el componente** o no funcionará. Si se cambia el parámetro de info después de la inicialización del componente **no ocurrirá nada**. Además de su información, un collider también define las siguientes propiedades físicas:
 
 - Restitución
 - Fricción
+- Offset de posición y rotación
+
+Los atributos del ``ColliderComponent`` solamente deben ser accedidos a través de getters y setters definidos en la estructura. Esto se debe a que cuando se modifican los valores del cuerpo físico de **HUGO** también deben modificarse los de **bullet**. Para ello existen una serie de flags que se activan cuando el usuario modifica alguno de los valores del **Rigidbody** utilizando sus setters. De esta forma, en cada frame, actualiza los valores en **bullet** en función de las flags.
+
+También es posible dibujar la forma que tiene el **Collider** seteando su atributo **useGizmo** a ``true``. Esto es especialmente útil para hacer pruebas y ver el tamaño real del **Collider**. La forma en la que se dibuja se describe más adelante.
+
+### RigidbodyComponent
+
+Un **Rigidbody**, o un cuerpo rígido, es la forma que tiene **HUGO** y otros muchos motores de definir la forma y las propiedades de objetos que son afectados por el sistema de físicas (gravedad, velocidad, fuerzas, etc.). Para añadir un **RigidBody** a una entidad es necesario que tenga antes un ``ColliderComponent`` que defina su forma. **Si a una entidad se le añade un RigidBody sin tener un Collider, no ocurrirá nada**. En la inicialización del componente se debe definir el tipo de cuerpo que se está creando (**dinámico**, **estático** o **kinemático**, por defecto **dinámico**) utilizando el método ``setBodyType``. El cuerpo se crea del tipo especificado. **Si se cambia el tipo de cuerpo después de haberlo inicializado, no ocurrirá nada**. En nuestro motor un **Rigidbody** define las siguientes propiedades físicas:
+
 - Masa
 - Damping lineal y angular
 - Velocidad lineal y angular
-- Offset de posición y rotación (con respecto al transform de la entidad)
 
-Los atributos del ``RigidbodyComponent`` solamente serán accesibles a través de getters y setters definidos en la estructura. Esto se debe a que cuando se modifican los valores del cuerpo físico de **HUGO** también deben modificarse los de **bullet**. Para ello existen una serie de flags que se activan cuando el usuario modifica alguno de los valores del **Rigidbody** utilizando sus setters. De esta forma, en cada frame, actualiza los valores en **bullet** en función de las flags.
+Al igual que el ``ColliderComponent`` y por los mismos motivos, sus atributos deben ser accedidos a través de sus getters y setters.
 
-También existen setters para aplicarle impulso y/o fuerza a un **Rigidbody** en el frame en el que se setea la fuerza/impulso.
+También existen setters para aplicarle impulso y/o fuerza a un **Rigidbody** en el frame en el que se setea dicha fuerza/impulso.
 
-#### Sleep y Active
+### Sleep y Active
 
-Los cuerpos tienen tres posibles estados: **Active**, **Asleep** y **Inactive**. 
+Los colliders tienen dos posibles estados: **Active** e **Inactive**.  
+Los cuerpos definen un estado a mayores: **Asleep**.
 
-- **Active** es el estado por defecto. Si un **RigidBody** está activo, se actualizará en cada frame y se procesarán las colisiones que tenga. 
+- **Active** es el estado por defecto. Si un **Collider** está activo, se actualizará en cada frame y se procesarán las colisiones que tenga. 
 
 - **Asleep** es un estado pensado para ahorrar recursos. Si un cuerpo no se mueve más de un umbral en un tiempo determinado, **bullet** considerará que ese cuerpo está quieto y no lo actualizará. De esta forma no se procesan datos sobre una entidad que no cambia. **El estado del RigidBody pasa a ser Activo en cuanto actualiza alguna de alguna forma alguna de sus propiedades**. Las propiedades de un RigidBody pueden cambiar porque:
 
@@ -379,26 +386,45 @@ Los cuerpos tienen tres posibles estados: **Active**, **Asleep** y **Inactive**.
 
     Es posible dormir un **RigidBody** manualmente y setear a mano el umbral lineal y angular a partir del cual un objeto se duerme con los setters ``setAsleep``, ``setLinearSleepingThreshold`` y ``setAngularSleepingThreshold`` respectivamente.
 
-- **Inactive** dejará al **Rigidbody** en un estado en el que no se actualiza en ningún frame. Sigue siendo posible cambiar los valores del **RigidBody** y que estén cambiados al reactivarlo, pero mientras esté en este estado **el RigidBody no se va a ver afectado por ningún tipo de fuerza/impulso y no va a detectar colisiones de ningún tipo**. Se puede activar/desactivar el RigidBody con el método ``SetActive``.
+- **Inactive** dejará al **Collider** en un estado en el que no se actualiza en ningún frame. Sigue siendo posible cambiar los valores del **Collider** y que estén cambiados al reactivarlo, pero mientras esté en este estado **el RigidBody asociado a dicho collider no se va a ver afectado por ningún tipo de fuerza/impulso y el Collider no va a detectar colisiones de ningún tipo**. Se puede activar/desactivar el Collider con el método ``SetActive``.
 
 >**Nota**: un **RigidBody** inactivo no se puede poner en estado dormido usando ``setAsleep``, es necesario activarlo primero para poder dormirlo. Esto debido a que el estado **Asleep** es innecesario si un objeto está inactivo.
 
-#### Colisiones
+### Colisiones
 
-Para la gestión de colisiones, **HUGO** tiene una clase ``HUGODispatcher`` que se encarga de actualizar en cada frame una propiedad del ``RigidBodyComponent`` llamada ``collisionInfo``. Esta propiedad es una lista de ids de las **entidades** con las que está colisionando un **RigidBody**. En cada frame ``HUGODispatcher`` recorre todas las colisiones que ha habido en el mundo fisico y añade a cada **RigidBody** que haya chocado con otro el id de la **entidad** a la que pertenece. Por supuesto, una colisión solo se procesa si ambas entidades tienen **Rigidbodies**. Por lo tanto se puede asegurar que todas las entidades registradas en el ``collisionInfo`` de un Rigidbody tienen un **Rigidbody** en el frame en el que han sido registradas.
+Para la gestión de colisiones, **HUGO** tiene una clase ``HUGODispatcher`` que se encarga de actualizar en cada frame una propiedad del ``ColliderComponent`` llamada ``collisionInfo``, accesible a través del método ``getCollisionInfo``. Esta propiedad es una lista de ids de las **entidades** con las que está colisionando un **Collider**. En cada frame ``HUGODispatcher`` recorre todas las colisiones que ha habido en el mundo fisico y añade a cada **Collider** que haya chocado con otro el id de la **entidad** a la que pertenece. Por supuesto, una colisión solo se procesa si ambas entidades tienen **Colliders**. Por lo tanto se puede asegurar que todas las entidades registradas en el ``collisionInfo`` de un ``ColliderComponent`` tienen un **Collider** en el frame en el que han sido registradas.
 
-La lista se actualiza en cada frame. Esto facilita las interacciones entre entidades al colisionar. Por ejemplo, imaginemos que queremos hacer en un sistema que todas las entidades con "FooComponent" añadan un componente "BarComponent" que añada lógica a la entidad.
+La lista se actualiza en cada frame. Esto facilita las interacciones entre entidades al colisionar. Por ejemplo, imaginemos que queremos hacer en un sistema que cambie el parametro "bar" de todas las entidades con "FooComponent" que choquen contra un objeto especifico.
 
 ````cpp
-for(auto pack : scene->query<RigidBodyComponent, FooComponent>){
-    RigidBodyComponent& rb = pack.get<RigidBodyComponent&>();
-    float force = 10.f;
 
-    for(unsigned long int entity : rb.getCollisionInfo()){
-        scene->addComponent<BarComponent>(entity, Args...);
+void init(){
+
+    objectId = scene->createEntity();
+
+    // ... añade Transform, Collider, etc.
+
+    EntityID e1 = scene->createEntity();
+
+    // ... añade Transform, Collider, FooComponent, etc.
+
+    EntityID e2 = scene->createEntity();
+
+    // ... añade Transform, Collider, NO FooComponent, etc.
+}
+
+void update(dt){
+    
+    for(auto collisionId : scene->getComponent<ColliderComponent>(objectId).getCollisionInfo()){
+        if(scene->hasComponent<FooComponent>(collisionId))
+            scene->getComponent<FooComponent>(collisionId).bar += 10;
+            // Solo se aplica este cambio sobre e1
     }
 }
 ````
+
+Seguir Actualizando a partir de aqui
+---
 
 ### Pipeline de físicas a nivel de usuario
 Para crear un cuerpo físico el usuario debe crear una estructura llamada ``Shape`` que recibe hasta cinco tipos distintos de información para crear una forma:
@@ -434,9 +460,6 @@ Esta es una interfaz que se encarga de gestionar las simulaciones (IPhysicsSimul
 Nuestra implementación de la interfaz es ``BulletModule`` que simplemente se encarga de aplicar todas las gestiones ya mencionadas sobre las ``BulletSimulation`` registradas, usando cuando sea necesario los métodos que implementa la librería de bullet.
 
 ``BulletModule`` se inicializa en ``Core`` y se ejecutan sus métodos cuando es necesario para actualizar todas las simulaciones activas cuando corresponda.
-
-### BulletUtils
-Una estructura con conversiones de vectores y cuaterniones del motor al de la librería de físicas y viceversa para garantizar la buena comunicación entre ambos. Es necesario implementar nuevas transformaciones si se quisiera utilizar otro motor de físicas que usara vectores/cuaterniones distintos a los del motor.
 
 # Pipeline de generación de contenido
 
