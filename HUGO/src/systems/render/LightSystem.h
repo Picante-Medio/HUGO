@@ -24,9 +24,11 @@ HSYSTEM(LightSystem)
 
     void onUpdateLightComponent(LightComponent& light);
 
+    void setAmbientLight(HUGO::Float r, HUGO::Float g, HUGO::Float b);
+
 public:
     void init() override;
-    void onLoad() override{}
+    void onLoad() override;
     void fixedUpdate(double) override {}
     void update(double) override;
     ~LightSystem();

@@ -38,9 +38,6 @@ HSYSTEM(RenderSystem)
     void unregisterRenderEntity(RenderComponent& comp);
 
     void clearAnimationStates(OgreObject &obj);
-                   
-    // Global light configuration
-    void setAmbientLight(float r, float g, float b);
 
     //Component Events
     void onUpdateRenderComponet(RenderComponent& rc);

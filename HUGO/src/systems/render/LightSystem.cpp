@@ -3,6 +3,7 @@
 #include "LightComponent.h"
 #include "OgreUtils.h"
 #include "TransformComponent.h"
+#include "LuaBinder.h"
 
 void LightSystem::init(){
     ogreRoot = Ogre::Root::getSingletonPtr();
@@ -12,6 +13,13 @@ void LightSystem::init(){
     scene->onAddComponent<LightComponent>().connect(this, &LightSystem::registerLightEntity);
     scene->onUpdateComponent<LightComponent>().connect(this, &LightSystem::onUpdateLightComponent);
     scene->onRemoveComponent<LightComponent>().connect(this, &LightSystem::unregisterLightEntity);
+
+    // Basic light
+    setAmbientLight(0.6f, 0.6f, 0.6f);
+}
+
+void LightSystem::onLoad(){
+    LuaBinder::getInstance()->registerMethod<LightSystem, void, float, float, float>(*this, &LightSystem::setAmbientLight, "SetAmbientLight");
 }
 
 LightSystem::~LightSystem(){
@@ -113,19 +121,11 @@ void LightSystem::registerLightEntity(LightComponent& lightComp)
 void LightSystem::unregisterLightEntity(LightComponent& comp)
 {
     EntityID entity = comp.entity;
-    auto it = lightMap.find(entity);
-    if (it != lightMap.end()) {
-        if(it->second.node){
-            it->second.node->detachAllObjects();
-            sceneManager->destroySceneNode(it->second.node);
-            it->second.node = nullptr;
-        }
-        if(it->second.ogreLight){
-            sceneManager->destroyLight(it->second.ogreLight);
-            it->second.ogreLight = nullptr;
-        }
-        lightMap.erase(it);
-    }
+
+    lightMap[entity].node->detachAllObjects();
+    sceneManager->destroySceneNode(lightMap[entity].node);
+    sceneManager->destroyLight(lightMap[entity].ogreLight);
+    lightMap.erase(entity);
 }
 
 #pragma region LightComponentEvents
@@ -133,44 +133,46 @@ void LightSystem::onUpdateLightComponent(LightComponent &light)
 {
     EntityID entity = light.entity;
     if(!scene->hasComponent<TransformComponent>(entity)){
-        std::cerr<<"[LightSystem] Light "<<entity<<" has not trasnform\n";
+        scene->log(std::make_shared<StringError>("[LightSystem] Light " + std::to_string(entity) + " has not trasnform"));
         return;
     }
     TransformComponent& tr =scene->getComponent<TransformComponent>(entity);
-    
-    auto it = lightMap.find(entity);
-    if (it != lightMap.end()) {
-        // update position
-        it->second.node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getPosition()));
+
+    // update position
+        lightMap[entity].node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getPosition()));
         
         // for dirrectonal light
         if (light.getLightType() == HUGO::LightType::LT_DIRECTIONAL) {
-            it->second.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getRotation()));
+            lightMap[entity].node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getRotation()));
         }
 
         // update diffuse and specular
-        it->second.ogreLight->setDiffuseColour(Ogre::ColourValue(light.getDiffuse().x, light.getDiffuse().y, light.getDiffuse().z, light.getDiffuse().w));
-        it->second.ogreLight->setSpecularColour(Ogre::ColourValue(light.getSpecular().x, light.getSpecular().y, light.getSpecular().z, light.getSpecular().w));
+        lightMap[entity].ogreLight->setDiffuseColour(Ogre::ColourValue(light.getDiffuse().x, light.getDiffuse().y, light.getDiffuse().z, light.getDiffuse().w));
+        lightMap[entity].ogreLight->setSpecularColour(Ogre::ColourValue(light.getSpecular().x, light.getSpecular().y, light.getSpecular().z, light.getSpecular().w));
         
         if (light.getLightType() == HUGO::LightType::LT_SPOTLIGHT) {
-            it->second.ogreLight->setSpotlightRange(Ogre::Radian(light.getSpotInner().valueRadians())
+            lightMap[entity].ogreLight->setSpotlightRange(Ogre::Radian(light.getSpotInner().valueRadians())
                 , Ogre::Radian(light.getSpotOuter().valueRadians()), light.getSpotFallOff());
 
             if (light.getSpotNearClip() > 0) {
-                it->second.ogreLight->setSpotlightNearClipDistance(light.getSpotNearClip());
+                lightMap[entity].ogreLight->setSpotlightNearClipDistance(light.getSpotNearClip());
             }
         }
         
         // parameters for directional light
         if (light.getLightType() != HUGO::LightType::LT_DIRECTIONAL) {
-            it->second.ogreLight->setAttenuation( light.getAttenuation().w, light.getAttenuation().x,  
+            lightMap[entity].ogreLight->setAttenuation( light.getAttenuation().w, light.getAttenuation().x,  
                                         light.getAttenuation().y, light.getAttenuation().z);
         }
 
         // shadows
         if(light.getShadowFarDistance() > 0){
-            it->second.ogreLight->setShadowFarDistance(light.getShadowFarDistance());
+            lightMap[entity].ogreLight->setShadowFarDistance(light.getShadowFarDistance());
         }
-    }
 }
 #pragma endregion
+
+void LightSystem::setAmbientLight(HUGO::Float r, HUGO::Float g, HUGO::Float b)
+{
+    sceneManager->setAmbientLight(Ogre::ColourValue(r, g, b));
+}

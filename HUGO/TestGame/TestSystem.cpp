@@ -72,13 +72,19 @@ TestSystem::init() {
     //     //tr.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(0)), HUGO::Vector3(0,0,0));
     //     //tr.rotation.normalize();
     // });
-    // scene->addComponent<LightComponent>(ui, [](LightComponent& lg){
-    //     //lg.setLightType(HUGO::LightType::LT_SPOTLIGHT);
-    //     lg.setLightType(HUGO::LightType::LT_DIRECTIONAL);
-    //     lg.setAttenuation(HUGO::Vector4(1.0f, 0.0f, 0.001f, 0.0001f));
-    //     lg.setDiffuse(HUGO::Vector4(0.8f, 0.8f, 0.8f, 1.0f));
-    //     lg.setSpecular(HUGO::Vector4(0.3f, 0.3f, 0.3f, 1.0f));
-    // });
+    EntityID light = scene->createEntity();
+    
+    scene->addComponent<TransformComponent>(light, [](TransformComponent& tr){
+        tr.setPosition(HUGO::Vector3(0, 0, 0));
+        //tr.setRotation(HUGO::Quaternion(HUGO::Radian(HUGO::Degree(0)), HUGO::Vector3(0,0,0)));
+    });
+
+    scene->addComponent<LightComponent>(light, [](LightComponent& lg){
+         lg.setLightType(HUGO::LightType::LT_POINT);
+        lg.setAttenuation(HUGO::Vector4(1.0f, 0.0f, 0.001f, 0.0001f));
+         lg.setDiffuse(HUGO::Vector4(0.8f, 0.8f, 0.8f, 1.0f));
+         lg.setSpecular(HUGO::Vector4(0.3f, 0.3f, 0.3f, 1.0f));
+     });
 
     EntityID ui = scene->createEntity();
     scene->addComponent<TransformComponent>(ui, [](TransformComponent& tr){
@@ -122,6 +128,13 @@ bool usedTimer = false;
 
 void
 TestSystem::update(double dt) {
+
+    for(auto& elem: scene->query<TransformComponent, LightComponent>()){
+        elem.modify<TransformComponent>([dt](TransformComponent& tr){
+            tr.setPosition(tr.getPosition() + HUGO::Vector3(0,0, dt));
+        });
+    }
+
     // timer += dt;
 
     // if(timer >= 1 && !usedTimer){

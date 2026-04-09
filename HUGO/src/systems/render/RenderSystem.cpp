@@ -51,15 +51,12 @@ void RenderSystem::init(){
 
     scene->onRemoveComponent<RenderComponent>().connect(this, &RenderSystem::unregisterRenderEntity); 
     scene->onRemoveComponent<AnimationComponent>().connect(this, &RenderSystem::onRemoveAnimationComponet);
-    
-    // Basic light
-    setAmbientLight(0.6f, 0.6f, 0.6f);
 }
 #pragma endregion
 
 #pragma region SystemLoad
 void RenderSystem::onLoad(){
-    LuaBinder::getInstance()->registerMethod<RenderSystem, void, float, float, float>(*this, &RenderSystem::setAmbientLight, "SetAmbientLight");
+    
 }
 #pragma endregion
 
@@ -174,11 +171,6 @@ void RenderSystem::clearAnimationStates(OgreObject &obj)
     obj.animationStates.clear();
 }
 #pragma endregion
-
-void RenderSystem::setAmbientLight(float r, float g, float b)
-{
-    sceneManager->setAmbientLight(Ogre::ColourValue(r, g, b));
-}
 
 #pragma region RenderComponentEvents
 
