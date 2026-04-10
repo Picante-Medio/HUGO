@@ -19,7 +19,7 @@ void LightSystem::init(){
 }
 
 void LightSystem::onLoad(){
-    LuaBinder::getInstance()->registerMethod<LightSystem, void, float, float, float>(*this, &LightSystem::setAmbientLight, "SetAmbientLight");
+    LuaBinder::getInstance().registerMethod<LightSystem, void, float, float, float>(*this, &LightSystem::setAmbientLight, "SetAmbientLight");
 }
 
 LightSystem::~LightSystem(){
