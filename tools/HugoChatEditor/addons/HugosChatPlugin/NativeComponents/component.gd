@@ -1,4 +1,4 @@
-@icon("res://Icons/component_free_style.png")
+@icon("res://addons/HugosChatPlugin/Icons/component_free_style.png")
 extends Node
 class_name Component
 

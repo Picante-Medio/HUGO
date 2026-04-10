@@ -1,6 +1,6 @@
 @tool
 extends MeshInstance3D
-class_name MeshRenderer
+class_name RenderComponent
 
 @export var materialName:String
 @export var objectID:int

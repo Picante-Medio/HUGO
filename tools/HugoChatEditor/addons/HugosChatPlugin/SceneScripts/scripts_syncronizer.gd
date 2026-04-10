@@ -3,7 +3,7 @@ extends EditorScript
 class_name ScriptsSyncronizer
 
 const output_components_path = "Components"
-const HUGO_TYPES_PATH = "../../HUGO/include/utils/HugoTypes.h"
+const HUGO_TYPES_PATH = "../../HUGO/HugoAPI/HugoTypes.h"
 
 const PREFABS_PATH = "res://Prefabs/"
 const OUTPUT_ENUMS_PATH = "Enums.gd"
@@ -12,19 +12,17 @@ static var enums_dictionary:Dictionary
 static var types_dictionary:Dictionary
 static var components_dictionary:Dictionary
 
-const WHITE_LIST:Array[String] = ["string", "int", "float", "Vector2", "Vector3", "Vector4", "Quaternion"]
 const BLACK_LIST:Array[String] = ["TransformComponent", "CameraComponent", "RenderComponent"]
 
 func _run() -> void:
+	#write_enums()
 	sync()
-	
+
 static func sync():
 	components_dictionary = {}
 	enums_dictionary = {}
 	components_dictionary = {}
 	
-	parse_hugo_types()
-	write_enums()
 	parse_components(HugoConfig.COMPONENTS_PATH)
 	create_prefabs(PREFABS_PATH)
 	write_components()
@@ -91,18 +89,20 @@ static func write_components():
 		file.close()
 
 static func write_enums():
-	var file := FileAccess.open(OUTPUT_ENUMS_PATH, FileAccess.WRITE)
-	file.store_line("class_name ENUMS")
+	parse_hugo_types()
+	
+	#var file := FileAccess.open(OUTPUT_ENUMS_PATH, FileAccess.WRITE)
+	#file.store_line("class_name ENUMS")
 
-	for enum_key in enums_dictionary.keys():
-		var enum_value = enums_dictionary[enum_key]
-		var text_to_write:String = "enum " + enum_key + "{"
-		for value in enum_value:
-			text_to_write = text_to_write + value + ","
-		text_to_write = text_to_write + "}"
-		file.store_line(text_to_write)
+	#for enum_key in enums_dictionary.keys():
+		#var enum_value = enums_dictionary[enum_key]
+		#var text_to_write:String = "enum " + enum_key + "{"
+		#for value in enum_value:
+			#text_to_write = text_to_write + value + ","
+		#text_to_write = text_to_write + "}"
+		#file.store_line(text_to_write)
 
-	file.close()
+	#file.close()
 
 static func hugo_check_line(line: String) -> void:
 	if line.begins_with("using "):
@@ -110,20 +110,25 @@ static func hugo_check_line(line: String) -> void:
 		var variant_name:String = line.split("=")[1].split(";")[0].strip_edges()
 		types_dictionary.get_or_add(alias_name, variant_name)
 
-	if line.begins_with("typedef enum"):
-		var enum_values:PackedStringArray = line.split("{")[1].split("}")[0].split(",")
-		var enum_name:String = line.split("}")[1].split(";")[0].strip_edges()
-		enums_dictionary.get_or_add(enum_name, enum_values)
-
+	#if line.begins_with("enum"):
+		#print(line)
+		#var enum_values:PackedStringArray = line.split("{")[1].split("}")[0].split(",")
+		#var enum_name:String = line.split("}")[1].split(";")[0].strip_edges()
+		#enums_dictionary.get_or_add(enum_name, enum_values)
+	
+	
 static func parse_hugo_types() -> void:
 	var file := FileAccess.open(HUGO_TYPES_PATH, FileAccess.READ)
 	
-	if not file: return
+	if not file:
+		printerr("JOPETAS MECACHIS CARAMABA")
+		return
+	print("PARSEANDO TIPOS")
 
 	while not file.eof_reached():
 		var line := file.get_line().strip_edges()
 		hugo_check_line(line)
-
+	
 	file.close()
 
 static func parse_components(path: String) -> void:
@@ -160,8 +165,7 @@ static func hugo_parse_component(path: String) -> void:
 
 	var complete_whitelist:Array[String]
 	complete_whitelist.append_array(enums_dictionary.keys())
-	complete_whitelist.append_array(WHITE_LIST)
-	complete_whitelist.append_array(types_dictionary.keys())
+	complete_whitelist.append_array(ENUMS.TYPES_DICTIONARY.keys())
 
 	print(path)
 	while not file.eof_reached():
@@ -181,8 +185,9 @@ static func hugo_parse_component(path: String) -> void:
 		
 		if parameter_type.contains("::"): parameter_type = parameter_type.split("::")[1].strip_edges()
 		
-		if parameter_type == "string": parameter_type = "String"
-		elif types_dictionary.has(parameter_type): parameter_type = types_dictionary[parameter_type]
+		if parameter_type == "std::string" or parameter_type == "string": parameter_type = "String"
+		
+		elif ENUMS.TYPES_DICTIONARY.has(parameter_type): parameter_type = ENUMS.TYPES_DICTIONARY[parameter_type]
 		elif enums_dictionary.has(parameter_type): parameter_type = "ENUMS." + parameter_type
 
 		components_dictionary[component_name].push_back([parameter_type, parameter_name, parameter_default_value])

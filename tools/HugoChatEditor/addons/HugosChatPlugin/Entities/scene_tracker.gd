@@ -1,4 +1,4 @@
-@icon("res://Icons/scene_tracker_icon.png")
+@icon("res://addons/HugosChatPlugin/Icons/scene_tracker_icon.png")
 @tool
 extends Node3D
 class_name SCENE_TRACKER
