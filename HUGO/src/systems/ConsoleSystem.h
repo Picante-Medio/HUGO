@@ -10,11 +10,13 @@ struct TextComponent;
 
 HSYSTEM(ConsoleSystem)
 
-
 std::vector<HUGO::String> history;
 size_t historyIndex; // Constant access and reset
 EntityID consoleInput;
 EntityID consoleText;
+EntityID consoleInfo;
+
+HUGO::String logIni = ">  ";
 bool active; // to set weather the console is active or not
 
 static inline std::queue<HUGO::String> luaOutput = std::queue<HUGO::String>();
@@ -67,7 +69,6 @@ static inline std::queue<HUGO::String> luaOutput = std::queue<HUGO::String>();
         }
     }
 
-    
 public:
 
    void update(double) override;

@@ -4,11 +4,10 @@
 #include "TextComponent.h"
 #include "InputFieldComponent.h"
 
-
 void ConsoleSystem::printLuaOutput(TextComponent& consoleTextCmp){
 
     while(!ConsoleSystem::luaOutput.empty()){
-        consoleTextCmp.text += ConsoleSystem::luaOutput.front() + "\n";
+        consoleTextCmp.text += logIni + ConsoleSystem::luaOutput.front() + "\n";
         ConsoleSystem::luaOutput.pop();
     }
 }
@@ -19,7 +18,7 @@ void ConsoleSystem::printLogs(TextComponent& consoleTextCmp){
     while (!log.isError())
     {
         // if not explicitly specified, no \n is included
-        consoleTextCmp.text += log.getValue();
+        consoleTextCmp.text += logIni + log.getValue();
         log = scene->getNextLog();
     }
     
@@ -31,7 +30,7 @@ void ConsoleSystem::printErrors(TextComponent& consoleTextCmp){
     while (!error.isError())
     {
         // for errors, \n is included by default
-        consoleTextCmp.text += "ERROR: " + error.getValue() + "\n";
+        consoleTextCmp.text += logIni + "ERROR: " + error.getValue() + "\n";
         error = scene->getNextError();
     }
 }
@@ -127,12 +126,12 @@ void ConsoleSystem::handleKeyInput(){
 
         // Console input
         scene->getComponent<PanelComponent>(consoleInput).isVisible = active;
-        scene->getComponent<InputFieldComponent>(consoleInput).isActive = active;
-        scene->getComponent<TextComponent>(consoleInput).colour = colour;
 
         // Console text
         scene->getComponent<PanelComponent>(consoleText).isVisible = active;
-        scene->getComponent<TextComponent>(consoleText).colour = colour;
+
+        // Console Info
+        scene->getComponent<PanelComponent>(consoleInfo).isVisible = active;
     }
 }
 
@@ -140,11 +139,11 @@ void ConsoleSystem::update(double){
 
     TextComponent& consoleTextCmp = scene->getComponent<TextComponent>(consoleText);
 
-    // Lua output
-    printLuaOutput(consoleTextCmp);
-    
     // Logs
     printLogs(consoleTextCmp);
+
+    // Lua output
+    printLuaOutput(consoleTextCmp);
 
     // Errors
     printErrors(consoleTextCmp);
@@ -172,22 +171,25 @@ void ConsoleSystem::init(){
     std::string panelContainerName;
 
     scene->addComponent<PanelComponent>(consoleInput, [&panelContainerName](PanelComponent& panel){
-        panel.overlayName = "testCanvas/SimpleTest1";
+        panel.overlayName = "Console/InputText";
         panel.containerName = panel.overlayName + "/Container";
-        panel.material = "UI/Background";
+        panel.material = "Console/InputBackground";
         panel.width = 0.3f;
-        panel.height =0.2f;
-        panel.left =0.5f;
-        panel.top = 0.2f;
+        panel.height = 0.06f;
+        panel.left = 0.7f;
+        panel.top = 0.41f;
         
         panelContainerName = panel.containerName;
     });
 
     scene->addComponent<TextComponent>(consoleInput, [&panelContainerName](TextComponent& text){
         text.textAreaName = panelContainerName + "/Text";
-        text.left = 0.025f;
+        text.left = 0.01f;
         text.colourTop = HUGO::Vector4(1.0f, 0.0f, 0.0f, 1.f);
         text.colourBottom = HUGO::Vector4(1.0f, 0.0f, 1.0f, 1.f);
+        text.characterHeight = 0.025f;
+        text.top = -0.01f;
+        text.spaceWidth = 0.01f;
     });
 
     scene->addComponent<InputFieldComponent>(consoleInput, [this](InputFieldComponent& input){
@@ -202,22 +204,52 @@ void ConsoleSystem::init(){
 
     consoleText = scene->createEntity();
 
-        // Reuse panelContainerName
+    // Reuse panelContainerName
     scene->addComponent<PanelComponent>(consoleText, [&panelContainerName](PanelComponent& panel2){
-        panel2.overlayName = "testCanvas/ConsoleTextTest";
+        panel2.overlayName = "Console/LogText";
         panel2.containerName = panel2.overlayName + "/Container";
-        panel2.material = "UI/Knob";
-        panel2.width = 0.5f;
-        panel2.height =0.1f;
-        panel2.left =0.1f;
-        panel2.top =0.1f;
+        panel2.material = "Console/LogBackground";
+        panel2.width = 0.3f;
+        panel2.height = 0.31f;
+        panel2.left = 0.7f;
+        panel2.top = 0.1f;
         
         panelContainerName = panel2.containerName;
     });
 
     scene->addComponent<TextComponent>(consoleText, [&panelContainerName](TextComponent& text2){
         text2.textAreaName = panelContainerName + "/Text";
-        text2.colourTop = HUGO::Vector4(0.f, 0.f, 0.f, 1.f);
-        text2.colourBottom = HUGO::Vector4(0.f, 0.f, 0.f, 1.f);
+        text2.colourTop = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.f);
+        text2.colourBottom = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.f);
+        text2.left = 0.005f;
+        text2.top = 0.01f;
+        text2.maxWidth = 0.45f;
+        text2.maxHeight = 0.3f;
+        text2.characterHeight = 0.024f;
+        text2.spaceWidth = 0.01f;
+    });
+
+    //-------------------------------Console Input Info
+    consoleInfo = scene->createEntity();
+    scene->addComponent<PanelComponent>(consoleInfo, [&panelContainerName](PanelComponent& panel3){
+        panel3.overlayName = "Console/InfoText";
+        panel3.containerName = panel3.overlayName + "/Container";
+        panel3.material = "Console/InputBackground";
+        panel3.width = 0.3f;
+        panel3.height = 0.04f;
+        panel3.left = 0.7f;
+        panel3.top = 0.06f;
+        panelContainerName = panel3.containerName;
+    });
+
+    scene->addComponent<TextComponent>(consoleInfo, [&panelContainerName](TextComponent& text3){
+        text3.textAreaName = panelContainerName + "/Text";
+        text3.colour = HUGO::Vector4(0.0f, 0.0f, 0.0f, 1.f);
+        text3.left = 0.01f;
+        text3.top = -0.01f;
+        text3.characterHeight = 0.025f;
+        text3.spaceWidth = 0.01f;
+        text3.text = "Show/Hide Console: Ctrl + T\n";
     });
 }
+

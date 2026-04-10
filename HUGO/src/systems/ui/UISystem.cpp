@@ -407,7 +407,6 @@ void UISystem::processTextChanges()
     for (auto &pack : scene->query<PanelComponent, TextComponent>())
     {
         TextComponent &text = pack.getDeprecated<TextComponent &>();
-        PanelComponent &panel = pack.getDeprecated<PanelComponent&>();
         ErrorOrType<Ogre::OverlayElement *> elementResult = HUGO::OgreOverlayUtils::getElement(text.textAreaName, true);
         if (elementResult.isError())
             return;

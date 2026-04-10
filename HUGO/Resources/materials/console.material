@@ -1,0 +1,94 @@
+// material for Console Overlays
+material Console/LogBackground
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture darkGray.png
+            }
+        }
+    }
+}
+
+material Console/InputBackground
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture gray.png
+            }
+        }
+    }
+}
+
+
+material Console/Button
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture button.png
+            }
+        }
+    }
+}
+material Console/ButtonHover
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture buttonHover.png
+            }
+        }
+    }
+}
+material Console/ButtonPressed
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture buttonPressed.png
+            }
+        }
+    }
+}
