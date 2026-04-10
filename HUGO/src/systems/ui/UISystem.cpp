@@ -155,26 +155,52 @@ void UISystem::syncPanel(const PanelComponent &p)
     if (!p.material.empty()) cache->container->setMaterialName(p.material);
 }
 
-HUGO::String UISystem::formatText(const HUGO::String & text, Ogre::TextAreaOverlayElement *textArea, HUGO::Float maxWidth, HUGO::Float characterHeight)
+HUGO::String UISystem::formatText(const HUGO::String & text, Ogre::TextAreaOverlayElement *textArea, std::optional<HUGO::Float> maxWidth,std::optional<HUGO::Float> maxHeight)
 {
     if (!textArea || !textArea->getFont() || text.empty())
         return text;
 
-    HUGO::String result;
-    HUGO::Float charWidth, currentWidth = 0.0f;
+    HUGO::Float height = textArea->getCharHeight();
+    int maxLines = (int)(maxHeight.value() / height);
+    
+    std::deque<HUGO::String> lines;
+    HUGO::String currentLine;
+    HUGO::Float currentWidth = 0.0f;
 
     for(char c : text){
-        if(c == '\n' || currentWidth >= maxWidth){
-            result += '\n';
+        if (c == '\n')
+        {
+            lines.push_back(currentLine);
+            currentLine.clear();
             currentWidth = 0.0f;
+            if(lines.size()> maxLines) lines.pop_front();
+            continue;
         }
-        else{
-            charWidth = textArea->getFont()->getGlyphAspectRatio(c) * characterHeight;
-            currentWidth += charWidth;
-            result += c;
+        HUGO::Float charWidth = textArea->getFont()->getGlyphAspectRatio(c) * height;
+        if (currentWidth + charWidth > maxWidth)
+        {
+            lines.push_back(currentLine);
+            currentLine.clear();
+            currentWidth = 0.0f;
+            if(lines.size()> maxLines) lines.pop_front();
         }
+
+        currentLine += c;
+        currentWidth += charWidth;
+    }
+    if(!currentLine.empty())
+        lines.push_back(currentLine);
+
+    HUGO::String result;
+    for (const HUGO::String &l : lines)
+    {
+        result += l + "\n";
     }
     return result;
+}
+
+bool UISystem::isValidColour(const HUGO::Vector4& colour){
+    return !(colour.x == -1.0f && colour.y == -1.0f && colour.z == -1.0f && colour.w == -1.0f);
 }
 
 void UISystem::syncText(const TextComponent &t)
@@ -187,27 +213,30 @@ void UISystem::syncText(const TextComponent &t)
     if (!textArea)
         return;
    
-    if(t.maxWidth >= 0){
-        textArea->setCaption(formatText(t.text, textArea, t.maxWidth, t.characterHeight));
-    }
-    else textArea->setCaption(t.text);
+    textArea->setCaption(t.text);
 
     textArea->setCharHeight(t.characterHeight);
-    textArea->setColour(Ogre::ColourValue(
-        t.colour.x,
-        t.colour.y,
-        t.colour.z,
-        t.colour.w));
-    textArea->setColourTop(Ogre::ColourValue(
-        t.colourTop.x,
-        t.colourTop.y,
-        t.colourTop.z,
-        t.colourTop.w));
-    textArea->setColourBottom(Ogre::ColourValue(
-        t.colourBottom.x,
-        t.colourBottom.y,
-        t.colourBottom.z,
-        t.colourBottom.w));
+    if(isValidColour(t.colour)){
+        textArea->setColour(Ogre::ColourValue(
+            t.colour.x,
+            t.colour.y,
+            t.colour.z,
+            t.colour.w));
+    }
+    if(isValidColour(t.colourTop)){
+        textArea->setColourTop(Ogre::ColourValue(
+            t.colourTop.x,
+            t.colourTop.y,
+            t.colourTop.z,
+            t.colourTop.w));
+    }
+    if(isValidColour(t.colourBottom)){
+        textArea->setColourBottom(Ogre::ColourValue(
+            t.colourBottom.x,
+            t.colourBottom.y,
+            t.colourBottom.z,
+            t.colourBottom.w));
+    }
     textArea->setTop(t.top);
     textArea->setFontName(t.textFont);
     textArea->setSpaceWidth(t.spaceWidth);
@@ -378,6 +407,7 @@ void UISystem::processTextChanges()
     for (auto &pack : scene->query<PanelComponent, TextComponent>())
     {
         TextComponent &text = pack.getDeprecated<TextComponent &>();
+        PanelComponent &panel = pack.getDeprecated<PanelComponent&>();
         ErrorOrType<Ogre::OverlayElement *> elementResult = HUGO::OgreOverlayUtils::getElement(text.textAreaName, true);
         if (elementResult.isError())
             return;
@@ -389,7 +419,10 @@ void UISystem::processTextChanges()
         UIElementCache *cache = getCache(text.entity);
         if (cache)
             cache->element = area;
-
+    
+        if(text.maxWidth || text.maxHeight){
+            text.text = formatText(text.text, area, text.maxWidth, text.maxHeight);
+        }
         syncText(text);
     }
 }

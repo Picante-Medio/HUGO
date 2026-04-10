@@ -2,7 +2,7 @@
 #include "HugoComponentMacros.h"
 #include "HugoMath.h"
 #include "HugoTypes.h"
-
+#include <optional>
 HCOMPONENT(TextComponent)
     HUGO::String textAreaName = "textArea";     // text area element name
 
@@ -20,6 +20,8 @@ HCOMPONENT(TextComponent)
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, left, 0.0f);
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, top, 0.0f);
 
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, maxWidth, -1.0f);
+    std::optional<HUGO::Float> maxWidth;
+    std::optional<HUGO::Float> maxHeight;
+    
 END_HCOMPONENT()
 

@@ -7,6 +7,7 @@
 
 #include <unordered_map>
 #include <memory>
+#include <optional>
 
 #include <Ogre.h>
 #include <OgreOverlay.h>
@@ -59,7 +60,8 @@ bool isMouseOverPanel(const PanelComponent& panel, HUGO::Float mouseX, HUGO::Flo
 
 void syncPanel(const PanelComponent& p);
 void syncText(const TextComponent& t);
-HUGO::String formatText(const HUGO::String& text, Ogre::TextAreaOverlayElement* textArea,HUGO::Float maxWidth, HUGO::Float characterHeight);
+bool isValidColour(const HUGO::Vector4& colour);
+HUGO::String formatText(const HUGO::String& text, Ogre::TextAreaOverlayElement* textArea,std::optional<HUGO::Float> maxWidth,std::optional<HUGO::Float> maxHeight);
 void syncButton(const ButtonComponent& b, PanelComponent& p);
 void syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr);
 void syncSlider(const PanelComponent& p, const SliderComponent& s);
