@@ -3,6 +3,9 @@
 #include "UtilsAPI.h"
 
 #include "EcsTypes.h"
+#ifdef __linux__ 
+#include <cstdint>
+#endif
 
 #include <vector>
 
