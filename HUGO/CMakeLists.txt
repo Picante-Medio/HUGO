@@ -7,10 +7,10 @@ set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
 include(FetchContent)
 
-set(FETCHCONTENT_QUIET ON)
-set(CMAKE_MESSAGE_LOG_LEVEL WARNING)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "" FORCE)
-set(CMAKE_WARN_DEPRECATED OFF)
+# set(FETCHCONTENT_QUIET ON)
+# set(CMAKE_MESSAGE_LOG_LEVEL WARNING)
+# set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "" FORCE)
+# set(CMAKE_WARN_DEPRECATED OFF)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE)
 
@@ -85,7 +85,7 @@ if (WIN32)
     )
 else()
 #Plugin_ParticleFX
-    foreach(lib lua_shared OgreMain OgreOverlay RenderSystem_GL3Plus RenderSystem_GL Codec_STBI Plugin_ParticleFX)
+    foreach(lib lua_shared OgreMain OgreOverlay RenderSystem_GL3Plus RenderSystem_GL Codec_STBI Codec_Assimp Plugin_ParticleFX)
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             $<TARGET_FILE:${lib}>
