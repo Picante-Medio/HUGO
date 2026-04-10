@@ -357,7 +357,7 @@ El ``ColliderComponent`` es el componente de las físicas de **HUGO** que se usa
 
 Los atributos del ``ColliderComponent`` solamente deben ser accedidos a través de getters y setters definidos en la estructura. Esto se debe a que cuando se modifican los valores del cuerpo físico de **HUGO** también deben modificarse los de **bullet**. Para ello existen una serie de flags que se activan cuando el usuario modifica alguno de los valores del **Rigidbody** utilizando sus setters. De esta forma, en cada frame, actualiza los valores en **bullet** en función de las flags.
 
-También es posible dibujar la forma que tiene el **Collider** seteando su atributo **useGizmo** a ``true``. Esto es especialmente útil para hacer pruebas y ver el tamaño real del **Collider**. La forma en la que se dibuja se describe más adelante.
+También es posible dibujar la forma que tiene el **Collider** seteando su atributo ``useGizmo`` a ``true``. Esto es especialmente útil para hacer pruebas y ver el tamaño real del **Collider**. La forma en la que se dibuja se describe más adelante.
 
 ### RigidbodyComponent
 
@@ -423,36 +423,63 @@ void update(dt){
 }
 ````
 
-Seguir Actualizando a partir de aqui
----
+### Debug
+
+El sistema de **Debug** forma parte del sistema de **Render**. Comprueba en todos los **Colliders** el parámetro ``useGizmo`` y si está a ``true`` utiliza un **material** de cables para dibujar la forma del collider utilizando la información de ``info`` en ``ColliderComponent`` y su posición.
 
 ### Pipeline de físicas a nivel de usuario
-Para crear un cuerpo físico el usuario debe crear una estructura llamada ``Shape`` que recibe hasta cinco tipos distintos de información para crear una forma:
+Para crear una entidad con un componente físico el usuario debe añadirle un componente ``ColliderComponent`` e inicializarlo con una forma **al menos**. Opcionalmente se pueden inicializar más valores con sus setters y getters. Por ejemplo:
 
-- Caja
-- Esfera
-- Cápsula
-- Cilindro
-- Cono
+```cpp
+#include "HugoPhysics.h"
+#include "ColliderComponent.h"
 
-Esta información es representada a través de cinco estructuras que recibe como argumento la clase Shape.
+EntityId e1 = scene->createEntity();
 
->**Nota**: La clase ``Shape`` solo es capaz de recibir una estructura de información. Puede ser cualquiera de las cinco pero solo una de ellas por ``Shape`` (p.ej: una estructura ``Shape`` no puede tener un BoxColliderInfo y un CapsuleColliderInfo a la vez pero es posible hacer dos ``Shape`` una con un tipo de información y otra con otro). Para ello hace uso de ``std::variant``.
+// Añadimos transform
 
-Cuando se crea un ``RigidbodyComponent`` se le asigna una ``Shape`` para definir su forma y tamaño. Esta diferenciación entre la forma y el cuerpo permite asociar a distintos cuerpos la misma forma y el mismo tamaño. En la simulación física, todos esos cuerpos también comparten los mismos datos de su forma. De esta forma el usuario puede reaprovechar una misma forma para varios cuerpos.
+scene->AddComponent<ColliderComponent>(e1, [](ColliderComponent &col){
+    col.info = HUGO::BoxColliderInfo(HUGO::Vector3(0.5f, 0.5f, 0.5f));
+    // Esto le da una forma de caja, si queremos otra forma usaremos otro
+    // ColliderInfo
+});
+```
 
-Para hacer que los cuerpos sean **Dinámicos**, **Kinemáticos** o **Estáticos** se deben añadir las tags ``DynamicRBTag``, ``KinematicRBTag`` y ``StaticRBTag`` (incluídas en la cabecera ``PhysicsTags.h``) respectivamente a la entidad a la que se le añada el ``RigidbodyComponent`` inmediatamente después de hacerlo. Si se añade la tag en cualquier otro momento no se puede garantizar que se vaya a crear un cuerpo con las propiedades deseadas.
+Si queremos que una entidad tenga un **RigidBody** debemos añadir **a una entidad que ya tenga un Collider añadido como ya se ha explicado** un componente ``RigidBodyComponent`` de la forma que sigue:
+
+```cpp
+#include "HugoPhysics.h"
+#include "ColliderComponent.h"
+#include "RigidBodyCOmponent.h"
+
+EntityId e1 = scene->createEntity();
+
+// Añadimos transform y collider
+
+scene->AddComponent<RigidBodyComponent>(e1, [](RigidBodyComponent& rb){
+    rb->setBodyType(HUGO::BodyType::STATIC);
+    // Por defecto el BodyType de un RigidBody es HUGO::BodyType::DYNAMIC
+    // Si queremos que el tipo de cuerpo sea otro es necesario
+    // especificarlo de esta forma
+});
+```
+
+No es necesario añadir el ``RigidBodyComponent`` inmediatamente después del ``ColliderComponent``. Mientras se añada primero el **Collider** y después el **RigidBody**, se puede añadir en cualquier momento y se actualizará de forma correspondiente.
+
+>**Nota**: Se pueden crear desde **Hugodot** objetos con físicas siempre que se defina el parámetro info de ``ColliderComponent`` como ya hemos definido y se añada el **Collider** antes que el **RigidBody**. 
 
 ### IPhysicsSimulation
 Esta es una interfaz que permite a cualquier usuario implementar la simulación como desee. Tiene métodos virtuales para destruir la simulación que esté gestionando ahora mismo y para hacer un step en el mundo de físicas.
 
 > **Nota**: Un step es una simulación de un tiempo x (normalmente milesimas) que hace el mundo de físicas para simular el movimiento físico de los objetos afectados por el mundo en ese tiempo.
 
-Nuestra implementación de la interfaz es ``BulletSimulation``. Esta interfaz contiene un mundo de Bullet (btWorld) y se encarga de inicializarlo y ejecutar su step cuando sea necesario. Además tiene un registro de todas las formas y todos los cuerpos que hay en la simulación con un ID asociado al componente ``RigidbodyComponent`` de HUGO que tenga una entidad asociada.
+Nuestra implementación de la interfaz es ``BulletSimulation``. Esta interfaz contiene un mundo de Bullet (btWorld) y se encarga de inicializarlo y ejecutar su step cuando sea necesario. Además tiene un registro de todas las formas y todos los cuerpos que hay en la simulación con un ID asociado a sus componentes ``ColliderComponent`` y ``RigidbodyComponent`` de HUGO que tenga una entidad asociada.
 
-En cada frame se encarga de actualizar la información de los rigidbodies de bullet con respecto a los de HUGO si es que han cambiado, actualiza los transforms de bullet en función de los de HUGO para cuerpos kinemáticos y hace uso de una clase ``HugoMotionState`` que hereda de la interfaz ``MotionState`` de bullet creada especificamente para coordinar de forma automática los transforms de físicas con los de renderizado. Esta clase ``HugoMotionState`` es gestionada por la librería de bullet.
+En cada frame se encarga de actualizar la información de las entidades de bullet con respecto a los de HUGO si es que han cambiado. En el caso de los **RigidBodies** además, actualiza los transforms de bullet en función de los de HUGO para cuerpos kinemáticos y hace uso de una clase ``HugoMotionState`` que hereda de la interfaz ``MotionState`` de bullet creada especificamente para coordinar de forma automática los transforms de físicas con los de renderizado. Esta clase ``HugoMotionState`` es gestionada por la librería de bullet.
 
-La sincronización que no ocurre a través de ``HugoMotionState`` se lleva a cabo usando queries de ECS de la escena asociada a la simulación. La simulación es también la encargada de crear un rigidbody y una shape de bullet si durante la sincronización encuentra un ``RigidbodyComponent`` de HUGO que no tiene uno de bullet asociado (es decir, si su ID es inválido).
+La sincronización que no ocurre a través de ``HugoMotionState`` se lleva a cabo usando queries de ECS de la escena asociada a la simulación. La simulación es también la encargada de crear un rigidbody y/o un collisionObject con su shape de bullet si durante la sincronización encuentra un ``RigidbodyComponent`` o un ``ColliderComponent`` de HUGO, respectivamente, que no tiene uno de bullet asociado (es decir, si su ID es inválido).
+
+**Los Colliders se comportan como objetos kinemáticos por defecto. Esto es porque no tienen un cuerpo físico que simular y por lo tanto la simulación física no puede aplicarle fuerzas, velocidad, etc.**
 
 ### IPhysicsModule
 Esta es una interfaz que se encarga de gestionar las simulaciones (IPhysicsSimulation) del motor. Tiene una lista de simulaciones activas e inactivas y normalmente habrá siempre una simulación por escena. Tiene métodos virtuales para crear una nueva simulación, destruirla, activarla, desactivarla y ejecutar el step de todas las simulaciones activas.
