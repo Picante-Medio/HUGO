@@ -22,6 +22,7 @@ HUGO/[Dd]ependencies/*
 *.pdb
 *.clangd
 *.log
+*.exp
 
 #Outs en linux
 HUGO/bin/HUGO*
