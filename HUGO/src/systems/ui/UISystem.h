@@ -42,10 +42,10 @@ std::unordered_map<EntityID, std::shared_ptr<UIElementCache>> uiCache;
 //====================================================
 // CACHE CREATION
 //====================================================
-std::shared_ptr<UIElementCache> createElementCache(EntityID entity, Ogre::Overlay* o, 
-    Ogre::OverlayContainer* c, Ogre::OverlayElement* e = nullptr);
-std::shared_ptr<UIElementCache> createElementCache(EntityID entity, const HUGO::String& overlayName,
-    const HUGO::String& containerName, const HUGO::String& elementName = "", bool isTextArea = false);
+    
+std::shared_ptr<UIElementCache> createElementCache(EntityID entity, const HUGO::String& overlayName, const HUGO::String& containerName, 
+    const HUGO::String& elementName = "", bool isTextArea = false,
+    const HUGO::String& sliderKnobName = "");
 UIElementCache* getCache(EntityID entity);
 
 //====================================================
@@ -69,12 +69,16 @@ void syncSlider(const PanelComponent& p, const SliderComponent& s);
 //====================================================
 // PROCESSING
 //====================================================
-void processVisibility();
-void processPanelChanges();
-void processTextChanges();
-void processButtonChanges();
-void processProgressBarChanges();
-void processSliderChanges();
+void onUpdatePanelComponent(PanelComponent& panel);
+void onUpdateTextComponent(TextComponent& t);
+void onUpdateButtonComponent(ButtonComponent& b);
+void onUpdateProgressBarComponent(ProgressBarComponent& pb);
+void onUpdateSliderComponent(SliderComponent& s);
+
+void onAddPanelComponent(PanelComponent& p);
+void onAddTextComponent(TextComponent& t);
+void onAddProgressBarComponent(ProgressBarComponent& pb);
+void onAddSliderComponent(SliderComponent& s);
 
 void processInput();
 //====================================================

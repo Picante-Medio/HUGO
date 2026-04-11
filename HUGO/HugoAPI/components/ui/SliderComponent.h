@@ -26,7 +26,7 @@ HCOMPONENT(SliderComponent)
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, knobLeft, 0.0f);
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, knobTop, 0.0f);
 
-    bool isDragging = false;
+    HUGO::Bool isDragging = false;
 
     std::function<void(HUGO::Float)> onChangeCallback = nullptr;
 END_HCOMPONENT()

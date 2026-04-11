@@ -30,7 +30,7 @@ namespace HUGO {
     struct OgreOverlayUtils{
         static ErrorOrType<Ogre::Overlay*> getOverlay(const HUGO::String& name);
         static ErrorOrType<Ogre::OverlayElement*> getElement(const HUGO::String& name, bool isTextArea = false, Ogre::OverlayContainer* containerToAdd = nullptr);
-        static ErrorOrType<Ogre::OverlayContainer*> getContainer(const HUGO::String& name, Ogre::Overlay* overlayToAdd);
+        static ErrorOrType<Ogre::OverlayContainer*> getContainer(const HUGO::String& name, Ogre::Overlay* overlayToAdd = nullptr);
     };
 
 }

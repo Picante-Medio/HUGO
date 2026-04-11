@@ -122,35 +122,35 @@ ErrorOrType<Ogre::Overlay*> HUGO::OgreOverlayUtils::getOverlay(const HUGO::Strin
     }
     return ErrorOrType<Ogre::Overlay*>(overlay);
 }
-
-ErrorOrType<Ogre::OverlayElement*> HUGO::OgreOverlayUtils::getElement(const HUGO::String& name, bool isTextArea, Ogre::OverlayContainer* containerToAdd)
+ErrorOrType<Ogre::OverlayElement*> HUGO::OgreOverlayUtils::getElement(const HUGO::String& name, bool isTextArea,
+    Ogre::OverlayContainer* containerToAdd)
 {
     StringError e;
-    if (name.empty()) {
-        e.errorMessage = "Element name is empty";
+
+    if (name.empty())
+    {
+        e.errorMessage = "[OgreUtils] Element name is empty";
         return ErrorOrType<Ogre::OverlayElement*>(e);
     }
 
-    bool hasElement = Ogre::OverlayManager::getSingleton().hasOverlayElement(name);
-    Ogre::OverlayElement*  element = nullptr;
-    // if it is not created yet, just create one
-    if (!hasElement) {
-        HUGO::String type = isTextArea ? "TextArea" : "Panel";
-        element = Ogre::OverlayManager::getSingleton().createOverlayElement(type, name);
-        if (!element){
-            e.errorMessage = "Cannot find element: " + name;
-            return ErrorOrType<Ogre::OverlayElement*>(e);
-        }
+    Ogre::OverlayElement* element = nullptr;
 
+    if (!Ogre::OverlayManager::getSingleton().hasOverlayElement(name))
+    {
+        std::string type = isTextArea ? "TextArea" : "Panel";
+        element = Ogre::OverlayManager::getSingleton().createOverlayElement(type, name);
+        // only attach if we need to
         if (containerToAdd != nullptr)
-            containerToAdd->addChild(element);
+        {
+            if (element->getParent() == nullptr)
+                containerToAdd->addChild(element);
+        }
     }
-    else{
+    else
+    {
         element = Ogre::OverlayManager::getSingleton().getOverlayElement(name);
-        // WE NEED TO ADD INTO THE OVERLAY
-        if (containerToAdd != nullptr)
-            containerToAdd->addChild(element);
     }
+
     return ErrorOrType<Ogre::OverlayElement*>(element);
 }
 

@@ -35,20 +35,20 @@ overlay Console/LogText
     }
 }
 
-overlay Console/InfoText
-{
-    zorder 10
+// overlay Console/InfoText
+// {
+//     zorder 10
 
-    overlay_element Console/InfoText/Container Panel
-    {
-        overlay_element Console/InfoText/Container/Text TextArea
-        {
-            left 0.1
-            top 0.2
-            font_name Roboto 
-            space_width 0.025
-            horz_align left 
-            vert_align center   
-        }
-    }
-}
+//     overlay_element Console/InfoText/Container Panel
+//     {
+//         overlay_element Console/InfoText/Container/Text TextArea
+//         {
+//             left 0.1
+//             top 0.2
+//             font_name Roboto 
+//             space_width 0.025
+//             horz_align left 
+//             vert_align center   
+//         }
+//     }
+// }

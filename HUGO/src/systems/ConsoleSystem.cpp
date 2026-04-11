@@ -190,6 +190,7 @@ void ConsoleSystem::init(){
         text.characterHeight = 0.025f;
         text.top = -0.01f;
         text.spaceWidth = 0.01f;
+        text.text = "-";
     });
 
     scene->addComponent<InputFieldComponent>(consoleInput, [this](InputFieldComponent& input){
@@ -239,6 +240,7 @@ void ConsoleSystem::init(){
         panel3.height = 0.04f;
         panel3.left = 0.7f;
         panel3.top = 0.06f;
+        panel3.zOrder = 501;
         panelContainerName = panel3.containerName;
     });
 
@@ -246,9 +248,10 @@ void ConsoleSystem::init(){
         text3.textAreaName = panelContainerName + "/Text";
         text3.colour = HUGO::Vector4(0.0f, 0.0f, 0.0f, 1.f);
         text3.left = 0.01f;
-        text3.top = -0.01f;
+        text3.top = 0.01f;
         text3.characterHeight = 0.025f;
         text3.spaceWidth = 0.01f;
+        text3.textFont = "Roboto";
         text3.text = "Show/Hide Console: Ctrl + T\n";
     });
 }

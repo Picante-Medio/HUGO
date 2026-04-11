@@ -15,7 +15,7 @@ HCOMPONENT(PanelComponent)
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, top, 0.0f);
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, width, 0.1f);
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, height, 0.1f);
-
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Int, zOrder, 100); 
     // HUGO::UIHorizontalAlignment alignmentX =
     //     HUGO::UIHorizontalAlignment::UHA_LEFT;
 

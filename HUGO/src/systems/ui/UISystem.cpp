@@ -31,40 +31,53 @@ UISystem::~UISystem()
 //====================================================
 // CACHE CREATION
 //====================================================
-
-std::shared_ptr<UIElementCache> UISystem::createElementCache(EntityID entity,
-    Ogre::Overlay *o, Ogre::OverlayContainer *c, Ogre::OverlayElement *e)
+std::shared_ptr<UIElementCache> UISystem::createElementCache(
+    EntityID entity,
+    const HUGO::String& overlayName,
+    const HUGO::String& containerName,
+    const HUGO::String& elementName,
+    bool isTextArea,
+    const HUGO::String& sliderKnobName)
 {
-    std::shared_ptr<UIElementCache> cache = std::make_shared<UIElementCache>();
-    cache->overlay = o;
-    cache->container = c;
-    cache->element = e;
+    // already exists
+    auto it = uiCache.find(entity);
+    if (it != uiCache.end())
+        return it->second;
 
-    uiCache[entity] =cache;
+    // defining correct type (slider must be uislidercache)
+    std::shared_ptr<UIElementCache> cache = sliderKnobName.empty() ? std::make_shared<UIElementCache>() : std::make_shared<UISliderCache>();
 
-    return cache;
-}
+    // overlay
+    ErrorOrType<Ogre::Overlay*> overlayRes = HUGO::OgreOverlayUtils::getOverlay(overlayName);
+    if (!overlayRes.isError())
+        cache->overlay = overlayRes.getValue();
 
-std::shared_ptr<UIElementCache> UISystem::createElementCache(EntityID entity, const HUGO::String &overlayName, const HUGO::String &containerName, const HUGO::String &elementName,bool isTextArea)
-{
-    // if its already created, return it
-    if(uiCache.find(entity) != uiCache.end())
-        return uiCache[entity];{
+    // container (ROOT UI ELEMENT)
+    ErrorOrType<Ogre::OverlayContainer*> containerRes = HUGO::OgreOverlayUtils::getContainer(containerName, cache->overlay);
+    if (!containerRes.isError())
+        cache->container = containerRes.getValue();
+
+    // element (track, text, fill...)
+    if (!elementName.empty())
+    {
+        ErrorOrType<Ogre::OverlayElement*> elemRes = HUGO::OgreOverlayUtils::getElement(elementName, isTextArea, cache->container);
+
+        if (!elemRes.isError())
+            cache->element = elemRes.getValue();
     }
-    std::shared_ptr<UIElementCache> cache = std::make_shared<UIElementCache>();
-    
-    ErrorOrType<Ogre::Overlay*> overlayResult = HUGO::OgreOverlayUtils::getOverlay(overlayName);
-    if (!overlayResult.isError())
-        cache->overlay = overlayResult.getValue();
-    
-    ErrorOrType<Ogre::OverlayContainer*> containerResult = HUGO::OgreOverlayUtils::getContainer(containerName, cache->overlay);
-    if (!containerResult.isError())
-        cache->container = containerResult.getValue();
-    
-    if (elementName != ""){
-        ErrorOrType<Ogre::OverlayElement*> elementResult = HUGO::OgreOverlayUtils::getElement(elementName, isTextArea, cache->container);
-        if (!elementResult.isError())
-            cache->element = elementResult.getValue();
+
+    // slider knob
+    if (!sliderKnobName.empty())
+    {
+        std::shared_ptr<UISliderCache> sliderCache = std::dynamic_pointer_cast<UISliderCache>(cache);
+
+        if (sliderCache)
+        {
+            ErrorOrType<Ogre::OverlayElement*> knobRes = HUGO::OgreOverlayUtils::getElement(sliderKnobName, false, cache->container);
+
+            if (!knobRes.isError())
+                sliderCache->knob = dynamic_cast<Ogre::OverlayContainer*>(knobRes.getValue());
+        }
     }
 
     uiCache[entity] = cache;
@@ -151,6 +164,7 @@ void UISystem::syncPanel(const PanelComponent &p)
     // cache->container->setVerticalAlignment(OgreUtils::toOgre(p.alignmentY));
     cache->container->setMetricsMode(HUGO::OgreUtils::toOgre(p.metricsMode));
     cache->setVisible(p.isVisible);
+    cache->overlay->setZOrder(static_cast<Ogre::ushort>(p.zOrder));
 
     if (!p.material.empty()) cache->container->setMaterialName(p.material);
 }
@@ -205,10 +219,7 @@ bool UISystem::isValidColour(const HUGO::Vector4& colour){
 
 void UISystem::syncText(const TextComponent &t)
 {
-    UIElementCache *cache = getCache(t.entity);
-    if (!cache)
-        return;
-
+    UIElementCache* cache = getCache(t.entity);
     Ogre::TextAreaOverlayElement *textArea = dynamic_cast<Ogre::TextAreaOverlayElement *>(cache->element);
     if (!textArea)
         return;
@@ -366,64 +377,25 @@ void UISystem::syncSlider(const PanelComponent& p, const SliderComponent& s)
 //====================================================
 // PROCESSING
 //====================================================
-void UISystem::processPanelChanges()
+void UISystem::onUpdatePanelComponent(PanelComponent& panel)
 {
-   for (auto &pack : scene->query<PanelComponent>())
-    {
-        PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
-        if(uiCache.find(panel.entity) == uiCache.end()) { // if it doesn't have cache, create it
-            createElementCache(panel.entity, panel.overlayName, panel.containerName);
-        }
-        syncPanel(panel);
-    }
+   syncPanel(panel);
 }
 
-void UISystem::processVisibility()
+void UISystem::onUpdateButtonComponent(ButtonComponent& b)
 {
-    for (auto &pack : scene->query<PanelComponent>())
-    {
-        PanelComponent &panel = pack.getDeprecated<PanelComponent&>();
-        UIElementCache *cache = getCache(panel.entity);
-
-        if (cache && cache->overlay && cache->container)
-        {
-        }
-    }
+    PanelComponent& p = scene->getComponent<PanelComponent>(b.entity);
+    syncButton(b, p);
 }
 
-
-void UISystem::processButtonChanges()
+void UISystem::onUpdateTextComponent(TextComponent& t)
 {
-    for (auto &pack : scene->query<ButtonComponent, PanelComponent>())
-    {
-        ButtonComponent &button = pack.getDeprecated<ButtonComponent&>();
-        PanelComponent &panel = pack.getDeprecated<PanelComponent&>();
-        syncButton(button, panel);
-    }
-}
+    Ogre::TextAreaOverlayElement* area = static_cast<Ogre::TextAreaOverlayElement*>(HUGO::OgreOverlayUtils::getElement(t.textAreaName).getValue());
 
-void UISystem::processTextChanges()
-{
-    for (auto &pack : scene->query<PanelComponent, TextComponent>())
-    {
-        TextComponent &text = pack.getDeprecated<TextComponent &>();
-        ErrorOrType<Ogre::OverlayElement *> elementResult = HUGO::OgreOverlayUtils::getElement(text.textAreaName, true);
-        if (elementResult.isError())
-            return;
-
-        Ogre::TextAreaOverlayElement *area = dynamic_cast<Ogre::TextAreaOverlayElement *>(elementResult.getValue());
-        if (!area)
-            return;
-        
-        UIElementCache *cache = getCache(text.entity);
-        if (cache)
-            cache->element = area;
-    
-        if(text.maxWidth || text.maxHeight){
-            text.text = formatText(text.text, area, text.maxWidth, text.maxHeight);
-        }
-        syncText(text);
+    if(t.maxWidth || t.maxHeight){
+        t.text = formatText(t.text, area, t.maxWidth, t.maxHeight);
     }
+    syncText(t);
 }
 
 constexpr HUGO::Int MIN_ACSII = 32;
@@ -659,7 +631,7 @@ void UISystem::processInput()
             text.text = visible;
         }
     }
-
+    
     // clear SDL text input buffer
     input->clearTextInput();
 
@@ -672,30 +644,67 @@ void UISystem::processInput()
         }
     }
     input->toggleTextInput(anyFieldActive);
-}
 
-void UISystem::processProgressBarChanges()
-{
-    for (auto &pack : scene->query<PanelComponent, ProgressBarComponent>())
-    {
-        PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
-        ProgressBarComponent& pr = pack.getDeprecated<ProgressBarComponent&>();
-        syncProgressBar(panel, pr);
+    // I DONT KNOW WHY MY ONUPDATE METHODS DONT WORK 
+    for (auto& pack : scene->query<TextComponent>()) {
+        TextComponent& t = pack.getDeprecated<TextComponent&>();
+        syncText(t);
     }
 }
 
-void UISystem::processSliderChanges()
+void UISystem::onUpdateProgressBarComponent(ProgressBarComponent& pb)
 {
-   for (auto &pack : scene->query<PanelComponent, SliderComponent>())
-    {
-        PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
-        SliderComponent& slider = pack.getDeprecated<SliderComponent&>();
-        syncSlider(panel, slider);
-    }
+    PanelComponent& p = scene->getComponent<PanelComponent>(pb.entity);
+    syncProgressBar(p, pb);
+}
+
+void UISystem::onUpdateSliderComponent(SliderComponent& s)
+{
+    PanelComponent& p = scene->getComponent<PanelComponent>(s.entity);
+    syncSlider(p, s);
 }
 //====================================================
 // CACHE MANAGEMENT
 //====================================================
+void UISystem::clearEntityCache(EntityID entity)
+{
+    auto it = uiCache.find(entity);
+    if (it == uiCache.end())
+        return;
+
+    auto& cache = it->second;
+
+    Ogre::OverlayManager& mgr = Ogre::OverlayManager::getSingleton();
+
+    // detach first (IMPORTANT)
+    if (cache->container && cache->container->getParent())
+    {
+        cache->container->getParent()->removeChild(cache->container->getName());
+    }
+
+    if (cache->element && cache->element->getParent())
+    {
+        cache->element->getParent()->removeChild(cache->element->getName());
+    }
+
+    if (auto slider = std::dynamic_pointer_cast<UISliderCache>(cache))
+    {
+        if (slider->knob && slider->knob->getParent())
+            slider->knob->getParent()->removeChild(slider->knob->getName());
+    }
+
+    // destroy safely
+    if (cache->element)
+        mgr.destroyOverlayElement(cache->element);
+
+    if (cache->container)
+        mgr.destroyOverlayElement(cache->container);
+
+    if (cache->overlay)
+        mgr.destroy(cache->overlay);
+
+    uiCache.erase(it);
+}
 
 void UISystem::clearAllCaches()
 {
@@ -711,19 +720,66 @@ void UISystem::init()
     renderWindow = OgreModule::Instance().getOgreRenderWindow();
     OgreModule::Instance().getCurrentSceneManager()->addRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
     scene->getInput()->registerAction("SubmitInput", {HUGO::KeyCode::RETURN});
+
+    //component events
+    scene->onAddComponent<PanelComponent>().connect(this, &UISystem::onAddPanelComponent);
+    scene->onAddComponent<TextComponent>().connect(this, &UISystem::onAddTextComponent);
+    scene->onAddComponent<ButtonComponent>().connect(this, &UISystem::onUpdateButtonComponent);
+    scene->onAddComponent<ProgressBarComponent>().connect(this, &UISystem::onAddProgressBarComponent);
+    scene->onAddComponent<SliderComponent>().connect(this, &UISystem::onAddSliderComponent);
+
+    scene->onUpdateComponent<PanelComponent>().connect(this, &UISystem::onUpdatePanelComponent);
+    scene->onUpdateComponent<TextComponent>().connect(this, &UISystem::onUpdateTextComponent);
+    scene->onUpdateComponent<ButtonComponent>().connect(this, &UISystem::onUpdateButtonComponent);
+    scene->onUpdateComponent<ProgressBarComponent>().connect(this, &UISystem::onUpdateProgressBarComponent);
+    scene->onUpdateComponent<SliderComponent>().connect(this, &UISystem::onUpdateSliderComponent);
 }
 
 void UISystem::onLoad() {}
 
 void UISystem::update(double)
 {
-    processPanelChanges();
-    processTextChanges();
-
     processInput();
-    processProgressBarChanges();
-    processSliderChanges();
-    processButtonChanges();
 }
 
 void UISystem::fixedUpdate(double) {}
+
+void UISystem::onAddPanelComponent(PanelComponent &p)
+{
+    createElementCache(p.entity, p.overlayName, p.containerName);
+    syncPanel(p);
+}
+
+void UISystem::onAddTextComponent(TextComponent &t)
+{
+    UIElementCache *cache = getCache(t.entity);
+    if (!cache) 
+        return;
+
+    ErrorOrType<Ogre::OverlayElement *> elementResult = HUGO::OgreOverlayUtils::getElement(t.textAreaName, true, cache->container);
+    if (elementResult.isError())
+        return;
+    Ogre::TextAreaOverlayElement *area = dynamic_cast<Ogre::TextAreaOverlayElement *>(elementResult.getValue());
+    if (!area)
+        return;
+    
+    cache->element = area;
+    onUpdateTextComponent(t);
+    PanelComponent& p = scene->getComponent<PanelComponent>(t.entity);
+}
+
+void UISystem::onAddProgressBarComponent(ProgressBarComponent &pb)
+{
+    PanelComponent& p = scene->getComponent<PanelComponent>(pb.entity);
+    createElementCache(pb.entity, p.overlayName, p.containerName, pb.fillElementName, false);
+    syncProgressBar(p, pb);
+}
+
+void UISystem::onAddSliderComponent(SliderComponent &s)
+{
+    clearEntityCache(s.entity);
+    PanelComponent& p = scene->getComponent<PanelComponent>(s.entity);
+    createElementCache(s.entity, p.overlayName, p.containerName, s.trackElementName, false, s.knobElementName);
+    syncSlider(p, s);
+}
+
