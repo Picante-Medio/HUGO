@@ -29,16 +29,17 @@ HUGO::ResourcesGenerator::generateResourcesConfig() {
 
 void
 HUGO::ResourcesGenerator::appendContent(const std::filesystem::path& path, std::ofstream& configFile) {
+    // Zips must appear before their directories or it will lead to double loading
     for (directory_entry entry : directory_iterator(path)) {
-        if(entry.is_directory()) {
-            configFile << "FileSystem=" << entry.path().c_str() << '\n';
+        if (entry.is_regular_file() && entry.path().extension() == ".zip")
+            configFile << "Zip=" << std::filesystem::canonical(entry.path()).string() << '\n';
+    }
+
+    // Recursion into directories
+    for (directory_entry entry : directory_iterator(path)) {
+        if (entry.is_directory()) {
+            configFile << "FileSystem=" << std::filesystem::canonical(entry.path()).string() << '\n';
             appendContent(entry.path(), configFile);
         }
-
-        else if(!entry.is_regular_file()) 
-            continue;
-
-        if(entry.path().extension() == ".zip")
-            configFile << "Zip=" << entry.path().c_str() << '\n';
     }
 }
