@@ -21,8 +21,6 @@ void HUGOMotionState::updateBulletTransform()
 
     // Uses associated HUGO::TransformComponent to update itself
     btTransformRegister = btTransform(q, BulletUtils::vector3ToBullet(hugoTransform.getPosition()));
-
-    // btTransformRegister = auxTransform;
 }
 
 void HUGOMotionState::getWorldTransform(btTransform& worldTrans) const
