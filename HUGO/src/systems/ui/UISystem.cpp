@@ -34,18 +34,14 @@ UISystem::~UISystem()
 std::shared_ptr<UIElementCache> UISystem::createElementCache(
     EntityID entity,
     const HUGO::String& overlayName,
-    const HUGO::String& containerName,
-    const HUGO::String& elementName,
-    bool isTextArea,
-    const HUGO::String& sliderKnobName)
+    const HUGO::String& containerName)
 {
     // already exists
     auto it = uiCache.find(entity);
     if (it != uiCache.end())
         return it->second;
 
-    // defining correct type (slider must be uislidercache)
-    std::shared_ptr<UIElementCache> cache = sliderKnobName.empty() ? std::make_shared<UIElementCache>() : std::make_shared<UISliderCache>();
+    std::shared_ptr<UIElementCache> cache = std::make_shared<UIElementCache>();
 
     // overlay
     ErrorOrType<Ogre::Overlay*> overlayRes = HUGO::OgreOverlayUtils::getOverlay(overlayName);
@@ -56,29 +52,6 @@ std::shared_ptr<UIElementCache> UISystem::createElementCache(
     ErrorOrType<Ogre::OverlayContainer*> containerRes = HUGO::OgreOverlayUtils::getContainer(containerName, cache->overlay);
     if (!containerRes.isError())
         cache->container = containerRes.getValue();
-
-    // element (track, text, fill...)
-    if (!elementName.empty())
-    {
-        ErrorOrType<Ogre::OverlayElement*> elemRes = HUGO::OgreOverlayUtils::getElement(elementName, isTextArea, cache->container);
-
-        if (!elemRes.isError())
-            cache->element = elemRes.getValue();
-    }
-
-    // slider knob
-    if (!sliderKnobName.empty())
-    {
-        std::shared_ptr<UISliderCache> sliderCache = std::dynamic_pointer_cast<UISliderCache>(cache);
-
-        if (sliderCache)
-        {
-            ErrorOrType<Ogre::OverlayElement*> knobRes = HUGO::OgreOverlayUtils::getElement(sliderKnobName, false, cache->container);
-
-            if (!knobRes.isError())
-                sliderCache->knob = dynamic_cast<Ogre::OverlayContainer*>(knobRes.getValue());
-        }
-    }
 
     uiCache[entity] = cache;
     return cache;
@@ -328,8 +301,8 @@ void UISystem::syncProgressBar(const PanelComponent& p, const ProgressBarCompone
 
 void UISystem::syncSlider(const PanelComponent& p, const SliderComponent& s)
 {
-    UISliderCache* cache = dynamic_cast<UISliderCache*>(uiCache[s.entity].get());
-    if (!cache || !cache->container || !cache->element || !cache->knob)
+    UIElementCache* cache = uiCache[s.entity].get();
+    if (!cache || !cache->container || !cache->element || !cache->extra)
         return;
 
     HUGO::Float percent = (s.currentValue - s.minValue) / (s.maxValue - s.minValue);
@@ -347,10 +320,10 @@ void UISystem::syncSlider(const PanelComponent& p, const SliderComponent& s)
         knobPos = (p.width - s.knobWidth) * percent;
         knobPos = std::clamp(knobPos, 0.0f, p.width - s.knobWidth);
         
-        cache->knob->setLeft(knobPos);
-        cache->knob->setTop(-s.knobWidth/4.0f);
-        cache->knob->setWidth(s.knobWidth);
-        cache->knob->setHeight(s.knobHeight);
+        cache->extra->setLeft(knobPos);
+        cache->extra->setTop(-s.knobWidth/4.0f);
+        cache->extra->setWidth(s.knobWidth);
+        cache->extra->setHeight(s.knobHeight);
         break;
     
     case HUGO::SliderOrientation::VERTICAL:
@@ -362,16 +335,16 @@ void UISystem::syncSlider(const PanelComponent& p, const SliderComponent& s)
         knobPos = (p.height - s.knobHeight) * (1.0f - percent);
         knobPos = std::clamp(knobPos, 0.0f, p.height - s.knobHeight);
         
-        cache->knob->setLeft(-s.knobHeight/4.0f);
-        cache->knob->setTop(knobPos);
-        cache->knob->setWidth(s.knobWidth);
-        cache->knob->setHeight(s.knobHeight);
+        cache->extra->setLeft(-s.knobHeight/4.0f);
+        cache->extra->setTop(knobPos);
+        cache->extra->setWidth(s.knobWidth);
+        cache->extra->setHeight(s.knobHeight);
         break;
     }
     
     // apply materials or colors
     if(!s.trackMaterial.empty()) cache->element->setMaterialName(s.trackMaterial);
-    if(!s.knobMaterial.empty()) cache->knob->setMaterialName(s.knobMaterial);
+    if(!s.knobMaterial.empty()) cache->extra->setMaterialName(s.knobMaterial);
 }
 
 //====================================================
@@ -419,20 +392,28 @@ void UISystem::processInput()
             if (isMouseOverPanel(panel, mouse.x, mouse.y)) {
                 if (!field.isActive){
                     // activate this field
-                    field.isActive = true;
+                    pack.modify<InputFieldComponent>([](InputFieldComponent& f){
+                        f.isActive = true;
+                    });
                     anyFieldActive = true;
 
                     if (field.originalText.empty()){
-                        field.originalText = text.text;
-                        text.text.clear();
-
-                        field.fullText.clear();
-                        field.cursorPos = 0;
+                        pack.modify<InputFieldComponent>([text](InputFieldComponent& f){
+                            f.originalText = text.text;
+                            f.fullText.clear();
+                            f.cursorPos = 0;
+                        });
+                        pack.modify<TextComponent>([](TextComponent& t){
+                            t.text.clear();
+                        });
                     }
                 }
             }
             else {
-                field.isActive = false;
+                // activate this field
+                pack.modify<InputFieldComponent>([](InputFieldComponent& f){
+                    f.isActive = false;
+                });
             }
         }
         input->toggleTextInput(anyFieldActive);    
@@ -440,11 +421,11 @@ void UISystem::processInput()
         for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
         {
             PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
-            ButtonComponent& button = pack.getDeprecated<ButtonComponent&>();
-
             if (isMouseOverPanel(panel, mouse.x, mouse.y))
             {
-                button.state = HUGO::BS_DOWN;
+               pack.modify<ButtonComponent>([](ButtonComponent& b){
+                    b.state = HUGO::BS_DOWN;
+                 });
                 break;
             }
         }
@@ -453,55 +434,59 @@ void UISystem::processInput()
     
         for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
         {
-            PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
-            ButtonComponent& button = pack.getDeprecated<ButtonComponent&>();
+            PanelComponent& panel = pack.getConst<PanelComponent&>();
             bool isOver = isMouseOverPanel(panel, mouse.x, mouse.y);
-            if (isOver){
-                if (button.onClickCallback) button.onClickCallback();
-                button.state = HUGO::BS_OVER;
-            }
-            else 
-                button.state = HUGO::BS_UP;
+
+            pack.modify<ButtonComponent>([isOver](ButtonComponent& b){
+                b.state = isOver? HUGO::BS_OVER : HUGO::BS_UP;
+                if (isOver)
+                    if (b.onClickCallback) b.onClickCallback();
+            });
         }
     }
 
 
     for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
     {
-        PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
-        ButtonComponent& button = pack.getDeprecated<ButtonComponent&>();
+        PanelComponent& panel = pack.getConst<PanelComponent&>();
+        ButtonComponent& button = pack.getConst<ButtonComponent&>();
 
         bool isOver = isMouseOverPanel(panel, mouse.x, mouse.y);
         if (isOver && button.state != HUGO::BS_DOWN)
         {
-            button.state = HUGO::BS_OVER;
+            pack.modify<ButtonComponent>([](ButtonComponent& b){
+                b.state = HUGO::BS_OVER;
+            });
         }
         else if (!isOver && button.state != HUGO::BS_UP && button.state != HUGO::BS_DOWN)
         {
-            button.state = HUGO::BS_UP;
+            pack.modify<ButtonComponent>([](ButtonComponent& b){
+                b.state = HUGO::BS_UP;
+            });
         }
     }
-    
 
     for (auto &pack : scene->query<SliderComponent, PanelComponent>())
     {
-        SliderComponent& slider = pack.getDeprecated<SliderComponent&>();
-        PanelComponent& panel   = pack.getDeprecated<PanelComponent&>();
+        SliderComponent& slider = pack.getConst<SliderComponent&>();
+        PanelComponent& panel = pack.getConst<PanelComponent&>();
 
-        UISliderCache* cache = dynamic_cast<UISliderCache*>(uiCache[slider.entity].get());
-        if (!cache || !cache->container || !cache->element || !cache->knob)
+        UIElementCache* cache = uiCache[slider.entity].get();
+        if (!cache || !cache->container || !cache->element || !cache->extra)
             continue;
         
         // get knob position and size
-        HUGO::Float knobLeft = cache->knob->getLeft();
-        HUGO::Float knobTop = cache->knob->getTop();
+        HUGO::Float knobLeft = cache->extra->getLeft();
+        HUGO::Float knobTop = cache->extra->getTop();
         bool mouseOverKnob = isMouseOver(knobLeft, knobTop, slider.knobWidth, slider.knobHeight, mouse.x, mouse.y);
         bool mouseOverTrack = isMouseOverPanel(panel, mouse.x, mouse.y);
 
         // check for initial click to start dragging
         if ((mouseOverKnob || mouseOverTrack) && input->wasMouseButtonJustPressed(HUGO::MouseCode::MOUSE_LEFT))
         {
-            slider.isDragging = true;
+            pack.modify<SliderComponent>([](SliderComponent& s){
+                s.isDragging = true;
+            });
             
             // if clicking directly on the track, move knob to clicked position
             if (mouseOverTrack && !mouseOverKnob)
@@ -521,7 +506,9 @@ void UISystem::processInput()
                 }
 
                 percent = std::clamp(percent, 0.0f, 1.0f);
-                slider.currentValue = slider.minValue + percent * (slider.maxValue - slider.minValue);
+                pack.modify<SliderComponent>([percent](SliderComponent& s){
+                    s.currentValue = s.minValue + percent * (s.maxValue - s.minValue);
+                });
             }
         }
         
@@ -551,12 +538,17 @@ void UISystem::processInput()
                 HUGO::Float newValue = slider.minValue + percent * (slider.maxValue - slider.minValue);
                 
                 // only update if it is needed
-                if (slider.currentValue != newValue)
-                    slider.currentValue = newValue;
+                if (slider.currentValue != newValue){
+                    pack.modify<SliderComponent>([newValue](SliderComponent& s){
+                        s.currentValue = newValue;
+                    });
+                }
             }
             else
             {
-                slider.isDragging = false;
+                pack.modify<SliderComponent>([](SliderComponent& s){
+                    s.isDragging = false;
+                });
             }
         }
     }
@@ -564,11 +556,11 @@ void UISystem::processInput()
     // process text for the active input field using SDL text buffer
     const HUGO::String& textInput = input->getTextInput();
     for (auto &pack : scene->query<InputFieldComponent, TextComponent, PanelComponent>()) {
-        InputFieldComponent& field = pack.getDeprecated<InputFieldComponent&>();
+        InputFieldComponent& field = pack.getConst<InputFieldComponent&>();
         if (!field.isActive) continue;
 
-        TextComponent& text = pack.getDeprecated<TextComponent&>();
-        PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
+        TextComponent& text = pack.getConst<TextComponent&>();
+        PanelComponent& panel = pack.getConst<PanelComponent&>();
         bool changed = false;
 
         // append new text input from SDL
@@ -576,31 +568,40 @@ void UISystem::processInput()
             int c = static_cast<int>(textInput[0]);
             //only english printable ascii codes are accepted
             if (c >= MIN_ACSII && c <= MAX_ACSII){
-                field.fullText.insert(field.cursorPos, 1, textInput[0]);
-                field.cursorPos++;
+                pack.modify<InputFieldComponent>([textInput](InputFieldComponent& f){
+                    f.fullText.insert(f.cursorPos, 1, textInput[0]);
+                    f.cursorPos++;
+                });
                 changed = true;
             }
         }
 
         // backspace -> remove last character
         if (input->wasKeyJustPressed(HUGO::KeyCode::BACKSPACE) && field.cursorPos > 0) {
-            field.fullText.erase(field.cursorPos - 1, 1);
-            field.cursorPos--;
+            pack.modify<InputFieldComponent>([textInput](InputFieldComponent& f){
+                f.fullText.erase(f.cursorPos - 1, 1);
+                f.cursorPos--;
+            });
             changed = true;
         }
 
         // enter -> save result and deactivate
         if (input->wasActionJustPressed("SubmitInput")) {
-            field.result = field.fullText;
+            pack.modify<TextComponent>([field](TextComponent& t){
+                // recover the original text
+                t.text = field.originalText;
+            });
 
-            if (field.onChangeCallback)
-                field.onChangeCallback(field.fullText);
+            pack.modify<InputFieldComponent>([](InputFieldComponent& f){
+                f.result = f.fullText;
+                if (f.onChangeCallback)
+                    f.onChangeCallback(f.fullText);
+                
+                f.originalText.clear();
+                f.fullText.clear();
+                f.cursorPos = 0;
+            });
 
-            // recover the original text
-            text.text = field.originalText;
-            field.originalText.clear();
-            field.fullText.clear();
-            field.cursorPos = 0;
             continue;
         }
         // update visible text
@@ -628,7 +629,9 @@ void UISystem::processInput()
                 visible.insert(visible.begin(), c);
                 width += w;
             }
-            text.text = visible;
+            pack.modify<TextComponent>([visible](TextComponent& t){
+                t.text = visible;
+            });
         }
     }
     
@@ -638,18 +641,13 @@ void UISystem::processInput()
     // toggle SDL text input if any field is active
     anyFieldActive = false;
     for (auto& pack : scene->query<InputFieldComponent>()) {
-        if (pack.getDeprecated<InputFieldComponent&>().isActive) {
+        if (pack.getConst<InputFieldComponent&>().isActive) {
             anyFieldActive = true;
             break;
         }
     }
     input->toggleTextInput(anyFieldActive);
 
-    // I DONT KNOW WHY MY ONUPDATE METHODS DONT WORK 
-    for (auto& pack : scene->query<TextComponent>()) {
-        TextComponent& t = pack.getDeprecated<TextComponent&>();
-        syncText(t);
-    }
 }
 
 void UISystem::onUpdateProgressBarComponent(ProgressBarComponent& pb)
@@ -666,45 +664,6 @@ void UISystem::onUpdateSliderComponent(SliderComponent& s)
 //====================================================
 // CACHE MANAGEMENT
 //====================================================
-void UISystem::clearEntityCache(EntityID entity)
-{
-    auto it = uiCache.find(entity);
-    if (it == uiCache.end())
-        return;
-
-    auto& cache = it->second;
-
-    Ogre::OverlayManager& mgr = Ogre::OverlayManager::getSingleton();
-
-    // detach first (IMPORTANT)
-    if (cache->container && cache->container->getParent())
-    {
-        cache->container->getParent()->removeChild(cache->container->getName());
-    }
-
-    if (cache->element && cache->element->getParent())
-    {
-        cache->element->getParent()->removeChild(cache->element->getName());
-    }
-
-    if (auto slider = std::dynamic_pointer_cast<UISliderCache>(cache))
-    {
-        if (slider->knob && slider->knob->getParent())
-            slider->knob->getParent()->removeChild(slider->knob->getName());
-    }
-
-    // destroy safely
-    if (cache->element)
-        mgr.destroyOverlayElement(cache->element);
-
-    if (cache->container)
-        mgr.destroyOverlayElement(cache->container);
-
-    if (cache->overlay)
-        mgr.destroy(cache->overlay);
-
-    uiCache.erase(it);
-}
 
 void UISystem::clearAllCaches()
 {
@@ -765,21 +724,51 @@ void UISystem::onAddTextComponent(TextComponent &t)
     
     cache->element = area;
     onUpdateTextComponent(t);
-    PanelComponent& p = scene->getComponent<PanelComponent>(t.entity);
 }
 
 void UISystem::onAddProgressBarComponent(ProgressBarComponent &pb)
 {
+    UIElementCache *cache = getCache(pb.entity);
+    if (!cache) 
+        return;
+
+    ErrorOrType<Ogre::OverlayElement *> elementResult = HUGO::OgreOverlayUtils::getElement(pb.fillElementName, false, cache->container);
+    if (elementResult.isError())
+        return;
+    Ogre::OverlayElement *area = elementResult.getValue();
+    if (!area)
+        return;
+    
+    cache->element = area;
+
     PanelComponent& p = scene->getComponent<PanelComponent>(pb.entity);
-    createElementCache(pb.entity, p.overlayName, p.containerName, pb.fillElementName, false);
     syncProgressBar(p, pb);
 }
 
 void UISystem::onAddSliderComponent(SliderComponent &s)
 {
-    clearEntityCache(s.entity);
+    UIElementCache *cache = getCache(s.entity);
+    if (!cache) 
+        return;
+
+    ErrorOrType<Ogre::OverlayElement*> trackResult = HUGO::OgreOverlayUtils::getElement(s.trackElementName, false, cache->container);
+    if (trackResult.isError())
+        return;
+    Ogre::OverlayElement *track = trackResult.getValue();
+    if (!track)
+        return;
+    
+    cache->element = track;
+
+    ErrorOrType<Ogre::OverlayElement*> knobResult = HUGO::OgreOverlayUtils::getElement(s.knobElementName, false, cache->container);
+    if (knobResult.isError())
+        return;
+    Ogre::OverlayElement *knob = knobResult.getValue();
+    if (!knob)
+        return;
+    
+    cache->extra = knob;
+
     PanelComponent& p = scene->getComponent<PanelComponent>(s.entity);
-    createElementCache(s.entity, p.overlayName, p.containerName, s.trackElementName, false, s.knobElementName);
     syncSlider(p, s);
 }
-

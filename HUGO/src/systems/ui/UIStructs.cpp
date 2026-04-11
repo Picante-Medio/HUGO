@@ -7,6 +7,8 @@ void UIElementCache::setVisible(bool visible)
         container->show();
         if (element != nullptr)
             element->show();
+        if (extra != nullptr)
+            extra->show();
     }
     else
     {
@@ -14,14 +16,7 @@ void UIElementCache::setVisible(bool visible)
         container->hide();
         if (element != nullptr)
             element->hide();
+        if (extra != nullptr)
+            extra->hide();
     }
-}
-
-void UISliderCache::setVisible(bool visible)
-{
-    UIElementCache::setVisible(visible);
-    if (visible)
-        knob->show();
-    else
-        knob->hide();
 }

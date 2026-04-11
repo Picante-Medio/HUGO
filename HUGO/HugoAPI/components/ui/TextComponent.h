@@ -22,6 +22,8 @@ HCOMPONENT(TextComponent)
 
     std::optional<HUGO::Float> maxWidth;
     std::optional<HUGO::Float> maxHeight;
+
+    
     
 END_HCOMPONENT()
 

@@ -31,6 +31,7 @@ void ParticleSystem::init() {
 
     scene->onAddComponent<ParticleEmitterComponent>().connect(this, &ParticleSystem::onAddParticleEmitterComponent);
     scene->onUpdateComponent<ParticleEmitterComponent>().connect(this, &ParticleSystem::onUpdateParticleEmitterComponent);
+    scene->onUpdateComponent<TransformComponent>().connect(this, &ParticleSystem::processPosition);
 }
 
 void ParticleSystem::onLoad() {}
@@ -90,8 +91,9 @@ void ParticleSystem::destroyParticleSystem(EntityID id) {
     activeParticleSystems.erase(it);
 }
 
-void ParticleSystem::processPosition(const TransformComponent &tr)
+void ParticleSystem::processPosition(TransformComponent &tr)
 {
+    // set every particle system in their position correctly
     // get the specific particle system
     EntityID id = tr.entity;
     auto it = activeParticleSystems.find(id);
@@ -169,13 +171,7 @@ void ParticleSystem::processChanges(const ParticleEmitterComponent& pe, const Tr
 
 void ParticleSystem::fixedUpdate(double) {}
 
-void ParticleSystem::update(double) {
-    // set every particle system in their position correctly
-    for (auto pack: scene->query<ParticleEmitterComponent, TransformComponent>()){
-        TransformComponent& tr = pack.getDeprecated<TransformComponent>();
-        processPosition(tr);
-    }
-}
+void ParticleSystem::update(double) {}
 
 void ParticleSystem::onAddParticleEmitterComponent(ParticleEmitterComponent &pe)
 {

@@ -43,9 +43,7 @@ std::unordered_map<EntityID, std::shared_ptr<UIElementCache>> uiCache;
 // CACHE CREATION
 //====================================================
     
-std::shared_ptr<UIElementCache> createElementCache(EntityID entity, const HUGO::String& overlayName, const HUGO::String& containerName, 
-    const HUGO::String& elementName = "", bool isTextArea = false,
-    const HUGO::String& sliderKnobName = "");
+std::shared_ptr<UIElementCache> createElementCache(EntityID entity, const HUGO::String& overlayName, const HUGO::String& containerName);
 UIElementCache* getCache(EntityID entity);
 
 //====================================================
@@ -84,8 +82,6 @@ void processInput();
 //====================================================
 // CACHE
 //====================================================
-
-void clearEntityCache(EntityID entity);
 void clearAllCaches();
 public:
 

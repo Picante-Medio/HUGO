@@ -6,32 +6,54 @@
 
 void ConsoleSystem::printLuaOutput(TextComponent& consoleTextCmp){
 
-    while(!ConsoleSystem::luaOutput.empty()){
-        consoleTextCmp.text += logIni + ConsoleSystem::luaOutput.front() + "\n";
-        ConsoleSystem::luaOutput.pop();
+    for (auto& pack: scene->query<TextComponent>()){
+        EntityID id = pack.getConst<TextComponent>().entity;
+        if (id != consoleTextCmp.entity) continue;
+
+        while(!ConsoleSystem::luaOutput.empty()){
+            pack.modify<TextComponent>([this](TextComponent& t){
+                t.text += logIni + ConsoleSystem::luaOutput.front() + "\n";
+            });
+            ConsoleSystem::luaOutput.pop();
+        }
     }
 }
 
 void ConsoleSystem::printLogs(TextComponent& consoleTextCmp){
     ErrorOrType log = scene->getNextLog();
 
-    while (!log.isError())
-    {
-        // if not explicitly specified, no \n is included
-        consoleTextCmp.text += logIni + log.getValue();
-        log = scene->getNextLog();
+    for (auto& pack: scene->query<TextComponent>()){
+        EntityID id = pack.getConst<TextComponent>().entity;
+        if (id != consoleTextCmp.entity) continue;
+
+        while (!log.isError())
+        {
+            // if not explicitly specified, no \n is included
+            const HUGO::String& logText = log.getValue();
+            pack.modify<TextComponent>([this, logText](TextComponent& t){
+                t.text += logIni + logText;
+            });
+            log = scene->getNextLog();
+        }
+
     }
-    
 }
 
 void ConsoleSystem::printErrors(TextComponent& consoleTextCmp){
     ErrorOrType error = scene->getNextError();
 
-    while (!error.isError())
-    {
+    for (auto& pack: scene->query<TextComponent>()){
+        EntityID id = pack.getConst<TextComponent>().entity;
+        if (id != consoleTextCmp.entity) continue;
+
+        const HUGO::String& errorText = error.getValue();
         // for errors, \n is included by default
-        consoleTextCmp.text += logIni + "ERROR: " + error.getValue() + "\n";
-        error = scene->getNextError();
+        while(!error.isError()){
+            pack.modify<TextComponent>([this, errorText](TextComponent& t){
+                t.text += logIni + "ERROR: " + errorText + "\n";
+            });
+            error = scene->getNextError();
+        }
     }
 }
 
@@ -107,31 +129,43 @@ void ConsoleSystem::receiveInput(const HUGO::String& input){
 
 void ConsoleSystem::handleKeyInput(){
 
+    HUGO::String result = "";
     if(active && scene->getInput()->wasKeyJustPressed(HUGO::KeyCode::UP_ARROW)){
-        HUGO::String next = getNextHistoric();
-        scene->getComponent<InputFieldComponent>(consoleInput).fullText = next;
-        scene->getComponent<TextComponent>(consoleInput).text = next;
+        result = getNextHistoric();
     }
     if(active && scene->getInput()->wasKeyJustPressed(HUGO::KeyCode::DOWN_ARROW)){
-        HUGO::String prev = getPreviousHistoric();
-        scene->getComponent<InputFieldComponent>(consoleInput).fullText = prev;
-        scene->getComponent<TextComponent>(consoleInput).text = prev;
+        result = getPreviousHistoric();
     }
+
+    for (auto& pack: scene->query<TextComponent, InputFieldComponent, PanelComponent>()){
+        InputFieldComponent& inp = pack.getConst<InputFieldComponent&>();
+        //search for the console input
+        if (inp.entity != consoleInput || result.empty()) continue;
+        
+        pack.modify<InputFieldComponent>([result](InputFieldComponent& i){
+            i.fullText = result;
+        });
+        pack.modify<TextComponent>([result](TextComponent& t){
+            t.text = result;
+        });
+    }
+
     if(scene->getInput()->isKeyPressed(HUGO::KeyCode::LCTRL) &&
-       scene->getInput()->wasKeyJustPressed(HUGO::KeyCode::T))
+    scene->getInput()->wasKeyJustPressed(HUGO::KeyCode::T))
     {
         active = !active;
         HUGO::Vector4 colour = {1.0, 1.0, 1.0, 1.0};
         if(!active) colour.w = 0;
-
-        // Console input
-        scene->getComponent<PanelComponent>(consoleInput).isVisible = active;
-
-        // Console text
-        scene->getComponent<PanelComponent>(consoleText).isVisible = active;
-
-        // Console Info
-        scene->getComponent<PanelComponent>(consoleInfo).isVisible = active;
+        
+        for (auto& pack: scene->query<PanelComponent>()){
+            PanelComponent& panel = pack.getConst<PanelComponent&>();
+            if (panel.entity != consoleInput && panel.entity != consoleText && panel.entity != consoleInfo)
+                continue;
+            
+            pack.modify<PanelComponent>([this](PanelComponent& p){
+                p.isVisible = active;
+            });
+        } 
     }
 }
 
@@ -255,4 +289,3 @@ void ConsoleSystem::init(){
         text3.text = "Show/Hide Console: Ctrl + T\n";
     });
 }
-

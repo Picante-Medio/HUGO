@@ -294,6 +294,7 @@ void AudioSystem::processChanges(AudioComponent &c)
     else if (!c.isPlaying && ma_sound_is_playing(c.activePtr)){
         stopAudio(c.activePtr);
     }
+    
 }
 
 void AudioSystem::process3DChanges(AudioComponent& a, const Audio3DInfoComponent &c)
@@ -311,47 +312,16 @@ void AudioSystem::process3DChanges(AudioComponent& a, const Audio3DInfoComponent
 #pragma region UPDATES
 void AudioSystem::update(double)
 {
-    // REPLACED BY EVENTS OF COMPONENTS
-    // // sync audio listeners
-    // for (auto& pack : scene->query<AudioListenerComponent, TransformComponent>())
-    // {
-    //     AudioListenerComponent& listener = pack.getDeprecated<AudioListenerComponent&>();
-    //     TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
-    //     updateListeners(listener, tr);
-    // }
-    
-    // // 3D changes
-    // for (auto& pack: scene->query<AudioComponent, Audio3DInfoComponent, TransformComponent>())
-    // {
-    //     AudioComponent& a = pack.getDeprecated<AudioComponent&>();
-    //     Audio3DInfoComponent& info = pack.getDeprecated<Audio3DInfoComponent&>();
-    //     TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
-    //     process3DChanges(a, info, tr);
-    // }
-    
-    // // general changes
-    // for (auto& pack: scene->query<AudioComponent>())
-    // {
-    //     AudioComponent& c = pack.getDeprecated<AudioComponent&>();
-    //     processChanges(c);
-    // }
-
-    // update every 3d audios position 
-    for (auto& pack : scene->query<AudioComponent,Audio3DInfoComponent, TransformComponent>())
-    {
-        AudioComponent& a = pack.getDeprecated<AudioComponent>();
-        TransformComponent& tr = pack.getDeprecated<TransformComponent>();
-        onAn3DAudioMove(a, tr);
-    }
-
     // cleanup finished voices
     for (auto& pack : scene->query<AudioComponent>())
     {
-        AudioComponent& c = pack.getDeprecated<AudioComponent&>();
+        AudioComponent& c = pack.getConst<AudioComponent&>();
         if (c.activePtr && !ma_sound_is_playing(c.activePtr))
         {
-            c.activePtr = nullptr;
-            c.isPlaying = false;
+            pack.modify<AudioComponent>([](AudioComponent& a){
+                a.activePtr = nullptr;
+                a.isPlaying = false;
+            });
         }
     }
 }
@@ -376,6 +346,7 @@ void AudioSystem::init(){
     scene->onAddComponent<AudioComponent>().connect(this, &AudioSystem::onAddAudioComponent);
     scene->onAddComponent<Audio3DInfoComponent>().connect(this, &AudioSystem::onAdd3DAudioComponent);
 
+    scene->onUpdateComponent<TransformComponent>().connect(this, &AudioSystem::onAn3DAudioMove);
     scene->onUpdateComponent<AudioComponent>().connect(this, &AudioSystem::onUpdateAudioComponent);
     scene->onUpdateComponent<Audio3DInfoComponent>().connect(this, &AudioSystem::onUpdate3DAudioComponent);
     scene->onUpdateComponent<AudioListenerComponent>().connect(this, &AudioSystem::onUpdateAudioListener);
@@ -421,7 +392,11 @@ void AudioSystem::onAdd3DAudioComponent(Audio3DInfoComponent &c)
     });
 }
 
-void AudioSystem::onAn3DAudioMove(AudioComponent& a, TransformComponent &tr)
+void AudioSystem::onAn3DAudioMove(TransformComponent &tr)
 {
-    set3DPosition(a.activePtr, tr.getPosition());
+    // update every 3d audios position 
+    if (scene->hasComponent<AudioComponent>(tr.entity) && scene->hasComponent<Audio3DInfoComponent>(tr.entity)){
+        AudioComponent& a = scene->getComponent<AudioComponent>(tr.entity);
+        set3DPosition(a.activePtr, tr.getPosition());
+    }
 }

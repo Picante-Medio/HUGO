@@ -17,14 +17,9 @@ struct UIElementCache
     Ogre::Overlay* overlay = nullptr;
     Ogre::OverlayContainer* container = nullptr;
     Ogre::OverlayElement* element = nullptr;
+    Ogre::OverlayElement* extra = nullptr;
     virtual ~UIElementCache() = default;
     virtual void setVisible(bool visible);
-};
-
-struct UISliderCache : public UIElementCache
-{
-    Ogre::OverlayContainer* knob = nullptr;
-    void setVisible(bool visible) override;
 };
 
 namespace HUGO {
