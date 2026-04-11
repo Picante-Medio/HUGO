@@ -6,7 +6,9 @@
 #include "HugoPhysics.h"
 
 void PhysicsGizmoSystem::init(){
-
+    //scene->onAddComponent<LightComponent>().connect(this, &LightSystem::registerLightEntity);
+    scene->onAddComponent<ColliderComponent>().connect(this, &PhysicsGizmoSystem::createGizmo);
+    scene->onRemoveComponent<ColliderComponent>().connect(this, &PhysicsGizmoSystem::destroyGizmo);
 }
 
 void PhysicsGizmoSystem::onLoad(){
@@ -116,7 +118,7 @@ ErrorOrVoid createGizmoMesh<HUGO::CapsuleColliderInfo>(std::shared_ptr<HUGO::ISc
 //------------------GIZMO CREATION------------------------
 
 //Creates gizmo with transform and shape mesh
-ErrorOrType<EntityID> createGizmoEntity(std::shared_ptr<HUGO::IScene> scene, const ColliderComponent& collider){
+void PhysicsGizmoSystem::createGizmo(ColliderComponent& collider){
     EntityID newID = scene->createEntity();
 
     scene->addComponent<TransformComponent>(newID);
@@ -125,9 +127,17 @@ ErrorOrType<EntityID> createGizmoEntity(std::shared_ptr<HUGO::IScene> scene, con
     //C++ magic to determine the type that holds collider.info without if-else madness
     ErrorOrVoid res = std::visit([&](auto&& info) {return createGizmoMesh(scene, newID, info);}, collider.info);
 
-    if(res.isError()) return ErrorOrType<EntityID>(StringError{"[PhysicsGizmoSystem] Error creating Gizmo: "+ res.getError().errorMessage});
+    if(res.isError()) {
+        scene->log(std::make_shared<StringError>("[PhysicsGizmoSystem] Error creating Gizmo: "+ res.getError().errorMessage));
+        return;
+    }
 
-    return ErrorOrType<EntityID>(newID);
+    m_gizmoEntities[collider.entity] = newID;
+}
+
+void PhysicsGizmoSystem::destroyGizmo(ColliderComponent& coll){
+    scene->removeEntity(m_gizmoEntities[coll.entity]);
+    m_gizmoEntities.erase(coll.entity);
 }
 
 #pragma endregion
@@ -142,41 +152,13 @@ void PhysicsGizmoSystem::update(double){
         //If we dont want gizmos, we skip all of this
         if(!collider.useGizmo) continue;
 
-        //If collider isnt registered, we register it in the map and create a gizmo entity
-        if(m_gizmoEntities.find(transform.entity) == m_gizmoEntities.end()) {
-            ErrorOrType<EntityID> newID = createGizmoEntity(scene, collider);
-
-            //If an error occured when creating the gizmo entity, current case is skipped
-            if(newID.isError()) {
-                auto err = std::shared_ptr<StringError>();
-                err->errorMessage = newID.getError().errorMessage;
-                scene->log(std::shared_ptr<Error>(err));
-                continue;
-            }
-            m_gizmoEntities[transform.entity] = {newID.getValue(), false};
-        }
-
         //Update transform position and rotation based on the colliders transform
+        EntityID gizmoID= m_gizmoEntities[transform.entity];
 
-        EntityVisited& entVisited = m_gizmoEntities[transform.entity];
-        entVisited.visited = true;
-
-        scene->modifyComponent<TransformComponent>(entVisited.entityID, [&transform](TransformComponent& gizmoTr){
+        scene->modifyComponent<TransformComponent>(gizmoID, [&transform](TransformComponent& gizmoTr){
             gizmoTr.setPosition(transform.getPosition());
             gizmoTr.setRotation(transform.getRotation());
         });
-    }
-
-    //If an entry was not visited, we remove that entry.
-    for(auto it = m_gizmoEntities.begin(); it != m_gizmoEntities.end();){
-        if(!it->second.visited) 
-        {
-            it = m_gizmoEntities.erase(it);
-        }
-        else {
-            it->second.visited = false;
-            it++; 
-        }
     }
 
 #endif

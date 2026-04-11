@@ -18,20 +18,13 @@ public:
     void createGizmo(ColliderComponent& coll);
     void destroyGizmo(ColliderComponent& coll);
 private:
-    /*
-        @param entityID Gizmo entity associated with physics collider
-        @param visited Wether or not this collider was visited this frame
-    */
-    struct EntityVisited{
-        EntityID entityID;
-        bool visited;
-    };
 #ifndef NDEBUG
+
     /*
-        Key: Entity with collider
-        Return: Gizmo entity
+    First: Entity with collider
+    Second: Gizmo entity associated
     */
-    std::unordered_map<EntityID, EntityVisited> m_gizmoEntities;
+    std::unordered_map<EntityID, EntityID> m_gizmoEntities;
 
 #endif
 
