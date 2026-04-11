@@ -40,7 +40,7 @@ HCOMPONENT(RigidBodyComponent)
     DEFAULT_SERIALIZED_MEMBER(float, angularSleepingThreshold, 1.f)
 
     HUGO::CollisionObjectID objectID = HUGO::INVALID_COL_OBJ_ID;
-    HUGO::BodyType type = HUGO::BodyType::DYNAMIC;
+    DEFAULT_SERIALIZED_MEMBER(HUGO::BodyType, type, HUGO::BodyType::DYNAMIC)
 
     // ----------------------Setters----------------------
 
