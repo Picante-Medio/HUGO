@@ -54,7 +54,7 @@ HUGO::ConfigGenerator::generatePluginsConfig() {
     // Add plugins
     std::ofstream file("plugins.cfg");
     for(auto plugin : requiredPlugins)
-        file << plugin << '\n';
+        file << "Plugin=" << plugin << '\n';
 
     // Close file before OGRE tries to read it
     file.close();
