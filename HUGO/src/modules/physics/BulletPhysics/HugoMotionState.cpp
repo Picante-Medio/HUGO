@@ -10,11 +10,6 @@ HUGOMotionState::HUGOMotionState(const btTransform initialPos, std::shared_ptr<S
 {
 
 }
-
-// void HUGOMotionState::setHugoTransform(TransformComponent& transform)
-// {
-//     hugoTransform = transform;
-// }
     
 void HUGOMotionState::updateBulletTransform()
 {
@@ -25,11 +20,9 @@ void HUGOMotionState::updateBulletTransform()
     q.normalize();
 
     // Uses associated HUGO::TransformComponent to update itself
-    btTransform auxTransform = btTransform(
-                               q, 
-                               BulletUtils::vector3ToBullet(hugoTransform.getPosition()));
+    btTransformRegister = btTransform(q, BulletUtils::vector3ToBullet(hugoTransform.getPosition()));
 
-    btTransformRegister = auxTransform;
+    // btTransformRegister = auxTransform;
 }
 
 void HUGOMotionState::getWorldTransform(btTransform& worldTrans) const
@@ -40,9 +33,6 @@ void HUGOMotionState::getWorldTransform(btTransform& worldTrans) const
 void HUGOMotionState::setWorldTransform(const btTransform& worldTrans)
 {
     btTransformRegister = worldTrans;
-    // if(hugoTransform.use_count() == 0){
-    //     return;
-    // }
 
     TransformComponent& hugoTransform = hugoScene->getComponent<TransformComponent>(entityID);
         

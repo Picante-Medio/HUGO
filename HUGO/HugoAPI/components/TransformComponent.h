@@ -24,13 +24,22 @@ private:
     bool needUpdateWorldScale = false;
 
 public:
+    enum UpdateFlags{
+        POSITION_UPDATED = 1,
+        ROTATION_UPDATED = 2
+    };
+
+    int flags = 0;
+
     inline void setPosition(HUGO::Vector3 newPosition){
         position = newPosition;
         needUpdateWorldPosition = true;
+        flags = flags | POSITION_UPDATED;
     }
     inline void setRotation(HUGO::Quaternion newRotation){
         rotation = newRotation;
         needUpdateWorldRotation= true;
+        flags = flags | ROTATION_UPDATED;
     }
     inline void setScale(HUGO::Vector3 newScale){
         scale = newScale;
@@ -49,10 +58,12 @@ public:
     inline void setWorldPosition(HUGO::Vector3 newPosition){
         worldPosition = newPosition;
         needUpdateLocalPosition = true;
+        flags = flags | POSITION_UPDATED;
     }
     inline void setWorldRotation(HUGO::Quaternion newRotation){
         worldRotation = newRotation;
         needUpdateLocalRotation = true;
+        flags = flags | ROTATION_UPDATED;
     }
     inline void setWorldScale(HUGO::Vector3 newScale){
         worldScale = newScale;

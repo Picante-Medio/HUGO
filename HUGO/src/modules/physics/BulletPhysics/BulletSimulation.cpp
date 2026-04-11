@@ -465,6 +465,21 @@ void BulletSimulation::checkColliderFlags(ColliderComponent& hgCol)
     }
 }
 
+void BulletSimulation::checkTransformFlags(const ColliderComponent& collider, const TransformComponent& transform) {
+    if(transform.flags != 0) {
+        CollisionObject obj = rigidBodies[rbIdToIndex[collider.objectID]];
+
+        if(transform.flags & TransformComponent::POSITION_UPDATED) {
+            btTransform tr = obj.bulletRB->getWorldTransform();
+            tr.setOrigin(BulletUtils::vector3ToBullet(transform.getPosition()));
+        }
+        if(transform.flags & TransformComponent::ROTATION_UPDATED) {
+            btTransform tr = obj.bulletRB->getWorldTransform();
+            tr.setRotation(BulletUtils::quaternionToBullet(transform.getRotation()));
+        }
+    }
+}
+
 void BulletSimulation::syncBodiesToBullet() {
     
     // Add new rigidBodies to simulation and Update kinematic bodies
@@ -488,12 +503,14 @@ void BulletSimulation::syncBodiesToBullet() {
     // Add colliders to simulation
      for(auto& pack: scene->query<ColliderComponent, TransformComponent>()){
         ColliderComponent& col = pack.getDeprecated<ColliderComponent&>();
+        TransformComponent& transform = pack.getConst<TransformComponent&>();
     
         if(col.objectID == HUGO::INVALID_COL_OBJ_ID){
             col.objectID = createColliderObject(col);
         }
-    
+
         checkColliderFlags(col);
+        checkTransformFlags(col, transform);
     }
 }
 

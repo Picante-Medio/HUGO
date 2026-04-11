@@ -17,7 +17,6 @@ public:
 
     HUGOMotionState(const btTransform initialPos, std::shared_ptr<Scene> scene, unsigned long int id, btTransform offset = btTransform::getIdentity());
 
-    // void setHugoTransform(TransformComponent& transform);
     void updateBulletTransform();
 
     void getWorldTransform(btTransform& worldTrans) const override;

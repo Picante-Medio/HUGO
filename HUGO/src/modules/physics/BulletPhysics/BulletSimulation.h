@@ -63,9 +63,10 @@ class BulletSimulation : public IPhysicsSimulation {
     void removeRigidBodyObject(HUGO::CollisionObjectID& id);
     void removeColliderObject(HUGO::CollisionObjectID& id);
 
-    // Check for updates on a specific RB
+    // Check for updates on a specific RB or collider
     void checkRigidBodyFlags(RigidBodyComponent& hgRB);
     void checkColliderFlags(ColliderComponent& hgCol);
+    void checkTransformFlags(const ColliderComponent& collider, const TransformComponent& transform);
 
     // @brief Creates and adds rigidbodies to simulation. Updates kinematic bodies.
     void syncBodiesToBullet();
