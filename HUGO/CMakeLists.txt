@@ -85,7 +85,7 @@ if (WIN32)
     )
 else()
 #Plugin_ParticleFX
-    foreach(lib lua_shared OgreMain OgreOverlay RenderSystem_GL3Plus RenderSystem_GL Codec_STBI Codec_Assimp Plugin_ParticleFX)
+    foreach(lib lua_shared OgreMain OgreOverlay RenderSystem_GL3Plus RenderSystem_GL Codec_STBI Codec_Assimp Plugin_ParticleFX OgreRTShaderSystem)
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             $<TARGET_FILE:${lib}>

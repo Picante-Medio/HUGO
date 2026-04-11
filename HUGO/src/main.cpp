@@ -2,10 +2,12 @@
 #include "miniaudio.h"
 
 #include "Core.h"
+#include "ResourcesGenerator.h"
 #include <iostream>
 
 // Aunque de warning esto no puede borrarse, en windows no compila porque SDL busca esta implementacion
 int main(int argc, char* argv[]) {
+    ResourcesGenerator::generateResourcesConfig();
 
     HUGO::Core core = HUGO::Core();
     ErrorOrVoid err = core.init();
