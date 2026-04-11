@@ -46,9 +46,9 @@ void ConsoleSystem::printErrors(TextComponent& consoleTextCmp){
         EntityID id = pack.getConst<TextComponent>().entity;
         if (id != consoleTextCmp.entity) continue;
 
-        const HUGO::String& errorText = error.getValue();
         // for errors, \n is included by default
         while(!error.isError()){
+            const HUGO::String& errorText = error.getValue();
             pack.modify<TextComponent>([this, errorText](TextComponent& t){
                 t.text += logIni + "ERROR: " + errorText + "\n";
             });
@@ -58,7 +58,7 @@ void ConsoleSystem::printErrors(TextComponent& consoleTextCmp){
 }
 
 HUGO::String ConsoleSystem::getNextHistoric(){
-    HUGO::String item = "";
+    HUGO::String item = "-";
 
     if(historyIndex > 0){ 
         historyIndex--;
