@@ -53,10 +53,8 @@ HUGO::ConfigGenerator::generatePluginsConfig() {
 
     // Add plugins
     std::ofstream file("plugins.cfg");
-    file << "Plugin=RenderSystem_GL \n";
-    file << "Plugin=Codec_STBI \n";
-    file << "Plugin=Plugin_ParticleFX \n";
-    file << "Plugin=Codec_Assimp \n";
+    for(auto plugin : requiredPlugins)
+        file << plugin << '\n';
 
     // Close file before OGRE tries to read it
     file.close();
