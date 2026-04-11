@@ -7,7 +7,8 @@
 
 // Aunque de warning esto no puede borrarse, en windows no compila porque SDL busca esta implementacion
 int main(int argc, char* argv[]) {
-    ResourcesGenerator::generateResourcesConfig();
+    HUGO::ResourcesGenerator resourcesGenerator;
+    resourcesGenerator.generateResourcesConfig();
 
     HUGO::Core core = HUGO::Core();
     ErrorOrVoid err = core.init();
