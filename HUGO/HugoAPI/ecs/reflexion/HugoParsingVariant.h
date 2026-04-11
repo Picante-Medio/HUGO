@@ -16,6 +16,7 @@ using HVariant = std::variant<
     HUGO::Vector2,
     HUGO::Bool,
     HUGO::ColliderInfo,
+    HUGO::BodyType,
     HUGO::Quaternion,
     HUGO::Radian,
     HUGO::Degree,
