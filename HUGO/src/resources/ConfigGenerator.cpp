@@ -1,4 +1,4 @@
-#include "ResourcesGenerator.h"
+#include "ConfigGenerator.h"
 
 #include <cstdio>
 #include <filesystem>
@@ -7,7 +7,7 @@ using std::filesystem::directory_entry;
 using std::filesystem::directory_iterator;
 
 void 
-HUGO::ResourcesGenerator::generateResourcesConfig() {
+HUGO::ConfigGenerator::generateResourcesConfig() {
     // Delete resources config file if it exists
     if(std::filesystem::exists("resources.cfg"))
         std::remove("resources.cfg");
@@ -18,17 +18,17 @@ HUGO::ResourcesGenerator::generateResourcesConfig() {
 
     //Append engine and game resources
     if(std::filesystem::exists(RESOURCES))
-        appendContent(RESOURCES, file);
+        appendResources(RESOURCES, file);
 
     if(std::filesystem::exists(ASSETS))
-        appendContent(ASSETS, file);
+        appendResources(ASSETS, file);
 
     //Close file before OGRE tries to read it
     file.close();
 }
 
 void
-HUGO::ResourcesGenerator::appendContent(const std::filesystem::path& path, std::ofstream& configFile) {
+HUGO::ConfigGenerator::appendResources(const std::filesystem::path& path, std::ofstream& configFile) {
     // Zips must appear before their directories or it will lead to double loading
     for (directory_entry entry : directory_iterator(path)) {
         if (entry.is_regular_file() && entry.path().extension() == ".zip")
@@ -39,7 +39,25 @@ HUGO::ResourcesGenerator::appendContent(const std::filesystem::path& path, std::
     for (directory_entry entry : directory_iterator(path)) {
         if (entry.is_directory()) {
             configFile << "FileSystem=" << std::filesystem::canonical(entry.path()).string() << '\n';
-            appendContent(entry.path(), configFile);
+            appendResources(entry.path(), configFile);
         }
     }
+}
+
+
+void 
+HUGO::ConfigGenerator::generatePluginsConfig() {
+    // Delete plugins config if it exists
+    if(std::filesystem::exists("plugins.cfg"))
+        std::remove("plugins.cfg");
+
+    // Add plugins
+    std::ofstream file("plugins.cfg");
+    file << "Plugin=RenderSystem_GL \n";
+    file << "Plugin=Codec_STBI \n";
+    file << "Plugin=Plugin_ParticleFX \n";
+    file << "Plugin=Codec_Assimp \n";
+
+    // Close file before OGRE tries to read it
+    file.close();
 }

@@ -1,7 +1,7 @@
 # Directories
 [Bb]uild/*
 HUGO/[Bb]uild/*
-#[Bb]in/*
+HUGO/[Bb]in/*
 **/.vscode/*
 **/.obsidian/*
 **/.git/*
@@ -23,9 +23,6 @@ HUGO/[Dd]ependencies/*
 *.clangd
 *.log
 *.exp
-
-#Outs en linux
-HUGO/bin/HUGO*
 
 # Runfiles y demás
 **/project.godot
