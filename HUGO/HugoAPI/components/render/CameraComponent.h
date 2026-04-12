@@ -10,7 +10,7 @@ private:
     /*
         =========== CAMERA PARAMETERS =================
     */
-    HUGO::ProjectionType projectionType = HUGO::ProjectionType::Perspective;
+    DEFAULT_SERIALIZED_MEMBER(HUGO::ProjectionType, projectionType, HUGO::ProjectionType::Perspective);
     
     // Perspective parameters
     // Field of view in the Y direction, in degrees

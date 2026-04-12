@@ -21,5 +21,6 @@ using HVariant = std::variant<
     HUGO::Radian,
     HUGO::Degree,
     HUGO::LightType,
-    HUGO::UIMetricsMode
+    HUGO::UIMetricsMode,
+    HUGO::ProjectionType
 >;
