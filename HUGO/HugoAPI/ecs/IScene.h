@@ -29,18 +29,6 @@ public:
 	virtual EntityID createEntity() = 0;
 	virtual void removeEntity(EntityID entity) = 0;
 
-	// Component handling
-	template <typename T, typename... Ts>
-	void addComponent(EntityID entity, Ts &&...args) {
-		// Creating the component
-		T component(entity, std::forward<Ts>(args)...);
-		ComponentID id = HUGO::ComponentRegistry::getComponentId<T>();
-
-		// Adding the component
-		DenseListIndex index = componentTable->addComponent(component, entity);
-		entityTable->registerComponent(entity, id, index);
-	}
-
 	template<typename T> 
 	T &getComponent(EntityID entity) {
 	ComponentID componentID = HUGO::ComponentRegistry::getComponentId<T>();
