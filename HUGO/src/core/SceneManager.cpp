@@ -92,8 +92,8 @@ ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
 ErrorOrVoid SceneManager::unloadScene(const HUGO::String& sceneName){
     if(m_sceneMap.find(sceneName) == m_sceneMap.end()) return ErrorOrVoid(StringError{"Scene " + sceneName + " can't be unloaded because it doesn't exist"});
 
+    m_physicsModule->destroySceneSimulation(sceneName);
     m_sceneMap.erase(sceneName);
-
 
     //Destroy sceneManager associated with scene as it is unloaded
     OgreModule::Instance().destroySceneManager(sceneName);

@@ -118,6 +118,12 @@ TestSystem::init() {
     //     pe.material = "debug/Smoke";
     // });
     
+    auto tweenEnt = scene.createEntity();
+    scene.addComponent<TransformComponent>(tweenEnt);
+
+    scene.addComponent<TweenComponent>(tweenEnt, [](TweenComponent& tw){
+        
+    });
 }
 
 
