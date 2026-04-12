@@ -141,13 +141,18 @@ void UISystem::syncPanel(const PanelComponent &p)
     if (!p.material.empty()) cache->container->setMaterialName(p.material);
 }
 
-HUGO::String UISystem::formatText(const HUGO::String & text, Ogre::TextAreaOverlayElement *textArea, std::optional<HUGO::Float> maxWidth,std::optional<HUGO::Float> maxHeight)
+HUGO::String UISystem::formatText(const HUGO::String & text, Ogre::TextAreaOverlayElement *textArea, HUGO::Float maxWidth,HUGO::Float maxHeight)
 {
     if (!textArea || !textArea->getFont() || text.empty())
         return text;
 
-    HUGO::Float height = textArea->getCharHeight();
-    int maxLines = (int)(maxHeight.value() / height);
+    float screenWidth = static_cast<float>(renderWindow->getWidth());
+    float screenHeight = static_cast<float>(renderWindow->getHeight());
+
+    HUGO::Float height = (textArea->getMetricsMode() == Ogre::GMM_RELATIVE)? textArea->getCharHeight() * screenHeight : textArea->getCharHeight();
+    HUGO::Float maxH = maxHeight * screenHeight;
+    HUGO::Float maxW = maxWidth * screenWidth;
+    int maxLines = static_cast<int>(maxH / height);   
     
     std::deque<HUGO::String> lines;
     HUGO::String currentLine;
@@ -159,29 +164,29 @@ HUGO::String UISystem::formatText(const HUGO::String & text, Ogre::TextAreaOverl
             lines.push_back(currentLine);
             currentLine.clear();
             currentWidth = 0.0f;
-            if(lines.size()> maxLines) lines.pop_front();
             continue;
         }
         HUGO::Float charWidth = textArea->getFont()->getGlyphAspectRatio(c) * height;
-        if (currentWidth + charWidth > maxWidth)
+        if (currentWidth + charWidth > maxW)
         {
             lines.push_back(currentLine);
             currentLine.clear();
             currentWidth = 0.0f;
-            if(lines.size()> maxLines) lines.pop_front();
         }
 
         currentLine += c;
         currentWidth += charWidth;
     }
+
     if(!currentLine.empty())
         lines.push_back(currentLine);
 
+    while(lines.size() > maxLines)
+        lines.pop_front();
+
     HUGO::String result;
     for (const HUGO::String &l : lines)
-    {
         result += l + "\n";
-    }
     return result;
 }
 
@@ -365,7 +370,7 @@ void UISystem::onUpdateTextComponent(TextComponent& t)
     Ogre::TextAreaOverlayElement* area = static_cast<Ogre::TextAreaOverlayElement*>(HUGO::OgreOverlayUtils::getElement(t.textAreaName).getValue());
 
     if(t.maxWidth || t.maxHeight){
-        t.text = formatText(t.text, area, t.maxWidth, t.maxHeight);
+        t.text = formatText(t.text, area, t.maxWidth.value_or(area->getWidth()), t.maxHeight.value_or(area->getHeight()));
     }
     syncText(t);
 }
@@ -646,7 +651,6 @@ void UISystem::processInput()
         }
     }
     input->toggleTextInput(anyFieldActive);
-
 }
 
 void UISystem::onUpdateProgressBarComponent(ProgressBarComponent& pb)

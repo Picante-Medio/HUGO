@@ -258,7 +258,7 @@ void ConsoleSystem::init(){
         text2.colourBottom = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.f);
         text2.left = 0.005f;
         text2.top = 0.01f;
-        text2.maxWidth = 0.45f;
+        text2.maxWidth = 0.26f;
         text2.maxHeight = 0.3f;
         text2.characterHeight = 0.024f;
         text2.spaceWidth = 0.01f;

@@ -7,7 +7,6 @@
 
 #include <unordered_map>
 #include <memory>
-#include <optional>
 
 #include <Ogre.h>
 #include <OgreOverlay.h>
@@ -25,71 +24,70 @@ struct SliderComponent;
 
 HSYSTEM(UISystem)
 private:
-EntityID consoleID;
+    EntityID consoleID;
 
-//====================================================
-// ENGINE
-//====================================================
+    //====================================================
+    // ENGINE
+    //====================================================
 
-Ogre::RenderWindow* renderWindow = nullptr;
- 
-//====================================================
-// UI CACHE
-//====================================================
-
-std::unordered_map<EntityID, std::shared_ptr<UIElementCache>> uiCache;
-
-//====================================================
-// CACHE CREATION
-//====================================================
+    Ogre::RenderWindow* renderWindow = nullptr;
     
-std::shared_ptr<UIElementCache> createElementCache(EntityID entity, const HUGO::String& overlayName, const HUGO::String& containerName);
-UIElementCache* getCache(EntityID entity);
+    //====================================================
+    // UI CACHE
+    //====================================================
 
-//====================================================
-// HELPERS
-//====================================================
-//helper to calculate if the mouse cursor is above a panel
-bool isMouseOver(HUGO::Float left, HUGO::Float top, HUGO::Float width, HUGO::Float height, HUGO::Float mouseX, HUGO::Float mouseY);
-bool isMouseOverPanel(const PanelComponent& panel, HUGO::Float mouseX, HUGO::Float mouseY);
-//====================================================
-// SYNCHRONIZATION
-//====================================================
+    std::unordered_map<EntityID, std::shared_ptr<UIElementCache>> uiCache;
 
-void syncPanel(const PanelComponent& p);
-void syncText(const TextComponent& t);
-bool isValidColour(const HUGO::Vector4& colour);
-HUGO::String formatText(const HUGO::String& text, Ogre::TextAreaOverlayElement* textArea,std::optional<HUGO::Float> maxWidth,std::optional<HUGO::Float> maxHeight);
-void syncButton(const ButtonComponent& b, PanelComponent& p);
-void syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr);
-void syncSlider(const PanelComponent& p, const SliderComponent& s);
+    //====================================================
+    // CACHE CREATION
+    //====================================================
+        
+    std::shared_ptr<UIElementCache> createElementCache(EntityID entity, const HUGO::String& overlayName, const HUGO::String& containerName);
+    UIElementCache* getCache(EntityID entity);
 
-//====================================================
-// PROCESSING
-//====================================================
-void onUpdatePanelComponent(PanelComponent& panel);
-void onUpdateTextComponent(TextComponent& t);
-void onUpdateButtonComponent(ButtonComponent& b);
-void onUpdateProgressBarComponent(ProgressBarComponent& pb);
-void onUpdateSliderComponent(SliderComponent& s);
+    //====================================================
+    // HELPERS
+    //====================================================
+    //helper to calculate if the mouse cursor is above a panel
+    bool isMouseOver(HUGO::Float left, HUGO::Float top, HUGO::Float width, HUGO::Float height, HUGO::Float mouseX, HUGO::Float mouseY);
+    bool isMouseOverPanel(const PanelComponent& panel, HUGO::Float mouseX, HUGO::Float mouseY);
+    //====================================================
+    // SYNCHRONIZATION
+    //====================================================
 
-void onAddPanelComponent(PanelComponent& p);
-void onAddTextComponent(TextComponent& t);
-void onAddProgressBarComponent(ProgressBarComponent& pb);
-void onAddSliderComponent(SliderComponent& s);
+    void syncPanel(const PanelComponent& p);
+    void syncText(const TextComponent& t);
+    bool isValidColour(const HUGO::Vector4& colour);
+    HUGO::String formatText(const HUGO::String& text, Ogre::TextAreaOverlayElement* textArea,HUGO::Float maxWidth,HUGO::Float maxHeight);
+    void syncButton(const ButtonComponent& b, PanelComponent& p);
+    void syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr);
+    void syncSlider(const PanelComponent& p, const SliderComponent& s);
 
-void processInput();
-//====================================================
-// CACHE
-//====================================================
-void clearAllCaches();
+    //====================================================
+    // PROCESSING
+    //====================================================
+    void onUpdatePanelComponent(PanelComponent& panel);
+    void onUpdateTextComponent(TextComponent& t);
+    void onUpdateButtonComponent(ButtonComponent& b);
+    void onUpdateProgressBarComponent(ProgressBarComponent& pb);
+    void onUpdateSliderComponent(SliderComponent& s);
+
+    void onAddPanelComponent(PanelComponent& p);
+    void onAddTextComponent(TextComponent& t);
+    void onAddProgressBarComponent(ProgressBarComponent& pb);
+    void onAddSliderComponent(SliderComponent& s);
+
+    void processInput();
+    //====================================================
+    // CACHE
+    //====================================================
+    void clearAllCaches();
 public:
+    virtual ~UISystem();
 
-virtual ~UISystem();
+    void init();
+    void onLoad();
 
-void init();
-void onLoad();
-
-void update(double dt) override;
-void fixedUpdate(double dt) override;
+    void update(double dt) override;
+    void fixedUpdate(double dt) override;
 END_HSYSTEM()
