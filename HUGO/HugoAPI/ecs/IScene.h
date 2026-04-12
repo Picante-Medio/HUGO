@@ -31,9 +31,15 @@ public:
 
 	template<typename T> 
 	T &getComponent(EntityID entity) {
-	ComponentID componentID = HUGO::ComponentRegistry::getComponentId<T>();
+		ComponentID componentID = HUGO::ComponentRegistry::getComponentId<T>();
 		return componentTable->getComponent<T>(
 			entityTable->getDenseListIndex(entity, componentID));
+	}
+
+	template<typename T> 
+	const T& getComponentConst() {
+		ComponentID componentID = HUGO::ComponentRegistry::getComponentId<T>();
+		return componentTable->getComponent<T>(entityTable->getDenseListIndex(entity, componentID));
 	}
 
 	template<typename T, typename Func>
