@@ -55,7 +55,7 @@ namespace HUGO{
             //Interpolated value (LERP)
             InterpType value = (m_from * (1.0 - t)) + (m_to * t);
     
-            ClassType& component = scene.modifyComponent<ClassType>(m_componentEntity,[this, value](ClassType& component){
+            scene.modifyComponent<ClassType>(m_componentEntity,[this, value](ClassType& component){
 
                 component.*m_parameterMemberPt = value;
             });
