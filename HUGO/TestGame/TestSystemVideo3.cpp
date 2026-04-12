@@ -3,6 +3,7 @@
 #include "ParticleEmitterComponent.h"
 #include "ChangeSceneMessage.h"
 #include "AudioComponent.h"
+#include "Audio3DInfoComponent.h"
 
 struct Aux {
     HUGO::String pname = "Particle/Smoke";
@@ -10,11 +11,12 @@ struct Aux {
     HUGO::Bool active = true;
     HUGO::String material = "debug/Smoke";
 };
+
 void
 TestSystemVideo3::init() {
     scene.subscribe<ChangeSceneMessage>([this](std::shared_ptr<HUGO::Message> msg) {
         std::shared_ptr<ChangeSceneMessage> m = std::static_pointer_cast<ChangeSceneMessage>(msg);
-        scene.changeAndDestroyPreviousScene(m->sceneName);
+        scene.changeScene(m->sceneName);
     });
 
     Aux a;
@@ -34,9 +36,11 @@ TestSystemVideo3::init() {
     });
 
     ent2 = scene.createEntity();
+
     scene.addComponent<TransformComponent>(ent2, [offset](TransformComponent& transform){
         transform.setPosition(HUGO::Vector3(-offset, 0.0f, 0.0f));
     });
+
     scene.addComponent<ParticleEmitterComponent>(ent2, [a](ParticleEmitterComponent& pe){
         pe.particleName = a.pname;
         pe.emitting = a.emmiting;
@@ -44,14 +48,22 @@ TestSystemVideo3::init() {
         pe.material = a.material;
         pe.quota = 200;
     });
-
-    EntityID audio = scene.createEntity();
-    scene.addComponent<AudioComponent>(audio, [](AudioComponent& a){
+    scene.addComponent<AudioComponent>(ent2, [](AudioComponent& a){
         a.isPlaying = true;
         a.type = HUGO::AudioTypes::MUSIC;
         a.audioName = "lucky";
-        a.audioId =0;
+        a.volume =0.0f;
+        a.loop = true;
     });
+    // scene.addComponent<Audio3DInfoComponent>(ent2);
+
+    // EntityID audio = scene.createEntity();
+    // scene.addComponent<AudioComponent>(audio, [](AudioComponent& a){
+    //     a.isPlaying = true;
+    //     a.type = HUGO::AudioTypes::MUSIC;
+    //     a.audioName = "lucky";
+    //     a.volume =0.1f;
+    // });
 
 
 }
@@ -68,6 +80,12 @@ TestSystemVideo3::update(double dt) {
         ChangeSceneMessage c;
         c.sceneName = "TestSceneVideo1";
         scene.sendMessage<ChangeSceneMessage>(c);
+    }
+    
+    if(scene.getInput()->wasKeyJustPressed(HUGO::KeyCode::P)){
+        scene.modifyComponent<AudioComponent>(ent2, [](AudioComponent& a){
+            a.volume += 0.05f;
+        });
     }
 }
 

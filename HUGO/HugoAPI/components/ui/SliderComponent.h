@@ -8,7 +8,8 @@ HCOMPONENT(SliderComponent)
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, minValue, 0.0f);
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, maxValue, 100.0f);
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, currentValue, 0.0f);
-
+    HUGO::Float previousValue = 0.0f;
+    
     // orientation
     DEFAULT_SERIALIZED_MEMBER(HUGO::SliderOrientation, orientation, HUGO::SliderOrientation::HORIZONTAL);
 

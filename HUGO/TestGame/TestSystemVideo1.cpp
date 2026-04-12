@@ -128,7 +128,9 @@ TestSystemVideo1::init() {
 
 
 void
-TestSystemVideo1::onLoad() {}
+TestSystemVideo1::onLoad() {
+
+}
 
 
 void

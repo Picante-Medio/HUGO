@@ -61,7 +61,7 @@ private:
     HUGO::String formatText(const HUGO::String& text, Ogre::TextAreaOverlayElement* textArea,HUGO::Float maxWidth,HUGO::Float maxHeight);
     void syncButton(const ButtonComponent& b);
     void syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr);
-    void syncSlider(const PanelComponent& p, const SliderComponent& s);
+    void syncSlider(const PanelComponent& p, SliderComponent& s);
 
     //====================================================
     // PROCESSING
@@ -81,6 +81,7 @@ private:
     //====================================================
     // CACHE
     //====================================================
+    void hideCache(UIElementCache* cache);
     void clearAllCaches();
 public:
     virtual ~UISystem();

@@ -280,9 +280,16 @@ void AudioSystem::updateListeners(const AudioListenerComponent& a, const Transfo
 
 void AudioSystem::processChanges(AudioComponent &c)
 {
+    if (!c.activePtr && c.isPlaying)
+    {
+        acquireVoice(c);
+    }
+    if (!c.activePtr) return;
+    
     setLooping(c.activePtr, c.loop);
     HUGO::Float mult = c.type != HUGO::AudioTypes::MUSIC ? soundsGroupVolume : musicsGroupVolume;
-    setVolume(c.activePtr, c.volume*mult);
+    HUGO::Float vol = c.volume*mult;    
+    setVolume(c.activePtr, vol);
     setPitch(c.activePtr, c.pitch);
     if (c.startTime >= 0.0){
         setAudioPosition(c.activePtr, c.startTime);
@@ -317,7 +324,7 @@ void AudioSystem::update(double)
     for (auto& pack : scene.query<AudioComponent>())
     {
         AudioComponent& c = pack.getConst<AudioComponent&>();
-        if (c.activePtr && !ma_sound_is_playing(c.activePtr))
+        if (c.activePtr && !ma_sound_is_playing(c.activePtr) && !c.loop)
         {
             pack.modify<AudioComponent>([](AudioComponent& a){
                 a.activePtr = nullptr;
@@ -388,10 +395,14 @@ void AudioSystem::onUpdateAudioListener(AudioListenerComponent &l)
 
 void AudioSystem::onAdd3DAudioComponent(Audio3DInfoComponent &c)
 {
+    const AudioComponent& a = scene.getComponentConst<AudioComponent>(c.entity);
+    const TransformComponent& tr = scene.getComponentConst<TransformComponent>(c.entity);
     // just to be sure the type is correctly chosen
-    scene.modifyComponent<AudioComponent>(c.entity, [](AudioComponent& a){
+    scene.modifyComponent<AudioComponent>(c.entity, [this, c](AudioComponent& a){
         a.type = HUGO::AudioTypes::SOUND3D;
     });
+    process3DChanges(a, c);
+    set3DPosition(a.activePtr, tr.getPosition());
 }
 
 void AudioSystem::onAn3DAudioMove(TransformComponent &tr)

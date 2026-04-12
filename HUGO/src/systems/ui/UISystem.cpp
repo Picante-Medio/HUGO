@@ -312,11 +312,19 @@ void UISystem::syncProgressBar(const PanelComponent& p, const ProgressBarCompone
     if (!p.material.empty()) cache->container->setMaterialName(p.material);
 }
 
-void UISystem::syncSlider(const PanelComponent& p, const SliderComponent& s)
+void UISystem::syncSlider(const PanelComponent& p, SliderComponent& s)
 {
     UIElementCache* cache = uiCache[s.entity].get();
     if (!cache || !cache->container || !cache->element || !cache->extra)
         return;
+
+    if (s.currentValue != s.previousValue)
+    {
+        if (s.onChangeCallback)
+            s.onChangeCallback(s.currentValue);
+
+        s.previousValue = s.currentValue;
+    }
 
     HUGO::Float percent = (s.currentValue - s.minValue) / (s.maxValue - s.minValue);
     percent = std::clamp(percent, 0.0f, 1.0f);
@@ -358,6 +366,7 @@ void UISystem::syncSlider(const PanelComponent& p, const SliderComponent& s)
     // apply materials or colors
     if(!s.trackMaterial.empty()) cache->element->setMaterialName(s.trackMaterial);
     if(!s.knobMaterial.empty()) cache->extra->setMaterialName(s.knobMaterial);
+
 }
 
 //====================================================
@@ -674,11 +683,43 @@ void UISystem::onUpdateSliderComponent(SliderComponent& s)
 //====================================================
 // CACHE MANAGEMENT
 //====================================================
+void UISystem::hideCache(UIElementCache* cache)
+{
+    if (!cache) return;
+
+    auto& overlayMgr = Ogre::OverlayManager::getSingleton();
+
+    if (cache->overlay)
+    {
+        overlayMgr.destroy(cache->overlay);
+        cache->overlay = nullptr;
+    }
+
+    if (cache->container)
+    {
+        overlayMgr.destroyOverlayElement(cache->container);
+        cache->container = nullptr;
+    }
+
+    if (cache->element)
+    {
+        overlayMgr.destroyOverlayElement(cache->element);
+        cache->element = nullptr;
+    }
+
+    if (cache->extra) // knob or opcional
+    {
+        overlayMgr.destroyOverlayElement(cache->extra);
+        cache->extra = nullptr;
+    }
+}
 
 void UISystem::clearAllCaches()
 {
+
     uiCache.clear();
 }
+
 
 //====================================================
 // LIFETIME & UPDATE
