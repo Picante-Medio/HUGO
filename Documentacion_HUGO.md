@@ -97,16 +97,21 @@ public:
     - AudioListener
 
 - **UI**
-    - TextLabel
+    - Panel
+    - Text
     - Button
-    - Image
-    - Container
+    - InputField
+    - Slider
+
+- **Partículas**
+    - ParticleEmmiter
 
 ## Sistemas de H.U.G.O
 - RenderSystem
 - InputSystem
 - AudioSystem
 - UISystem
+- ParticleSystem
 
 # Arquitectura del core del motor
 
@@ -156,7 +161,7 @@ Se define como clase. Es responsable de cargar los assets de juego y tiene méto
 Las librerías que utilizará el motor son las siguientes:
 | Librería  | Versión | Uso                                                                         |
 | --------- | ------- | --------------------------------------------------------------------------- |
-| OGRE3D    | 14.5.0  | Gráficos 3D (modelos, animaciones, shaders, generación de ventana, layouts) |
+| OGRE3D    | 14.5.0  | Gráficos 3D (modelos, animaciones, shaders, generación de ventana, layouts, partículas) |
 | SDL2      | 2.32.10 | Input (como dependencia de OGRE3D)                                          |
 | Miniaudio | 0.11.24 | Implementación de efectos de sonido y música                                |
 | Bullet3   | 3.25.5  | Físicas y detección de colisiones                                           |
@@ -173,79 +178,10 @@ El proyecto se construye con el uso de cmake, la estructura del directorio del p
 └── *src/* -> Código fuente del motor
 
 # Implementación de las librerías externas
-Para permitir la comunicación del motor con librerías externas como OGRE3D, Physx, o Miniaudio, se ha pensado en la implementación de dichas funcionalidades dentro de los sistemas de las escenas de juego, formando parte de la arquitectura ECS pensada. Estos sistemas serían los principales representantes de dichas librerías, y servirían como capa intermedia de comunicación entre el mundo de nuestro motor y la funcionalidad que proporciona cada librería.
+Para permitir la comunicación del motor con librerías externas como OGRE3D, Bullet, o Miniaudio, se ha pensado en la implementación de dichas funcionalidades dentro de los sistemas de las escenas de juego, formando parte de la arquitectura ECS pensada. Estos sistemas serían los principales representantes de dichas librerías, y servirían como capa intermedia de comunicación entre el mundo de nuestro motor y la funcionalidad que proporciona cada librería.
 
 ## Funcionalidad de los sistemas
 Hacen uso de la información que contienen los componentes. Por ejemplo, RenderSystem (sistema de renderizado que hace uso de Ogre3D), recorrería todos las entidades que cuentan con una posición y una malla, y las actualizaría en su propio mundo para así mostrarse correctamente en pantalla. AudioSystem cargará archivos de audio en memoria (efectos de sonido) o streaming (canciones), cambiar parámetros y reproducir sonidos.
-
-### AudioSystem
-**Componentes**  
-Este sistema ofrece dos componentes por defecto: AudioComponent y Audio3DComponent, siendo el primero aquello para modificar parámetros genéricos de un audio y lo otro para cambiar valores de un audio 3D como (factor de Doppler, distancia mínima y máxima, etc.). 
-
-Además, tiene un archivo llamado ```AudioTags.h``` que contiene todas las etiquetas que ofrece el sistema (reproducir/parar un sonido, cambiar valores de un audio específico).
-
-**Implementación del sistema**  
-Para este sistema, se han implementado tres estructuras auxiliares:
-- ```AudioInfo```: contiene el puntero inteligente de ma_sound y un booleano para indicar si está usado (necesario para el pool).
-- ```AudioEntry```: incluye nombre de un audio, ruta relativa del archivo y el tipo de audio (SOUND2D, SOUND3D, MUSIC). La diferencia entre sound y music es que los audios de tipo sound se cargan en memoria mientras que music se reproduce en streaming.
-- ```AudioPool```: incorpora un vector de AudioInfo (polifonía) y un índice para actualizar (Round-Robin).
-
-En adición, hemos utilizado tres estructuras de datos: 
-- ```audios``` :vector de datos de un audio (AudioEntry)
-- ```pools```: vector de pool de audios (uno por cada audio)
-- ```nameToID```: unordered_map de nombre-audioID (para acceder de forma más eficiente a un sonido que genera Miniaudio)
-
-Es importante anotar que un objeto de tipo ```ma_sound``` no puede reproducirse a la vez, por eso hemos optado por añadir un vector para cada audio. 
-
-Para acceder a un objeto ```ma_sound``` específico:
-1. Reusar una voz libre previamente creada 
-2. Si todas las voces están ocupadas, introducimos una voz nueva si el tamaño actual del vector no supera un límite, o descartamos una posición siguiendo la política Round-Robin.
-
-**Bucle principal de este sistema**
-```cpp
-// la complejidad de cada bucle es, como máximo, queueSize (un número pequeño)
-// aunque se añade la complejidad nos ofrece más riqueza y funcionalidad al sistema
-
-//query para cambios en audios 3D
-for (auto& pack->query<Audio3DInfoComponent, 
-                       TransformComponent, 
-                       Audio3DDirtyTag>()){
-    process3DChanges(audio, tr, tag);
-    //se puede coger cualquier componente porque comparten la entidad
-    removeComponent<Audio3DDirtyTag>(tag.entity);
-}
-
-//query para cambios genéricos de audios
-for (auto& pack->query<AudioComponent, 
-                       AudioDirtyTag>()){
-    processChanges(audio, tag);
-    removeComponent<AudioDirtyTag>(tag.entity);
-}
-
-//query para reproducir audios
-for (auto& pack->query<AudioComponent, 
-                       AudioPlayTag>()){
-    playAudio(audio.id);
-    removeComponent<AudioPlayTag>(tag.entity);
-}
-
-//query para parar audios
-for (auto& pack->query<AudioComponent, 
-                       AudioStopTag>()){
-    stopAudio(audio.id);
-    removeComponent<AudioStopTag>(tag.entity);
-}
-```
-**Carga de audio**  
-Los audios a incluir al motor se leerán desde un archivo .txt llamado ```ÀudioList.txt``` que tiene el siguiente formato: 
-``` txt
-Cada línea sería un audio
-# son comentarios
-; separa cada campo
-Sintaxis: nombre;ruta_relativa;tipo
-tipo-> 0: sonido 2D; 1: sonido 3D; 2: música
-```
-Se llama en ```Core``` una función de ```AudioSystem``` para cargar todos los audios. 
 
 ## Forma de comunicación con estos sistemas
 Una forma de introducir estas notificaciones es a través de **tags**. Los tags son simplemente componentes que un sistema añade a una entidad para que otro sistema lo detecte y haga algo en consecuencia. 
@@ -269,17 +205,227 @@ Al implementar las funcionalidades externas de las librerías como sistemas dent
 
 * Se reutiliza código ya hecho. Al tratarse de implementar sistemas, no hace falta programar una infraestructura distinta para estas funcionalidades ni mantenerla, sino que se reutiliza una parte fundamental de la arquitectura.
 
+### AudioSystem
+**Componentes**  
+El sistema utiliza tres componentes principales:
+``` cpp
+HCOMPONENT(AudioComponent)
+    HUGO::AudioTypes type;
+    HUGO::String audioName;
+    HUGO::Float volume;
+    HUGO::Bool loop;
+    HUGO::Float pitch;
+    double startTime;
+    HUGO::Bool isPlaying;
+
+    //identificador del audio (asignado por el módulo de audio assets)
+    HUGO::AudioID audioId;
+
+    //sonido en activo
+    ma_sound* activePtr = nullptr;
+    
+    //callback cuando se acaba el sonido
+    std::function<void(HUGO::AudioID)> onEnd; 
+    
+END_HCOMPONENT()
+```
+
+``` cpp
+HCOMPONENT(Audio3DInfoComponent)
+    // distancia de atenuación
+    HUGO::Float minDistance;
+    HUGO::Float maxDistance;
+
+    // velocidad para el efecto doppler
+    HUGO::Vector3 velocity;
+    HUGO::Float dopplerFactor;
+
+    // orientación para el cono
+    HUGO::Vector3 direction;
+
+    // rolloff
+    HUGO::Float rolloff;
+
+    // cono de emisión
+    HUGO::Float coneInnerAngle;
+    HUGO::Float coneOuterAngle;
+    HUGO::Float coneOuterGain;
+END_HCOMPONENT()
+```
+
+``` cpp
+HCOMPONENT(AudioListenerComponent)
+    // velocidad para el cálculo de doopler
+    HUGO::Vector3 listenerVelocity;
+    // volumen máster para este listener
+    HUGO::Float masterVolume;
+END_HCOMPONENT()
+```
+
+**Implementación del sistema**  
+Para este sistema, se han implementado tres estructuras auxiliares:
+- ***AudioInfo***
+    ``` cpp
+    struct AudioInfo {
+        std::shared_ptr<Audio> ptr;
+        bool inUse = false;
+    };
+    ```
+    - Representa una voz individual.
+    - `inUse` indica si está siendo utilizada actualmente.
+    - usa `shared_ptr` para gestionar el lifetime del `ma_sound`.
+- ***AudioPool***
+    ``` cpp
+    struct AudioPool {
+        std::vector<AudioInfo> voices;
+        size_t stealIndex = 0;
+    };
+    ```
+    - Cada audio tiene su propio pool.
+    - Permite polifonía
+    - stealIndex implementa round-robin voice stealing.
+
+En adición, hemos utilizado una estructuras de datos: 
+- ```audios``` :vector de datos de un audio.
+- ```pools```: vector de pool de audios (uno por cada audio).
+
+Es importante anotar que un objeto de tipo ```ma_sound``` no puede reproducirse a la vez, por eso hemos optado por añadir un vector para cada audio. 
+
+Para acceder a un objeto ```ma_sound``` específico:
+1. Reusar una voz libre previamente creada 
+2. Si todas las voces están ocupadas, introducimos una voz nueva si el tamaño actual del vector no supera un límite, o descartamos una posición siguiendo la política Round-Robin.
+
+**Bucle principal de este sistema**
+```cpp
+void AudioSystem::update(double)
+{
+    // liberar los sonidos terminados de reproducir
+    for (auto& pack : scene.query<AudioComponent>())
+    {
+        AudioComponent& c = pack.getConst<AudioComponent&>();
+        if (c.activePtr && !ma_sound_is_playing(c.activePtr))
+        {
+            pack.modify<AudioComponent>([](AudioComponent& a){
+                a.activePtr = nullptr;
+                a.isPlaying = false;
+            });
+        }
+    }
+}
+
+void AudioSystem::init(){
+    engine = MiniaudioModule::Instance().getMiniaudioEngine();
+    
+    // configurar el tamaño correcto del mapa de sonidos
+    ensurePoolSize();
+
+    // conectar los eventos de creación de componentes
+    scene.onAddComponent<AudioComponent>().connect(this, &AudioSystem::onAddAudioComponent);
+    scene.onAddComponent<Audio3DInfoComponent>().connect(this, &AudioSystem::onAdd3DAudioComponent);
+
+    // conectar los eventos de modificación de componente
+    scene.onUpdateComponent<TransformComponent>().connect(this, &AudioSystem::onAn3DAudioMove);
+    scene.onUpdateComponent<AudioComponent>().connect(this, &AudioSystem::onUpdateAudioComponent);
+    scene.onUpdateComponent<Audio3DInfoComponent>().connect(this, &AudioSystem::onUpdate3DAudioComponent);
+    scene.onUpdateComponent<AudioListenerComponent>().connect(this, &AudioSystem::onUpdateAudioListener);
+
+}
+
+// crear un puntero ma_sound para poder usar posteriormente
+void AudioSystem::onAddAudioComponent(AudioComponent &c)
+{
+    acquireVoice(c);
+}
+#pragma endregion
+
+// actualizar cambios relacionados con el audio genérico
+void AudioSystem::onUpdateAudioComponent(AudioComponent &c)
+{
+    processChanges(c);
+}
+
+// actualizar cambios relacionados con el audio 3d
+void AudioSystem::onUpdate3DAudioComponent(Audio3DInfoComponent &c)
+{
+    EntityID id = c.entity;
+    if (!scene.hasComponent<AudioComponent>(id)) return;
+
+    const AudioComponent& a = scene.getComponentConst<AudioComponent>(id);
+    process3DChanges(a, c);
+}
+
+//actualizar audio listener
+void AudioSystem::onUpdateAudioListener(AudioListenerComponent &l)
+{
+    EntityID id = l.entity;
+    if (scene.hasComponent<TransformComponent>(id)){
+        const TransformComponent& tr = scene.getComponentConst<TransformComponent>(id);
+        updateListeners(l, tr);
+    }
+}
+
+// por seguridad, convierto el tipo de audio a 3d
+void AudioSystem::onAdd3DAudioComponent(Audio3DInfoComponent &c)
+{
+    scene.modifyComponent<AudioComponent>(c.entity, [](AudioComponent& a){
+        a.type = HUGO::AudioTypes::SOUND3D;
+    });
+}
+
+// actualizar la posición de un sonido 3d cuando se ha movido
+void AudioSystem::onAn3DAudioMove(TransformComponent &tr)
+{
+    if (scene.hasComponent<AudioComponent>(tr.entity) && scene.hasComponent<Audio3DInfoComponent>(tr.entity)){
+        const AudioComponent& a = scene.getComponentConst<AudioComponent>(tr.entity);
+        set3DPosition(a.activePtr, tr.getPosition());
+    }
+}
+```
+**Carga de audio**  
+Se realiza una búsqueda recursiva desde una ruta relativa base y se guardan el nombre del sonido, la ruta relativa correspondiente y se le asigna un ID exclusivo. Este diseño permite más libertad al usuario de organizar los assets de audio. También permite al usuario crear dos tipos de audio (por ejemplo, 2D y 3D) usando una sola ruta.
+
+Los audios a incluir al motor se guardarán en un diccionario donde se puede acceder tanto por su nombre como por un identificador único desde cualquier sitio del motor usando el módulo de `AudioAssetsModule`.  
+
+Para consultar información relacionada con los assets de audio, se crea un archivo ```AudioAssetsDebug.log``` que tiene el siguiente formato: 
+``` log
+AUDIO ASSETS DEBUG
+========================================
+Generated: Apr 12 2026 22:40:15
+Base Path: ../Resources/audios/
+Total Assets: 2
+========================================
+
+1. lucky
+   ID: 0
+   Path: ../Resources/audios//music\lucky.mp3
+   SUCCESS
+
+2. risa
+   ID: 1
+   Path: ../Resources/audios//sfx\risa.wav
+   SUCCESS
+
+========================================
+SUMMARY
+========================================
+Total Assets: 2
+Files Found: 2
+Files Missing: 0
+========================================
+```
+Dicho módulo se inicializa en ```Core```. 
+
 ## RenderSystem
 Es el sistema que se encarga de gestionar el renderizado del motor. Conecta las entidades de HUGO con Ogre, permitiendo visualizar en pantalla las entidades del motor que tenga el RenderComponent, CameraComponent, ViewportComponent y LightComponent. Es el responsable de crear el SceneManager de Ogre.
 
 
-## Responsabilidades Principales
+### Responsabilidades Principales
 
 - Crear y eliminar objetos de Ogre (entidades, sceneNode, luces, cámaras, viewports).
 - Sincronizar el transform de las entidades en Ogre.
 - Gestionar cámaras, viewports, materiales y el tamaño de la ventana.
 
-## Componentes Relacionados
+### Componentes Relacionados
 
 El RenderSystem trabaja con los siguientes componentes que pueden ser añadidos a las entidades:
 
@@ -299,7 +445,7 @@ std::unordered_map<EntityID, CameraInfo> cameraMap;     // Entidad -> Informaci�
 std::unordered_map<EntityID, ViewportInfo> viewportMap; // Entidad -> Información de viewport
 std::unordered_map<EntityID, LightInfo> lightMap;       // Entidad -> Información de luz
 ```
-## Estructuras Internas de Almacenamiento
+### Estructuras Internas de Almacenamiento
 
 Internamente, el sistema almacena los objetos de Ogre en structs, y utiliza estructuras de datos para relacionar cada entidad de HUGO con su objeto de Ogre.:
 
@@ -322,6 +468,8 @@ struct OgreObject {
 Para gestionar las entidades renderizables, se ha utilizado un TAD propio, llamada PagedArray, que consiste en un vector de arrays. Cada entidad renderizable tiene un OgreObjectID que corresponda a un objeto de Ogre. Y la correspondencia entre el ID y la posición del PagedArray se realiza mediante un vector idToIndex. Además, se utiliza un vector freeOgreObjectID para reutilizar IDs.
 
 Faltan los mensajes de cuando se crean las entidades del render system desde fuera.
+
+
 
 ## Simulación de físicas
 El módulo de físicas se carga junto con el resto de módulos en el core del motor. Se encarga de cargar una simulación física por escena y almacenarlas para intercambiarlas y simular la escena activa en el momento.
