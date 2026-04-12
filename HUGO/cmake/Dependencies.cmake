@@ -211,12 +211,7 @@ target_link_libraries(HugoDeps INTERFACE
     Bullet3Collision
     LinearMath
     OgreMain
-    Codec_STBI
-    Codec_Assimp
     OgreOverlay
-    RenderSystem_GL3Plus
-    RenderSystem_GL
-    Plugin_ParticleFX
     SDL2::SDL2
     SDL2::SDL2main
     miniaudio)

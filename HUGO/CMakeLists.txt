@@ -4,7 +4,7 @@ project(HUGO LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "" FORCE)
 set(CMAKE_WARN_DEPRECATED OFF)
 set(POSITION_INDEPENDENT_CODE ON)
 
@@ -69,6 +69,16 @@ if(HUGO_BUILD_ENGINE)
         INSTALL_RPATH "$ORIGIN"
         BUILD_WITH_INSTALL_RPATH TRUE)
 
+
+    # Ogre plugins are independent, so they need to be explicitly copied in both platforms
+    foreach(plugin RenderSystem_GL3Plus RenderSystem_GL Codec_STBI Codec_Assimp Plugin_ParticleFX OgreRTShaderSystem)
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:${plugin}>
+            $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        COMMAND_EXPAND_LISTS)
+    endforeach()
+
     if (WIN32)
         add_custom_command(TARGET ${PROJECT_NAME}  POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -77,7 +87,8 @@ if(HUGO_BUILD_ENGINE)
             COMMAND_EXPAND_LISTS
         )
     else()
-        foreach(lib lua_shared OgreMain OgreOverlay RenderSystem_GL3Plus RenderSystem_GL Codec_STBI Codec_Assimp Plugin_ParticleFX OgreRTShaderSystem)
+        # Copy generated .so libs to the bin dir
+        foreach(lib lua_shared OgreMain OgreOverlay)
             add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 $<TARGET_FILE:${lib}>
