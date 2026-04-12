@@ -483,64 +483,68 @@ void BulletSimulation::checkTransformFlags(const ColliderComponent& collider, co
 void BulletSimulation::syncBodiesToBullet() {
     
     // Add new rigidBodies to simulation and Update kinematic bodies
-    for(auto& pack: scene->query<ColliderComponent, RigidBodyComponent, TransformComponent>()) {
-        RigidBodyComponent& rb = pack.getDeprecated<RigidBodyComponent&>();
-        ColliderComponent& col = pack.getDeprecated<ColliderComponent&>();
+    for(auto& item : scene->query<ColliderComponent, RigidBodyComponent, TransformComponent>()) {
+        item.modify<RigidBodyComponent>([item](RigidBodyComponent &rb){
 
-        if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
-            //create a new CollisionObject
-            rb.objectID = upgradeToRigidBodyObject(col, rb);
-        }
+            if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
+                //create a new CollisionObject
+                //! posible que getConst no funcione
+                rb.objectID = upgradeToRigidBodyObject(item.getConst<ColliderComponent>(), rb);
+            }
 
-        if(rb.getBodyType() == HUGO::BodyType::KINEMATIC){
-            HUGOMotionState* motionState = static_cast<HUGOMotionState*>(btRigidBody::upcast(getCollisionObject(rb.objectID).bulletRB)->getMotionState());
-            motionState->updateBulletTransform();
-        }
+            if(rb.getBodyType() == HUGO::BodyType::KINEMATIC){
+                HUGOMotionState* motionState = static_cast<HUGOMotionState*>(btRigidBody::upcast(getCollisionObject(rb.objectID).bulletRB)->getMotionState());
+                motionState->updateBulletTransform();
+            }
         
-        checkRigidBodyFlags(rb);
+            checkRigidBodyFlags(rb);
+        });
     }
 
     // Add colliders to simulation
-     for(auto& pack: scene->query<ColliderComponent, TransformComponent>()){
-        ColliderComponent& col = pack.getDeprecated<ColliderComponent&>();
-        TransformComponent& transform = pack.getConst<TransformComponent&>();
+     for(auto& item : scene->query<ColliderComponent, TransformComponent>()){
+        item.modify<ColliderComponent>([item](ColliderComponent &col){
     
-        if(col.objectID == HUGO::INVALID_COL_OBJ_ID){
-            col.objectID = createColliderObject(col);
-        }
+            if(col.objectID == HUGO::INVALID_COL_OBJ_ID){
+                col.objectID = createColliderObject(col);
+            }
 
-        checkColliderFlags(col);
-        checkTransformFlags(col, transform);
+            checkColliderFlags(col);
+            checkTransformFlags(col, item.getConst<TransformComponent>());
+        });
     }
 }
 
 void BulletSimulation::syncBodiesToGame() {
 
-    for(auto& pack: scene->query<ColliderComponent, RigidBodyComponent, TransformComponent>()) {
-        RigidBodyComponent& rb = pack.getDeprecated<RigidBodyComponent&>();
-        btRigidBody* btRb = btRigidBody::upcast(getCollisionObject(rb.objectID).bulletRB);
-        
-        if(btRb->wantsSleeping())
-            rb.asleep = true;
-        else
-            rb.asleep = false;
-        
-        // Update velocity if the object collided
-        rb.linearVelocity = BulletUtils::btVector3ToVector3(btRb->getLinearVelocity());
-        rb.angularVelocity = BulletUtils::btVector3ToVector3(btRb->getAngularVelocity());
+    for(auto& item : scene->query<ColliderComponent, RigidBodyComponent, TransformComponent>()) {
+        item.modify<RigidBodyComponent>([](){
 
-        // Clear forces applied this frame
-        // NOT neccessary, is done by bullet in the stepSimulation
-        // btRb->clearForces();
+            btRigidBody* btRb = btRigidBody::upcast(getCollisionObject(rb.objectID).bulletRB);
+        
+            if(btRb->wantsSleeping())
+                rb.asleep = true;
+            else
+                rb.asleep = false;
+        
+            // Update velocity if the object collided
+            rb.linearVelocity = BulletUtils::btVector3ToVector3(btRb->getLinearVelocity());
+            rb.angularVelocity = BulletUtils::btVector3ToVector3(btRb->getAngularVelocity());
+
+            // Clear forces applied this frame
+            // NOT neccessary, is done by bullet in the stepSimulation
+            // btRb->clearForces();
+        });
     }
 
     if (numSubSteps != 0){
-        for(auto& pack: scene->query<ColliderComponent, TransformComponent>()) {
-            ColliderComponent& col = pack.getDeprecated<ColliderComponent&>();
+        for(auto& item : scene->query<ColliderComponent, TransformComponent>()) {
+            item.modify<ColliderComponent>([](){
         
-            col.collisionInfo.clear();
-            col.collisionInfo = col.collisionBuffer;
-            col.collisionBuffer.clear();
+                col.collisionInfo.clear();
+                col.collisionInfo = col.collisionBuffer;
+                col.collisionBuffer.clear();
+            });
         }
     }
 }
