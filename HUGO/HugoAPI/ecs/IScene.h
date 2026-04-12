@@ -37,7 +37,7 @@ public:
 	}
 
 	template<typename T> 
-	const T& getComponentConst() {
+	const T& getComponentConst(EntityID entity) {
 		ComponentID componentID = HUGO::ComponentRegistry::getComponentId<T>();
 		return componentTable->getComponent<T>(entityTable->getDenseListIndex(entity, componentID));
 	}

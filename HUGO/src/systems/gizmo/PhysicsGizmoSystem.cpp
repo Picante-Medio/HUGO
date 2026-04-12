@@ -28,7 +28,7 @@ ErrorOrVoid createGizmoMesh(HUGO::IScene&, EntityID entity, const T& colliderInf
 template <>
 ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::BoxColliderInfo& colliderInfo) {
 
-    if(scene.getComponent<RenderComponent>(entity).getMeshName() != "cube.mesh") {
+    if(scene.getComponentConst<RenderComponent>(entity).getMeshName() != "cube.mesh") {
 
         scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
             gizmoRender.setMeshName("cube.mesh");
