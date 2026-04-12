@@ -243,37 +243,30 @@ void
 HierarchySystem::onUpdateChildrenComponent(ChildrenComponent& childrenComp)
 {
     EntityID parent = childrenComp.entity;
-    std::vector<EntityID>& toAdd = childrenComp.addedChildren;
-    std::vector<EntityID>& toRemove = childrenComp.removedChildren;
+    std::queue<EntityID>& toAdd = childrenComp.addedChildren;
+    std::queue<EntityID>& toRemove = childrenComp.removedChildren;
 
     //child added
-    if(!toAdd.empty()){
-        for(EntityID& child: toAdd){
-            //check if child is valid and does not create cycle
-            if(child == parent || hasCycle(child, parent)){
-                scene.log(std::make_shared<StringError>("[HierarchySystem] Cannot add child "+ std::to_string(child) + " for entity " + std::to_string(parent)));
-                childrenComp.children.erase(child);
-                return;
-            } 
-            //add parentComponent to child
-            addParentToChild(child, parent);  
-        }
-        toAdd.clear();
+    while(!toAdd.empty()){
+        EntityID child = toAdd.front();toAdd.pop();
+        if(child == parent || hasCycle(child, parent)){
+            scene.log(std::make_shared<StringError>("[HierarchySystem] Cannot add child "+ std::to_string(child) + " for entity " + std::to_string(parent)));
+            childrenComp.children.erase(child);
+            return;
+        } 
+        //add parentComponent to child
+        addParentToChild(child, parent); 
     }
 
     //child removed
-    if(!toRemove.empty()){
-        for(EntityID& child: toRemove){
-            //check if child is valid
-            if(child == parent){
-                scene.log(std::make_shared<StringError>("[HierarchySystem] Cannot remove child "+ std::to_string(child) + " for entity " + std::to_string(parent)));
-                return;
-            } 
-            
-            //remove the parent
-            removeParentFromChild(child); 
-        }
-        toRemove.clear();
+    while(!toRemove.empty()){
+        EntityID child = toRemove.front();toRemove.pop();
+        if(child == parent){
+            scene.log(std::make_shared<StringError>("[HierarchySystem] Cannot remove child "+ std::to_string(child) + " for entity " + std::to_string(parent)));
+            return;
+         }  
+        //remove the parent
+        removeParentFromChild(child); 
     }
 }
 
@@ -285,13 +278,12 @@ HierarchySystem::onUpdateParentComponent(ParentComponent& parentComp)
     EntityID child = parentComp.entity;
     EntityID newParent= parentComp.parent.value();
     std::optional<EntityID> oldParent= parentComp.previousParent;
-
-    if (newParent == child || hasCycle(child, newParent)) {
+    if (newParent == child || hasCycle(child, newParent) || newParent == oldParent) {
         if(oldParent)parentComp.parent = oldParent;
         scene.log(std::make_shared<StringError>("[HierarchySystem] Cannot set parent "+ std::to_string(newParent) + " for entity " + std::to_string(child)));
         return;
     }
-
+ 
     //remove child from old parent
     if(oldParent){
         removeChildFromParent(child, oldParent.value());

@@ -144,7 +144,7 @@ void UISystem::syncPanel(const PanelComponent &p)
 
 HUGO::String UISystem::formatText(const HUGO::String & text, Ogre::TextAreaOverlayElement *textArea, HUGO::Float maxWidth,HUGO::Float maxHeight)
 {
-    if (!textArea || !textArea->getFont() || text.empty())
+    if (!textArea || !textArea->getFont()  ||!textArea->getFont()->isLoaded() || text.empty())
         return text;
 
     float screenWidth = static_cast<float>(renderWindow->getWidth());
