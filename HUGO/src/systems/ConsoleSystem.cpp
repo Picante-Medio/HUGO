@@ -263,8 +263,7 @@ void ConsoleSystem::init(){
     scene.addComponent<PanelComponent>(consoleInfo, [this, &panelContainerName](PanelComponent& panel3){
         panel3.overlayName = "Console/InfoText";
         panel3.containerName = panel3.overlayName + "/Container";
-        panel3.material = "UI/Knob";
-        //panel3.material = "Console/InputBackground";
+        panel3.material = "Console/InputBackground";
         panel3.width = 0.3f;
         panel3.height = 0.04f;
         panel3.left = 0.7f;
@@ -272,12 +271,6 @@ void ConsoleSystem::init(){
         panel3.zOrder = 501;
         panel3.isVisible = active;
         panelContainerName = panel3.containerName;
-    });
-
-    scene.addComponent<ButtonComponent>(consoleInfo, [](ButtonComponent& b){
-        b.normalMaterial = "UI/Knob";
-        b.hoverMaterial = "UI/KnobHover";
-        b.pressedMaterial = "UI/KnobPressed";
     });
 
     scene.addComponent<TextComponent>(consoleInfo, [&panelContainerName](TextComponent& text3){
