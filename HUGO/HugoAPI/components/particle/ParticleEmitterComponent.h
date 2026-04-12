@@ -4,13 +4,6 @@
 #include "HugoMath.h"
 #include "HugoTypes.h"
 
-struct Particle {
-    HUGO::String material = "";
-
-    HUGO::Float width = 0.0f;
-    HUGO::Float height = 0.0f;
-};
-
 HCOMPONENT(ParticleEmitterComponent)
 
     DEFAULT_SERIALIZED_MEMBER(HUGO::String, particleName, "");

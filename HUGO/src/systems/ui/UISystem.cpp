@@ -385,9 +385,9 @@ void UISystem::processInput()
     // handle mouse click: activate/deactivate input fields
     if (input->wasMouseButtonJustPressed(HUGO::MouseCode::MOUSE_LEFT)) {
         for (auto& pack : scene->query<PanelComponent, TextComponent, InputFieldComponent>()) {
-            PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
-            TextComponent& text = pack.getDeprecated<TextComponent&>();
-            InputFieldComponent& field = pack.getDeprecated<InputFieldComponent&>();
+            PanelComponent& panel = pack.getConst<PanelComponent&>();
+            TextComponent& text = pack.getConst<TextComponent&>();
+            InputFieldComponent& field = pack.getConst<InputFieldComponent&>();
 
             if (isMouseOverPanel(panel, mouse.x, mouse.y)) {
                 if (!field.isActive){
@@ -420,12 +420,12 @@ void UISystem::processInput()
 
         for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
         {
-            PanelComponent& panel = pack.getDeprecated<PanelComponent&>();
+            PanelComponent& panel = pack.getConst<PanelComponent&>();
             if (isMouseOverPanel(panel, mouse.x, mouse.y))
             {
-               pack.modify<ButtonComponent>([](ButtonComponent& b){
+                pack.modify<ButtonComponent>([](ButtonComponent& b){
                     b.state = HUGO::BS_DOWN;
-                 });
+                });
                 break;
             }
         }
