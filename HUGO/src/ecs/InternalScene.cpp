@@ -17,7 +17,7 @@
 #include "SceneManager.h"
 #include "ComponentFactory.h"
 #include "GameLibraryLoader.h"
-#include "StringUtils.h"
+#include "HStringUtils.h"
 #include "ParentComponent.h"
 #include "ChildrenComponent.h"
 
@@ -69,10 +69,11 @@ Scene::createEntityLUA() {
 
 void
 Scene::addComponentLUA(int entityID, std::string& componentData) {
+
 	//Input Example
 	//AddComponent Rigidbody float mass 2.5 vector3 velocity 2 2 2
 	
-	std::vector<std::string_view> splittedData = StringUtils::split(componentData, ' ');
+	std::vector<std::string_view> splittedData = HStringUtils::split(componentData, ' ');
 	std::string componentName = std::string{splittedData[1]};
 
 	std::unordered_map<std::string, HVariant> parameters = std::unordered_map<std::string, HVariant>();

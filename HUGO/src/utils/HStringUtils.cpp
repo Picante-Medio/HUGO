@@ -1,6 +1,6 @@
-#include "StringUtils.h"
+#include "HStringUtils.h"
 
-std::vector<std::string_view> StringUtils::split(std::string_view str, char delim)
+std::vector<std::string_view> HStringUtils::split(std::string_view str, char delim)
 {
     std::vector<std::string_view> result; 
     auto left = str.begin(); 
@@ -17,7 +17,7 @@ std::vector<std::string_view> StringUtils::split(std::string_view str, char deli
     return result; 
 }
 
-std::string StringUtils::killSwitch(std::string& str) {
+std::string HStringUtils::killSwitch(std::string& str) {
     std::string temp = str;
     str = "";
     return temp;
