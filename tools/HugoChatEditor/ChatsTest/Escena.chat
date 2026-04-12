@@ -1,30 +1,21 @@
 SCENE
 
-ENTITY Juan 0
-	COMPONENT TransformComponent
-		VECTOR_3 position 0.56475341320038 0.0 0.0
-		VECTOR_3 rotation 0.0 0.0 0.0
-		VECTOR_3 scale 1.0 1.0 1.0
-
-ENTITY Guille 1
-	COMPONENT ParentComponent
-		INT 0
+ENTITY Entity 0
+	COMPONENT LightComponent
+		VECTOR_4 diffuse 0.0 0.0 0.0 0.0
+		VECTOR_4 specular 0.0 0.0 0.0 0.0
+		INT lightType 0
+		FLOAT spotFalloff 0.0
+		FLOAT spotNearClip 0.0
+		FLOAT spotOuter 0.0
+		FLOAT spotInner 0.0
+		FLOAT shadowFarDist 0.0
+		FLOAT shadowFarDistSquared 0.0
+		VECTOR_4 attenuation 0.0 0.0 0.0 0.0
+		FLOAT shadowNearClipDist 0.0
+		FLOAT shadowFarClipDist 0.0
 	COMPONENT RenderComponent
-		STRING mesh res://sphere.tres
+		STRING mesh res://meshes/new_box_mesh.tres
 		STRING materialName 
-		INT 0
-
-ENTITY Entity 2
-
-ENTITY Alfonso 3
-	COMPONENT ParentComponent
-		INT 2
-	COMPONENT RenderComponent
-		STRING mesh res://sphere.tres
-		STRING materialName 
-		INT 0
-
-ENTITY David 4
-	COMPONENT ParentComponent
-		INT 3
+		INT objectID 0
 

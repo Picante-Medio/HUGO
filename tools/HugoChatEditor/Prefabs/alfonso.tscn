@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://krs4pyuy4e"]
 
-[ext_resource type="Script" uid="uid://bqw6njmy1hy34" path="res://addons/HugosChatPlugin/NativeComponents/RenderComponent.gd" id="2_8f7sm"]
-[ext_resource type="SphereMesh" uid="uid://citadnjn16yba" path="res://sphere.tres" id="2_v4oxg"]
+[ext_resource type="Script" uid="uid://bnjt3w18hk2gs" path="res://addons/HugosChatPlugin/NativeComponents/RenderComponent.gd" id="2_8f7sm"]
+[ext_resource type="SphereMesh" uid="uid://citadnjn16yba" path="res://meshes/sphere.tres" id="2_v4oxg"]
+
 
 [node name="Alfonso" type="Node3D" unique_id=307300848]
 

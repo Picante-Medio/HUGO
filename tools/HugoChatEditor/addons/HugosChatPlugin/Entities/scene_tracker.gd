@@ -51,9 +51,14 @@ func gather_entities(parent:Node):
 	return entities
 
 enum SYSTEMS {
-	MOVEMENT_SYSTEM,
-	CHAT_SYSTEM,
-	ZAPAS_SYSTEM,
-	SKIBIDI_SYSTEM,
-	HUGO_SYSTEM
+	ConsoleSystem,
+	AudioSystem,
+	PhysicsGizmoSystem,
+	HierarchySystem,
+	ParticleSystem,
+	CameraSystem,
+	LightSystem,
+	RenderSystem,
+	TweenSystem,
+	UISystem
 }
