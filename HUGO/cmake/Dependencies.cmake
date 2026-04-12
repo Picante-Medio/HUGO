@@ -73,6 +73,7 @@ FetchContent_Declare(
     SYSTEM
 )
 
+set(ASSIMP_BUILD_ZLIB ON CACHE BOOL "") # This is not default in linux, so we set it to ensure linkage is PIC
 set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "")
 set(ASSIMP_NO_EXPORT ON CACHE BOOL "")
 set(ASSIMP_BUILD_OGRE_IMPORTER OFF CACHE BOOL "")
@@ -84,7 +85,6 @@ get_target_property(_assimp_includes assimp INTERFACE_INCLUDE_DIRECTORIES)
 set(ASSIMP_INCLUDE_DIRS ${_assimp_includes})
 set(ASSIMP_LIBRARIES assimp::assimp)
 set(ASSIMP_LIBRARY_DIRS "")
-
 
 if(WIN32)
 
@@ -185,6 +185,11 @@ set(OGRE_COPY_DEPENDENCIES ON CACHE BOOL "")
 set(OGRE_ENABLE_PRECOMPILED_HEADERS ON CACHE BOOL "")
 set(OGRE_INSTALL_PDB ON CACHE BOOL "")
 set(OGRE_PROJECT_FOLDERS ON CACHE BOOL "")
+
+if(NOT WIN32) # Resets to default because ogre does not define the postfix for non windows systems
+    set(CMAKE_RELWITHDEBINFO_POSTFIX "" CACHE STRING "" FORCE)
+    set(CMAKE_DEBUG_POSTFIX "" CACHE STRING "" FORCE)
+endif()
 
 FetchContent_MakeAvailable(ogre)
 

@@ -6,6 +6,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_WARN_DEPRECATED OFF)
+set(POSITION_INDEPENDENT_CODE ON)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Functions.cmake)
 
@@ -20,6 +21,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/HugoAPI.cmake)
 ################################## HUGO executable engine
 
 option(HUGO_BUILD_ENGINE "Builds the HUGO executable" ON)
+
 if(HUGO_BUILD_ENGINE)
 
     # Can be overrided
