@@ -233,6 +233,9 @@ HierarchySystem::fixedUpdate(double) {}
 
 void 
 HierarchySystem::onAddTransformComponent(TransformComponent& tr){
+    tr.needUpdateLocalPosition = tr.worldPosition!=HUGO::Vector3();
+    tr.needUpdateLocalRotation = tr.worldRotation!=HUGO::Quaternion();
+    tr.needUpdateLocalScale = tr.worldScale!=HUGO::Vector3();
     getFullTransform(tr.entity);
 }
 

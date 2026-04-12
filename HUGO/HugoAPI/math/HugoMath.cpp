@@ -46,6 +46,13 @@ namespace HUGO {
 		return Vector2(x / len, y / len);
 	}
 
+	bool Vector2::operator==(const Vector2& other) const{
+		return x == other.x && y == other.y;
+	}
+	bool Vector2::operator!=(const Vector2& other) const{
+		return x != other.x && y != other.y;
+	}
+
     Vector3::Vector3()
 		: x(0.0f), y(0.0f), z(0.0f) {}
     Vector3::Vector3(float n)
@@ -91,6 +98,11 @@ namespace HUGO {
 	bool Vector3::operator!=(const Vector3 &other) const
 	{
 		return x != other.x && y != other.y && z != other.z;
+	}
+
+	bool Vector3::operator==(const Vector3 &other) const
+	{
+		return x == other.x && y == other.y && z == other.z;
 	}
 
     Vector3 Vector3::cross(const Vector3 &other) const
@@ -248,6 +260,14 @@ namespace HUGO {
 		}
 	}
 
+	bool Quaternion::operator==(const Quaternion& other) const{
+		return w == other.w && x == other.x && y == other.y && z == other.z;
+	}
+	bool Quaternion::operator!=(const Quaternion& other) const{
+		return !operator==(other);
+	}
+
+
     Quaternion operator*(const Quaternion& a, const Quaternion& b)
 	{
 		return Quaternion(
@@ -267,9 +287,8 @@ namespace HUGO {
     }
 
 	Quaternion operator+(const Quaternion& l, const Quaternion& r){
-		Quaternion res(l.w+r.w, l.x+r.x, r.y+l.y, r.z+l.z);
+		Quaternion res(l.w+r.w, l.x+r.x, l.y+r.y, l.z+r.z);
 		res.normalize();
-
 		return res;
 	}
 

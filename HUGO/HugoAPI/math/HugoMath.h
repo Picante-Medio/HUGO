@@ -23,6 +23,9 @@ namespace HUGO {
 		void operator-=(const Vector2& other);
 
 		Vector2 operator*(float scalar) const;
+		
+		bool operator==(const Vector2& other) const;
+		bool operator!=(const Vector2& other) const;
 
 		float dot(const Vector2& other) const;
 
@@ -50,6 +53,7 @@ namespace HUGO {
 		Vector3 operator/(float scalar) const;
 		Vector3 operator/(const Vector3& other) const;
 
+		bool operator==(const Vector3& other) const;
 		bool operator!=(const Vector3& other) const;
 		
 		Vector3 cross(const Vector3& other) const;
@@ -97,6 +101,9 @@ namespace HUGO {
 		Vector3 up() const;
 		Vector3 right() const;
 		
+		bool operator==(const Quaternion& other) const;
+		bool operator!=(const Quaternion& other) const;
+
 		void operator*=(const Quaternion& other);
 		void normalize();
 	};
