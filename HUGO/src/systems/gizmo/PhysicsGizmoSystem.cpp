@@ -46,7 +46,7 @@ ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::Bo
 template <>
 ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::SphereColliderInfo& colliderInfo) {
 
-    if(scene.getComponent<RenderComponent>(entity).getMeshName() != "sphere.mesh") {
+    if(scene.getComponentConst<RenderComponent>(entity).getMeshName() != "sphere.mesh") {
 
         scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
             gizmoRender.setMeshName("sphere.mesh");
@@ -64,7 +64,7 @@ ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::Sp
 template <>
 ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::CylinderColliderInfo& colliderInfo){
 
-    if(scene.getComponent<RenderComponent>(entity).getMeshName() != "cylinder.mesh") {
+    if(scene.getComponentConst<RenderComponent>(entity).getMeshName() != "cylinder.mesh") {
 
         scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
             gizmoRender.setMeshName("cylinder.mesh");
@@ -82,7 +82,7 @@ ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::Cy
 template <>
 ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::ConeColliderInfo& colliderInfo){
 
-    if(scene.getComponent<RenderComponent>(entity).getMeshName() != "cone.mesh") {
+    if(scene.getComponentConst<RenderComponent>(entity).getMeshName() != "cone.mesh") {
 
         scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
             gizmoRender.setMeshName("cone.mesh");
@@ -100,7 +100,7 @@ ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::Co
 template <>
 ErrorOrVoid createGizmoMesh<HUGO::CapsuleColliderInfo>(HUGO::IScene& scene, EntityID entity, const HUGO::CapsuleColliderInfo& colliderInfo){
 
-    if(scene.getComponent<RenderComponent>(entity).getMeshName() != "capsule.mesh") {
+    if(scene.getComponentConst<RenderComponent>(entity).getMeshName() != "capsule.mesh") {
 
         scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
             gizmoRender.setMeshName("capsule.mesh");
