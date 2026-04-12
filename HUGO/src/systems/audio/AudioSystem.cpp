@@ -127,6 +127,7 @@ void AudioSystem::acquireVoice(AudioComponent &c)
 {
     if (c.type < 0 || c.type >= HUGO::AudioTypes::LAST_TYPE) return;
     if (c.activePtr == nullptr) {
+        c.audioId = AudioAssetsModule::Instance().getID(c.audioName);
         c.activePtr = getSound(c.audioId, static_cast<HUGO::AudioTypes>(c.type));
     }
 }
@@ -358,6 +359,7 @@ void AudioSystem::init(){
 void AudioSystem::onAddAudioComponent(AudioComponent &c)
 {
     acquireVoice(c);
+    processChanges(c);
 }
 #pragma endregion
 

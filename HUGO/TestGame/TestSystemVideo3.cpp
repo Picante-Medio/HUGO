@@ -2,7 +2,7 @@
 #include "TransformComponent.h"
 #include "ParticleEmitterComponent.h"
 #include "ChangeSceneMessage.h"
-
+#include "AudioComponent.h"
 
 struct Aux {
     HUGO::String pname = "Particle/Smoke";
@@ -44,6 +44,16 @@ TestSystemVideo3::init() {
         pe.material = a.material;
         pe.quota = 200;
     });
+
+    EntityID audio = scene.createEntity();
+    scene.addComponent<AudioComponent>(audio, [](AudioComponent& a){
+        a.isPlaying = true;
+        a.type = HUGO::AudioTypes::MUSIC;
+        a.audioName = "lucky";
+        a.audioId =0;
+    });
+
+
 }
 
 
@@ -53,9 +63,10 @@ TestSystemVideo3::onLoad() {}
 
 void
 TestSystemVideo3::update(double dt) {
-    if(scene.getInput()->wasKeyJustPressed(HUGO::KeyCode::TWO)){
+    if(scene.getInput()->wasKeyJustPressed(HUGO::KeyCode::ONE)){
         std::cout << "Cambiando escena...\n";
         ChangeSceneMessage c;
+        c.sceneName = "TestSceneVideo1";
         scene.sendMessage<ChangeSceneMessage>(c);
     }
 }

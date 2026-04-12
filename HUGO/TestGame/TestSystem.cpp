@@ -18,6 +18,7 @@
 #include "AnimationComponent.h"
 #include "AudioComponent.h"
 
+#include "ChangeSceneMessage.h"
 void
 TestSystem::init() {
     // EntityID ent = scene.createEntity();
