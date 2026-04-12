@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://2of0ia11wy04"]
 
-[ext_resource type="Script" uid="uid://cfitq45r2oufq" path="res://addons/HugosChatPlugin/hugo_config.gd" id="1_yp3x2"]
+[ext_resource type="Script" uid="uid://cgt6dd2vlwyuh" path="res://addons/HugosChatPlugin/hugo_config.gd" id="1_yp3x2"]
 [ext_resource type="PackedScene" uid="uid://bd8gmlf8r68yr" path="res://addons/HugosChatPlugin/Dock/path_container.tscn" id="2_6l8ao"]
 
 [node name="HugoConfig" type="Control" unique_id=590554959 node_paths=PackedStringArray("components_path_container", "chats_path_container", "lua_path_container")]

@@ -15,7 +15,7 @@ func _enter_tree():
 	add_inspector_plugin(plugin)
 	
 	config_dock = preload("res://addons/HugosChatPlugin/Dock/hugo_config.tscn").instantiate()
-	add_control_to_dock(EditorPlugin.DOCK_SLOT_RIGHT_UR, config_dock)
+	add_control_to_dock(EditorPlugin.DOCK_SLOT_RIGHT_UL, config_dock)
 
 func save_scene(_scene_path):
 	if Input.is_physical_key_pressed(KEY_R):

@@ -1,11 +1,9 @@
 [gd_scene format=3 uid="uid://bd8gmlf8r68yr"]
 
-[ext_resource type="Script" uid="uid://8a8ogw8co3uv" path="res://addons/HugosChatPlugin/path_container.gd" id="1_hwr78"]
+[ext_resource type="Script" uid="uid://ctlpl4nun8mpu" path="res://addons/HugosChatPlugin/path_container.gd" id="1_hwr78"]
 
 [node name="components_path_container" type="HBoxContainer" unique_id=743859217 node_paths=PackedStringArray("file_label", "file_dialog", "path_button", "path_text")]
 script = ExtResource("1_hwr78")
-filters = null
-is_file_path = null
 file_label = NodePath("components_path_label")
 file_dialog = NodePath("components_path_file_dialog")
 path_button = NodePath("components_path_button")

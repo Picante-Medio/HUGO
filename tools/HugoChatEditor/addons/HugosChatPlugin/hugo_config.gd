@@ -11,7 +11,28 @@ static var LUA_PATH:String
 @export var lua_path_container:PathContainer
 
 func _ready() -> void:
-	components_path_container.on_path_changed.connect(func(value): COMPONENTS_PATH = value)
-	chats_path_container.on_path_changed.connect(func(value): CHATS_PATH = value)
-	lua_path_container.on_path_changed.connect(func(value): LUA_PATH = value)
+	COMPONENTS_PATH = ProjectSettings.get_setting("hugo/components_path", "")
+	CHATS_PATH = ProjectSettings.get_setting("hugo/chats_path", "")
+	LUA_PATH = ProjectSettings.get_setting("hugo/lua_path", "")
 	
+	components_path_container.path_text.text = COMPONENTS_PATH
+	chats_path_container.path_text.text = CHATS_PATH
+	lua_path_container.path_text.text = LUA_PATH
+	
+	components_path_container.on_path_changed.connect(set_components_path)
+	chats_path_container.on_path_changed.connect(set_chats_path)
+	lua_path_container.on_path_changed.connect(set_lua_path)
+
+func set_components_path(value):
+	COMPONENTS_PATH = value
+	ProjectSettings.set_setting("hugo/components_path", value)
+
+
+func set_chats_path(value):
+	CHATS_PATH = value
+	ProjectSettings.set_setting("hugo/chats_path", value)
+
+
+func set_lua_path(value):
+	LUA_PATH = value
+	ProjectSettings.set_setting("hugo/lua_path", value)
