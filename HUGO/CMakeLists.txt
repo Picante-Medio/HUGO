@@ -4,96 +4,90 @@ project(HUGO LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_WARN_DEPRECATED OFF)
 
-include(FetchContent)
-
-# set(FETCHCONTENT_QUIET ON)
-# set(CMAKE_MESSAGE_LOG_LEVEL WARNING)
-# set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "" FORCE)
-# set(CMAKE_WARN_DEPRECATED OFF)
-
-set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE)
-
-include(cmake/Dependencies.cmake)
-include(cmake/Functions.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Functions.cmake)
 
 ################################## HugoAPI
 
-include(cmake/HugoAPI.cmake)
+# Can be overrided
+set(HUGO_API_LIB_DIR "${CMAKE_SOURCE_DIR}/lib" CACHE STRING "Binary directory for HUGO library files")
 
-################################## Aquí empieza el proyecto principal
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Lua.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/HugoAPI.cmake)
 
-file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cpp)
+################################## HUGO executable engine
 
-add_executable(${PROJECT_NAME} ${SRC_FILES})
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
+option(HUGO_BUILD_ENGINE "Builds the HUGO executable" ON)
+if(HUGO_BUILD_ENGINE)
 
-enable_warnings(${PROJECT_NAME})
+    # Can be overrided
+    set(HUGO_BIN_DIR "${CMAKE_SOURCE_DIR}/bin" CACHE STRING "Binary directory for HUGO executable")
 
-file(GLOB_RECURSE SRC_DIRS CONFIGURE_DEPENDS LIST_DIRECTORIES true ${CMAKE_SOURCE_DIR}/src/*)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Dependencies.cmake)
 
-set(INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src)
+    file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
-foreach(path ${SRC_DIRS})
-    if(IS_DIRECTORY "${path}")
-        list(APPEND INCLUDE_DIRS "${path}")
-    endif()
-endforeach()
+    add_executable(${PROJECT_NAME} ${SRC_FILES})
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 
-set(SYSTEM_INCLUDE_DIRS ${HUGO_DEPS_INCLUDE_DIRS})  # ya contiene bullet3
+    enable_warnings(${PROJECT_NAME})
 
-foreach(lib IN LISTS HUGO_LINKED_LIBRARIES)
-    if(TARGET ${lib})
-        get_target_property(inc_dirs ${lib} INTERFACE_INCLUDE_DIRECTORIES)
-        if(inc_dirs)
-            list(APPEND SYSTEM_INCLUDE_DIRS ${inc_dirs})
+    file(GLOB_RECURSE SRC_DIRS CONFIGURE_DEPENDS LIST_DIRECTORIES true ${CMAKE_CURRENT_SOURCE_DIR}/src/*)
+
+    set(INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+    foreach(path ${SRC_DIRS})
+        if(IS_DIRECTORY "${path}")
+            list(APPEND INCLUDE_DIRS "${path}")
         endif()
-    endif()
-endforeach()
-
-list(REMOVE_DUPLICATES SYSTEM_INCLUDE_DIRS)
-
-
-target_include_directories(${PROJECT_NAME} PRIVATE 
-    ${INCLUDE_DIRS})
-
-target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE
-    ${SYSTEM_INCLUDE_DIRS})
-
-target_link_libraries(${PROJECT_NAME} PRIVATE 
-    ${HUGO_LINKED_LIBRARIES}
-    HugoAPI)
-
-set(CMAKE_SKIP_RPATH FALSE)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    DEBUG_POSTFIX "d"
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin
-    VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
-    INSTALL_RPATH "$ORIGIN"
-    BUILD_WITH_INSTALL_RPATH TRUE)
-
-if (WIN32)
-    add_custom_command(TARGET ${PROJECT_NAME}  POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>
-        COMMAND_EXPAND_LISTS
-    )
-else()
-#Plugin_ParticleFX
-    foreach(lib lua_shared OgreMain OgreOverlay RenderSystem_GL3Plus RenderSystem_GL Codec_STBI Codec_Assimp Plugin_ParticleFX OgreRTShaderSystem)
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            $<TARGET_FILE:${lib}>
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>
-        COMMAND_EXPAND_LISTS)
     endforeach()
-endif ()
 
-########################################
+    target_include_directories(${PROJECT_NAME} PRIVATE 
+        ${INCLUDE_DIRS})
 
-include(cmake/TestGame.cmake)
+    target_link_libraries(${PROJECT_NAME} PRIVATE 
+        HugoDeps
+        HugoAPI)
+
+    set(CMAKE_SKIP_RPATH FALSE)
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED ON
+        CXX_EXTENSIONS OFF
+        POSITION_INDEPENDENT_CODE ON
+        DEBUG_POSTFIX "d"
+        RUNTIME_OUTPUT_DIRECTORY ${HUGO_BIN_DIR}
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG ${HUGO_BIN_DIR}
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE ${HUGO_BIN_DIR}
+        VS_DEBUGGER_WORKING_DIRECTORY ${HUGO_BIN_DIR}
+        INSTALL_RPATH "$ORIGIN"
+        BUILD_WITH_INSTALL_RPATH TRUE)
+
+    if (WIN32)
+        add_custom_command(TARGET ${PROJECT_NAME}  POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
+                $<TARGET_FILE_DIR:${PROJECT_NAME}>
+            COMMAND_EXPAND_LISTS
+        )
+    else()
+        foreach(lib lua_shared OgreMain OgreOverlay RenderSystem_GL3Plus RenderSystem_GL Codec_STBI Codec_Assimp Plugin_ParticleFX OgreRTShaderSystem)
+            add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                $<TARGET_FILE:${lib}>
+                $<TARGET_FILE_DIR:${PROJECT_NAME}>
+            COMMAND_EXPAND_LISTS)
+        endforeach()
+    endif ()
+    
+endif()
+
+################Test Game########################
+
+if(PROJECT_IS_TOP_LEVEL)
+    include(cmake/TestGame.cmake)
+endif()
