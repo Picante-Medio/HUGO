@@ -8,10 +8,11 @@ namespace HUGO {
 	// Systems are only functionality
 	class System {
 	protected:
-		std::shared_ptr<HUGO::IScene> scene = nullptr;
+		// std::shared_ptr<HUGO::IScene> scene = nullptr;
+		IScene& scene;
 
 	public:
-		explicit System(std::shared_ptr<HUGO::IScene> scene): scene(scene) {}
+		explicit System(IScene& scene): scene(scene) {}
 		virtual ~System() {}
 
 		//Called when the System is created

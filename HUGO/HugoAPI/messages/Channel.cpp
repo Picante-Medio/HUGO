@@ -2,19 +2,19 @@
 #include <memory>
 #include <queue>
 #include <utility>
+#include <iostream>
 
 namespace HUGO {
 
     struct Channel::Impl {
         std::queue<std::shared_ptr<Message>> messages;
         std::vector<std::function<void(std::shared_ptr<Message>)>> callbacks;
+
     };
 
     Channel::Channel() 
+    : pImpl(std::make_unique<Channel::Impl>())
     {
-        pImpl = std::make_unique<Channel::Impl>();
-        pImpl->messages = std::queue<std::shared_ptr<Message>>();
-        pImpl->callbacks = std::vector<std::function<void(std::shared_ptr<Message>)>>();
     }
 
     Channel::~Channel() = default;

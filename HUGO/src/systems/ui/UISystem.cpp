@@ -356,7 +356,7 @@ void UISystem::onUpdatePanelComponent(PanelComponent& panel)
 
 void UISystem::onUpdateButtonComponent(ButtonComponent& b)
 {
-    PanelComponent& p = scene->getComponent<PanelComponent>(b.entity);
+    PanelComponent& p = scene.getComponent<PanelComponent>(b.entity);
     syncButton(b, p);
 }
 
@@ -375,7 +375,7 @@ constexpr HUGO::Int MAX_ACSII = 126;
 
 void UISystem::processInput()
 {
-    std::shared_ptr<HUGO::IInput> input = scene->getInput();
+    std::shared_ptr<HUGO::IInput> input = scene.getInput();
             // get normalized mouse position
 
     const HUGO::IInput::MouseRelativePosition& mouse = input->getMouseRelativePosition();
@@ -383,7 +383,7 @@ void UISystem::processInput()
     bool anyFieldActive = false; // flag to control SDL text input
     // handle mouse click: activate/deactivate input fields
     if (input->wasMouseButtonJustPressed(HUGO::MouseCode::MOUSE_LEFT)) {
-        for (auto& pack : scene->query<PanelComponent, TextComponent, InputFieldComponent>()) {
+        for (auto& pack : scene.query<PanelComponent, TextComponent, InputFieldComponent>()) {
             PanelComponent& panel = pack.getConst<PanelComponent&>();
             TextComponent& text = pack.getConst<TextComponent&>();
             InputFieldComponent& field = pack.getConst<InputFieldComponent&>();
@@ -417,7 +417,7 @@ void UISystem::processInput()
         }
         input->toggleTextInput(anyFieldActive);    
 
-        for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
+        for (auto& pack : scene.query<PanelComponent, ButtonComponent>())
         {
             PanelComponent& panel = pack.getConst<PanelComponent&>();
             if (isMouseOverPanel(panel, mouse.x, mouse.y))
@@ -431,7 +431,7 @@ void UISystem::processInput()
     } else if (input->wasMouseButtonJustReleased(HUGO::MouseCode::MOUSE_LEFT))
     {
     
-        for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
+        for (auto& pack : scene.query<PanelComponent, ButtonComponent>())
         {
             PanelComponent& panel = pack.getConst<PanelComponent&>();
             bool isOver = isMouseOverPanel(panel, mouse.x, mouse.y);
@@ -445,7 +445,7 @@ void UISystem::processInput()
     }
 
 
-    for (auto& pack : scene->query<PanelComponent, ButtonComponent>())
+    for (auto& pack : scene.query<PanelComponent, ButtonComponent>())
     {
         PanelComponent& panel = pack.getConst<PanelComponent&>();
         ButtonComponent& button = pack.getConst<ButtonComponent&>();
@@ -465,7 +465,7 @@ void UISystem::processInput()
         }
     }
 
-    for (auto &pack : scene->query<SliderComponent, PanelComponent>())
+    for (auto &pack : scene.query<SliderComponent, PanelComponent>())
     {
         SliderComponent& slider = pack.getConst<SliderComponent&>();
         PanelComponent& panel = pack.getConst<PanelComponent&>();
@@ -554,7 +554,7 @@ void UISystem::processInput()
 
     // process text for the active input field using SDL text buffer
     const HUGO::String& textInput = input->getTextInput();
-    for (auto &pack : scene->query<InputFieldComponent, TextComponent, PanelComponent>()) {
+    for (auto &pack : scene.query<InputFieldComponent, TextComponent, PanelComponent>()) {
         InputFieldComponent& field = pack.getConst<InputFieldComponent&>();
         if (!field.isActive) continue;
 
@@ -639,7 +639,7 @@ void UISystem::processInput()
 
     // toggle SDL text input if any field is active
     anyFieldActive = false;
-    for (auto& pack : scene->query<InputFieldComponent>()) {
+    for (auto& pack : scene.query<InputFieldComponent>()) {
         if (pack.getConst<InputFieldComponent&>().isActive) {
             anyFieldActive = true;
             break;
@@ -651,13 +651,13 @@ void UISystem::processInput()
 
 void UISystem::onUpdateProgressBarComponent(ProgressBarComponent& pb)
 {
-    PanelComponent& p = scene->getComponent<PanelComponent>(pb.entity);
+    PanelComponent& p = scene.getComponent<PanelComponent>(pb.entity);
     syncProgressBar(p, pb);
 }
 
 void UISystem::onUpdateSliderComponent(SliderComponent& s)
 {
-    PanelComponent& p = scene->getComponent<PanelComponent>(s.entity);
+    PanelComponent& p = scene.getComponent<PanelComponent>(s.entity);
     syncSlider(p, s);
 }
 //====================================================
@@ -677,20 +677,20 @@ void UISystem::init()
 {
     renderWindow = OgreModule::Instance().getOgreRenderWindow();
     OgreModule::Instance().getCurrentSceneManager()->addRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
-    scene->getInput()->registerAction("SubmitInput", {HUGO::KeyCode::RETURN});
+    scene.getInput()->registerAction("SubmitInput", {HUGO::KeyCode::RETURN});
 
     //component events
-    scene->onAddComponent<PanelComponent>().connect(this, &UISystem::onAddPanelComponent);
-    scene->onAddComponent<TextComponent>().connect(this, &UISystem::onAddTextComponent);
-    scene->onAddComponent<ButtonComponent>().connect(this, &UISystem::onUpdateButtonComponent);
-    scene->onAddComponent<ProgressBarComponent>().connect(this, &UISystem::onAddProgressBarComponent);
-    scene->onAddComponent<SliderComponent>().connect(this, &UISystem::onAddSliderComponent);
+    scene.onAddComponent<PanelComponent>().connect(this, &UISystem::onAddPanelComponent);
+    scene.onAddComponent<TextComponent>().connect(this, &UISystem::onAddTextComponent);
+    scene.onAddComponent<ButtonComponent>().connect(this, &UISystem::onUpdateButtonComponent);
+    scene.onAddComponent<ProgressBarComponent>().connect(this, &UISystem::onAddProgressBarComponent);
+    scene.onAddComponent<SliderComponent>().connect(this, &UISystem::onAddSliderComponent);
 
-    scene->onUpdateComponent<PanelComponent>().connect(this, &UISystem::onUpdatePanelComponent);
-    scene->onUpdateComponent<TextComponent>().connect(this, &UISystem::onUpdateTextComponent);
-    scene->onUpdateComponent<ButtonComponent>().connect(this, &UISystem::onUpdateButtonComponent);
-    scene->onUpdateComponent<ProgressBarComponent>().connect(this, &UISystem::onUpdateProgressBarComponent);
-    scene->onUpdateComponent<SliderComponent>().connect(this, &UISystem::onUpdateSliderComponent);
+    scene.onUpdateComponent<PanelComponent>().connect(this, &UISystem::onUpdatePanelComponent);
+    scene.onUpdateComponent<TextComponent>().connect(this, &UISystem::onUpdateTextComponent);
+    scene.onUpdateComponent<ButtonComponent>().connect(this, &UISystem::onUpdateButtonComponent);
+    scene.onUpdateComponent<ProgressBarComponent>().connect(this, &UISystem::onUpdateProgressBarComponent);
+    scene.onUpdateComponent<SliderComponent>().connect(this, &UISystem::onUpdateSliderComponent);
 }
 
 void UISystem::onLoad() {}
@@ -740,7 +740,7 @@ void UISystem::onAddProgressBarComponent(ProgressBarComponent &pb)
     
     cache->element = area;
 
-    PanelComponent& p = scene->getComponent<PanelComponent>(pb.entity);
+    PanelComponent& p = scene.getComponent<PanelComponent>(pb.entity);
     syncProgressBar(p, pb);
 }
 
@@ -768,6 +768,6 @@ void UISystem::onAddSliderComponent(SliderComponent &s)
     
     cache->extra = knob;
 
-    PanelComponent& p = scene->getComponent<PanelComponent>(s.entity);
+    PanelComponent& p = scene.getComponent<PanelComponent>(s.entity);
     syncSlider(p, s);
 }

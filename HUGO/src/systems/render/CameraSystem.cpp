@@ -9,21 +9,21 @@ void CameraSystem::init(){
     ogreRoot = Ogre::Root::getSingletonPtr();
     sceneManager = OgreModule::Instance().getCurrentSceneManager();
 
-    scene->onAddComponent<CameraComponent>().connect(this, &CameraSystem::registerCameraEntity);
-    scene->onRemoveComponent<CameraComponent>().connect(this, &CameraSystem::unregisterCameraEntity); 
+    scene.onAddComponent<CameraComponent>().connect(this, &CameraSystem::registerCameraEntity);
+    scene.onRemoveComponent<CameraComponent>().connect(this, &CameraSystem::unregisterCameraEntity); 
 }
 
 void CameraSystem::update(double){
     //If there are no cameras, throw error
     if(cameraMap.size() == 0){
-        scene->log(std::make_shared<StringError>("[CameraSystem] No cameras in scene"));
+        scene.log(std::make_shared<StringError>("[CameraSystem] No cameras in scene"));
     }
     if(m_mainCamera == NULL){
-        scene->log(std::make_shared<StringError>("[CameraSystem] Main camera is not set"));
+        scene.log(std::make_shared<StringError>("[CameraSystem] Main camera is not set"));
     }
 
     // Camera update
-    for(auto& pack : scene->query<TransformComponent, CameraComponent>()) {
+    for(auto& pack : scene.query<TransformComponent, CameraComponent>()) {
         TransformComponent& tr = pack.getConst<TransformComponent&>();
         CameraComponent& camera = pack.getConst<CameraComponent&>();
 
@@ -49,7 +49,7 @@ void CameraSystem::update(double){
 CameraSystem::~CameraSystem(){
     //destroy all cameras
     for(auto& c: cameraMap){
-        unregisterCameraEntity(scene->getComponent<CameraComponent>(c.first));
+        unregisterCameraEntity(scene.getComponent<CameraComponent>(c.first));
     }
     cameraMap.clear();
 }
@@ -59,11 +59,11 @@ void CameraSystem::registerCameraEntity(CameraComponent& cameraComp){
     CameraInfo res;
     // Get the transformComponent and CameraComponent of the camera to set the initial configuration
 
-    if(!scene->hasComponent<TransformComponent>(entity)){
-        scene->log(std::make_shared<StringError>("[CameraSystem] Camera entity " + std::to_string(entity) + " missing required components"));
+    if(!scene.hasComponent<TransformComponent>(entity)){
+        scene.log(std::make_shared<StringError>("[CameraSystem] Camera entity " + std::to_string(entity) + " missing required components"));
         return;
     }
-    TransformComponent& transformComp = scene->getComponent<TransformComponent>(entity);
+    TransformComponent& transformComp = scene.getComponent<TransformComponent>(entity);
 
     // Unique name for the camera
     std::string camName = "Camera_" + std::to_string(entity);

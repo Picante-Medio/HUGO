@@ -8,14 +8,14 @@ void TweenSystem::onLoad() {
 
 }
 void TweenSystem::update(double dt) {
-    for(auto& pack : scene->query<TweenComponent>()) {
+    for(auto& pack : scene.query<TweenComponent>()) {
         pack.modify<TweenComponent>([this, dt](TweenComponent& comp){
             for(auto it = comp.currentTweens.begin(); it != comp.currentTweens.end();){
 
             ErrorOrType<bool> res = it->get()->tweenParameter(scene, static_cast<HUGO::Float>(dt));
 
             if(res.isError()){
-                scene->log(std::make_shared<StringError>("[TweenSystem] " + res.getError().errorMessage));
+                scene.log(std::make_shared<StringError>("[TweenSystem] " + res.getError().errorMessage));
                 //Write in console the error
                 it = comp.currentTweens.erase(it);
             }

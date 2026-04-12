@@ -48,10 +48,10 @@ ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
     m_sceneMap[sceneName] = std::make_shared<Scene>(m_input, *this);
 
     for(auto systemName : sceneData.getValue().systems){
-        ErrorOrType<std::shared_ptr<HUGO::System>> value = HUGO::SystemFactory::makeSystem(m_sceneMap[sceneName], systemName);
+        ErrorOrType<std::shared_ptr<HUGO::System>> value = HUGO::SystemFactory::makeSystem(*m_sceneMap[sceneName], systemName);
 
         if(value.isError()) {
-            value = HUGO::GameLibraryLoader::instance().GenerateAndGetSystem(m_sceneMap[sceneName], systemName);
+            value = HUGO::GameLibraryLoader::instance().GenerateAndGetSystem(*m_sceneMap[sceneName], systemName);
             if (value.isError()) {
                 return ErrorOrVoid(value.getError());
             }

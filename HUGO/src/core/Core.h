@@ -26,12 +26,6 @@ namespace HUGO {
         void initLua();
         void initAudioAssets();
 
-        //Ogre
-        //std::shared_ptr<OgreModule> m_ogreModule;
-
-        //Miniaudio
-        //std::shared_ptr<MiniaudioModule> m_miniaudioModule;
-
         // Physics
         std::shared_ptr<IPhysicsModule> physicsModule;
 

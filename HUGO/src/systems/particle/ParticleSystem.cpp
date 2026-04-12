@@ -29,9 +29,9 @@ ParticleSystem::~ParticleSystem() {
 void ParticleSystem::init() {
     sm = OgreModule::Instance().getCurrentSceneManager();
 
-    scene->onAddComponent<ParticleEmitterComponent>().connect(this, &ParticleSystem::onAddParticleEmitterComponent);
-    scene->onUpdateComponent<ParticleEmitterComponent>().connect(this, &ParticleSystem::onUpdateParticleEmitterComponent);
-    scene->onUpdateComponent<TransformComponent>().connect(this, &ParticleSystem::processPosition);
+    scene.onAddComponent<ParticleEmitterComponent>().connect(this, &ParticleSystem::onAddParticleEmitterComponent);
+    scene.onUpdateComponent<ParticleEmitterComponent>().connect(this, &ParticleSystem::onUpdateParticleEmitterComponent);
+    scene.onUpdateComponent<TransformComponent>().connect(this, &ParticleSystem::processPosition);
 }
 
 void ParticleSystem::onLoad() {}
@@ -175,16 +175,16 @@ void ParticleSystem::update(double) {}
 
 void ParticleSystem::onAddParticleEmitterComponent(ParticleEmitterComponent &pe)
 {
-    if (scene->hasComponent<TransformComponent>(pe.entity)) {
-        TransformComponent& tr = scene->getComponent<TransformComponent>(pe.entity);
+    if (scene.hasComponent<TransformComponent>(pe.entity)) {
+        TransformComponent& tr = scene.getComponent<TransformComponent>(pe.entity);
         createParticleSystem(tr.entity, pe.particleName, pe, tr.getPosition());
     }
 }
 
 void ParticleSystem::onUpdateParticleEmitterComponent(ParticleEmitterComponent &pe)
 {
-    if (scene->hasComponent<TransformComponent>(pe.entity)) {
-        TransformComponent& tr = scene->getComponent<TransformComponent>(pe.entity);
+    if (scene.hasComponent<TransformComponent>(pe.entity)) {
+        TransformComponent& tr = scene.getComponent<TransformComponent>(pe.entity);
         processChanges(pe, tr);
     }
 }

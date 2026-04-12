@@ -13,7 +13,7 @@ namespace HUGO{
     class ITween{
         public:
     
-        virtual ErrorOrType<bool> tweenParameter(std::shared_ptr<HUGO::IScene> scene, HUGO::Float dt) = 0;
+        virtual ErrorOrType<bool> tweenParameter(HUGO::IScene& scene, HUGO::Float dt) = 0;
     };
     
     template<typename ClassType, typename EasingType, typename InterpType>
@@ -40,7 +40,7 @@ namespace HUGO{
         }
     
         //Apply interpolation value to the referenced HUGO::Float parameter. Returns if Tween has finished or not.
-        ErrorOrType<bool> tweenParameter(std::shared_ptr<HUGO::IScene> scene, HUGO::Float dt) override{
+        ErrorOrType<bool> tweenParameter(HUGO::IScene& scene, HUGO::Float dt) override{
             
             m_currentTime += dt;
             if(m_currentTime > m_totalTime) m_currentTime = m_totalTime;

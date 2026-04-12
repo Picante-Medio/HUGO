@@ -11,8 +11,6 @@ struct RigidBodyComponent;
 struct ColliderComponent;
 struct Shape;
 
-class OgreBulletDebugger;
-
 struct CollisionObject{
     std::shared_ptr<Scene> scene;
     HUGO::CollisionObjectID id;

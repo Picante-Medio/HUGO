@@ -7,9 +7,9 @@
 void 
 EventTestSystem::init() {
 
-    scene->onAddComponent<TestComponent>().connect(this, &EventTestSystem::testEventA);
-    scene->onUpdateComponent<TestComponent>().connect(this, &EventTestSystem::testEventB);
-    scene->onRemoveComponent<TestComponent>().connect(this, &EventTestSystem::testEventC);
+    scene.onAddComponent<TestComponent>().connect(this, &EventTestSystem::testEventA);
+    scene.onUpdateComponent<TestComponent>().connect(this, &EventTestSystem::testEventB);
+    scene.onRemoveComponent<TestComponent>().connect(this, &EventTestSystem::testEventC);
 }
 
 void 
@@ -29,15 +29,15 @@ EventTestSystem::update(double dt) {
 
     if(timer >= 5.0 ) {
 
-        EntityID ent = scene->createEntity();
-        scene->addComponent<TestComponent>(ent);
+        EntityID ent = scene.createEntity();
+        scene.addComponent<TestComponent>(ent);
 
-        for(auto& elem : scene->query<TestComponent>()){ 
+        for(auto& elem : scene.query<TestComponent>()){ 
             elem.modify<TestComponent>([](TestComponent& testCmp) {
                 //testCmp.stringDePrueba = "Prueba modificada";
             });
 
-            //scene->removeComponent<TestComponent>(elem.getConst<TestComponent>().entity);
+            //scene.removeComponent<TestComponent>(elem.getConst<TestComponent>().entity);
         }
 
         timer -= 5.0;

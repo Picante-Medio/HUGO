@@ -313,7 +313,7 @@ void AudioSystem::process3DChanges(AudioComponent& a, const Audio3DInfoComponent
 void AudioSystem::update(double)
 {
     // cleanup finished voices
-    for (auto& pack : scene->query<AudioComponent>())
+    for (auto& pack : scene.query<AudioComponent>())
     {
         AudioComponent& c = pack.getConst<AudioComponent&>();
         if (c.activePtr && !ma_sound_is_playing(c.activePtr))
@@ -343,13 +343,13 @@ void AudioSystem::init(){
 
     
     //components events
-    scene->onAddComponent<AudioComponent>().connect(this, &AudioSystem::onAddAudioComponent);
-    scene->onAddComponent<Audio3DInfoComponent>().connect(this, &AudioSystem::onAdd3DAudioComponent);
+    scene.onAddComponent<AudioComponent>().connect(this, &AudioSystem::onAddAudioComponent);
+    scene.onAddComponent<Audio3DInfoComponent>().connect(this, &AudioSystem::onAdd3DAudioComponent);
 
-    scene->onUpdateComponent<TransformComponent>().connect(this, &AudioSystem::onAn3DAudioMove);
-    scene->onUpdateComponent<AudioComponent>().connect(this, &AudioSystem::onUpdateAudioComponent);
-    scene->onUpdateComponent<Audio3DInfoComponent>().connect(this, &AudioSystem::onUpdate3DAudioComponent);
-    scene->onUpdateComponent<AudioListenerComponent>().connect(this, &AudioSystem::onUpdateAudioListener);
+    scene.onUpdateComponent<TransformComponent>().connect(this, &AudioSystem::onAn3DAudioMove);
+    scene.onUpdateComponent<AudioComponent>().connect(this, &AudioSystem::onUpdateAudioComponent);
+    scene.onUpdateComponent<Audio3DInfoComponent>().connect(this, &AudioSystem::onUpdate3DAudioComponent);
+    scene.onUpdateComponent<AudioListenerComponent>().connect(this, &AudioSystem::onUpdateAudioListener);
 
 }
 #pragma endregion
@@ -369,17 +369,17 @@ void AudioSystem::onUpdateAudioComponent(AudioComponent &c)
 void AudioSystem::onUpdate3DAudioComponent(Audio3DInfoComponent &c)
 {
     EntityID id = c.entity;
-    if (!scene->hasComponent<AudioComponent>(id)) return;
+    if (!scene.hasComponent<AudioComponent>(id)) return;
 
-    AudioComponent& a = scene->getComponent<AudioComponent>(id);
+    AudioComponent& a = scene.getComponent<AudioComponent>(id);
     process3DChanges(a, c);
 }
 
 void AudioSystem::onUpdateAudioListener(AudioListenerComponent &l)
 {
     EntityID id = l.entity;
-    if (scene->hasComponent<TransformComponent>(id)){
-        TransformComponent& tr = scene->getComponent<TransformComponent>(id);
+    if (scene.hasComponent<TransformComponent>(id)){
+        TransformComponent& tr = scene.getComponent<TransformComponent>(id);
         updateListeners(l, tr);
     }
 }
@@ -387,7 +387,7 @@ void AudioSystem::onUpdateAudioListener(AudioListenerComponent &l)
 void AudioSystem::onAdd3DAudioComponent(Audio3DInfoComponent &c)
 {
     // just to be sure the type is correctly chosen
-    scene->modifyComponent<AudioComponent>(c.entity, [](AudioComponent& a){
+    scene.modifyComponent<AudioComponent>(c.entity, [](AudioComponent& a){
         a.type = HUGO::AudioTypes::SOUND3D;
     });
 }
@@ -395,8 +395,8 @@ void AudioSystem::onAdd3DAudioComponent(Audio3DInfoComponent &c)
 void AudioSystem::onAn3DAudioMove(TransformComponent &tr)
 {
     // update every 3d audios position 
-    if (scene->hasComponent<AudioComponent>(tr.entity) && scene->hasComponent<Audio3DInfoComponent>(tr.entity)){
-        AudioComponent& a = scene->getComponent<AudioComponent>(tr.entity);
+    if (scene.hasComponent<AudioComponent>(tr.entity) && scene.hasComponent<Audio3DInfoComponent>(tr.entity)){
+        AudioComponent& a = scene.getComponent<AudioComponent>(tr.entity);
         set3DPosition(a.activePtr, tr.getPosition());
     }
 }

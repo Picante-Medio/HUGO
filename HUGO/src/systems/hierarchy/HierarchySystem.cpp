@@ -9,15 +9,15 @@
 void 
 HierarchySystem::init()
 {
-    scene->onAddComponent<ChildrenComponent>().connect(this, &HierarchySystem::onUpdateChildrenComponent);
-    scene->onAddComponent<ParentComponent>().connect(this, &HierarchySystem::onUpdateParentComponent);
-    scene->onAddComponent<TransformComponent>().connect(this, &HierarchySystem::onAddTransformComponent);
+    scene.onAddComponent<ChildrenComponent>().connect(this, &HierarchySystem::onUpdateChildrenComponent);
+    scene.onAddComponent<ParentComponent>().connect(this, &HierarchySystem::onUpdateParentComponent);
+    scene.onAddComponent<TransformComponent>().connect(this, &HierarchySystem::onAddTransformComponent);
     
-    scene->onUpdateComponent<ChildrenComponent>().connect(this, &HierarchySystem::onUpdateChildrenComponent);
-    scene->onUpdateComponent<ParentComponent>().connect(this, &HierarchySystem::onUpdateParentComponent);
+    scene.onUpdateComponent<ChildrenComponent>().connect(this, &HierarchySystem::onUpdateChildrenComponent);
+    scene.onUpdateComponent<ParentComponent>().connect(this, &HierarchySystem::onUpdateParentComponent);
 
-    scene->onRemoveComponent<ChildrenComponent>().connect(this, &HierarchySystem::onRemoveChildrenComponent); 
-    scene->onRemoveComponent<ParentComponent>().connect(this, &HierarchySystem::onRemoveParentComponent);
+    scene.onRemoveComponent<ChildrenComponent>().connect(this, &HierarchySystem::onRemoveChildrenComponent); 
+    scene.onRemoveComponent<ParentComponent>().connect(this, &HierarchySystem::onRemoveParentComponent);
 }
 
 void 
@@ -26,13 +26,13 @@ HierarchySystem::onLoad(){}
 void 
 HierarchySystem::addChildToParent(EntityID child, EntityID parent){
 
-    if (!scene->hasComponent<ChildrenComponent>(parent)) {
-        scene->addComponent<ChildrenComponent>(parent, [child](ChildrenComponent& childrenComponent) {
+    if (!scene.hasComponent<ChildrenComponent>(parent)) {
+        scene.addComponent<ChildrenComponent>(parent, [child](ChildrenComponent& childrenComponent) {
             childrenComponent.children.insert(child);
         });
     }
     else {
-        scene->modifyComponent<ChildrenComponent>(parent, [child](ChildrenComponent& childrenComponent) {
+        scene.modifyComponent<ChildrenComponent>(parent, [child](ChildrenComponent& childrenComponent) {
             childrenComponent.children.insert(child);
         });
     }
@@ -40,9 +40,9 @@ HierarchySystem::addChildToParent(EntityID child, EntityID parent){
 
 void 
 HierarchySystem::removeChildFromParent(EntityID child, EntityID parent){
-    if (!scene->hasComponent<ChildrenComponent>(parent)) return;
+    if (!scene.hasComponent<ChildrenComponent>(parent)) return;
 
-    std::unordered_set<EntityID>& children = scene->getComponent<ChildrenComponent>(parent).children;
+    std::unordered_set<EntityID>& children = scene.getComponent<ChildrenComponent>(parent).children;
     children.erase(child);
 }
 
@@ -50,21 +50,21 @@ HierarchySystem::removeChildFromParent(EntityID child, EntityID parent){
 void 
 HierarchySystem::addParentToChild(EntityID child, EntityID parent){
 
-    if (scene->hasComponent<ParentComponent>(child)) {
-        ParentComponent& parentComp= scene->getComponent<ParentComponent>(child);
+    if (scene.hasComponent<ParentComponent>(child)) {
+        ParentComponent& parentComp= scene.getComponent<ParentComponent>(child);
         parentComp.previousParent = parentComp.parent;
         parentComp.parent = parent;
     }
     else {
-        scene->addComponent<ParentComponent>(child, [parent](ParentComponent& parentComp){
+        scene.addComponent<ParentComponent>(child, [parent](ParentComponent& parentComp){
             parentComp.parent = parent;
         });
     }
 }
 void 
 HierarchySystem::removeParentFromChild(EntityID child){
-    if(scene->hasComponent<ParentComponent>(child)){
-        scene->getComponent<ParentComponent>(child).parent.reset();   
+    if(scene.hasComponent<ParentComponent>(child)){
+        scene.getComponent<ParentComponent>(child).parent.reset();   
     }
 }
 
@@ -74,8 +74,8 @@ HierarchySystem::hasCycle(EntityID child,EntityID newParent){
     while (current)
     {
         if (current == child) return true;
-        if (!scene->hasComponent<ParentComponent>(current.value())) break;
-        current = scene->getComponent<ParentComponent>(current.value()).parent;
+        if (!scene.hasComponent<ParentComponent>(current.value())) break;
+        current = scene.getComponent<ParentComponent>(current.value()).parent;
     }
 
     return false;
@@ -93,12 +93,12 @@ HierarchySystem::updateLocalTransform(TransformComponent &transform){
     EntityID entity = transform.entity;
 
     // if the entity does not has parent, set it's world transform
-    if(!scene->hasComponent<ParentComponent>(entity)){
+    if(!scene.hasComponent<ParentComponent>(entity)){
         setWorldTransform(transform);
         return;
     }
 
-    ParentComponent& parentComp = scene->getComponent<ParentComponent>(entity);
+    ParentComponent& parentComp = scene.getComponent<ParentComponent>(entity);
     if(!parentComp.parent){ //parent does not exist
         setWorldTransform(transform);
         return;
@@ -132,12 +132,12 @@ void
 HierarchySystem::updateWorldTransform(TransformComponent& transform){
     EntityID entity = transform.entity;
     // if the entity does not has parent, set it's local trasnform
-    if(!scene->hasComponent<ParentComponent>(entity)){
+    if(!scene.hasComponent<ParentComponent>(entity)){
         setLocalTransform(transform);
         return;
     }
 
-    ParentComponent& parentComp = scene->getComponent<ParentComponent>(entity);
+    ParentComponent& parentComp = scene.getComponent<ParentComponent>(entity);
     if(!parentComp.parent){
         setLocalTransform(transform);
         return;
@@ -163,7 +163,7 @@ HierarchySystem::updateWorldTransform(TransformComponent& transform){
 TransformComponent& 
 HierarchySystem::getFullTransform(EntityID entity){
 
-    TransformComponent& tr = scene->getComponent<TransformComponent>(entity);
+    TransformComponent& tr = scene.getComponent<TransformComponent>(entity);
     
     //check if the entity needs update
      if(tr.needUpdateLocalPosition || tr.needUpdateLocalRotation || tr.needUpdateLocalScale){
@@ -194,11 +194,11 @@ void HierarchySystem::propagateNeedUpdateToChildren(EntityID parent)
         needPropagate.pop_back();
         
         //if entity has children --> the children needUpdate
-        if (scene->hasComponent<ChildrenComponent>(current)) {
+        if (scene.hasComponent<ChildrenComponent>(current)) {
             
-            const std::unordered_set<EntityID>& children = scene->getComponent<ChildrenComponent>(current).children;
+            const std::unordered_set<EntityID>& children = scene.getComponent<ChildrenComponent>(current).children;
             for (EntityID child : children) {
-                TransformComponent& tr = scene->getComponent<TransformComponent>(child);
+                TransformComponent& tr = scene.getComponent<TransformComponent>(child);
                 if(!(tr.needUpdateWorldPosition || tr.needUpdateWorldRotation || tr.needUpdateWorldScale)) needPropagate.push_back(child);
                 tr.needUpdateWorldPosition = true;
                 tr.needUpdateWorldRotation = true;
@@ -212,7 +212,7 @@ void
 HierarchySystem::update(double){
 
     //update needUpdate state
-    for (auto& pack : scene->query<TransformComponent>()) {
+    for (auto& pack : scene.query<TransformComponent>()) {
         TransformComponent& tr= pack.getConst<TransformComponent&>();
         if(tr.needUpdateWorldPosition || tr.needUpdateWorldRotation || tr.needUpdateWorldScale
             ||tr.needUpdateLocalPosition || tr.needUpdateLocalRotation || tr.needUpdateLocalScale){
@@ -221,7 +221,7 @@ HierarchySystem::update(double){
     }
 
     //update worldTranforms
-    for (auto& pack : scene->query<TransformComponent>()) {
+    for (auto& pack : scene.query<TransformComponent>()) {
         TransformComponent& tr= pack.getConst<TransformComponent&>();
         getFullTransform(tr.entity);
     }
@@ -251,7 +251,7 @@ HierarchySystem::onUpdateChildrenComponent(ChildrenComponent& childrenComp)
         for(EntityID& child: toAdd){
             //check if child is valid and does not create cycle
             if(child == parent || hasCycle(child, parent)){
-                scene->log(std::make_shared<StringError>("[HierarchySystem] Cannot add child "+ std::to_string(child) + " for entity " + std::to_string(parent)));
+                scene.log(std::make_shared<StringError>("[HierarchySystem] Cannot add child "+ std::to_string(child) + " for entity " + std::to_string(parent)));
                 childrenComp.children.erase(child);
                 return;
             } 
@@ -266,7 +266,7 @@ HierarchySystem::onUpdateChildrenComponent(ChildrenComponent& childrenComp)
         for(EntityID& child: toRemove){
             //check if child is valid
             if(child == parent){
-                scene->log(std::make_shared<StringError>("[HierarchySystem] Cannot remove child "+ std::to_string(child) + " for entity " + std::to_string(parent)));
+                scene.log(std::make_shared<StringError>("[HierarchySystem] Cannot remove child "+ std::to_string(child) + " for entity " + std::to_string(parent)));
                 return;
             } 
             
@@ -288,7 +288,7 @@ HierarchySystem::onUpdateParentComponent(ParentComponent& parentComp)
 
     if (newParent == child || hasCycle(child, newParent)) {
         if(oldParent)parentComp.parent = oldParent;
-        scene->log(std::make_shared<StringError>("[HierarchySystem] Cannot set parent "+ std::to_string(newParent) + " for entity " + std::to_string(child)));
+        scene.log(std::make_shared<StringError>("[HierarchySystem] Cannot set parent "+ std::to_string(newParent) + " for entity " + std::to_string(child)));
         return;
     }
 

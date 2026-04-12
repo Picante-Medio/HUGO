@@ -6,7 +6,7 @@
 
 void ConsoleSystem::printLuaOutput(TextComponent& consoleTextCmp){
 
-    for (auto& pack: scene->query<TextComponent>()){
+    for (auto& pack: scene.query<TextComponent>()){
         EntityID id = pack.getConst<TextComponent>().entity;
         if (id != consoleTextCmp.entity) continue;
 
@@ -20,9 +20,9 @@ void ConsoleSystem::printLuaOutput(TextComponent& consoleTextCmp){
 }
 
 void ConsoleSystem::printLogs(TextComponent& consoleTextCmp){
-    ErrorOrType log = scene->getNextLog();
+    ErrorOrType log = scene.getNextLog();
 
-    for (auto& pack: scene->query<TextComponent>()){
+    for (auto& pack: scene.query<TextComponent>()){
         EntityID id = pack.getConst<TextComponent>().entity;
         if (id != consoleTextCmp.entity) continue;
 
@@ -33,16 +33,16 @@ void ConsoleSystem::printLogs(TextComponent& consoleTextCmp){
             pack.modify<TextComponent>([this, logText](TextComponent& t){
                 t.text += logIni + logText;
             });
-            log = scene->getNextLog();
+            log = scene.getNextLog();
         }
 
     }
 }
 
 void ConsoleSystem::printErrors(TextComponent& consoleTextCmp){
-    ErrorOrType error = scene->getNextError();
+    ErrorOrType error = scene.getNextError();
 
-    for (auto& pack: scene->query<TextComponent>()){
+    for (auto& pack: scene.query<TextComponent>()){
         EntityID id = pack.getConst<TextComponent>().entity;
         if (id != consoleTextCmp.entity) continue;
 
@@ -52,7 +52,7 @@ void ConsoleSystem::printErrors(TextComponent& consoleTextCmp){
             pack.modify<TextComponent>([this, errorText](TextComponent& t){
                 t.text += logIni + "ERROR: " + errorText + "\n";
             });
-            error = scene->getNextError();
+            error = scene.getNextError();
         }
     }
 }
@@ -85,7 +85,7 @@ void ConsoleSystem::receiveInput(const HUGO::String& input){
     // Register input in history and log it to console
     history.push_back(input);
     historyIndex = history.size();
-    scene->log(input + "\n");
+    scene.log(input + "\n");
 
     // Check input
     size_t start = 0;
@@ -119,25 +119,25 @@ void ConsoleSystem::receiveInput(const HUGO::String& input){
             ErrorOrType<HUGO::String> returnedInfo = LuaBinder::getInstance().getFromString<HUGO::String>(command);
             handleReturn<HUGO::String>(returnedInfo);
         }
-        else scene->log(std::shared_ptr<Error>(new StringError("LUA: Invalid return type")));
+        else scene.log(std::shared_ptr<Error>(new StringError("LUA: Invalid return type")));
     }
     else{
         ErrorOrVoid error = LuaBinder::getInstance().interpretString(command);
-        if(error.isError()) scene->log(std::make_shared<StringError>(error.getError()));
+        if(error.isError()) scene.log(std::make_shared<StringError>(error.getError()));
     }
 }
 
 void ConsoleSystem::handleKeyInput(){
 
     HUGO::String result = "";
-    if(active && scene->getInput()->wasKeyJustPressed(HUGO::KeyCode::UP_ARROW)){
+    if(active && scene.getInput()->wasKeyJustPressed(HUGO::KeyCode::UP_ARROW)){
         result = getNextHistoric();
     }
-    if(active && scene->getInput()->wasKeyJustPressed(HUGO::KeyCode::DOWN_ARROW)){
+    if(active && scene.getInput()->wasKeyJustPressed(HUGO::KeyCode::DOWN_ARROW)){
         result = getPreviousHistoric();
     }
 
-    for (auto& pack: scene->query<TextComponent, InputFieldComponent, PanelComponent>()){
+    for (auto& pack: scene.query<TextComponent, InputFieldComponent, PanelComponent>()){
         InputFieldComponent& inp = pack.getConst<InputFieldComponent&>();
         //search for the console input
         if (inp.entity != consoleInput || result.empty()) continue;
@@ -150,14 +150,14 @@ void ConsoleSystem::handleKeyInput(){
         });
     }
 
-    if(scene->getInput()->isKeyPressed(HUGO::KeyCode::LCTRL) &&
-    scene->getInput()->wasKeyJustPressed(HUGO::KeyCode::T))
+    if(scene.getInput()->isKeyPressed(HUGO::KeyCode::LCTRL) &&
+    scene.getInput()->wasKeyJustPressed(HUGO::KeyCode::T))
     {
         active = !active;
         HUGO::Vector4 colour = {1.0, 1.0, 1.0, 1.0};
         if(!active) colour.w = 0;
         
-        for (auto& pack: scene->query<PanelComponent>()){
+        for (auto& pack: scene.query<PanelComponent>()){
             PanelComponent& panel = pack.getConst<PanelComponent&>();
             if (panel.entity != consoleInput && panel.entity != consoleText && panel.entity != consoleInfo)
                 continue;
@@ -171,7 +171,7 @@ void ConsoleSystem::handleKeyInput(){
 
 void ConsoleSystem::update(double){
 
-    TextComponent& consoleTextCmp = scene->getComponent<TextComponent>(consoleText);
+    TextComponent& consoleTextCmp = scene.getComponent<TextComponent>(consoleText);
 
     // Logs
     printLogs(consoleTextCmp);
@@ -200,11 +200,11 @@ void ConsoleSystem::init(){
     historyIndex = 0;
 
     //---------------------------------------Input field
-    consoleInput = scene->createEntity();
+    consoleInput = scene.createEntity();
 
     std::string panelContainerName;
 
-    scene->addComponent<PanelComponent>(consoleInput, [&panelContainerName](PanelComponent& panel){
+    scene.addComponent<PanelComponent>(consoleInput, [&panelContainerName](PanelComponent& panel){
         panel.overlayName = "Console/InputText";
         panel.containerName = panel.overlayName + "/Container";
         panel.material = "Console/InputBackground";
@@ -216,7 +216,7 @@ void ConsoleSystem::init(){
         panelContainerName = panel.containerName;
     });
 
-    scene->addComponent<TextComponent>(consoleInput, [&panelContainerName](TextComponent& text){
+    scene.addComponent<TextComponent>(consoleInput, [&panelContainerName](TextComponent& text){
         text.textAreaName = panelContainerName + "/Text";
         text.left = 0.01f;
         text.colourTop = HUGO::Vector4(1.0f, 0.0f, 0.0f, 1.f);
@@ -227,7 +227,7 @@ void ConsoleSystem::init(){
         text.text = "-";
     });
 
-    scene->addComponent<InputFieldComponent>(consoleInput, [this](InputFieldComponent& input){
+    scene.addComponent<InputFieldComponent>(consoleInput, [this](InputFieldComponent& input){
         input.isActive = true;
         input.originalText = "";
         input.onChangeCallback = [this](const HUGO::String& input){
@@ -237,10 +237,10 @@ void ConsoleSystem::init(){
 
     //---------------------------------------Console text
 
-    consoleText = scene->createEntity();
+    consoleText = scene.createEntity();
 
     // Reuse panelContainerName
-    scene->addComponent<PanelComponent>(consoleText, [&panelContainerName](PanelComponent& panel2){
+    scene.addComponent<PanelComponent>(consoleText, [&panelContainerName](PanelComponent& panel2){
         panel2.overlayName = "Console/LogText";
         panel2.containerName = panel2.overlayName + "/Container";
         panel2.material = "Console/LogBackground";
@@ -252,7 +252,7 @@ void ConsoleSystem::init(){
         panelContainerName = panel2.containerName;
     });
 
-    scene->addComponent<TextComponent>(consoleText, [&panelContainerName](TextComponent& text2){
+    scene.addComponent<TextComponent>(consoleText, [&panelContainerName](TextComponent& text2){
         text2.textAreaName = panelContainerName + "/Text";
         text2.colourTop = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.f);
         text2.colourBottom = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.f);
@@ -265,8 +265,8 @@ void ConsoleSystem::init(){
     });
 
     //-------------------------------Console Input Info
-    consoleInfo = scene->createEntity();
-    scene->addComponent<PanelComponent>(consoleInfo, [&panelContainerName](PanelComponent& panel3){
+    consoleInfo = scene.createEntity();
+    scene.addComponent<PanelComponent>(consoleInfo, [&panelContainerName](PanelComponent& panel3){
         panel3.overlayName = "Console/InfoText";
         panel3.containerName = panel3.overlayName + "/Container";
         panel3.material = "Console/InputBackground";
@@ -278,7 +278,7 @@ void ConsoleSystem::init(){
         panelContainerName = panel3.containerName;
     });
 
-    scene->addComponent<TextComponent>(consoleInfo, [&panelContainerName](TextComponent& text3){
+    scene.addComponent<TextComponent>(consoleInfo, [&panelContainerName](TextComponent& text3){
         text3.textAreaName = panelContainerName + "/Text";
         text3.colour = HUGO::Vector4(0.0f, 0.0f, 0.0f, 1.f);
         text3.left = 0.01f;

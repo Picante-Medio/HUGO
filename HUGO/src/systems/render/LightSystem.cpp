@@ -10,9 +10,9 @@ void LightSystem::init(){
     
     sceneManager = OgreModule::Instance().getCurrentSceneManager();
 
-    scene->onAddComponent<LightComponent>().connect(this, &LightSystem::registerLightEntity);
-    scene->onUpdateComponent<LightComponent>().connect(this, &LightSystem::onUpdateLightComponent);
-    scene->onRemoveComponent<LightComponent>().connect(this, &LightSystem::unregisterLightEntity);
+    scene.onAddComponent<LightComponent>().connect(this, &LightSystem::registerLightEntity);
+    scene.onUpdateComponent<LightComponent>().connect(this, &LightSystem::onUpdateLightComponent);
+    scene.onRemoveComponent<LightComponent>().connect(this, &LightSystem::unregisterLightEntity);
 
     // Basic light
     setAmbientLight(0.6f, 0.6f, 0.6f);
@@ -25,13 +25,13 @@ void LightSystem::onLoad(){
 LightSystem::~LightSystem(){
     //destroy all lights
     for(auto& l: lightMap){
-        unregisterLightEntity(scene->getComponent<LightComponent>(l.first));
+        unregisterLightEntity(scene.getComponent<LightComponent>(l.first));
     }
     lightMap.clear();
 }
 
 void LightSystem::update(double){
-    for(auto pack : scene->query<TransformComponent, LightComponent>()){
+    for(auto pack : scene.query<TransformComponent, LightComponent>()){
         TransformComponent transform = pack.getConst<TransformComponent>();
         LightComponent light = pack.getConst<LightComponent>();
 
@@ -50,12 +50,12 @@ void LightSystem::registerLightEntity(LightComponent& lightComp)
     LightInfo res;
     
     // Get the transformComponent and LightComponentof the light to set the initial configuration
-    if(!scene->hasComponent<TransformComponent>(entity)){
-        scene->log(std::make_shared<StringError>("[LightSystem] Light entity "+ std::to_string(entity) + "missing required components"));
+    if(!scene.hasComponent<TransformComponent>(entity)){
+        scene.log(std::make_shared<StringError>("[LightSystem] Light entity "+ std::to_string(entity) + "missing required components"));
         return;
     }
 
-    TransformComponent& transformComp = scene->getComponent<TransformComponent>(entity);
+    TransformComponent& transformComp = scene.getComponent<TransformComponent>(entity);
 
     // Unique name for the light
     std::string lightName = "Light_" + std::to_string(entity);
@@ -132,11 +132,11 @@ void LightSystem::unregisterLightEntity(LightComponent& comp)
 void LightSystem::onUpdateLightComponent(LightComponent &light)
 {
     EntityID entity = light.entity;
-    if(!scene->hasComponent<TransformComponent>(entity)){
-        scene->log(std::make_shared<StringError>("[LightSystem] Light " + std::to_string(entity) + " has not trasnform"));
+    if(!scene.hasComponent<TransformComponent>(entity)){
+        scene.log(std::make_shared<StringError>("[LightSystem] Light " + std::to_string(entity) + " has not trasnform"));
         return;
     }
-    TransformComponent& tr =scene->getComponent<TransformComponent>(entity);
+    TransformComponent& tr =scene.getComponent<TransformComponent>(entity);
 
     // update position
         lightMap[entity].node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getPosition()));

@@ -11,7 +11,7 @@ class SystemFactory{
 
 public:
     //Returns shared_ptr of the system because the Scene that holds it must reference it to update it.
-    using SystemGenerator = std::function<ErrorOrType<std::shared_ptr<HUGO::System>>(std::shared_ptr<HUGO::IScene>)>; 
+    using SystemGenerator = std::function<ErrorOrType<std::shared_ptr<HUGO::System>>(IScene&)>; 
 
 private:
     static std::unordered_map<std::string, SystemGenerator>& generators() {
@@ -25,7 +25,7 @@ public:
         generators()[name] = generator;
     }
 
-    static ErrorOrType<std::shared_ptr<HUGO::System>> makeSystem(std::shared_ptr<HUGO::IScene> scene,
+    static ErrorOrType<std::shared_ptr<HUGO::System>> makeSystem(HUGO::IScene& scene,
         const std::string& name) {
 
         if (generators().count(name)) {

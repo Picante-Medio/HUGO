@@ -20,97 +20,97 @@
 
 void
 TestSystem::init() {
-    // EntityID ent = scene->createEntity();
+    // EntityID ent = scene.createEntity();
 
-    // scene->addComponent<RenderComponent>(ent, [](RenderComponent& renderComp){
+    // scene.addComponent<RenderComponent>(ent, [](RenderComponent& renderComp){
     //     renderComp.setMeshName("cube.mesh");
     // });
 
-    // scene->addComponent<TransformComponent>(ent);
-    // scene->addComponent<TweenComponent>(ent);
+    // scene.addComponent<TransformComponent>(ent);
+    // scene.addComponent<TweenComponent>(ent);
 
     // // ------------HierarchySystemTest----------
 
-    e1 = scene->createEntity();
-    scene->addComponent<TransformComponent>(e1, [](TransformComponent& t1) {
+    e1 = scene.createEntity();
+    scene.addComponent<TransformComponent>(e1, [](TransformComponent& t1) {
         t1.setPosition(HUGO::Vector3(0, 0, 0));
         t1.setScale(HUGO::Vector3(0.5f, 0.5f, 0.5f));
     });
-    scene->addComponent<RenderComponent>(e1, [](RenderComponent& rc) {
+    scene.addComponent<RenderComponent>(e1, [](RenderComponent& rc) {
         rc.setMeshName("Sinbad.mesh");
     });
-    scene->addComponent<AnimationComponent>(e1, [](AnimationComponent& rc) {
+    scene.addComponent<AnimationComponent>(e1, [](AnimationComponent& rc) {
         rc.addAnimation("Dance", true, true);
     });
 
-    e2 = scene->createEntity();
-    scene->addComponent<TransformComponent>(e2, [](TransformComponent& t2) {
+    e2 = scene.createEntity();
+    scene.addComponent<TransformComponent>(e2, [](TransformComponent& t2) {
         t2.setWorldPosition(HUGO::Vector3(2, -4, 0));
     });
-    scene->addComponent<RenderComponent>(e2, [](RenderComponent& rc2) {
+    scene.addComponent<RenderComponent>(e2, [](RenderComponent& rc2) {
         rc2.setMeshName("cube.mesh");
         rc2.setMaterialName("prueba/ColorVerde");
     });
 
-    e3 = scene->createEntity(); 
-    scene->addComponent<TransformComponent>(e3, [](TransformComponent& t3) {
+    e3 = scene.createEntity(); 
+    scene.addComponent<TransformComponent>(e3, [](TransformComponent& t3) {
         t3.setPosition(HUGO::Vector3(-2, 4, 0));
     });
-    scene->addComponent<RenderComponent>(e3, [](RenderComponent& rc3) {
+    scene.addComponent<RenderComponent>(e3, [](RenderComponent& rc3) {
         rc3.setMeshName("cube.mesh");
     });
 
-    scene->addComponent<ChildrenComponent>(e1, [this](ChildrenComponent& childrenComp){
+    scene.addComponent<ChildrenComponent>(e1, [this](ChildrenComponent& childrenComp){
         childrenComp.addChild(e2);
         childrenComp.addChild(e3);
     });
 
     // //----------------------------------------
 
-    // EntityID ui = scene->createEntity();
-    // scene->addComponent<TransformComponent>(ui, [](TransformComponent& tr){
+    // EntityID ui = scene.createEntity();
+    // scene.addComponent<TransformComponent>(ui, [](TransformComponent& tr){
     //     //tr.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(0)), HUGO::Vector3(0,0,0));
     //     //tr.rotation.normalize();
     // });
-    EntityID light = scene->createEntity();
+    EntityID light = scene.createEntity();
     
-    scene->addComponent<TransformComponent>(light, [](TransformComponent& tr){
+    scene.addComponent<TransformComponent>(light, [](TransformComponent& tr){
         tr.setPosition(HUGO::Vector3(0, 0, 0));
         //tr.setRotation(HUGO::Quaternion(HUGO::Radian(HUGO::Degree(0)), HUGO::Vector3(0,0,0)));
     });
 
-    scene->addComponent<LightComponent>(light, [](LightComponent& lg){
+    scene.addComponent<LightComponent>(light, [](LightComponent& lg){
          lg.setLightType(HUGO::LightType::LT_POINT);
         lg.setAttenuation(HUGO::Vector4(1.0f, 0.0f, 0.001f, 0.0001f));
          lg.setDiffuse(HUGO::Vector4(0.8f, 0.8f, 0.8f, 1.0f));
          lg.setSpecular(HUGO::Vector4(0.3f, 0.3f, 0.3f, 1.0f));
      });
 
-    EntityID ui = scene->createEntity();
-    scene->addComponent<TransformComponent>(ui, [](TransformComponent& tr){
+    EntityID ui = scene.createEntity();
+    scene.addComponent<TransformComponent>(ui, [](TransformComponent& tr){
         tr.setPosition(HUGO::Vector3(0, 100, 100));
         //tr.setRotation(HUGO::Quaternion(HUGO::Radian(HUGO::Degree(0)), HUGO::Vector3(0,0,0)));
     });
-    scene->addComponent<LightComponent>(ui, [](LightComponent& lg){
+    scene.addComponent<LightComponent>(ui, [](LightComponent& lg){
         lg.setLightType(HUGO::LightType::LT_SPOTLIGHT);
         lg.setDiffuse(HUGO::Vector4(0.8f, 1.8f, 0.8f, 1.0f));
         lg.setSpecular(HUGO::Vector4(0.8f, 0.8f, 0.8f, 1.0f));
     });
 
-    // EntityID audio = scene->createEntity();
-    // scene->addComponent<AudioComponent>(audio, [](AudioComponent& a){
+    // EntityID audio = scene.createEntity();
+    // scene.addComponent<AudioComponent>(audio, [](AudioComponent& a){
     //     a.isPlaying = true;
     //     a.type = HUGO::AudioTypes::MUSIC;
     //     a.audioName = "lucky";
     //     a.audioId = 0;
     // });
-    // scene->addComponent<AudioPlayTag>(audio);
+    // scene.addComponent<AudioPlayTag>(audio);
 
-    // EntityID emmiter = scene->createEntity();
-    // scene->addComponent<TransformComponent>(emmiter, [](TransformComponent& transform){
+    // EntityID emmiter = scene.createEntity();
+    // scene.addComponent<TransformComponent>(emmiter, [](TransformComponent& transform){
     //     transform.setPosition(HUGO::Vector3(10.f, 0.0f, 0.0f));
     // });
-    // scene->addComponent<ParticleEmitterComponent>(emmiter, [](ParticleEmitterComponent& pe){
+    // scene.addComponent<ParticleEmitterComponent>(emmiter, [](ParticleEmitterComponent& pe){
     //     pe.particleName = "Particle/Smoke";
     //     pe.emitting = true;
     //     pe.active = true;
@@ -129,7 +129,7 @@ bool usedTimer = false;
 void
 TestSystem::update(double dt) {
 
-    for(auto& elem: scene->query<TransformComponent, LightComponent>()){
+    for(auto& elem: scene.query<TransformComponent, LightComponent>()){
         elem.modify<TransformComponent>([dt](TransformComponent& tr){
             tr.setPosition(tr.getPosition() + HUGO::Vector3(0,0, dt));
         });

@@ -50,22 +50,22 @@ static inline std::queue<HUGO::String> luaOutput = std::queue<HUGO::String>();
 
         std::variant<int, float, bool, HUGO::String>  lastValueReturned;
 
-        if(returnedInfo.isError()) scene->log(std::make_shared<StringError>(returnedInfo.getError()));
+        if(returnedInfo.isError()) scene.log(std::make_shared<StringError>(returnedInfo.getError()));
         else lastValueReturned = returnedInfo.getValue();
 
         if(std::holds_alternative<HUGO::Int>(lastValueReturned)){
-            scene->log(std::to_string(std::get<HUGO::Int>(lastValueReturned)) + "\n");
+            scene.log(std::to_string(std::get<HUGO::Int>(lastValueReturned)) + "\n");
         }
         else if(std::holds_alternative<HUGO::Float>(lastValueReturned)){
-            scene->log(std::to_string(std::get<HUGO::Int>(lastValueReturned)) + "\n");
+            scene.log(std::to_string(std::get<HUGO::Int>(lastValueReturned)) + "\n");
         }
         else if(std::holds_alternative<bool>(lastValueReturned)){
             bool value = std::get<bool>(lastValueReturned);
-            if(value) scene->log("true\n");
-            else scene->log("false\n");
+            if(value) scene.log("true\n");
+            else scene.log("false\n");
         }
         else{
-            scene->log(std::get<HUGO::String>(lastValueReturned) + "\n");
+            scene.log(std::get<HUGO::String>(lastValueReturned) + "\n");
         }
     }
 

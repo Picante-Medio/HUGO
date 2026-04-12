@@ -21,7 +21,7 @@ RenderSystem::~RenderSystem()
 
     // Destroy all renderable Ogre objects
     for(auto& obj : ogreObjects){
-        unregisterRenderEntity(scene->getComponent<RenderComponent>(obj.first));
+        unregisterRenderEntity(scene.getComponent<RenderComponent>(obj.first));
         clearAnimationStates(obj.second);
     }
     ogreObjects.clear();
@@ -41,14 +41,14 @@ void RenderSystem::init(){
     sceneManager = OgreModule::Instance().getCurrentSceneManager();
 
     //components events
-    scene->onAddComponent<RenderComponent>().connect(this, &RenderSystem::registerRenderEntity);
-    scene->onAddComponent<AnimationComponent>().connect(this, &RenderSystem::onUpdateAnimationComponet);
+    scene.onAddComponent<RenderComponent>().connect(this, &RenderSystem::registerRenderEntity);
+    scene.onAddComponent<AnimationComponent>().connect(this, &RenderSystem::onUpdateAnimationComponet);
 
-    scene->onUpdateComponent<RenderComponent>().connect(this, &RenderSystem::onUpdateRenderComponet);
-    scene->onUpdateComponent<AnimationComponent>().connect(this, &RenderSystem::onUpdateAnimationComponet);
+    scene.onUpdateComponent<RenderComponent>().connect(this, &RenderSystem::onUpdateRenderComponet);
+    scene.onUpdateComponent<AnimationComponent>().connect(this, &RenderSystem::onUpdateAnimationComponet);
 
-    scene->onRemoveComponent<RenderComponent>().connect(this, &RenderSystem::unregisterRenderEntity); 
-    scene->onRemoveComponent<AnimationComponent>().connect(this, &RenderSystem::onRemoveAnimationComponet);
+    scene.onRemoveComponent<RenderComponent>().connect(this, &RenderSystem::unregisterRenderEntity); 
+    scene.onRemoveComponent<AnimationComponent>().connect(this, &RenderSystem::onRemoveAnimationComponet);
 }
 #pragma endregion
 
@@ -62,7 +62,7 @@ void RenderSystem::onLoad(){
 // ==================== Update Animations ====================
 void RenderSystem::updateAnimations(double dt)
 {
-    for(auto& pack : scene->query<RenderComponent, AnimationComponent>()) {
+    for(auto& pack : scene.query<RenderComponent, AnimationComponent>()) {
         AnimationComponent& animComp = pack.getConst<AnimationComponent&>();
         RenderComponent& rc = pack.getConst<RenderComponent&>();
 
@@ -93,7 +93,7 @@ void RenderSystem::update(double dt)
     updateAnimations(dt);
 
     //Update transform of entity with renderComponent
-    for(auto& pack : scene->query<TransformComponent,RenderComponent>()) {
+    for(auto& pack : scene.query<TransformComponent,RenderComponent>()) {
         TransformComponent& tr=pack.getConst<TransformComponent&>();
         OgreObject& obj = ogreObjects[tr.entity];
         if(obj.ogreSceneNode){
@@ -136,7 +136,7 @@ void RenderSystem::registerRenderEntity(RenderComponent& comp)
         if (ent) sceneManager->destroyEntity(ent);
         if (node) sceneManager->destroySceneNode(node);
         
-        scene->log(std::make_shared<StringError>(err));
+        scene.log(std::make_shared<StringError>(err));
         return;
     }
     
@@ -193,9 +193,9 @@ void RenderSystem::onUpdateRenderComponet(RenderComponent &rc)
             obj.meshName = rc.meshName;
 
             //clear animations
-            if(scene->hasComponent<AnimationComponent>(rc.entity))
+            if(scene.hasComponent<AnimationComponent>(rc.entity))
             {
-                auto& animComp = scene->getComponent<AnimationComponent>(rc.entity);
+                auto& animComp = scene.getComponent<AnimationComponent>(rc.entity);
                 animComp.anims.clear();
                 clearAnimationStates(obj);
             }
@@ -210,9 +210,9 @@ void RenderSystem::onUpdateRenderComponet(RenderComponent &rc)
 void RenderSystem::onUpdateAnimationComponet(AnimationComponent &animComp)
 {
     EntityID entity = animComp.entity;
-    if(!scene->hasComponent<RenderComponent>(entity)) return;
+    if(!scene.hasComponent<RenderComponent>(entity)) return;
     
-    RenderComponent& rc = scene->getComponent<RenderComponent>(entity);
+    RenderComponent& rc = scene.getComponent<RenderComponent>(entity);
     if(ogreObjects.find(rc.entity) == ogreObjects.end()) return;
     
     OgreObject& ogreObj = ogreObjects[rc.entity];
@@ -242,7 +242,7 @@ void RenderSystem::onUpdateAnimationComponet(AnimationComponent &animComp)
         {
             if(!ogre_ent->hasAnimationState(animName))
             {
-                scene->log(std::make_shared<StringError>("[RenderSystem] Animation "+ animName + " does not exist in entity " + std::to_string(rc.entity)));
+                scene.log(std::make_shared<StringError>("[RenderSystem] Animation "+ animName + " does not exist in entity " + std::to_string(rc.entity)));
                 continue;
             }
             //get a new AnimationSate from ogre

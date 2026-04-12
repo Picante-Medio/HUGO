@@ -23,7 +23,7 @@ bool GenerateComponent(std::shared_ptr<HUGO::IScene> scene, EntityID ent, const 
     return true;
 }
 
-bool GenerateAndGetSystem(std::shared_ptr<HUGO::IScene> scene, const std::string& systemName, 
+bool GenerateAndGetSystem(HUGO::IScene& scene, const std::string& systemName, 
     std::shared_ptr<HUGO::System>& returnSystem) {
 
     ErrorOrType<std::shared_ptr<HUGO::System>> makeSystemResult = HUGO::SystemFactory::makeSystem(scene, systemName);

@@ -16,4 +16,4 @@
 EXPORT bool GenerateComponent(std::shared_ptr<HUGO::IScene>, EntityID ent, const std::string& component, 
     const std::unordered_map<std::string, HVariant>& componentMembers);
 
-EXPORT bool GenerateAndGetSystem(std::shared_ptr<HUGO::IScene> scene, const std::string& systemName, std::shared_ptr<HUGO::System>& returnSystem);
+EXPORT bool GenerateAndGetSystem(HUGO::IScene& scene, const std::string& systemName, std::shared_ptr<HUGO::System>& returnSystem);
