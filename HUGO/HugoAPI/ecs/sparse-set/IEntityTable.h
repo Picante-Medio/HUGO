@@ -13,6 +13,8 @@
  */
 class IEntityTable {
 public:
+	// Virtual destructor so the implementation of EntityTable gets properly disposed of
+	virtual ~IEntityTable() = default;
 
 	/**
 	 * @brief creates an entity
