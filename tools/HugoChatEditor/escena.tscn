@@ -34,6 +34,7 @@ entities = Dictionary[String, Dictionary]({
 
 [node name="Entity" type="Node3D" parent="." unique_id=1869963947]
 script = ExtResource("2_sks45")
+systems = Array[int]([])
 metadata/_custom_type_script = "uid://dcc6b5sxl6c7u"
 
 [node name="LightComponent" type="Node" parent="Entity" unique_id=1188881374]

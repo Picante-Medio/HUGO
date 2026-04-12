@@ -4,7 +4,18 @@ extends Node3D
 class_name SCENE_TRACKER
 
 @export var entities:Dictionary[String, Dictionary]
-@export var systems:Array[SYSTEMS]
+@export var systems:Array[SYSTEMS] = [
+	SYSTEMS.ConsoleSystem,
+	SYSTEMS.AudioSystem,
+	SYSTEMS.PhysicsGizmoSystem,
+	SYSTEMS.HierarchySystem,
+	SYSTEMS.ParticleSystem,
+	SYSTEMS.CameraSystem,
+	SYSTEMS.LightSystem,
+	SYSTEMS.RenderSystem,
+	SYSTEMS.TweenSystem,
+	SYSTEMS.UISystem
+]
 
 @export_tool_button("Save Scene") var button = SceneWriter.write
 

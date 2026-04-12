@@ -1,21 +1,6 @@
 SCENE
-
-ENTITY Entity 0
-	COMPONENT LightComponent
-		VECTOR_4 diffuse 0.0 0.0 0.0 0.0
-		VECTOR_4 specular 0.0 0.0 0.0 0.0
-		INT lightType 0
-		FLOAT spotFalloff 0.0
-		FLOAT spotNearClip 0.0
-		FLOAT spotOuter 0.0
-		FLOAT spotInner 0.0
-		FLOAT shadowFarDist 0.0
-		FLOAT shadowFarDistSquared 0.0
-		VECTOR_4 attenuation 0.0 0.0 0.0 0.0
-		FLOAT shadowNearClipDist 0.0
-		FLOAT shadowFarClipDist 0.0
-	COMPONENT RenderComponent
-		STRING mesh res://meshes/new_box_mesh.tres
-		STRING materialName 
-		INT objectID 0
-
+SYSTEM MOVEMENT_SYSTEM
+SYSTEM CHAT_SYSTEM
+SYSTEM ZAPAS_SYSTEM
+SYSTEM SKIBIDI_SYSTEM
+SYSTEM HUGO_SYSTEM
