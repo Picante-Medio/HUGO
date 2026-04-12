@@ -1,6 +1,6 @@
 #pragma once
 
-#include "btIDebugDraw.h"
+#include "btBulletCollisionCommon.h"
 #include "Ogre.h"
 
 class OgreBulletDebugger : public btIDebugDraw {
