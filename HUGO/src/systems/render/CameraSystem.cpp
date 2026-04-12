@@ -49,9 +49,11 @@ void CameraSystem::update(double){
 CameraSystem::~CameraSystem(){
     //destroy all cameras
     for(auto& c: cameraMap){
-        unregisterCameraEntity(scene.getComponent<CameraComponent>(c.first));
+        destroyCamera(c.first,c.second);
     }
     cameraMap.clear();
+    
+    sceneManager = nullptr;
 }
 
 void CameraSystem::registerCameraEntity(CameraComponent& cameraComp){
@@ -97,20 +99,30 @@ void CameraSystem::registerCameraEntity(CameraComponent& cameraComp){
         setMainCamera(cameraComp);
     }
 }
+void CameraSystem::destroyCamera(EntityID entity, CameraInfo& camInfo)
+{
+    if(camInfo.node){
+        camInfo.node->detachAllObjects();
+        sceneManager->destroySceneNode(camInfo.node);
+        camInfo.node = nullptr;
+    }
 
-void CameraSystem::unregisterCameraEntity(CameraComponent& comp){
-    EntityID entity = comp.entity;
-
-    //remove camera and destroy Ogre Camera
-    cameraMap[entity].node->detachAllObjects();
-    sceneManager->destroySceneNode(cameraMap[entity].node);
-    sceneManager->destroyCamera(cameraMap[entity].ogreCamera);
-    cameraMap.erase(entity);
+    if(camInfo.ogreCamera){
+        sceneManager->destroyCamera(camInfo.ogreCamera);
+        camInfo.ogreCamera = nullptr;
+    }
 
     //If it was main cam, change it for the default blank camera. It is the user´s fault to not change the mainCamera before deleting the actual one
     if(entity == m_mainCamera){
         OgreModule::Instance().viewportToDefaultCamera();
     }
+}
+
+void CameraSystem::unregisterCameraEntity(CameraComponent& comp){
+    EntityID entity = comp.entity;
+    //remove camera and destroy Ogre Camera
+    destroyCamera(entity, cameraMap[entity]);
+    cameraMap.erase(entity);
 }
 
 void CameraSystem::setMainCamera(CameraComponent& camComp){

@@ -22,6 +22,8 @@ HSYSTEM(LightSystem)
     void unregisterLightEntity(LightComponent& comp);
     void registerLightEntity(LightComponent& comp);
 
+    void destroyLight(LightInfo& info);
+
     void onUpdateLightComponent(LightComponent& light);
 
     void setAmbientLight(HUGO::Float r, HUGO::Float g, HUGO::Float b);

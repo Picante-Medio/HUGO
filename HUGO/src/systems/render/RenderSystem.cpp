@@ -18,18 +18,14 @@
 #pragma region Destructor
 RenderSystem::~RenderSystem()
 {
-
     // Destroy all renderable Ogre objects
     for(auto& obj : ogreObjects){
-        unregisterRenderEntity(scene.getComponent<RenderComponent>(obj.first));
+        destroyOgreObject(obj.second);
         clearAnimationStates(obj.second);
     }
     ogreObjects.clear();
-
-    if(sceneManager){
-        ogreRoot->destroySceneManager(sceneManager);
-        sceneManager = nullptr;
-    }
+    
+    sceneManager = nullptr;
 }
 #pragma endregion
 
@@ -148,11 +144,8 @@ void RenderSystem::registerRenderEntity(RenderComponent& comp)
     ogreObjects[id] = std::move(obj);
 }
 // ==================== Destroy OgreObject ====================
-void RenderSystem::unregisterRenderEntity(RenderComponent& comp)
+void RenderSystem::destroyOgreObject(OgreObject &obj)
 {
-    EntityID id = comp.entity;
-    OgreObject& obj = ogreObjects[id];
-
     if(obj.ogreSceneNode){
         
         sceneManager->destroySceneNode(obj.ogreSceneNode);
@@ -162,6 +155,11 @@ void RenderSystem::unregisterRenderEntity(RenderComponent& comp)
         sceneManager->destroyEntity(obj.ogreEntity);
         obj.ogreEntity = nullptr;
     }
+}
+void RenderSystem::unregisterRenderEntity(RenderComponent& comp)
+{
+    EntityID id = comp.entity;
+    destroyOgreObject(ogreObjects[id]);
 }
 
 void RenderSystem::clearAnimationStates(OgreObject &obj)

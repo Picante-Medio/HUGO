@@ -22,12 +22,15 @@ void LightSystem::onLoad(){
     LuaBinder::getInstance().registerMethod<LightSystem, void, float, float, float>(*this, &LightSystem::setAmbientLight, "SetAmbientLight");
 }
 
-LightSystem::~LightSystem(){
+LightSystem::~LightSystem()
+{
     //destroy all lights
     for(auto& l: lightMap){
-        unregisterLightEntity(scene.getComponent<LightComponent>(l.first));
+        destroyLight(l.second);
     }
     lightMap.clear();
+
+    sceneManager = nullptr;
 }
 
 void LightSystem::update(double){
@@ -118,13 +121,25 @@ void LightSystem::registerLightEntity(LightComponent& lightComp)
 }
 
 // ==================== Unregister Light Entity ====================
+void LightSystem::destroyLight(LightInfo &info)
+{
+    if(info.node)
+    {
+        info.node->detachAllObjects();
+        sceneManager->destroySceneNode(info.node);
+        info.node = nullptr;
+    }
+
+    if(info.ogreLight)
+    {
+        sceneManager->destroyLight(info.ogreLight);
+        info.ogreLight = nullptr;
+    }
+}
 void LightSystem::unregisterLightEntity(LightComponent& comp)
 {
     EntityID entity = comp.entity;
-
-    lightMap[entity].node->detachAllObjects();
-    sceneManager->destroySceneNode(lightMap[entity].node);
-    sceneManager->destroyLight(lightMap[entity].ogreLight);
+    destroyLight(lightMap[entity]);
     lightMap.erase(entity);
 }
 

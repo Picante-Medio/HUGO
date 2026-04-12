@@ -37,6 +37,7 @@ HSYSTEM(RenderSystem)
     void registerRenderEntity(RenderComponent& comp);
     void unregisterRenderEntity(RenderComponent& comp);
 
+    void destroyOgreObject(OgreObject& obj);
     void clearAnimationStates(OgreObject &obj);
 
     //Component Events

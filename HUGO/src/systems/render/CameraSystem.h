@@ -2,6 +2,7 @@
 
 #include "HugoSystemMacros.h"
 #include "Ogre.h"
+#include "LightSystem.h"
 
 struct CameraComponent;
 
@@ -25,10 +26,13 @@ HSYSTEM(CameraSystem)
     void registerCameraEntity(CameraComponent& comp);
     void unregisterCameraEntity(CameraComponent& comp);
 
+    void destroyCamera(EntityID entity, CameraInfo& camInfo);
+
 public:
     void init() override;
-    void onLoad() override{}
-    void fixedUpdate(double) override {}
+    void onLoad() override {}
+    
+void fixedUpdate(double) override {}
     void update(double) override;
     ~CameraSystem(); 
 

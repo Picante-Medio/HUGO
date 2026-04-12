@@ -113,6 +113,14 @@ OgreModule::OgreModule(){
 
 OgreModule::~OgreModule(){
 
+    for(auto& sm: m_sceneManagers){
+        if(sm.second){
+
+            m_ogreRoot->destroySceneManager(sm.second);
+        }
+    }
+    m_sceneManagers.clear();
+    
     m_ogreRenderWindow->destroy();
 
     m_ogreRoot->shutdown();
