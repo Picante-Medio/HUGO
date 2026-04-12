@@ -9,13 +9,13 @@ void TweenSystem::onLoad() {
 }
 void TweenSystem::update(double dt) {
     for(auto& pack : scene->query<TweenComponent>()) {
-        TweenComponent& comp = pack.getDeprecated<TweenComponent&>();
-
-        for(auto it = comp.currentTweens.begin(); it != comp.currentTweens.end();){
+        pack.modify<TweenComponent&>([this, dt](TweenComponent& comp){
+            for(auto it = comp.currentTweens.begin(); it != comp.currentTweens.end();){
 
             ErrorOrType<bool> res = it->get()->tweenParameter(scene, static_cast<HUGO::Float>(dt));
 
             if(res.isError()){
+                scene->log(std::make_shared<StringError>("[TweenSystem] " + res.getError().errorMessage));
                 //Write in console the error
                 it = comp.currentTweens.erase(it);
             }
@@ -25,6 +25,7 @@ void TweenSystem::update(double dt) {
             }
             else ++it;
         }
+        });
     }
 }
 void TweenSystem::fixedUpdate(double) {}
