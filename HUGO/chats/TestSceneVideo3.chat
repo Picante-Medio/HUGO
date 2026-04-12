@@ -1,4 +1,4 @@
-SCENE TestSceneVideo2
+SCENE TestSceneVideo3
 
 SYSTEM AudioSystem
 SYSTEM RenderSystem
@@ -12,5 +12,5 @@ SYSTEM TweenSystem
 SYSTEM HierarchySystem
 SYSTEM ParticleSystem
 SYSTEM CameraMovementSystem
-SYSTEM TestSystem
+SYSTEM TestSystemVideo3
 SYSTEM MessagesTestSystem

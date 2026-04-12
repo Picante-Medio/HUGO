@@ -4,9 +4,9 @@
 #include "System.h"
 
 HSYSTEM(TestSystemVideo3)
-    //test
-    EntityID menuText;
-    EntityID menuButton;
+    // test
+    EntityID ent1;
+    EntityID ent2;
 public:
     void init() override;
     //Called every time the scene is loaded

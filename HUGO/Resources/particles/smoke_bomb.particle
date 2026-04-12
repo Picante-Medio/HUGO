@@ -1,26 +1,26 @@
 particle_system Particle/Smoke
 {
     billboard_type      point
-    particle_width      5
-    particle_height     5
+    particle_width      1
+    particle_height     1
     quota               300
     sorted              true
 
     emitter Point {
         position 0 0 0
         direction 0 1 0
-        angle 160 
+        angle 15 
         duration 0
         emission_rate 60  
-        time_to_live_min 1.5
-        time_to_live_max 3.0
+        time_to_live_min 2.0
+        time_to_live_max 4.0
 
         velocity_min 5
         velocity_max 20
     }
 
     affector Scaler {
-        rate 15
+        rate 5
     }
 
     affector ColourFader {

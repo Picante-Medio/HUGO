@@ -1,4 +1,4 @@
-SCENE TestSceneVideo1
+SCENE TestSceneVideo2
 
 SYSTEM AudioSystem
 SYSTEM RenderSystem

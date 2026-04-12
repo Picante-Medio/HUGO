@@ -12,5 +12,5 @@ SYSTEM TweenSystem
 SYSTEM HierarchySystem
 SYSTEM ParticleSystem
 SYSTEM CameraMovementSystem
-SYSTEM TestSystem
+SYSTEM TestSystemVideo3
 SYSTEM MessagesTestSystem
