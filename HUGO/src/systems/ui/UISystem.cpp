@@ -3,7 +3,6 @@
 #include "PanelComponent.h"
 #include "TextComponent.h"
 #include "ButtonComponent.h"
-#include "ConsoleComponent.h"
 #include "InputFieldComponent.h"
 #include "ProgressBarComponent.h"
 #include "SliderComponent.h"

@@ -10,7 +10,7 @@ HCOMPONENT(ProgressBarComponent)
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, currentValue, 0.0f);
 
     // type of the bar
-    HUGO::ProgressBarFillMode fillMode = HUGO::ProgressBarFillMode::HORIZONTAL_LEFT_TO_RIGHT;
+    DEFAULT_SERIALIZED_MEMBER(HUGO::ProgressBarFillMode, fillMode, HUGO::ProgressBarFillMode::HORIZONTAL_LEFT_TO_RIGHT);
 
     // name of the fill element
     HUGO::String fillElementName = "";

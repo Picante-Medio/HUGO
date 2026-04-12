@@ -22,5 +22,7 @@ using HVariant = std::variant<
     HUGO::Degree,
     HUGO::LightType,
     HUGO::UIMetricsMode,
-    HUGO::ProjectionType
+    HUGO::ProjectionType,
+    HUGO::ProgressBarFillMode,
+    HUGO::SliderOrientation
 >;

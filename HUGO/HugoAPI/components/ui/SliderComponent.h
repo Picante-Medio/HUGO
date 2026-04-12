@@ -10,15 +10,15 @@ HCOMPONENT(SliderComponent)
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, currentValue, 0.0f);
 
     // orientation
-    HUGO::SliderOrientation orientation = HUGO::SliderOrientation::HORIZONTAL;
+    DEFAULT_SERIALIZED_MEMBER(HUGO::SliderOrientation, orientation, HUGO::SliderOrientation::HORIZONTAL);
 
     // knob name
     HUGO::String trackElementName = "";
     HUGO::String knobElementName = "";
 
     // materials
-    HUGO::String trackMaterial = "";
-    HUGO::String knobMaterial = "";
+    DEFAULT_SERIALIZED_MEMBER(HUGO::String, trackMaterial, "");
+    DEFAULT_SERIALIZED_MEMBER(HUGO::String, knobMaterial, "");
 
     // relative sizes
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, knobWidth, 0.0f);
