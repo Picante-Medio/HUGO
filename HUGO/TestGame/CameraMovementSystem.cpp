@@ -43,16 +43,15 @@ void CameraMovementSystem::update(double dt) {
     for(auto pack : scene->query<CameraComponent, TransformComponent>()) {
         if(!pack.getConst<CameraComponent>().isMain()) continue;
 
-        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
-
         auto input = scene->getInput();
         float delta = static_cast<float>(dt);
-        if(input->isKeyPressed(HUGO::KeyCode::W)) tr.setPosition(tr.getPosition() + tr.getRotation().forward() * (-0.05f)* delta);
-        if(input->isKeyPressed(HUGO::KeyCode::A)) tr.setPosition(tr.getPosition() + tr.getRotation().right() *(-0.05f)* delta);
-        if(input->isKeyPressed(HUGO::KeyCode::S)) tr.setPosition(tr.getPosition() + tr.getRotation().forward() * (0.05f)* delta);
-        if(input->isKeyPressed(HUGO::KeyCode::D)) tr.setPosition(tr.getPosition() + tr.getRotation().right() *(0.05f)* delta);
 
-        //std::cout << "CamPos = " << tr.position.x << " " << tr.position.y <<" " << tr.position.z << "\n";
+        pack.modify<TransformComponent>([input, delta](TransformComponent& tr) {
+            if(input->isKeyPressed(HUGO::KeyCode::W)) tr.setPosition(tr.getPosition() + tr.getRotation().forward() * (-0.05f)* delta);
+            if(input->isKeyPressed(HUGO::KeyCode::A)) tr.setPosition(tr.getPosition() + tr.getRotation().right() *(-0.05f)* delta);
+            if(input->isKeyPressed(HUGO::KeyCode::S)) tr.setPosition(tr.getPosition() + tr.getRotation().forward() * (0.05f)* delta);
+            if(input->isKeyPressed(HUGO::KeyCode::D)) tr.setPosition(tr.getPosition() + tr.getRotation().right() *(0.05f)* delta);
+        });
     }
 
     if(scene->getInput()->wasKeyJustPressed(HUGO::KeyCode::Q)){

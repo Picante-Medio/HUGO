@@ -213,7 +213,7 @@ HierarchySystem::update(double){
 
     //update needUpdate state
     for (auto& pack : scene->query<TransformComponent>()) {
-        TransformComponent& tr= pack.getDeprecated<TransformComponent&>();
+        TransformComponent& tr= pack.getConst<TransformComponent&>();
         if(tr.needUpdateWorldPosition || tr.needUpdateWorldRotation || tr.needUpdateWorldScale
             ||tr.needUpdateLocalPosition || tr.needUpdateLocalRotation || tr.needUpdateLocalScale){
             propagateNeedUpdateToChildren(tr.entity);
@@ -222,7 +222,7 @@ HierarchySystem::update(double){
 
     //update worldTranforms
     for (auto& pack : scene->query<TransformComponent>()) {
-        TransformComponent& tr= pack.getDeprecated<TransformComponent&>();
+        TransformComponent& tr= pack.getConst<TransformComponent&>();
         getFullTransform(tr.entity);
     }
 }

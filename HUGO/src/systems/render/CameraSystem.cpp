@@ -24,8 +24,8 @@ void CameraSystem::update(double){
 
     // Camera update
     for(auto& pack : scene->query<TransformComponent, CameraComponent>()) {
-        TransformComponent& tr = pack.getDeprecated<TransformComponent&>();
-        CameraComponent& camera = pack.getDeprecated<CameraComponent&>();
+        TransformComponent& tr = pack.getConst<TransformComponent&>();
+        CameraComponent& camera = pack.getConst<CameraComponent&>();
 
         cameraMap[camera.entity].node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getPosition()));
         cameraMap[camera.entity].node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getRotation()));
@@ -37,9 +37,12 @@ void CameraSystem::update(double){
         cameraMap[camera.entity].ogreCamera->setNearClipDistance(camera.getNearClip());
         cameraMap[camera.entity].ogreCamera->setFarClipDistance(camera.getFarClip());
 
-
         //Check if it is a different mainCamera tham the actual one. If it is, then change it
-        if(camera.isMain() && camera.entity != m_mainCamera) setMainCamera(camera);
+        if(camera.isMain() && camera.entity != m_mainCamera) {
+            pack.modify<CameraComponent>([this](CameraComponent& camera) {
+                setMainCamera(camera);
+            });
+        } 
     }
 }
 
