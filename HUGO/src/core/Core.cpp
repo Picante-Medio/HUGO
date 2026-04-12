@@ -132,7 +132,7 @@ void HUGO::Core::initAudioAssets()
     auto& assets = AudioAssetsModule::Instance();
     
     // set base path
-    assets.setBasePath("test_media/audios/");
+    assets.setBasePath("../Resources/audios/");
     
     // automatically scan and register all audio files
     assets.scanAndRegisterAll();

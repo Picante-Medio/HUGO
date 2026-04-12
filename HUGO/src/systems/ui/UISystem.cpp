@@ -233,25 +233,31 @@ void UISystem::syncText(const TextComponent &t)
 
 }
 
-void UISystem::syncButton(const ButtonComponent &button, PanelComponent &panel)
+void UISystem::syncButton(const ButtonComponent &button)
 {
     UIElementCache* cache = getCache(button.entity);
     if (!cache || !cache->container) return;
 
+    HUGO::String change ="";
+
     switch (button.state) {
         case HUGO::ButtonStateTypes::BS_UP :
-            panel.material = button.normalMaterial;
+            change = button.normalMaterial;
             break;
         case HUGO::ButtonStateTypes::BS_DOWN :
-            panel.material = button.pressedMaterial;
+            change = button.pressedMaterial;
             break;
         case HUGO::ButtonStateTypes::BS_OVER :
-            panel.material = button.hoverMaterial;
+            change = button.hoverMaterial;
             break;
         default:
-            panel.material = button.normalMaterial;
+            change = button.normalMaterial;
             break;
     }
+
+    scene.modifyComponent<PanelComponent>(button.entity, [change](PanelComponent& p){
+        p.material = change;
+    });
 }
 
 void UISystem::syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr)
@@ -361,8 +367,7 @@ void UISystem::onUpdatePanelComponent(PanelComponent& panel)
 
 void UISystem::onUpdateButtonComponent(ButtonComponent& b)
 {
-    PanelComponent& p = scene.getComponent<PanelComponent>(b.entity);
-    syncButton(b, p);
+    syncButton(b);
 }
 
 void UISystem::onUpdateTextComponent(TextComponent& t)

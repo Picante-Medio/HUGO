@@ -59,7 +59,7 @@ private:
     void syncText(const TextComponent& t);
     bool isValidColour(const HUGO::Vector4& colour);
     HUGO::String formatText(const HUGO::String& text, Ogre::TextAreaOverlayElement* textArea,HUGO::Float maxWidth,HUGO::Float maxHeight);
-    void syncButton(const ButtonComponent& b, PanelComponent& p);
+    void syncButton(const ButtonComponent& b);
     void syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr);
     void syncSlider(const PanelComponent& p, const SliderComponent& s);
 

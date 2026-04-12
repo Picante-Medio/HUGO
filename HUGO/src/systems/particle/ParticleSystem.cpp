@@ -31,7 +31,6 @@ void ParticleSystem::init() {
 
     scene.onAddComponent<ParticleEmitterComponent>().connect(this, &ParticleSystem::onAddParticleEmitterComponent);
     scene.onUpdateComponent<ParticleEmitterComponent>().connect(this, &ParticleSystem::onUpdateParticleEmitterComponent);
-    scene.onUpdateComponent<TransformComponent>().connect(this, &ParticleSystem::processPosition);
 }
 
 void ParticleSystem::onLoad() {}
@@ -91,7 +90,7 @@ void ParticleSystem::destroyParticleSystem(EntityID id) {
     activeParticleSystems.erase(it);
 }
 
-void ParticleSystem::processPosition(TransformComponent &tr)
+void ParticleSystem::processPosition(const TransformComponent &tr)
 {
     // set every particle system in their position correctly
     // get the specific particle system
@@ -171,12 +170,17 @@ void ParticleSystem::processChanges(const ParticleEmitterComponent& pe, const Tr
 
 void ParticleSystem::fixedUpdate(double) {}
 
-void ParticleSystem::update(double) {}
+void ParticleSystem::update(double) {
+    for (auto& pack: scene.query<TransformComponent, ParticleEmitterComponent>()){
+        const TransformComponent& tr = pack.getConst<TransformComponent>();
+        processPosition(tr);
+    }
+}
 
 void ParticleSystem::onAddParticleEmitterComponent(ParticleEmitterComponent &pe)
 {
     if (scene.hasComponent<TransformComponent>(pe.entity)) {
-        TransformComponent& tr = scene.getComponent<TransformComponent>(pe.entity);
+        const TransformComponent& tr = scene.getComponentConst<TransformComponent>(pe.entity);
         createParticleSystem(tr.entity, pe.particleName, pe, tr.getPosition());
     }
 }
@@ -184,7 +188,7 @@ void ParticleSystem::onAddParticleEmitterComponent(ParticleEmitterComponent &pe)
 void ParticleSystem::onUpdateParticleEmitterComponent(ParticleEmitterComponent &pe)
 {
     if (scene.hasComponent<TransformComponent>(pe.entity)) {
-        TransformComponent& tr = scene.getComponent<TransformComponent>(pe.entity);
+        const TransformComponent& tr = scene.getComponentConst<TransformComponent>(pe.entity);
         processChanges(pe, tr);
     }
 }
