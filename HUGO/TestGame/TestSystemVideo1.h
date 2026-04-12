@@ -7,6 +7,8 @@ HSYSTEM(TestSystemVideo1)
     //test
     EntityID menuText;
     EntityID menuButton;
+    EntityID audioSlider;
+    EntityID audio;
 public:
     void init() override;
     //Called every time the scene is loaded

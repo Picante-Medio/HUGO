@@ -6,9 +6,6 @@ SYSTEM LightSystem
 SYSTEM CameraSystem
 SYSTEM UISystem
 SYSTEM ConsoleSystem
-SYSTEM TweenSystem
-SYSTEM HierarchySystem
-SYSTEM ParticleSystem
-SYSTEM TestSystemVideo1
 SYSTEM CameraMovementSystem
 SYSTEM MessagesTestSystem
+SYSTEM TestSystemVideo1
