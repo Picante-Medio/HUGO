@@ -67,7 +67,7 @@ private:
 
    void processChanges(AudioComponent& c);
 
-   void process3DChanges(AudioComponent& a, const Audio3DInfoComponent& c);
+   void process3DChanges(const AudioComponent& a, const Audio3DInfoComponent& c);
 
    /* ================
       playback control

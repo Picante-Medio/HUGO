@@ -5,55 +5,42 @@
 #include "InputFieldComponent.h"
 
 void ConsoleSystem::printLuaOutput(TextComponent& consoleTextCmp){
-
-    for (auto& pack: scene.query<TextComponent>()){
-        EntityID id = pack.getConst<TextComponent>().entity;
-        if (id != consoleTextCmp.entity) continue;
-
-        while(!ConsoleSystem::luaOutput.empty()){
-            pack.modify<TextComponent>([this](TextComponent& t){
-                t.text += logIni + ConsoleSystem::luaOutput.front() + "\n";
-            });
-            ConsoleSystem::luaOutput.pop();
-        }
+    while(!ConsoleSystem::luaOutput.empty()){
+        scene.modifyComponent<TextComponent>(consoleTextCmp.entity, [this](TextComponent& t){
+            t.text += logIni + ConsoleSystem::luaOutput.front() + "\n";
+        });
+        ConsoleSystem::luaOutput.pop();
     }
 }
 
 void ConsoleSystem::printLogs(TextComponent& consoleTextCmp){
     ErrorOrType log = scene.getNextLog();
 
-    for (auto& pack: scene.query<TextComponent>()){
-        EntityID id = pack.getConst<TextComponent>().entity;
-        if (id != consoleTextCmp.entity) continue;
+    while (!log.isError())
+    {
+        // if not explicitly specified, no \n is included
+        const HUGO::String& logText = log.getValue();
 
-        while (!log.isError())
-        {
-            // if not explicitly specified, no \n is included
-            const HUGO::String& logText = log.getValue();
-            pack.modify<TextComponent>([this, logText](TextComponent& t){
-                t.text += logIni + logText;
-            });
-            log = scene.getNextLog();
-        }
+        scene.modifyComponent<TextComponent>(consoleTextCmp.entity, [this, logText](TextComponent& t){
+            t.text += logIni + logText;
+        });
 
+        log = scene.getNextLog();
     }
 }
 
 void ConsoleSystem::printErrors(TextComponent& consoleTextCmp){
     ErrorOrType error = scene.getNextError();
 
-    for (auto& pack: scene.query<TextComponent>()){
-        EntityID id = pack.getConst<TextComponent>().entity;
-        if (id != consoleTextCmp.entity) continue;
+    // for errors, \n is included by default
+    while(!error.isError()){
+        const HUGO::String& errorText = error.getValue();
 
-        // for errors, \n is included by default
-        while(!error.isError()){
-            const HUGO::String& errorText = error.getValue();
-            pack.modify<TextComponent>([this, errorText](TextComponent& t){
-                t.text += logIni + "ERROR: " + errorText + "\n";
-            });
-            error = scene.getNextError();
-        }
+        scene.modifyComponent<TextComponent>(consoleTextCmp.entity, [this, errorText](TextComponent& t){
+            t.text += logIni + "ERROR: " + errorText + "\n";
+        });
+
+        error = scene.getNextError();
     }
 }
 
@@ -137,19 +124,16 @@ void ConsoleSystem::handleKeyInput(){
         result = getPreviousHistoric();
     }
 
-    for (auto& pack: scene.query<TextComponent, InputFieldComponent, PanelComponent>()){
-        InputFieldComponent& inp = pack.getConst<InputFieldComponent&>();
-        //search for the console input
-        if (inp.entity != consoleInput || result.empty()) continue;
-        
-        pack.modify<InputFieldComponent>([result](InputFieldComponent& i){
+    if (!result.empty()){
+        scene.modifyComponent<InputFieldComponent>(consoleInput, [result](InputFieldComponent& i){
             i.fullText = result;
         });
-        pack.modify<TextComponent>([result](TextComponent& t){
+        
+        scene.modifyComponent<TextComponent>(consoleInput, [result](TextComponent& t){
             t.text = result;
         });
     }
-
+    
     if(scene.getInput()->isKeyPressed(HUGO::KeyCode::LCTRL) &&
     scene.getInput()->wasKeyJustPressed(HUGO::KeyCode::T))
     {
@@ -157,15 +141,18 @@ void ConsoleSystem::handleKeyInput(){
         HUGO::Vector4 colour = {1.0, 1.0, 1.0, 1.0};
         if(!active) colour.w = 0;
         
-        for (auto& pack: scene.query<PanelComponent>()){
-            PanelComponent& panel = pack.getConst<PanelComponent&>();
-            if (panel.entity != consoleInput && panel.entity != consoleText && panel.entity != consoleInfo)
-                continue;
-            
-            pack.modify<PanelComponent>([this](PanelComponent& p){
-                p.isVisible = active;
-            });
-        } 
+
+        scene.modifyComponent<PanelComponent>(consoleText, [this](PanelComponent& p){
+            p.isVisible = active;
+        });
+
+        scene.modifyComponent<PanelComponent>(consoleInfo, [this](PanelComponent& p){
+            p.isVisible = active;
+        });
+
+        scene.modifyComponent<PanelComponent>(consoleInput, [this](PanelComponent& p){
+            p.isVisible = active;
+        });
     }
 }
 

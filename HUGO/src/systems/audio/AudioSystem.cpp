@@ -297,7 +297,7 @@ void AudioSystem::processChanges(AudioComponent &c)
     
 }
 
-void AudioSystem::process3DChanges(AudioComponent& a, const Audio3DInfoComponent &c)
+void AudioSystem::process3DChanges(const AudioComponent& a, const Audio3DInfoComponent &c)
 {
     set3DMinDistance(a.activePtr, c.minDistance);
     set3DMaxDistance(a.activePtr, c.maxDistance);
@@ -371,7 +371,7 @@ void AudioSystem::onUpdate3DAudioComponent(Audio3DInfoComponent &c)
     EntityID id = c.entity;
     if (!scene.hasComponent<AudioComponent>(id)) return;
 
-    AudioComponent& a = scene.getComponent<AudioComponent>(id);
+    const AudioComponent& a = scene.getComponentConst<AudioComponent>(id);
     process3DChanges(a, c);
 }
 
@@ -379,7 +379,7 @@ void AudioSystem::onUpdateAudioListener(AudioListenerComponent &l)
 {
     EntityID id = l.entity;
     if (scene.hasComponent<TransformComponent>(id)){
-        TransformComponent& tr = scene.getComponent<TransformComponent>(id);
+        const TransformComponent& tr = scene.getComponentConst<TransformComponent>(id);
         updateListeners(l, tr);
     }
 }
@@ -396,7 +396,7 @@ void AudioSystem::onAn3DAudioMove(TransformComponent &tr)
 {
     // update every 3d audios position 
     if (scene.hasComponent<AudioComponent>(tr.entity) && scene.hasComponent<Audio3DInfoComponent>(tr.entity)){
-        AudioComponent& a = scene.getComponent<AudioComponent>(tr.entity);
+        const AudioComponent& a = scene.getComponentConst<AudioComponent>(tr.entity);
         set3DPosition(a.activePtr, tr.getPosition());
     }
 }
