@@ -17,7 +17,7 @@
 #include "RenderSystem.h"
 #include "AudioSystem.h"
 #include "UISystem.h"
-#include "Scene.h"
+#include "InternalScene.h"
 #include "BulletModule.h"
 //#include "ResourceManager.h"
 

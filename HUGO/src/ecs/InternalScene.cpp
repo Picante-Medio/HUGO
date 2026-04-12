@@ -1,4 +1,4 @@
-#include "Scene.h"
+#include "InternalScene.h"
 
 #include <cstddef>
 #include <memory>

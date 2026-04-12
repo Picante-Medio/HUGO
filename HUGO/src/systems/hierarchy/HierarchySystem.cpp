@@ -1,7 +1,7 @@
 #include "HierarchySystem.h"
 #include <algorithm>
 
-#include "Scene.h"
+#include "InternalScene.h"
 #include "TransformComponent.h"
 #include "ParentComponent.h"
 #include "ChildrenComponent.h"

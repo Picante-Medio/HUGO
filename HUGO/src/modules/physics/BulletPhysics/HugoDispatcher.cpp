@@ -1,7 +1,7 @@
 #include "HugoDispatcher.h"
 #include "BulletSimulation.h"
 #include "ColliderComponent.h"
-#include "Scene.h"
+#include "InternalScene.h"
 
 HUGODispatcher::HUGODispatcher(btCollisionConfiguration *collisionConfiguration)
 : btCollisionDispatcher(collisionConfiguration)

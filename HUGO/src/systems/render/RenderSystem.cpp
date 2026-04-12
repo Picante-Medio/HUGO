@@ -5,7 +5,7 @@
 #include "OgreOverlaySystem.h"
 #include "SDL_video.h"
 
-#include "Scene.h"
+#include "InternalScene.h"
 #include "LuaBinder.h"
 
 #include "OgreUtils.h"

@@ -1,5 +1,5 @@
 #include "BulletSimulation.h"
-#include "Scene.h"
+#include "InternalScene.h"
 #include "HugoMotionState.h"
 #include "RigidBodyComponent.h"
 #include "ColliderComponent.h"

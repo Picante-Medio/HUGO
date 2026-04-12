@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include "btBulletDynamicsCommon.h"
-#include "Scene.h"
+#include "InternalScene.h"
 
 class HUGOMotionState : public btMotionState{
 

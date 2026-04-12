@@ -1,6 +1,6 @@
 #include "SceneManager.h"
 #include "LuaBinder.h"
-#include "Scene.h"
+#include "InternalScene.h"
 #include "SystemFactory.h"
 #include "ComponentFactory.h"
 #include "ComponentRegistry.h"

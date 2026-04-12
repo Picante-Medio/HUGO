@@ -4,7 +4,7 @@
 #include "Audio3DInfoComponent.h"
 #include "HugoError.h"
 #include "HugoTypes.h"
-#include "Scene.h"
+#include "InternalScene.h"
 #include "TransformComponent.h"
 #include "LuaBinder.h"
 
