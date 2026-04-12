@@ -17,6 +17,7 @@
 
 #include "OgreTextAreaOverlayElement.h"
 #include "OgreOverlaySystem.h"
+#include "Input.h"
 
 //====================================================
 // DESTRUCTOR
@@ -385,51 +386,51 @@ constexpr HUGO::Int MAX_ACSII = 126;
 
 void UISystem::processInput()
 {
-    std::shared_ptr<HUGO::IInput> input = scene.getInput();
-            // get normalized mouse position
-
+    std::shared_ptr<HUGO::Input> input = std::dynamic_pointer_cast<HUGO::Input>(scene.getInput());
+    
+    // get normalized mouse position
     const HUGO::IInput::MouseRelativePosition& mouse = input->getMouseRelativePosition();
 
     bool anyFieldActive = false; // flag to control SDL text input
     // handle mouse click: activate/deactivate input fields
     if (input->wasMouseButtonJustPressed(HUGO::MouseCode::MOUSE_LEFT)) {
         for (auto& pack : scene.query<PanelComponent, TextComponent, InputFieldComponent>()) {
-            PanelComponent& panel = pack.getConst<PanelComponent&>();
-            TextComponent& text = pack.getConst<TextComponent&>();
-            InputFieldComponent& field = pack.getConst<InputFieldComponent&>();
+            const PanelComponent& panel = pack.getConst<PanelComponent&>();
+            const TextComponent& text = pack.getConst<TextComponent&>();
+            const InputFieldComponent& field = pack.getConst<InputFieldComponent&>();
 
             if (isMouseOverPanel(panel, mouse.x, mouse.y)) {
                 if (!field.isActive){
                     // activate this field
+                    pack.modify<TextComponent>([field](TextComponent& t){
+                        t.text.clear();
+                        t.text= field.originalText;
+                    });
                     pack.modify<InputFieldComponent>([](InputFieldComponent& f){
                         f.isActive = true;
+                        f.fullText.clear();
+                        f.cursorPos = 0;
                     });
                     anyFieldActive = true;
-
-                    if (field.originalText.empty()){
-                        pack.modify<InputFieldComponent>([text](InputFieldComponent& f){
-                            f.originalText = text.text;
-                            f.fullText.clear();
-                            f.cursorPos = 0;
-                        });
-                        pack.modify<TextComponent>([](TextComponent& t){
-                            t.text.clear();
-                        });
-                    }
                 }
             }
             else {
-                // activate this field
+                // deactivate this field
                 pack.modify<InputFieldComponent>([](InputFieldComponent& f){
                     f.isActive = false;
                 });
+                if (field.fullText.empty()) {
+                    pack.modify<TextComponent>([field](TextComponent& t){
+                        t.text = field.deactiveText;
+                    });
+                }
             }
         }
         input->toggleTextInput(anyFieldActive);    
 
         for (auto& pack : scene.query<PanelComponent, ButtonComponent>())
         {
-            PanelComponent& panel = pack.getConst<PanelComponent&>();
+            const PanelComponent& panel = pack.getConst<PanelComponent&>();
             if (isMouseOverPanel(panel, mouse.x, mouse.y))
             {
                 pack.modify<ButtonComponent>([](ButtonComponent& b){
@@ -443,7 +444,7 @@ void UISystem::processInput()
     
         for (auto& pack : scene.query<PanelComponent, ButtonComponent>())
         {
-            PanelComponent& panel = pack.getConst<PanelComponent&>();
+            const PanelComponent& panel = pack.getConst<PanelComponent&>();
             bool isOver = isMouseOverPanel(panel, mouse.x, mouse.y);
 
             pack.modify<ButtonComponent>([isOver](ButtonComponent& b){
@@ -457,8 +458,8 @@ void UISystem::processInput()
 
     for (auto& pack : scene.query<PanelComponent, ButtonComponent>())
     {
-        PanelComponent& panel = pack.getConst<PanelComponent&>();
-        ButtonComponent& button = pack.getConst<ButtonComponent&>();
+        const PanelComponent& panel = pack.getConst<PanelComponent&>();
+        const ButtonComponent& button = pack.getConst<ButtonComponent&>();
 
         bool isOver = isMouseOverPanel(panel, mouse.x, mouse.y);
         if (isOver && button.state != HUGO::BS_DOWN)
@@ -477,8 +478,8 @@ void UISystem::processInput()
 
     for (auto &pack : scene.query<SliderComponent, PanelComponent>())
     {
-        SliderComponent& slider = pack.getConst<SliderComponent&>();
-        PanelComponent& panel = pack.getConst<PanelComponent&>();
+        const SliderComponent& slider = pack.getConst<SliderComponent&>();
+        const PanelComponent& panel = pack.getConst<PanelComponent&>();
 
         UIElementCache* cache = uiCache[slider.entity].get();
         if (!cache || !cache->container || !cache->element || !cache->extra)
@@ -568,8 +569,8 @@ void UISystem::processInput()
         InputFieldComponent& field = pack.getConst<InputFieldComponent&>();
         if (!field.isActive) continue;
 
-        TextComponent& text = pack.getConst<TextComponent&>();
-        PanelComponent& panel = pack.getConst<PanelComponent&>();
+        const TextComponent& text = pack.getConst<TextComponent&>();
+        const PanelComponent& panel = pack.getConst<PanelComponent&>();
         bool changed = false;
 
         // append new text input from SDL
@@ -586,7 +587,7 @@ void UISystem::processInput()
         }
 
         // backspace -> remove last character
-        if (input->wasKeyJustPressed(HUGO::KeyCode::BACKSPACE) && field.cursorPos > 0) {
+        if (input->wasConsoleKeyJustPressed(HUGO::KeyCode::BACKSPACE) && field.cursorPos > 0) {
             pack.modify<InputFieldComponent>([textInput](InputFieldComponent& f){
                 f.fullText.erase(f.cursorPos - 1, 1);
                 f.cursorPos--;
@@ -595,7 +596,7 @@ void UISystem::processInput()
         }
 
         // enter -> save result and deactivate
-        if (input->wasActionJustPressed("SubmitInput")) {
+        if (input->wasConsoleKeyJustPressed(HUGO::KeyCode::RETURN)) {
             pack.modify<TextComponent>([field](TextComponent& t){
                 // recover the original text
                 t.text = field.originalText;
@@ -606,7 +607,6 @@ void UISystem::processInput()
                 if (f.onChangeCallback)
                     f.onChangeCallback(f.fullText);
                 
-                f.originalText.clear();
                 f.fullText.clear();
                 f.cursorPos = 0;
             });
@@ -686,7 +686,6 @@ void UISystem::init()
 {
     renderWindow = OgreModule::Instance().getOgreRenderWindow();
     OgreModule::Instance().getCurrentSceneManager()->addRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
-    scene.getInput()->registerAction("SubmitInput", {HUGO::KeyCode::RETURN});
 
     //component events
     scene.onAddComponent<PanelComponent>().connect(this, &UISystem::onAddPanelComponent);

@@ -5,9 +5,12 @@
 #include "LuaBinder.h"
 
 #include <queue>
+#include <memory>
 
 struct TextComponent;
-
+namespace HUGO{
+    class Input;
+}
 HSYSTEM(ConsoleSystem)
 
 std::vector<HUGO::String> history;
@@ -15,6 +18,8 @@ size_t historyIndex; // Constant access and reset
 EntityID consoleInput;
 EntityID consoleText;
 EntityID consoleInfo;
+
+std::shared_ptr<HUGO::Input> input;
 
 HUGO::String logIni = ">  ";
 bool active; // to set weather the console is active or not
@@ -42,7 +47,7 @@ static inline std::queue<HUGO::String> luaOutput = std::queue<HUGO::String>();
     HUGO::String getNextHistoric();
     HUGO::String getPreviousHistoric();
 
-    void receiveInput(const HUGO::String& input);
+    void receiveInput(const HUGO::String& inputText);
     void handleKeyInput();
 
     template<typename T>

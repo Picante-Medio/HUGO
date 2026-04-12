@@ -20,6 +20,7 @@ namespace HUGO
 
         processKeyQueue();
         processMouseQueue();
+        processConsoleQueue();
         while (SDL_PollEvent(&event))
         {
             switch (event.type)
@@ -28,20 +29,31 @@ namespace HUGO
                 quit = true;
                 break;
             case SDL_KEYDOWN:
-                keyState[event.key.keysym.sym] = JUST_PRESSED;
-                toChange.push(event.key.keysym.sym);
+                if(consoleActive){
+                    consoleKeyState[event.key.keysym.sym] = JUST_PRESSED;
+                    consoletoChange.push(event.key.keysym.sym);
+                }else{
+                    keyState[event.key.keysym.sym] = JUST_PRESSED;
+                    toChange.push(event.key.keysym.sym);
+                }
                 break;
             case SDL_KEYUP:
-                keyState[event.key.keysym.sym] = JUST_RELEASED;
-                toChange.push(event.key.keysym.sym);
+                if(consoleActive){
+                    consoleKeyState[event.key.keysym.sym] = JUST_RELEASED;
+                    consoletoChange.push(event.key.keysym.sym);
+                }
+                else{
+                    keyState[event.key.keysym.sym] = JUST_RELEASED;
+                    toChange.push(event.key.keysym.sym);
+                }
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 mouseState[event.button.button] = JUST_PRESSED;
-                toChange.push(event.button.button);
+                mouseToChange.push(event.button.button);
                 break;
             case SDL_MOUSEBUTTONUP:
                 mouseState[event.button.button] = JUST_RELEASED;
-                toChange.push(event.button.button);
+                mouseToChange.push(event.button.button);
                 break;
             case SDL_TEXTINPUT:
                 textInputBuffer += event.text.text;
@@ -203,6 +215,23 @@ namespace HUGO
         }
     }
 
+    void Input::setConsoleActive(bool active)
+    {
+        consoleActive = active;
+    }
+
+    bool Input::isConsoleKeyPressed(HUGO::KeyCode key)
+    {
+        SDL_Keycode SDLKey = hugoKeyToSDLKey(key);
+        return consoleKeyState[SDLKey] == JUST_PRESSED || consoleKeyState[SDLKey] == PRESSED;
+    }
+
+    bool Input::wasConsoleKeyJustPressed(HUGO::KeyCode key)
+    {
+        SDL_Keycode SDLKey = hugoKeyToSDLKey(key);
+        return consoleKeyState[SDLKey] == JUST_PRESSED;
+    }
+
     void
     Input::processKeyQueue()
     {
@@ -227,6 +256,19 @@ namespace HUGO
                 mouseState[button] = PRESSED;
             else if (mouseState[button] == JUST_RELEASED)
                 mouseState[button] = NOT_PRESSED;
+        }
+    }
+
+    void Input::processConsoleQueue()
+    {
+        while (!consoletoChange.empty())
+        {
+            SDL_Keycode key = consoletoChange.front();
+            consoletoChange.pop();
+            if (consoleKeyState[key] == JUST_PRESSED)
+                consoleKeyState[key] = PRESSED;
+            else if (consoleKeyState[key] == JUST_RELEASED)
+                consoleKeyState[key] = NOT_PRESSED;
         }
     }
 

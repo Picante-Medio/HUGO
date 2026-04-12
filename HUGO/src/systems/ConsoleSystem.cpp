@@ -4,6 +4,7 @@
 #include "PanelComponent.h"
 #include "TextComponent.h"
 #include "InputFieldComponent.h"
+#include "Input.h"
 
 void ConsoleSystem::printLuaOutput(TextComponent& consoleTextCmp){
     while(!ConsoleSystem::luaOutput.empty()){
@@ -68,27 +69,27 @@ HUGO::String ConsoleSystem::getPreviousHistoric(){
     return item;
 }
 
-void ConsoleSystem::receiveInput(const HUGO::String& input){
+void ConsoleSystem::receiveInput(const HUGO::String& inputText){
 
     // Register input in history and log it to console
-    history.push_back(input);
+    history.push_back(inputText);
     historyIndex = history.size();
-    scene.log(input + "\n");
+    scene.log(inputText + "\n");
 
     // Check input
     size_t start = 0;
-    size_t end = input.find('|');
+    size_t end = inputText.find('|');
     HUGO::String command = "";
     HUGO::String type = "";
     bool expectsReturn = false;
 
     if(end != std::string::npos) {
-        type = input.substr(start, end - start);
+        type = inputText.substr(start, end - start);
         start = end+1;
-        command = input.substr(start);
+        command = inputText.substr(start);
         expectsReturn = true;
     }
-    else command = input;
+    else command = inputText;
 
     if(expectsReturn){
         if(type == "int"){
@@ -118,10 +119,10 @@ void ConsoleSystem::receiveInput(const HUGO::String& input){
 void ConsoleSystem::handleKeyInput(){
 
     HUGO::String result = "";
-    if(active && scene.getInput()->wasKeyJustPressed(HUGO::KeyCode::UP_ARROW)){
+    if(active && input->wasConsoleKeyJustPressed(HUGO::KeyCode::UP_ARROW)){
         result = getNextHistoric();
     }
-    if(active && scene.getInput()->wasKeyJustPressed(HUGO::KeyCode::DOWN_ARROW)){
+    if(active && input->wasConsoleKeyJustPressed(HUGO::KeyCode::DOWN_ARROW)){
         result = getPreviousHistoric();
     }
 
@@ -134,14 +135,15 @@ void ConsoleSystem::handleKeyInput(){
             t.text = result;
         });
     }
-    
-    if(scene.getInput()->isKeyPressed(HUGO::KeyCode::LCTRL) &&
-    scene.getInput()->wasKeyJustPressed(HUGO::KeyCode::T))
+
+    if((input->isConsoleKeyPressed(HUGO::KeyCode::LCTRL) && input->wasConsoleKeyJustPressed(HUGO::KeyCode::T)) ||
+        (input->isKeyPressed(HUGO::KeyCode::LCTRL) && input->wasKeyJustPressed(HUGO::KeyCode::T)))
     {
         active = !active;
+        input->setConsoleActive(active);
+
         HUGO::Vector4 colour = {1.0, 1.0, 1.0, 1.0};
         if(!active) colour.w = 0;
-        
 
         scene.modifyComponent<PanelComponent>(consoleText, [this](PanelComponent& p){
             p.isVisible = active;
@@ -184,15 +186,17 @@ void ConsoleSystem::onLoad(){
 void ConsoleSystem::init(){
     
     LuaBinder::getInstance().setPrintFunction(consoleLuaPrint);
-    active = true;
+    active = false;
     historyIndex = 0;
-
+    input = std::dynamic_pointer_cast<HUGO::Input>(scene.getInput());
+    input->setConsoleActive(active);
+    
     //---------------------------------------Input field
     consoleInput = scene.createEntity();
 
     std::string panelContainerName;
 
-    scene.addComponent<PanelComponent>(consoleInput, [&panelContainerName](PanelComponent& panel){
+    scene.addComponent<PanelComponent>(consoleInput, [this, &panelContainerName](PanelComponent& panel){
         panel.overlayName = "Console/InputText";
         panel.containerName = panel.overlayName + "/Container";
         panel.material = "Console/InputBackground";
@@ -202,6 +206,7 @@ void ConsoleSystem::init(){
         panel.top = 0.41f;
         
         panelContainerName = panel.containerName;
+        panel.isVisible = active;
     });
 
     scene.addComponent<TextComponent>(consoleInput, [&panelContainerName](TextComponent& text){
@@ -212,14 +217,15 @@ void ConsoleSystem::init(){
         text.characterHeight = 0.025f;
         text.top = -0.01f;
         text.spaceWidth = 0.01f;
-        text.text = "-";
+        text.text = "Click to write...";
     });
 
     scene.addComponent<InputFieldComponent>(consoleInput, [this](InputFieldComponent& input){
-        input.isActive = true;
-        input.originalText = "";
-        input.onChangeCallback = [this](const HUGO::String& input){
-            receiveInput(input);
+        input.isActive = active;
+        input.originalText = "| ";
+        input.deactiveText = "Click to write...";
+        input.onChangeCallback = [this](const HUGO::String& inputText){
+            receiveInput(inputText);
         };
     });
 
@@ -228,7 +234,7 @@ void ConsoleSystem::init(){
     consoleText = scene.createEntity();
 
     // Reuse panelContainerName
-    scene.addComponent<PanelComponent>(consoleText, [&panelContainerName](PanelComponent& panel2){
+    scene.addComponent<PanelComponent>(consoleText, [this, &panelContainerName](PanelComponent& panel2){
         panel2.overlayName = "Console/LogText";
         panel2.containerName = panel2.overlayName + "/Container";
         panel2.material = "Console/LogBackground";
@@ -236,7 +242,7 @@ void ConsoleSystem::init(){
         panel2.height = 0.31f;
         panel2.left = 0.7f;
         panel2.top = 0.1f;
-        
+        panel2.isVisible = active;
         panelContainerName = panel2.containerName;
     });
 
@@ -254,7 +260,7 @@ void ConsoleSystem::init(){
 
     //-------------------------------Console Input Info
     consoleInfo = scene.createEntity();
-    scene.addComponent<PanelComponent>(consoleInfo, [&panelContainerName](PanelComponent& panel3){
+    scene.addComponent<PanelComponent>(consoleInfo, [this, &panelContainerName](PanelComponent& panel3){
         panel3.overlayName = "Console/InfoText";
         panel3.containerName = panel3.overlayName + "/Container";
         panel3.material = "UI/Knob";
@@ -264,6 +270,7 @@ void ConsoleSystem::init(){
         panel3.left = 0.7f;
         panel3.top = 0.06f;
         panel3.zOrder = 501;
+        panel3.isVisible = active;
         panelContainerName = panel3.containerName;
     });
 
@@ -280,7 +287,6 @@ void ConsoleSystem::init(){
         text3.top = 0.01f;
         text3.characterHeight = 0.025f;
         text3.spaceWidth = 0.01f;
-        text3.textFont = "Roboto";
         text3.text = "Show/Hide Console: Ctrl + T\n";
     });
 }

@@ -28,6 +28,9 @@ namespace HUGO {
     std::unordered_map<int, KeyState> mouseState;
     std::queue<int> mouseToChange;
     
+    std::unordered_map<SDL_Keycode, KeyState> consoleKeyState;
+    std::queue<SDL_Keycode> consoletoChange;
+
     std::unordered_map<std::string, std::vector<HUGO::KeyCode>> keysOfAction;
     
     std::string textInputBuffer;
@@ -35,11 +38,13 @@ namespace HUGO {
     
     bool quit;
     bool windowChanged;
+    bool consoleActive;
     
     SDL_Window *sdlWindow = nullptr;
     
     void processKeyQueue();
     void processMouseQueue();
+    void processConsoleQueue();
 
     // Translators from hugo codes to SDL codes
     int hugoMouseInputToSDLMouseInput(HUGO::MouseCode button);
@@ -90,6 +95,12 @@ namespace HUGO {
     
     // Activate/desactivate Text input support of SDL
     void toggleTextInput(bool state);
+
+    //Activate/desactivate consoleInput
+    void setConsoleActive(bool active);
+    bool isConsoleKeyPressed(HUGO::KeyCode key);
+    bool wasConsoleKeyJustPressed(HUGO::KeyCode key);
+
 };
 
 } // namespace HUGO

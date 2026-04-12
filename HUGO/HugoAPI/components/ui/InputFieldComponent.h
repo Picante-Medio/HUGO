@@ -13,6 +13,9 @@ HCOMPONENT(InputFieldComponent)
     // original text before entering input mode (used to restore UI after submit/cancel)
     SERIALIZED_MEMBER(HUGO::String, originalText); 
 
+    //text that appears when the input field is disabled
+    SERIALIZED_MEMBER(HUGO::String, deactiveText); 
+
     // current cursor position within fullText
     size_t cursorPos = 0; 
 
