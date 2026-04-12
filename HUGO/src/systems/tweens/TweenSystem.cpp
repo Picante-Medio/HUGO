@@ -9,7 +9,7 @@ void TweenSystem::onLoad() {
 }
 void TweenSystem::update(double dt) {
     for(auto& pack : scene->query<TweenComponent>()) {
-        pack.modify<TweenComponent&>([this, dt](TweenComponent& comp){
+        pack.modify<TweenComponent>([this, dt](TweenComponent& comp){
             for(auto it = comp.currentTweens.begin(); it != comp.currentTweens.end();){
 
             ErrorOrType<bool> res = it->get()->tweenParameter(scene, static_cast<HUGO::Float>(dt));
