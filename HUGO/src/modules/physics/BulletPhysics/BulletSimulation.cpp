@@ -484,12 +484,13 @@ void BulletSimulation::syncBodiesToBullet() {
     
     // Add new rigidBodies to simulation and Update kinematic bodies
     for(auto& item : scene->query<ColliderComponent, RigidBodyComponent, TransformComponent>()) {
-        item.modify<RigidBodyComponent>([item](RigidBodyComponent &rb){
+        item.modify<RigidBodyComponent>([&item, this](RigidBodyComponent &rb){
 
             if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
                 //create a new CollisionObject
-                //! posible que getConst no funcione
-                rb.objectID = upgradeToRigidBodyObject(item.getConst<ColliderComponent>(), rb);
+                item.modify<ColliderComponent>([&rb, this](ColliderComponent &col){
+                    rb.objectID = upgradeToRigidBodyObject(col, rb);
+                });
             }
 
             if(rb.getBodyType() == HUGO::BodyType::KINEMATIC){
@@ -503,7 +504,7 @@ void BulletSimulation::syncBodiesToBullet() {
 
     // Add colliders to simulation
      for(auto& item : scene->query<ColliderComponent, TransformComponent>()){
-        item.modify<ColliderComponent>([item](ColliderComponent &col){
+        item.modify<ColliderComponent>([item, this](ColliderComponent &col){
     
             if(col.objectID == HUGO::INVALID_COL_OBJ_ID){
                 col.objectID = createColliderObject(col);
@@ -518,7 +519,7 @@ void BulletSimulation::syncBodiesToBullet() {
 void BulletSimulation::syncBodiesToGame() {
 
     for(auto& item : scene->query<ColliderComponent, RigidBodyComponent, TransformComponent>()) {
-        item.modify<RigidBodyComponent>([](){
+        item.modify<RigidBodyComponent>([this](RigidBodyComponent &rb){
 
             btRigidBody* btRb = btRigidBody::upcast(getCollisionObject(rb.objectID).bulletRB);
         
@@ -539,7 +540,7 @@ void BulletSimulation::syncBodiesToGame() {
 
     if (numSubSteps != 0){
         for(auto& item : scene->query<ColliderComponent, TransformComponent>()) {
-            item.modify<ColliderComponent>([](){
+            item.modify<ColliderComponent>([this](ColliderComponent &col){
         
                 col.collisionInfo.clear();
                 col.collisionInfo = col.collisionBuffer;
