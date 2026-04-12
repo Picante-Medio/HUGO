@@ -5,14 +5,14 @@
 #define HSYSTEM(SYSTEM_NAME) \
 class SYSTEM_NAME : public HUGO::System { \
 public:\
-    SYSTEM_NAME(HUGO::IScene& scene): HUGO::System(scene) {} \
+    SYSTEM_NAME(HUGO::IScene& sceneRef): HUGO::System(sceneRef) {} \
     static inline const std::string name = #SYSTEM_NAME; \
 private:\
     struct Reflection{ \
         Reflection(){\
             HUGO::SystemFactory::add(#SYSTEM_NAME, \
-            [](HUGO::IScene& scene) -> ErrorOrType<std::shared_ptr<HUGO::System>> { \
-                return ErrorOrType<std::shared_ptr<HUGO::System>>(std::make_shared<SYSTEM_NAME>(SYSTEM_NAME(scene)));\
+            [](HUGO::IScene& sceneRef) -> ErrorOrType<std::shared_ptr<HUGO::System>> { \
+                return ErrorOrType<std::shared_ptr<HUGO::System>>(std::make_shared<SYSTEM_NAME>(sceneRef)); \
             });\
         }\
     };\
