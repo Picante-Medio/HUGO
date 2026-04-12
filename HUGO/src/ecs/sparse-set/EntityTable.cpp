@@ -1,7 +1,6 @@
 #include "EntityTable.h"
 #include "EcsTypes.h"
 #include <vector>
-#include <iostream>
 
 EntityTable::EntityTable() 
 {}
