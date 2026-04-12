@@ -26,6 +26,8 @@
 UISystem::~UISystem()
 {
     clearAllCaches();
+    Ogre::OverlayManager::getSingleton().destroyAllOverlayElements();
+    Ogre::OverlayManager::getSingleton().destroyAll();
 }
 
 //====================================================
