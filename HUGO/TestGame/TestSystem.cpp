@@ -134,51 +134,6 @@ TestSystem::update(double dt) {
             tr.setPosition(tr.getPosition() + HUGO::Vector3(0,0, dt));
         });
     }
-
-    // timer += dt;
-
-    // if(timer >= 1 && !usedTimer){
-    //     usedTimer = true;
-
-    //     for(auto& elem : scene->query<TweenComponent, TransformComponent>()){
-    //         TransformComponent& tr = elem.getDeprecated<TransformComponent&>();
-    //         auto tween = elem.getMutable<TweenComponent>();
-
-    //         tween->currentTweens.push_back(HUGO::TweenFactory<EaseInBackTween>::makeTween(tr, &TransformComponent::position,
-    //         HUGO::Vector3(0,0,0), HUGO::Vector3(100,0,0), 1.f));
-
-
-    //         tween->currentTweens.push_back(HUGO::TweenFactory<EaseInBackTween>::makeTween(tr, &TransformComponent::rotation,
-    //         HUGO::Quaternion(HUGO::Radian(HUGO::Degree(0)), HUGO::Vector3(1,0,0)),
-    //         HUGO::Quaternion(HUGO::Radian(HUGO::Degree(-360)), HUGO::Vector3(1,0,0)),
-    //         1.f));
-    //     }
-    // }
-
-    // // ------------HierarchySystemTest----------
-    // TransformComponent& tr=scene->getComponent<TransformComponent>(e1);
-    // tr.setRotation( tr.getRotation()* HUGO::Quaternion(HUGO::Radian(HUGO::Degree(1.0f)), HUGO::Vector3(0,1,0)));
-
-    // TransformComponent& tr2=scene->getComponent<TransformComponent>(e2);
-    // tr2.setPosition( tr2.getPosition() + HUGO::Vector3(dt*5, 0, 0 ));
-
-    // timer += dt;
-
-    // if(timer >= 3 && !usedTimer){
-    //     usedTimer = true;
-    //     scene->removeEntity(e1);
-    //     scene->removeEntity(e2);
-    // }
-
-    // //----------------------------------------
-
-    // for(auto& pack : scene->query<LightComponent, TransformComponent>()) {
-    //     TransformComponent& tr = pack.get<TransformComponent&>();
-    //     LightComponent& lg = pack.get<LightComponent&>();
-
-    //     tr.rotation *= HUGO::Quaternion(HUGO::Radian(HUGO::Degree(5.0f)), HUGO::Vector3(0,1,0));
-    //     if(!scene->hasComponent<TransformChangedTag>(tr.entity))scene->addComponent<TransformChangedTag>(tr.entity);
-    // }
 }
 
 void
