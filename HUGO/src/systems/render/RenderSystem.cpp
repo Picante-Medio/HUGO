@@ -63,8 +63,8 @@ void RenderSystem::onLoad(){
 void RenderSystem::updateAnimations(double dt)
 {
     for(auto& pack : scene->query<RenderComponent, AnimationComponent>()) {
-        AnimationComponent& animComp = pack.getDeprecated<AnimationComponent&>();
-        RenderComponent& rc = pack.getDeprecated<RenderComponent&>();
+        AnimationComponent& animComp = pack.getConst<AnimationComponent&>();
+        RenderComponent& rc = pack.getConst<RenderComponent&>();
 
         if(ogreObjects.find(rc.entity) == ogreObjects.end()) continue;
         
@@ -94,7 +94,7 @@ void RenderSystem::update(double dt)
 
     //Update transform of entity with renderComponent
     for(auto& pack : scene->query<TransformComponent,RenderComponent>()) {
-        TransformComponent& tr=pack.getDeprecated<TransformComponent&>();
+        TransformComponent& tr=pack.getConst<TransformComponent&>();
         OgreObject& obj = ogreObjects[tr.entity];
         if(obj.ogreSceneNode){
             //update transform
