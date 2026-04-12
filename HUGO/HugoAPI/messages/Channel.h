@@ -1,4 +1,6 @@
 #pragma once
+#pragma warning(push)
+#pragma warning(disable:4251) // this warning is a false positive
 
 #include "UtilsAPI.h"
 
@@ -14,7 +16,7 @@ namespace HUGO {
     class UTILS_API Channel {
         // pImpl idiom to hide implementation details
         struct Impl;
-        std::unique_ptr<Impl> pImpl; // Ignore warning, Impl is an incomplete type here. Its full definition is in the implementation file
+        std::unique_ptr<Impl> pImpl; // Ignore warning (4251), Impl is an incomplete type here. Its full definition is in the implementation file
 
     public:
         Channel();
@@ -28,3 +30,4 @@ namespace HUGO {
         void enqueueMessage(std::shared_ptr<Message> msg);
     };
 }
+#pragma warning(pop)
