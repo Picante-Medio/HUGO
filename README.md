@@ -7,3 +7,4 @@
 - Implementación propuesta para el [manejo de errores](/Manejo-de-errores.md)
 - Implementaciones propuestas para la [detección de entrada](/Deteccion-input.md)
 - Cheatsheet para el [uso de git](/Git-cheatsheet.md)
+- [Integración de lua](/Integracion-lua.md) en el motor
