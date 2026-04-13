@@ -30,7 +30,7 @@ HCOMPONENT(RigidBodyComponent)
     
     SERIALIZED_MEMBER(HUGO::Vector3, linearVelocity)
     SERIALIZED_MEMBER(HUGO::Vector3, angularVelocity)
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Vector3, gravity, HUGO::Vector3(0, -9.8, 0))
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Vector3, gravity, HUGO::Vector3(0.f, -9.8f, 0.f))
     
     HUGO::Vector3 impulseApplied = HUGO::Vector3();
     HUGO::Vector3 torqueImpulseApplied = HUGO::Vector3();
