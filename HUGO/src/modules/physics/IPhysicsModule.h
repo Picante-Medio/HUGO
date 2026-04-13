@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <string>
 
-class Scene;
+class InternalScene;
 class IPhysicsSimulation;
 
 class IPhysicsModule {
@@ -16,7 +16,7 @@ public:
     explicit IPhysicsModule() {}
     virtual ~IPhysicsModule() {}
 
-    virtual void createSceneSimulation(std::string sceneName, std::shared_ptr<Scene> scene) = 0;
+    virtual void createSceneSimulation(std::string sceneName, std::shared_ptr<InternalScene> scene) = 0;
     virtual void destroySceneSimulation(std::string sceneName) = 0;
 
     virtual void resumeSceneSimulation(std::string sceneName) = 0;

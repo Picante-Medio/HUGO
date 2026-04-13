@@ -12,7 +12,7 @@ BulletModule::~BulletModule() {
 
 }
 
-void BulletModule::createSceneSimulation(std::string sceneName, std::shared_ptr<Scene> scene) {
+void BulletModule::createSceneSimulation(std::string sceneName, std::shared_ptr<InternalScene> scene) {
     // create BulletSimulation and add it to activeSimulations container
     std::shared_ptr<IPhysicsSimulation> simulation = std::make_shared<BulletSimulation>(scene);
     activeSimulations.insert({sceneName, simulation});

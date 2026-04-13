@@ -3,7 +3,7 @@
 #include "TransformComponent.h"
 #include "ColliderComponent.h"
 
-HUGOMotionState::HUGOMotionState(const btTransform initialPos, std::shared_ptr<Scene> scene, unsigned long int id, btTransform offset)
+HUGOMotionState::HUGOMotionState(const btTransform initialPos, std::shared_ptr<InternalScene> scene, unsigned long int id, btTransform offset)
 : entityID(id)
 , hugoScene(scene)
 , btTransformRegister(initialPos)

@@ -8,7 +8,7 @@ public:
     BulletModule();
     ~BulletModule();
 
-    void createSceneSimulation(std::string sceneName, std::shared_ptr<Scene> scene);
+    void createSceneSimulation(std::string sceneName, std::shared_ptr<InternalScene> scene);
     void destroySceneSimulation(std::string sceneName);
     
     void resumeSceneSimulation(std::string sceneName);

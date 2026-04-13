@@ -12,7 +12,7 @@ struct ColliderComponent;
 struct Shape;
 
 struct CollisionObject{
-    std::shared_ptr<Scene> scene;
+    std::shared_ptr<InternalScene> scene;
     HUGO::CollisionObjectID id;
     EntityID hgId;
     btCollisionObject* bulletRB = nullptr;
@@ -76,7 +76,7 @@ class BulletSimulation : public IPhysicsSimulation {
 
 public:
     
-    BulletSimulation(std::shared_ptr<Scene> scene);
+    BulletSimulation(std::shared_ptr<InternalScene> scene);
     ~BulletSimulation();
 
     void destroySimulation();

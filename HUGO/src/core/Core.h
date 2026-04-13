@@ -13,7 +13,7 @@
 #include "SceneManager.h"
 #include "Input.h"
 
-class Scene;
+class InternalScene;
 class VirtualTimer;
 struct SDL_Window;
 

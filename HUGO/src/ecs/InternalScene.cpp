@@ -21,7 +21,7 @@
 #include "ParentComponent.h"
 #include "ChildrenComponent.h"
 
-Scene::Scene(std::shared_ptr<HUGO::IInput> input, HUGO::SceneManager& sceneManager) 
+InternalScene::InternalScene(std::shared_ptr<HUGO::IInput> input, HUGO::SceneManager& sceneManager) 
     : input(input), sceneManager(sceneManager)
 {
 	entityTable = std::make_unique<EntityTable>();
@@ -29,46 +29,46 @@ Scene::Scene(std::shared_ptr<HUGO::IInput> input, HUGO::SceneManager& sceneManag
 }
 
 //Load method is called when the scene is loaded so LUA methods are overwritten
-void Scene::load() {
+void InternalScene::load() {
     LuaBinder& luaBinder = LuaBinder::getInstance();
-	luaBinder.registerMethod<Scene, void, int>(*this, &Scene::removeEntityLUA, "RemoveEntity");
-	luaBinder.registerMethod<Scene, int>(*this, &Scene::createEntityLUA, "CreateEntity");
+	luaBinder.registerMethod<InternalScene, void, int>(*this, &InternalScene::removeEntityLUA, "RemoveEntity");
+	luaBinder.registerMethod<InternalScene, int>(*this, &InternalScene::createEntityLUA, "CreateEntity");
 
 	for(std::shared_ptr<HUGO::System> system : systems) {
 		system->onLoad();
 	}
 }
 
-void Scene::init(){
+void InternalScene::init(){
 	for(std::shared_ptr<HUGO::System> system : systems) {
 		system->init();
 	}
 }
 
 void 
-Scene::update(double dt) {
+InternalScene::update(double dt) {
 	for(std::shared_ptr<HUGO::System> system : systems) 
 		system->update(dt);
 }
 
 void 
-Scene::fixedUpdate(double dt) {
+InternalScene::fixedUpdate(double dt) {
 	for(std::shared_ptr<HUGO::System> system : systems) 
 		system->fixedUpdate(dt);
 }
 
 EntityID 
-Scene::createEntity() {
+InternalScene::createEntity() {
   	return static_cast<EntityID>(entityTable->createEntity());
 }
 
 int 
-Scene::createEntityLUA() {
+InternalScene::createEntityLUA() {
   return createEntity();
 }
 
 void
-Scene::addComponentLUA(int entityID, std::string& componentData) {
+InternalScene::addComponentLUA(int entityID, std::string& componentData) {
 
 	//Input Example
 	//AddComponent Rigidbody float mass 2.5 vector3 velocity 2 2 2
@@ -139,7 +139,7 @@ Scene::addComponentLUA(int entityID, std::string& componentData) {
 }
 
 void
-Scene::removeComponentLUA(int entityID, std::string& componentName) {
+InternalScene::removeComponentLUA(int entityID, std::string& componentName) {
 	ErrorOrVoid result = HUGO::ComponentFactory::removeComponent(shared_from_this(), entityID, componentName);
 
 	if(result.isError()) {
@@ -148,7 +148,7 @@ Scene::removeComponentLUA(int entityID, std::string& componentName) {
 }
 
 void
-Scene::removeEntity(EntityID entity) {
+InternalScene::removeEntity(EntityID entity) {
 	// If the entity has children, remove them
 	if(hasComponent<ChildrenComponent>(entity)){
 		std::unordered_set<EntityID> children = getComponent<ChildrenComponent>(entity).getChildren();
@@ -175,12 +175,12 @@ Scene::removeEntity(EntityID entity) {
 }
 
 void
-Scene::removeEntityLUA(int entity) {
+InternalScene::removeEntityLUA(int entity) {
   	removeEntity(static_cast<EntityID>(entity));
 }
 
 void 
-Scene::printEntity(int id) {
+InternalScene::printEntity(int id) {
 	std::vector<std::bitset<MAX_COMPONENTS>> masks = entityTable->getComponentMask();
 
 	//Imprime la bitmask de todas las entidad de forma provisional
@@ -188,7 +188,7 @@ Scene::printEntity(int id) {
 }
 
 void 
-Scene::printEntities() {
+InternalScene::printEntities() {
 	std::vector<std::bitset<MAX_COMPONENTS>> masks = entityTable->getComponentMask();
 
 	//Imprime la bitmask de todas las entidades de forma provisional
@@ -202,17 +202,17 @@ Scene::printEntities() {
 }
 
 void 
-Scene::log(std::shared_ptr<Error> error) {
+InternalScene::log(std::shared_ptr<Error> error) {
     errorsToLog.push(error);
 }
 
 void 
-Scene::log(HUGO::String log) {
+InternalScene::log(HUGO::String log) {
     stringsToLog.push(log);
 }
 
 ErrorOrType<HUGO::String> 
-Scene::getNextError() {
+InternalScene::getNextError() {
     if(errorsToLog.empty()) return ErrorOrType<HUGO::String>(StringError{"La cola está vacía"});
 
     HUGO::String ret = errorsToLog.front()->description();
@@ -221,7 +221,7 @@ Scene::getNextError() {
 }
 
 ErrorOrType<HUGO::String> 
-Scene::getNextLog() {
+InternalScene::getNextLog() {
     if(stringsToLog.empty()) return ErrorOrType<HUGO::String>(StringError{"La cola está vacía"});
 
     HUGO::String ret = stringsToLog.front();
@@ -230,18 +230,18 @@ Scene::getNextLog() {
 }
 
 void
-Scene::dispatchMessages() {
+InternalScene::dispatchMessages() {
 	messenger.sendAll();
 }
 
 std::shared_ptr<HUGO::IInput>
-Scene::getInput() {
+InternalScene::getInput() {
 	return input;
 }
 
 
 void 
-Scene::removeComponentAux(EntityID entity, ComponentID componentID, DenseListIndex index) {
+InternalScene::removeComponentAux(EntityID entity, ComponentID componentID, DenseListIndex index) {
     // Calls removal event before removing
     componentTable->dispatchRemoveEvent(componentID, index);
 
@@ -254,11 +254,11 @@ Scene::removeComponentAux(EntityID entity, ComponentID componentID, DenseListInd
 }
 
 void 
-Scene::changeScene(const HUGO::String& sceneName) {
+InternalScene::changeScene(const HUGO::String& sceneName) {
     sceneManager.setCurrentScene(sceneName);
 }
 
 void 
-Scene::changeAndDestroyPreviousScene(const HUGO::String& sceneName) {
+InternalScene::changeAndDestroyPreviousScene(const HUGO::String& sceneName) {
     sceneManager.setCurrentSceneAndDestroyPrevious(sceneName);
 }

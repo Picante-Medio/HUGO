@@ -17,7 +17,7 @@ void printer(const char* name){
     std::cout << name << "\n";
 }
 
-BulletSimulation::BulletSimulation(std::shared_ptr<Scene> scene)
+BulletSimulation::BulletSimulation(std::shared_ptr<InternalScene> scene)
 : IPhysicsSimulation(scene)
 {
     // We are using bullet's default collision configuration. Custom configuration is recommended for more complexity

@@ -15,7 +15,7 @@ class Input;
 namespace HUGO {
     class SceneManager;
 }
-class Scene : public HUGO::IScene, public std::enable_shared_from_this<Scene>
+class InternalScene : public HUGO::IScene, public std::enable_shared_from_this<InternalScene>
 {
     std::vector<std::shared_ptr<HUGO::System>> systems;
     std::queue<std::shared_ptr<Error>> errorsToLog;
@@ -26,7 +26,7 @@ class Scene : public HUGO::IScene, public std::enable_shared_from_this<Scene>
 
     void removeComponentAux(EntityID entity, ComponentID componentID, DenseListIndex index);
 public:
-    Scene(std::shared_ptr<HUGO::IInput> input, HUGO::SceneManager& sceneManager);
+    InternalScene(std::shared_ptr<HUGO::IInput> input, HUGO::SceneManager& sceneManager);
 
     //Calls load() on all systems. Must be used only by SceneManager
     void load();

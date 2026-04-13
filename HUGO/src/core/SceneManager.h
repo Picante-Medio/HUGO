@@ -6,7 +6,7 @@
 
 #include "HugoError.h"
 
-class Scene;
+class InternalScene;
 class IPhysicsModule;
 namespace HUGO {
     class IInput;
@@ -15,10 +15,10 @@ namespace HUGO {
 
         HUGO::ChatParser m_chatParser;
         //Scene map that stores created game scenes.
-        std::unordered_map<HUGO::String, std::shared_ptr<Scene>> m_sceneMap;
+        std::unordered_map<HUGO::String, std::shared_ptr<InternalScene>> m_sceneMap;
 
         //Pointer to a scene inside m_sceneMap. It is the scene that will be updated in the main loop.
-        std::weak_ptr<Scene> m_currentScene;
+        std::weak_ptr<InternalScene> m_currentScene;
         HUGO::String m_currentSceneName;
 
         //Reads chatParser, creates a scene based on the SceneData, and indexes it in m_sceneMap.
