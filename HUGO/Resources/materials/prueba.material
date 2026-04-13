@@ -48,6 +48,36 @@ material debug/DefaultMaterial
 	}
 }
 
+material Square/Pedro
+{
+	technique 
+	{
+		pass{
+			 texture_unit{
+                texture pedro.png
+				scale 0.25 0.25
+				rotate 270
+				scroll 0 -0.5
+            }
+		}
+	}
+}
+
+material Square/Pablo
+{
+	technique 
+	{
+		pass{
+			texture_unit{
+                texture pablo.png
+				scale 0.25 0.25
+				rotate 270
+				scroll 0 -0.5
+            }
+		}
+	}
+}
+
 material debug/WireframeMaterial
 {
 	technique 

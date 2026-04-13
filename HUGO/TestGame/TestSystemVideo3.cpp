@@ -7,6 +7,7 @@
 #include "SliderComponent.h"
 #include "PanelComponent.h"
 #include "TextComponent.h"
+#include "RenderComponent.h"
 #include "ButtonComponent.h"
 
 struct Aux {
@@ -29,6 +30,28 @@ TestSystemVideo3::init() {
     ent1 = scene.createEntity();
     scene.addComponent<TransformComponent>(ent1, [offset](TransformComponent& transform){
         transform.setPosition(HUGO::Vector3(offset, 0.0f, 0.0f));
+    });
+
+    EntityID cuboPedro = scene.createEntity();
+    scene.addComponent<TransformComponent>(cuboPedro, [offset](TransformComponent& transform){
+        transform.setPosition(HUGO::Vector3(0.0f, 10.0f, 0.0f));
+                transform.setScale(HUGO::Vector3(4, 4, 4));
+
+    });
+    scene.addComponent<RenderComponent>(cuboPedro, [](RenderComponent& r){
+        r.meshName = "cube.mesh";
+        r.materialName = "Square/Pedro";
+    });
+
+    EntityID cuboPablo = scene.createEntity();
+    scene.addComponent<TransformComponent>(cuboPablo, [offset](TransformComponent& transform){
+        transform.setPosition(HUGO::Vector3(10.0f, 0.0f, 0.0f));
+        transform.setScale(HUGO::Vector3(4, 4, 4));
+    });
+
+    scene.addComponent<RenderComponent>(cuboPablo, [](RenderComponent& r){
+        r.meshName = "cube.mesh";
+        r.materialName = "Square/Pablo";
     });
 
     scene.addComponent<ParticleEmitterComponent>(ent1, [a](ParticleEmitterComponent& pe){
