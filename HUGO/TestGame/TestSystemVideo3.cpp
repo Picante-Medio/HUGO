@@ -65,7 +65,7 @@ TestSystemVideo3::init() {
         a.isPlaying = true;
         a.type = HUGO::AudioTypes::SOUND3D;
         a.audioName = "pedro";
-        a.volume =0.1f;
+        a.volume =0.5f;
         a.loop = true;
     });
     
@@ -96,7 +96,7 @@ TestSystemVideo3::init() {
         a.isPlaying = true;
         a.type = HUGO::AudioTypes::SOUND3D;
         a.audioName = "pablo";
-        a.volume =0.1f;
+        a.volume =0.5f;
         a.loop = true;
     });
     // -------------------------------------------------------------------------------------

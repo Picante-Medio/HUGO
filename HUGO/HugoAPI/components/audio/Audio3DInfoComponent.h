@@ -18,10 +18,10 @@ HCOMPONENT(Audio3DInfoComponent)
     DEFAULT_SERIALIZED_MEMBER(HUGO::Vector3, direction, HUGO::Vector3(0.0f, 0.0f, 1.0f)) // source direction (for cone)
 
     // doppler effect
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, dopplerFactor, 2.0f)
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, dopplerFactor, 1.0f)
 
     // rolloff
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, rolloff, 1.0f) // how volume decreases with distance
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, rolloff, 2.0f) // how volume decreases with distance
 
     // emission cone
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, coneInnerAngle, 360.0f) // inner cone angle in degrees

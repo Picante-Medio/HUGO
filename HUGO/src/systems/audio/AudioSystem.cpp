@@ -38,7 +38,7 @@ ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id, HUGO::AudioTyp
     if (type == HUGO::SOUND3D)
     {
         ma_sound_set_spatialization_enabled(info.ptr->get(), MA_TRUE);
-        ma_sound_set_attenuation_model(info.ptr->get(), ma_attenuation_model_inverse);
+        ma_sound_set_attenuation_model(info.ptr->get(), ma_attenuation_model_linear);
     }
     else
     {
@@ -115,7 +115,7 @@ ma_sound* AudioSystem::getSound(HUGO::AudioID id, HUGO::AudioTypes type)
     // reconfig using the type
     if (type == HUGO::SOUND3D) {
         ma_sound_set_spatialization_enabled(stolen.ptr->get(), MA_TRUE);
-        ma_sound_set_attenuation_model(stolen.ptr->get(), ma_attenuation_model_inverse);
+        ma_sound_set_attenuation_model(stolen.ptr->get(), ma_attenuation_model_linear);
     } else {
         ma_sound_set_spatialization_enabled(stolen.ptr->get(), MA_FALSE);
     }
@@ -137,6 +137,11 @@ void AudioSystem::acquireVoice(AudioComponent &c)
             scene.modifyComponent<AudioComponent>(c.entity, [this, c](AudioComponent& a){
                 a.activePtr = getSound(c.audioId, static_cast<HUGO::AudioTypes>(c.type));
             });
+        }
+        if (scene.hasComponent<Audio3DInfoComponent>(c.entity))
+        {
+            const Audio3DInfoComponent& info = scene.getComponentConst<Audio3DInfoComponent>(c.entity);
+            process3DChanges(c, info);
         }
     }
 }
@@ -279,7 +284,7 @@ void AudioSystem::updateListeners(const AudioListenerComponent& a, const Transfo
     const HUGO::Vector3& forward = tr.getRotation().forward();
     const HUGO::Vector3& up = tr.getRotation().up();
 
-    ma_engine_listener_set_position(engine.get(), 0, tr.getPosition().x, tr.getPosition().y, tr.getPosition().z);
+    ma_engine_listener_set_position(engine.get(), 0, tr.getWorldPosition().x, tr.getWorldPosition().y, tr.getWorldPosition().z);
 
     ma_engine_listener_set_direction(engine.get(), 0, forward.x, forward.y,forward.z);
 
@@ -317,6 +322,8 @@ void AudioSystem::processChanges(AudioComponent &c)
 
 void AudioSystem::process3DChanges(const AudioComponent& a, const Audio3DInfoComponent &c)
 {
+    if (!a.activePtr) return;
+
     set3DMinDistance(a.activePtr, c.minDistance);
     set3DMaxDistance(a.activePtr, c.maxDistance);
     setVelocity(a.activePtr, c.velocity); 
@@ -330,6 +337,12 @@ void AudioSystem::process3DChanges(const AudioComponent& a, const Audio3DInfoCom
 #pragma region UPDATES
 void AudioSystem::update(uint32_t)
 {
+    for (auto& pack : scene.query<AudioListenerComponent, TransformComponent>()){
+        const AudioListenerComponent& a = pack.getConst<AudioListenerComponent>();
+        const TransformComponent& tr = pack.getConst<TransformComponent>();
+
+        updateListeners(a, tr);
+    }
     //3d position
     for (auto& pack : scene.query<AudioComponent, Audio3DInfoComponent, TransformComponent>()){
         const AudioComponent& a = pack.getConst<AudioComponent>();
