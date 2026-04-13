@@ -39,8 +39,7 @@ void PhysicsTestSystem::init(){
     //scene.addComponent<TransformChangedTag>(e2);
 
     scene.addComponent<ColliderComponent>(e2, [](ColliderComponent& collider){
-        collider.info = HUGO::CylinderColliderInfo{HUGO::Vector3(.5f, 1, 1)};
-        collider.useGizmo = false;
+        collider.info = HUGO::CylinderColliderInfo{HUGO::Vector3(1.f, 2.f, 2.f)};
     });
 
     scene.addComponent<RigidBodyComponent>(e2, [](RigidBodyComponent& rb){
@@ -57,12 +56,16 @@ void PhysicsTestSystem::init(){
     });
     
     scene.addComponent<ColliderComponent>(e3, [](ColliderComponent& col){
-        col.info = HUGO::BoxColliderInfo{HUGO::Vector3(1.f, 1.f, 1.f)};
+        col.info = HUGO::BoxColliderInfo{HUGO::Vector3(0.5f, 0.5f, 0.5f)};
     });
 
     scene.addComponent<RigidBodyComponent>(e3, [](RigidBodyComponent& rb){
         rb.setMass(5.f);
         rb.setGravity(HUGO::Vector3(0, -3, 0));
+    });
+
+    scene.addComponent<RenderComponent>(e2, [](RenderComponent& render){
+        render.setMeshName("cube.mesh");
     });
 }
 
