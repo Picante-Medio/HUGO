@@ -40,6 +40,7 @@ void PhysicsTestSystem::init(){
 
     scene.addComponent<ColliderComponent>(e2, [](ColliderComponent& collider){
         collider.info = HUGO::CylinderColliderInfo{HUGO::Vector3(1.f, 2.f, 2.f)};
+        collider.setRotationOffset(HUGO::Quaternion(HUGO::Radian(HUGO::Degree(90)), HUGO::Vector3(0, 0, 1)));
     });
 
     scene.addComponent<RigidBodyComponent>(e2, [](RigidBodyComponent& rb){

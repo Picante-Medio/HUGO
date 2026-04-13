@@ -162,7 +162,7 @@ void PhysicsGizmoSystem::update(double){
 
         scene.modifyComponent<TransformComponent>(gizmoID, [&transform, &collider](TransformComponent& gizmoTr){
             gizmoTr.setPosition(transform.getPosition() + collider.getPositionOffset());
-            gizmoTr.setRotation(transform.getRotation() + collider.getRotationOffset());
+            gizmoTr.setRotation(transform.getRotation() * collider.getRotationOffset());
         });
     }
 
