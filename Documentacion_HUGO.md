@@ -514,6 +514,7 @@ Un **Rigidbody**, o un cuerpo rígido, es la forma que tiene **HUGO** y otros mu
 - Masa
 - Damping lineal y angular
 - Velocidad lineal y angular
+- Gravedad
 
 Al igual que el ``ColliderComponent`` y por los mismos motivos, sus atributos deben ser accedidos a través de sus getters y setters.
 
