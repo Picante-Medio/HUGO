@@ -1,8 +1,13 @@
 #include "TestSystemVideo2.h"
 
-#include "AudioComponent.h"
+#include "TransformComponent.h"
+#include "ParticleEmitterComponent.h"
 #include "ChangeSceneMessage.h"
+#include "AudioComponent.h"
+#include "Audio3DInfoComponent.h"
+#include "SliderComponent.h"
 #include "PanelComponent.h"
+#include "TextComponent.h"
 #include "ButtonComponent.h"
 
 #include <iostream>
@@ -16,14 +21,14 @@ TestSystemVideo2::init() {
 
     menuButton = scene.createEntity();
     scene.addComponent<PanelComponent>(menuButton, [](PanelComponent& panel){
-        panel.overlayName = "Menu/Mierdas6";
+        panel.overlayName = "Menu/Mierdas77";
         panel.containerName = panel.overlayName + "/Container";
         panel.material = "UI/HUGOPlayBoton";
         panel.metricsMode = HUGO::UIMetricsMode::GMM_RELATIVE;
-        panel.width = 0.28f;
-        panel.height = 0.18f;
-        panel.left = 0.4f;
-        panel.top = 0.5f;
+        panel.width = 0.2f;
+        panel.height = 0.1f;
+        panel.left = 0.1f;
+        panel.top = 0.1f;
         panel.isVisible = true;
         panel.zOrder = 540;
     });
@@ -45,7 +50,6 @@ TestSystemVideo2::onLoad() {}
 
 void
 TestSystemVideo2::update(double dt) {
-    std::cout << "Updating TestSystemVideo2... dt: " << dt << "ms\n";
 }
 
 void

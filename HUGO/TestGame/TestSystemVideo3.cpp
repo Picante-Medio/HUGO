@@ -55,7 +55,7 @@ TestSystemVideo3::init() {
     scene.addComponent<AudioComponent>(ent2, [](AudioComponent& a){
         a.isPlaying = true;
         a.type = HUGO::AudioTypes::MUSIC;
-        a.audioName = "lucky";
+        a.audioName = "pablo";
         a.volume =0.1f;
         a.loop = true;
     });

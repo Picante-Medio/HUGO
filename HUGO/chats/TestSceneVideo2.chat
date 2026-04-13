@@ -4,10 +4,13 @@ SYSTEM AudioSystem
 SYSTEM RenderSystem
 SYSTEM LightSystem
 SYSTEM CameraSystem
-SYSTEM TestSystemVideo2
+SYSTEM PhysicsGizmoSystem
+SYSTEM PhysicsTestSystem
 SYSTEM UISystem
 SYSTEM ConsoleSystem
+SYSTEM TweenSystem
 SYSTEM HierarchySystem
 SYSTEM ParticleSystem
 SYSTEM CameraMovementSystem
+SYSTEM TestSystemVideo2
 SYSTEM MessagesTestSystem
