@@ -36,7 +36,7 @@ namespace HUGO {
 
     public:
         Core();
-        ErrorOrVoid init();
+        ErrorOrVoid init(int argc, char* argv[]);
 
         void run();
     };

@@ -35,7 +35,14 @@ Core::Core(): input(std::make_shared<Input>()), sceneManager(input)
 }
 
 //Initialization of HUGO modules and loading of games dynamic lib
-ErrorOrVoid Core::init(){
+ErrorOrVoid Core::init(int argc, char* argv[]){
+    std::string gamePath = "TestGame";
+    std::string chatPath = "../chats";
+    std::string mainSceneName = "TestSceneVideo1";
+
+    if (argc > 1) gamePath = argv[1];
+    if (argc > 2) chatPath = argv[2];
+    if (argc > 3) mainSceneName = argv[3];
 
     //LuaBinder initialization
     initLua();
