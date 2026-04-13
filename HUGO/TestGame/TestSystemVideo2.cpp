@@ -51,15 +51,15 @@ TestSystemVideo2::init() {
             scene.sendMessage<ChangeSceneMessageVideo2>(ChangeSceneMessageVideo2{});
         };
     });
-    scene.addComponent<AudioComponent>(menuButton, [](AudioComponent& a){
-        a.isPlaying = true;
-        a.type = HUGO::AudioTypes::MUSIC;
-        a.audioName = "golden";
-        a.volume =0.1f;
-        a.pitch =1.5f;
-        a.loop = true;
-        a.startTime = 60.0f;
-    });
+    // scene.addComponent<AudioComponent>(menuButton, [](AudioComponent& a){
+    //     a.isPlaying = true;
+    //     a.type = HUGO::AudioTypes::MUSIC;
+    //     a.audioName = "golden";
+    //     a.volume =0.1f;
+    //     a.pitch =1.5f;
+    //     a.loop = true;
+    //     a.startTime = 60.0f;
+    // });
 
     //Sinbad
     sinbad = scene.createEntity();
