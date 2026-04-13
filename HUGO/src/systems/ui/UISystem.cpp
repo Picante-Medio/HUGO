@@ -338,11 +338,11 @@ void UISystem::syncSlider(const PanelComponent& p, SliderComponent& s)
         cache->element->setWidth(p.width * percent);
         cache->element->setHeight(p.height);
         
-        knobPos = (p.width - s.knobWidth) * percent;
-        knobPos = std::clamp(knobPos, 0.0f, p.width - s.knobWidth);
+        knobPos = p.width * percent - s.knobWidth * 0.5f;
+        knobPos = std::clamp(knobPos, s.knobLeft, (p.width + s.knobWidth));
         
         cache->extra->setLeft(knobPos);
-        cache->extra->setTop(-s.knobWidth/4.0f);
+        cache->extra->setTop(s.knobTop);
         cache->extra->setWidth(s.knobWidth);
         cache->extra->setHeight(s.knobHeight);
         break;
@@ -356,7 +356,7 @@ void UISystem::syncSlider(const PanelComponent& p, SliderComponent& s)
         knobPos = (p.height - s.knobHeight) * (1.0f - percent);
         knobPos = std::clamp(knobPos, 0.0f, p.height - s.knobHeight);
         
-        cache->extra->setLeft(-s.knobHeight/4.0f);
+        cache->extra->setLeft(-s.knobHeight/2.0f);
         cache->extra->setTop(knobPos);
         cache->extra->setWidth(s.knobWidth);
         cache->extra->setHeight(s.knobHeight);
@@ -366,7 +366,6 @@ void UISystem::syncSlider(const PanelComponent& p, SliderComponent& s)
     // apply materials or colors
     if(!s.trackMaterial.empty()) cache->element->setMaterialName(s.trackMaterial);
     if(!s.knobMaterial.empty()) cache->extra->setMaterialName(s.knobMaterial);
-
 }
 
 //====================================================
@@ -818,6 +817,14 @@ void UISystem::onAddSliderComponent(SliderComponent &s)
         return;
     
     cache->extra = knob;
+
+    // importante: quitar primero
+    cache->container->removeChild(track->getName());
+    cache->container->removeChild(knob->getName());
+
+    // volver a a en orden correcto
+    cache->container->addChild(track);
+    cache->container->addChild(knob); // SIEMPRE el último → arriba
 
     PanelComponent& p = scene.getComponent<PanelComponent>(s.entity);
     syncSlider(p, s);

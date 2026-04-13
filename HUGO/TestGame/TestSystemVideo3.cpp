@@ -145,7 +145,7 @@ TestSystemVideo3::init() {
         s.knobMaterial = "UI/KnobPressed";
         s.trackMaterial = "UI/Track";
         s.knobWidth = 0.05f;
-        s.knobHeight = 0.05f;
+        s.knobLeft = -0.025f;
         s.onChangeCallback = [this](HUGO::Float value){
             scene.modifyComponent<AudioComponent>(this->cuboPedro, [value](AudioComponent& a){
                 a.volume = std::clamp(value, 0.0f, 1.0f);

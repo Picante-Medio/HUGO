@@ -98,6 +98,8 @@ TestSystemVideo1::init() {
         s.knobMaterial = "UI/TrackHUGO";
         s.knobWidth = 0.1f;
         s.knobHeight = 0.15f;
+        s.knobTop = -0.025f;
+        s.knobLeft = -0.025f;
         s.onChangeCallback = [this](HUGO::Float value){
             scene.modifyComponent<AudioComponent>(this->audio, [value](AudioComponent& a){
                 a.volume = value;
