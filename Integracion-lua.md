@@ -74,3 +74,6 @@ void AudioSystem::playAudioLUA(int id, int type) {
 
 # ¿Dónde se usa lua?
 Lua puede usarse para hacer comportamiento para los juegos, creando entidades y componentes o llamando a funciones de audio, animaciones, etc. aunque, realmente, el uso principal de lua es en *debug de los juegos*, gracias a la consola de comandos que permite interpretar lua en tiempo de ejecución.
+
+# Consola de comandos
+
