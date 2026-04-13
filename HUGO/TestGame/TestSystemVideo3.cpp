@@ -7,6 +7,7 @@
 #include "SliderComponent.h"
 #include "PanelComponent.h"
 #include "TextComponent.h"
+#include "ButtonComponent.h"
 
 struct Aux {
     HUGO::String pname = "Particle/Smoke";
@@ -17,8 +18,8 @@ struct Aux {
 
 void
 TestSystemVideo3::init() {
-    scene.subscribe<ChangeSceneMessage>([this](std::shared_ptr<HUGO::Message> msg) {
-        std::shared_ptr<ChangeSceneMessage> m = std::static_pointer_cast<ChangeSceneMessage>(msg);
+    scene.subscribe<ChangeSceneMessageVideo3>([this](std::shared_ptr<HUGO::Message> msg) {
+        std::shared_ptr<ChangeSceneMessageVideo3> m = std::static_pointer_cast<ChangeSceneMessageVideo3>(msg);
         scene.changeScene(m->sceneName);
     });
 
@@ -109,7 +110,28 @@ TestSystemVideo3::init() {
         text.text = "Volume";
     });
 
+    EntityID menuButton = scene.createEntity();
+    scene.addComponent<PanelComponent>(menuButton, [](PanelComponent& panel){
+        panel.overlayName = "Menu/Mierdas10";
+        panel.containerName = panel.overlayName + "/Container";
+        panel.material = "UI/HUGOPlayBoton";
+        panel.metricsMode = HUGO::UIMetricsMode::GMM_RELATIVE;
+        panel.width = 0.2f;
+        panel.height = 0.1f;
+        panel.left = 0.7f;
+        panel.top = 0.1f;
+        panel.isVisible = true;
+        panel.zOrder = 540;
+    });
 
+    scene.addComponent<ButtonComponent>(menuButton, [this](ButtonComponent& b){
+        b.normalMaterial = "UI/HUGOPlayBoton";
+        b.hoverMaterial = "UI/HUGOPlayBotonHover";
+        b.pressedMaterial = "UI/HUGOPlayBotonHover";
+        b.onClickCallback = [this](){
+            scene.sendMessage<ChangeSceneMessageVideo3>(ChangeSceneMessageVideo3{});
+        };
+    });
 }
 
 

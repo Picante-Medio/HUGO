@@ -5,7 +5,6 @@
 
 HSYSTEM(TestSystemVideo2)
     //test
-    EntityID menuText;
     EntityID menuButton;
 public:
     void init() override;

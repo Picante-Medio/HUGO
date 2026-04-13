@@ -7,3 +7,11 @@ struct ChangeSceneMessage : HUGO::Message {
 struct ChangeSceneMessageVideo1 : HUGO::Message {
     HUGO::String sceneName = "TestSceneVideo2";
 };
+
+struct ChangeSceneMessageVideo2 : HUGO::Message {
+    HUGO::String sceneName = "TestSceneVideo3";
+};
+
+struct ChangeSceneMessageVideo3 : HUGO::Message {
+    HUGO::String sceneName = "TestSceneVideo1";
+};

@@ -72,7 +72,7 @@ material debug/Smoke
             depth_write off   
             diffuse vertexcolour
             texture_unit {
-                texture smoke.png
+                texture hugu.png
                 tex_address_mode clamp
             }
         }
