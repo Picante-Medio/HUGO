@@ -107,7 +107,7 @@ TestSystemVideo3::init() {
     });
 
     scene.addComponent<SliderComponent>(audioSlider, [this](SliderComponent& s){
-        s.trackElementName = "Menu/Mierdas4";
+        s.trackElementName = "Menu/Mierdas34";
         s.knobElementName = s.trackElementName + "/Element";
         s.trackMaterial = "UI/Background";
         s.knobMaterial = "UI/KnobPressed";
@@ -118,7 +118,6 @@ TestSystemVideo3::init() {
             scene.modifyComponent<AudioComponent>(this->ent2, [value](AudioComponent& a){
                 a.volume = std::clamp(value, 0.0f, 1.0f);
             });
-            std::cout << "Volume: " << value << "\n";
         };
     });
 

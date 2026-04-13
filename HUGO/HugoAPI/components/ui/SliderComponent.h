@@ -24,8 +24,8 @@ HCOMPONENT(SliderComponent)
     // relative sizes
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, knobWidth, 0.05f);
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, knobHeight, 0.05f);
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, knobLeft, 0.05f);
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, knobTop, 0.05f);
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, knobLeft, 0.0f);
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, knobTop, 0.0f);
 
     HUGO::Bool isDragging = false;
 
