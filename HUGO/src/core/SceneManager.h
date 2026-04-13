@@ -5,6 +5,11 @@
 #include "ChatParser.h"
 
 #include "HugoError.h"
+#include "EcsTypes.h"
+
+#ifdef __linux__
+#include <stdint.h>
+#endif
 
 class InternalScene;
 class IPhysicsModule;
@@ -66,6 +71,8 @@ namespace HUGO {
         void updateCurrentScene(uint32_t dt);
         void fixedUpdateCurrentScene(uint32_t dt);
         void dispatchMessagesCurrentScene();
+
+        ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName, std::shared_ptr<InternalScene> scene);
     };
 
 }

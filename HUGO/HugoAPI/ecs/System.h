@@ -1,6 +1,11 @@
 #pragma once
 
 #include <memory>
+
+#ifdef __linux__
+#include <stdint.h>
+#endif
+
 namespace HUGO {
 
 	class IScene;

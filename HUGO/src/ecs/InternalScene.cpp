@@ -262,3 +262,11 @@ void
 InternalScene::changeAndDestroyPreviousScene(const HUGO::String& sceneName) {
     sceneManager.setCurrentSceneAndDestroyPrevious(sceneName);
 }
+
+ErrorOrType<EntityID> InternalScene::instantiatePrefab(const HUGO::String& prefabName){
+	ErrorOrType<EntityID> prefabID = sceneManager.instantiatePrefab(prefabName, shared_from_this());
+
+	if(prefabID.isError()) log(std::make_shared<StringError>("Error instantiating prefab " + prefabName + ": "+ prefabID.getError().description()));
+
+	return prefabID;
+}

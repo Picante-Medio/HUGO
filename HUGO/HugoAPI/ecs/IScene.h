@@ -199,6 +199,8 @@ public:
      */
     virtual void changeScene(const HUGO::String& sceneName) = 0;
 	virtual void changeAndDestroyPreviousScene(const HUGO::String& sceneName) = 0;
+
+	virtual ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName) =0;
 };
 
 }

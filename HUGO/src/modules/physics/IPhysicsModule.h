@@ -4,6 +4,10 @@
 #include <unordered_map>
 #include <string>
 
+#ifdef __linux__
+#include <stdint.h>
+#endif
+
 class InternalScene;
 class IPhysicsSimulation;
 

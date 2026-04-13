@@ -166,3 +166,27 @@ void SceneManager::fixedUpdateCurrentScene(uint32_t dt){
 void SceneManager::dispatchMessagesCurrentScene() {
     m_currentScene.lock()->dispatchMessages();
 }
+
+ErrorOrType<EntityID> SceneManager::instantiatePrefab(const HUGO::String& prefabName, std::shared_ptr<InternalScene> scene){
+    ErrorOrType<EntityData> prefabData = m_chatParser.getPrefabData(prefabName);
+    
+    if(prefabData.isError()) return ErrorOrType<EntityID>(prefabData.getError().description());
+
+    EntityID currEntity = scene->createEntity();
+
+        for(auto componentData : prefabData.getValue()){
+            ErrorOrVoid compResult = HUGO::ComponentFactory::makeComponent(scene, currEntity, 
+                componentData.componentName, componentData.parameters);
+
+            if (compResult.isError()) {
+                compResult = HUGO::GameLibraryLoader::instance().GenerateComponent(scene, currEntity, 
+                    componentData.componentName, componentData.parameters);
+                if (compResult.isError()) {
+                    return ErrorOrType<EntityID>(compResult.getError());
+                }
+            }
+
+        }
+    
+    return ErrorOrType<EntityID>(currEntity);
+}
