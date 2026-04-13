@@ -17,16 +17,13 @@ public:
 
     void createGizmo(ColliderComponent& coll);
     void destroyGizmo(ColliderComponent& coll);
+    void onUpdateGizmo(ColliderComponent& coll);
 private:
-#ifndef NDEBUG
-
     /*
     First: Entity with collider
     Second: Gizmo entity associated
     */
     std::unordered_map<EntityID, EntityID> m_gizmoEntities;
-
-#endif
 
 END_HSYSTEM()
 

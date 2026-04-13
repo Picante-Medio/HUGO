@@ -6,9 +6,10 @@
 #include "HugoPhysics.h"
 
 void PhysicsGizmoSystem::init(){
-    //scene.onAddComponent<LightComponent>().connect(this, &LightSystem::registerLightEntity);
     scene.onAddComponent<ColliderComponent>().connect(this, &PhysicsGizmoSystem::createGizmo);
     scene.onRemoveComponent<ColliderComponent>().connect(this, &PhysicsGizmoSystem::destroyGizmo);
+
+    scene.onUpdateComponent<ColliderComponent>().connect(this, &PhysicsGizmoSystem::onUpdateGizmo);
 }
 
 void PhysicsGizmoSystem::onLoad(){
@@ -119,6 +120,9 @@ ErrorOrVoid createGizmoMesh<HUGO::CapsuleColliderInfo>(HUGO::IScene& scene, Enti
 
 //Creates gizmo with transform and shape mesh
 void PhysicsGizmoSystem::createGizmo(ColliderComponent& collider){
+
+    if(!collider.useGizmo) return;
+
     EntityID newID = scene.createEntity();
 
     scene.addComponent<TransformComponent>(newID);
@@ -136,8 +140,24 @@ void PhysicsGizmoSystem::createGizmo(ColliderComponent& collider){
 }
 
 void PhysicsGizmoSystem::destroyGizmo(ColliderComponent& coll){
+
+    if(m_gizmoEntities.find(coll.entity) == m_gizmoEntities.end()) return;
+
     scene.removeEntity(m_gizmoEntities[coll.entity]);
     m_gizmoEntities.erase(coll.entity);
+}
+
+void PhysicsGizmoSystem::onUpdateGizmo(ColliderComponent& coll){
+
+    bool gizmoRegistered = m_gizmoEntities.find(coll.entity) != m_gizmoEntities.end();
+
+    if(coll.useGizmo && !gizmoRegistered){
+        createGizmo(coll);
+    }
+    
+    if(!coll.useGizmo && gizmoRegistered){
+        destroyGizmo(coll);
+    }
 }
 
 #pragma endregion
@@ -148,16 +168,17 @@ void PhysicsGizmoSystem::update(double){
     for(auto pack : scene.query<ColliderComponent, TransformComponent>()) {
         const ColliderComponent& collider = pack.getConst<ColliderComponent>();
         const TransformComponent& transform = pack.getConst<TransformComponent>();
-
+        
         //If we dont want gizmos, we skip all of this
         if(!collider.useGizmo) continue;
+
 
         //Update transform position and rotation based on the colliders transform
         EntityID gizmoID= m_gizmoEntities[transform.entity];
 
-        scene.modifyComponent<TransformComponent>(gizmoID, [&transform](TransformComponent& gizmoTr){
-            gizmoTr.setPosition(transform.getPosition());
-            gizmoTr.setRotation(transform.getRotation());
+        scene.modifyComponent<TransformComponent>(gizmoID, [&transform, &collider](TransformComponent& gizmoTr){
+            gizmoTr.setPosition(transform.getPosition() + collider.getPositionOffset());
+            gizmoTr.setRotation(transform.getRotation() + collider.getRotationOffset());
         });
     }
 
