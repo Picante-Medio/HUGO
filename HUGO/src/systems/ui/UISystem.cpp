@@ -329,6 +329,7 @@ void UISystem::syncSlider(const PanelComponent& p, SliderComponent& s)
     HUGO::Float percent = (s.currentValue - s.minValue) / (s.maxValue - s.minValue);
     percent = std::clamp(percent, 0.0f, 1.0f);
     HUGO::Float knobPos;
+    HUGO::Float centerPos;
     // sync track and knob
     switch (s.orientation)
     {
@@ -338,10 +339,17 @@ void UISystem::syncSlider(const PanelComponent& p, SliderComponent& s)
         cache->element->setWidth(p.width * percent);
         cache->element->setHeight(p.height);
         
-        knobPos = p.width * percent - s.knobWidth * 0.5f;
-        knobPos = std::clamp(knobPos, s.knobLeft, (p.width + s.knobWidth));
-        
-        cache->extra->setLeft(knobPos);
+        // get the center position
+        centerPos = p.width * percent;
+
+        // 2. clamp del centro
+        centerPos = std::clamp(centerPos, 0.0f, p.width);
+
+        // 3. convertir a left (borde)
+        knobPos = centerPos - s.knobWidth * 0.25f;
+
+        // 4. aplicar offset visual
+        cache->extra->setLeft(knobPos + s.knobLeft);
         cache->extra->setTop(s.knobTop);
         cache->extra->setWidth(s.knobWidth);
         cache->extra->setHeight(s.knobHeight);
@@ -818,13 +826,11 @@ void UISystem::onAddSliderComponent(SliderComponent &s)
     
     cache->extra = knob;
 
-    // importante: quitar primero
     cache->container->removeChild(track->getName());
     cache->container->removeChild(knob->getName());
 
-    // volver a a en orden correcto
     cache->container->addChild(track);
-    cache->container->addChild(knob); // SIEMPRE el último → arriba
+    cache->container->addChild(knob);
 
     PanelComponent& p = scene.getComponent<PanelComponent>(s.entity);
     syncSlider(p, s);

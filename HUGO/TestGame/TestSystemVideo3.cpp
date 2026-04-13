@@ -145,7 +145,7 @@ TestSystemVideo3::init() {
         s.knobMaterial = "UI/KnobPressed";
         s.trackMaterial = "UI/Track";
         s.knobWidth = 0.05f;
-        s.knobLeft = -0.025f;
+        s.knobHeight =0.05f;
         s.onChangeCallback = [this](HUGO::Float value){
             scene.modifyComponent<AudioComponent>(this->cuboPedro, [value](AudioComponent& a){
                 a.volume = std::clamp(value, 0.0f, 1.0f);
@@ -157,12 +157,19 @@ TestSystemVideo3::init() {
         };
     });
 
+    HUGO::String aux = "Menu/Mierdas35";
     EntityID volumeText = scene.createEntity();
-    scene.addComponent<TextComponent>(volumeText, [](TextComponent& text){
+    scene.addComponent<PanelComponent>(volumeText, [&aux](PanelComponent& panel){
+        panel.overlayName = aux;
+        panel.containerName = panel.overlayName + "/Container";
+        aux = panel.containerName;
+    });
+    scene.addComponent<TextComponent>(volumeText, [aux](TextComponent& text){
+        text.textAreaName = aux +"/Text";
         text.left = 0.1f;
         text.top = 0.06f;
-        text.colourTop = HUGO::Vector4(1.0f, 0.0f, 1.0f, 1.f);
-        text.colourBottom = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.f);
+        text.colourTop = HUGO::Vector4(1.0f, 0.0f, 1.0f, 1.0f);
+        text.colourBottom = HUGO::Vector4(0.0f, 1.0f, 1.0f, 1.0f);
         text.characterHeight = 0.09f;
         text.spaceWidth = 0.01f;
         text.text = "Volume";

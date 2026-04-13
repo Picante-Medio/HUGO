@@ -106,7 +106,7 @@ void ParticleSystem::processPosition(const TransformComponent &tr)
     if (!instance.node || !instance.ps) return;
 
     // transform
-    instance.node->setPosition(tr.getPosition().x, tr.getPosition().y, tr.getPosition().z);
+    instance.node->setPosition(tr.getWorldPosition().x, tr.getWorldPosition().y, tr.getWorldPosition().z);
 }
 
 void ParticleSystem::processChanges(const ParticleEmitterComponent& pe, const TransformComponent& tr) {

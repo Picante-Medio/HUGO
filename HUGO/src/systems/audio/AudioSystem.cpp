@@ -330,6 +330,13 @@ void AudioSystem::process3DChanges(const AudioComponent& a, const Audio3DInfoCom
 #pragma region UPDATES
 void AudioSystem::update(uint32_t)
 {
+    //3d position
+    for (auto& pack : scene.query<AudioComponent, Audio3DInfoComponent, TransformComponent>()){
+        const AudioComponent& a = pack.getConst<AudioComponent>();
+        const TransformComponent& tr = pack.getConst<TransformComponent>();
+        set3DPosition(a.activePtr, tr.getWorldPosition());
+    }
+
     // cleanup finished voices
     for (auto& pack : scene.query<AudioComponent>())
     {
@@ -364,7 +371,6 @@ void AudioSystem::init(){
     scene.onAddComponent<AudioComponent>().connect(this, &AudioSystem::onAddAudioComponent);
     scene.onAddComponent<Audio3DInfoComponent>().connect(this, &AudioSystem::onAdd3DAudioComponent);
 
-    scene.onUpdateComponent<TransformComponent>().connect(this, &AudioSystem::onAn3DAudioMove);
     scene.onUpdateComponent<AudioComponent>().connect(this, &AudioSystem::onUpdateAudioComponent);
     scene.onUpdateComponent<Audio3DInfoComponent>().connect(this, &AudioSystem::onUpdate3DAudioComponent);
     scene.onUpdateComponent<AudioListenerComponent>().connect(this, &AudioSystem::onUpdateAudioListener);
@@ -377,6 +383,10 @@ void AudioSystem::onAddAudioComponent(AudioComponent &c)
 {
     acquireVoice(c);
     processChanges(c);
+    //if it is a 3d sound without 3d sound component, add one
+    if (c.type == HUGO::SOUND3D && !scene.hasComponent<Audio3DInfoComponent>(c.entity)){
+        scene.addComponent<Audio3DInfoComponent>(c.entity);
+    }
 }
 #pragma endregion
 
@@ -416,13 +426,4 @@ void AudioSystem::onAdd3DAudioComponent(Audio3DInfoComponent &c)
     });
     process3DChanges(a, c);
     set3DPosition(a.activePtr, tr.getPosition());
-}
-
-void AudioSystem::onAn3DAudioMove(TransformComponent &tr)
-{
-    // update every 3d audios position 
-    if (scene.hasComponent<AudioComponent>(tr.entity) && scene.hasComponent<Audio3DInfoComponent>(tr.entity)){
-        const AudioComponent& a = scene.getComponentConst<AudioComponent>(tr.entity);
-        set3DPosition(a.activePtr, tr.getPosition());
-    }
 }

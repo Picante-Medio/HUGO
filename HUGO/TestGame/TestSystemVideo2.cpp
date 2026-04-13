@@ -51,6 +51,15 @@ TestSystemVideo2::init() {
             scene.sendMessage<ChangeSceneMessageVideo2>(ChangeSceneMessageVideo2{});
         };
     });
+    scene.addComponent<AudioComponent>(menuButton, [](AudioComponent& a){
+        a.isPlaying = true;
+        a.type = HUGO::AudioTypes::MUSIC;
+        a.audioName = "golden";
+        a.volume =0.1f;
+        a.pitch =1.5f;
+        a.loop = true;
+        a.startTime = 60.0f;
+    });
 
     //Sinbad
     sinbad = scene.createEntity();
@@ -76,7 +85,13 @@ TestSystemVideo2::init() {
         rb.setMass(5.f);
         rb.setBodyType(HUGO::BodyType::DYNAMIC);
     });
-
+    scene.addComponent<AudioComponent>(sinbad, [](AudioComponent& a){
+        a.isPlaying = false;
+        a.type = HUGO::AudioTypes::SOUND2D;
+        a.audioName = "scream";
+        a.startTime = 0.1f;
+        a.volume =1.5f;
+    });
 
     //Suelo
     suelo = scene.createEntity();
@@ -158,7 +173,26 @@ TestSystemVideo2::init() {
         lg.setAttenuation(HUGO::Vector4(1.0f, 0.0f, 0.001f, 0.0001f));
          lg.setDiffuse(HUGO::Vector4(0.8f, 0.8f, 0.8f, 1.0f));
          lg.setSpecular(HUGO::Vector4(0.3f, 0.3f, 0.3f, 1.0f));
-     });
+    });
+
+    HUGO::String aux = "Menu/Mierdas25";
+    EntityID aText = scene.createEntity();
+    scene.addComponent<PanelComponent>(aText, [&aux](PanelComponent& panel){
+        panel.overlayName = aux;
+        panel.containerName = panel.overlayName + "/Container";
+        aux = panel.containerName;
+    });
+    scene.addComponent<TextComponent>(aText, [aux](TextComponent& text){
+        text.textAreaName = aux +"/Text";
+        text.left = 0.35f;
+        text.top = 0.06f;
+        text.colourTop = HUGO::Vector4(0.0f, 0.5f, 0.63f, 1.0f);
+        text.colourBottom = HUGO::Vector4(0.0f, 1.0f, 1.0f, 1.0f);
+        text.characterHeight = 0.035f;
+        text.textFont = "Bitcount";
+        text.spaceWidth = 0.01f;
+        text.text = "Pulsa P, hay sorpresa";
+    });
 }
 
 void TestSystemVideo2::createCube(EntityID cube){
@@ -215,6 +249,12 @@ TestSystemVideo2::update(uint32_t dt) {
         {
             anim.setEnabled("RunBase", true);
             anim.setEnabled("RunTop", true);
+        }
+    });
+
+    scene.modifyComponent<AudioComponent>(sinbad, [input](AudioComponent& a) {
+        if (input->wasKeyJustPressed(HUGO::KeyCode::P)){
+            a.isPlaying = true;
         }
     });
 }

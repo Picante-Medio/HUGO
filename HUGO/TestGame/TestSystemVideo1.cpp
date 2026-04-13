@@ -22,7 +22,7 @@ TestSystemVideo1::init() {
         a.isPlaying = true;
         a.type = HUGO::AudioTypes::MUSIC;
         a.audioName = "funkytown";
-        a.volume = 0.1f;
+        a.volume = 0.0f;
     });
 
     menuFondo = scene.createEntity();
