@@ -116,24 +116,27 @@ void ConsoleSystem::receiveInput(const HUGO::String& inputText){
     }
 }
 
+void ConsoleSystem::updateInputField(HUGO::String nText){
+
+    scene.modifyComponent<InputFieldComponent>(consoleInput, [nText](InputFieldComponent& i){
+        i.fullText = nText;
+    });
+        
+    scene.modifyComponent<TextComponent>(consoleInput, [nText](TextComponent& t){
+        t.text = nText;
+    });
+}
+
 void ConsoleSystem::handleKeyInput(){
 
     HUGO::String result = "";
     if(active && input->wasConsoleKeyJustPressed(HUGO::KeyCode::UP_ARROW)){
         result = getNextHistoric();
+        updateInputField(result);
     }
     if(active && input->wasConsoleKeyJustPressed(HUGO::KeyCode::DOWN_ARROW)){
         result = getPreviousHistoric();
-    }
-
-    if (!result.empty()){
-        scene.modifyComponent<InputFieldComponent>(consoleInput, [result](InputFieldComponent& i){
-            i.fullText = result;
-        });
-        
-        scene.modifyComponent<TextComponent>(consoleInput, [result](TextComponent& t){
-            t.text = result;
-        });
+        updateInputField(result);
     }
 
     if((input->isConsoleKeyPressed(HUGO::KeyCode::LCTRL) && input->wasConsoleKeyJustPressed(HUGO::KeyCode::T)) ||

@@ -49,6 +49,7 @@ static inline std::queue<HUGO::String> luaOutput = std::queue<HUGO::String>();
 
     void receiveInput(const HUGO::String& inputText);
     void handleKeyInput();
+    void updateInputField(HUGO::String nText);
 
     template<typename T>
     void handleReturn(ErrorOrType<T>& returnedInfo){
