@@ -70,12 +70,112 @@ material UI/Background
             scene_blend alpha_blend
 
             texture_unit{
+                texture fondo.png
+                colour_op replace
+            }
+        }
+    }
+}
+material UI/HUGOwhite
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture titulo.png
+                colour_op replace
+            }
+        }
+    }
+}
+
+material UI/HUGOPlayBotonHover
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture botonhover.png
+                colour_op replace
+            }
+        }
+    }
+}
+
+material UI/HUGOPlayBoton
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture botoninicio.png
+                colour_op replace
+            }
+        }
+    }
+}
+
+material UI/SliderBackground
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture sliderfondo.png
+                colour_op replace
+            }
+        }
+    }
+}
+
+material UI/BackgroundWhite
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
                 texture white.png
                 colour_op replace
             }
         }
     }
 }
+
 material UI/Track
 {
     technique
@@ -90,7 +190,7 @@ material UI/Track
 
             texture_unit
             {
-                texture blue.png
+                texture white.png
                 colour_op replace
             }
 

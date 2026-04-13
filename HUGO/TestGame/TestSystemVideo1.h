@@ -5,6 +5,7 @@
 
 HSYSTEM(TestSystemVideo1)
     //test
+    EntityID menuFondo;
     EntityID menuText;
     EntityID menuButton;
     EntityID audioSlider;
