@@ -267,7 +267,6 @@ namespace HUGO {
 		return !operator==(other);
 	}
 
-
     Quaternion operator*(const Quaternion& a, const Quaternion& b)
 	{
 		return Quaternion(
@@ -277,7 +276,7 @@ namespace HUGO {
 			a.w*b.z + a.x*b.y - a.y*b.x + a.z*b.w
 		);
 	}
-	
+
 	Vector3 operator*(const Quaternion &q, const Vector3 &v)
     {
        HUGO::Vector3 qv(q.x, q.y, q.z);

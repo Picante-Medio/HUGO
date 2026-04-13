@@ -455,7 +455,11 @@ void BulletSimulation::checkColliderFlags(ColliderComponent& hgCol)
             obj.bulletRB->setFriction(hgCol.friction);
         }
         if(hgCol.flags & ColliderComponent::TRANSFORM_OFFSET_UPDATED){
-            // We have to change the way the things are done to implement this
+            btCollisionObject* btObj = getCollisionObject(hgCol.objectID).bulletRB;
+            btTransform nTransform = btTransform();
+            nTransform.setRotation(btObj->getWorldTransform().getRotation() * BulletUtils::quaternionToBullet(hgCol.getRotationOffset()));
+            nTransform.setOrigin(btObj->getWorldTransform().getOrigin() + BulletUtils::vector3ToBullet(hgCol.getPositionOffset()));
+            btObj->setWorldTransform(nTransform);
         }
         if(hgCol.flags & ColliderComponent::ACTIVE_UPDATED){
             if(hgCol.active)

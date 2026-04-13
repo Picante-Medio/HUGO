@@ -40,6 +40,7 @@ void PhysicsTestSystem::init(){
 
     scene.addComponent<ColliderComponent>(e2, [](ColliderComponent& collider){
         collider.info = HUGO::CylinderColliderInfo{HUGO::Vector3(.5f, 1, 1)};
+        collider.useGizmo = false;
     });
 
     scene.addComponent<RigidBodyComponent>(e2, [](RigidBodyComponent& rb){
