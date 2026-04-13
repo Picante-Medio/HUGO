@@ -2,6 +2,7 @@ extends Control
 
 const ADDONS_ZIP_PATH := "res://addons.zip"
 const REQUIRED_FOLDERS := ["Resources", "Components", "Systems"]
+const ENGINE_PATH := ""
 
 @onready var project_name_line_edit: LineEdit = $PanelContainer/MarginContainer/VBoxContainer/ProjectNameLineEdit
 @onready var location_line_edit: LineEdit = $PanelContainer/MarginContainer/VBoxContainer/LocationRow/LocationLineEdit
@@ -73,7 +74,7 @@ func _create_project(project_name: String, project_dir: String) -> bool:
 			return false
 
 	_print_status("Escribiendo project.godot...")
-	if not _write_project_file(project_name, project_dir.path_join("project.godot")):
+	if not _write_project_file(project_name, project_dir):
 		return false
 
 	_print_status("Descomprimiendo addons.zip en la raiz...")
@@ -82,15 +83,41 @@ func _create_project(project_name: String, project_dir: String) -> bool:
 
 	return true
 
-func _write_project_file(project_name: String, file_path: String) -> bool:
-	var file := FileAccess.open(file_path, FileAccess.WRITE)
+func _write_project_file(project_name: String, file_dir: String) -> bool:
+	var project_godot := file_dir.path_join("project.godot")
+	var file := FileAccess.open(project_godot, FileAccess.WRITE)
 	if file == null:
-		_print_error("No se pudo crear project.godot en %s" % file_path)
+		_print_error("No se pudo crear project.godot en %s" % project_godot)
 		return false
 
 	file.store_string(_build_project_config(project_name))
 	file.close()
+	
+	var launch_config := file_dir.path_join("launch.config")
+	var config_file := FileAccess.open(launch_config, FileAccess.WRITE)
+	if config_file == null:
+		_print_error("No se pudo crear launch.config en %s" % launch_config)
+		return false
+		
+	var folder = OS.get_executable_path().get_base_dir()
+	config_file.store_line(folder.path_join("/bin/HUGO.exe"))
+	config_file.store_line(file_dir)
+	config_file.store_line(file_dir.path_join("Chats"))
+	config_file.store_line("main_scene.tscn")
+	
+	config_file.close()
+	
+	compile_executable(file_dir)
 	return true
+
+func compile_executable(output_dir_path:String) -> int:
+	var absolute_file_path = ProjectSettings.globalize_path("res://launcher.c")
+	var salida = []
+
+	var codigo = OS.execute("gcc", [absolute_file_path, "-o", output_dir_path.path_join("play.exe")], salida, true)
+
+	print("Salida:", salida)
+	return codigo
 
 func _extract_addons_zip(project_dir: String) -> bool:
 	var zip := ZIPReader.new()
@@ -146,6 +173,11 @@ config_version=5
 config/name=\"%s\"
 config/features=PackedStringArray(\"4.6\", \"GL Compatibility\")
 config/icon=\"res://icon.svg\"
+config/hugo/exe_path=\"res://game.exe\"
+
+[editor_plugins]
+
+enabled=PackedStringArray(\"res://addons/HugosChatPlugin/plugin.cfg\")
 
 [rendering]
 
