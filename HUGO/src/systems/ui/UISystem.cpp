@@ -746,12 +746,12 @@ void UISystem::init()
 
 void UISystem::onLoad() {}
 
-void UISystem::update(double)
+void UISystem::update(uint32_t)
 {
     processInput();
 }
 
-void UISystem::fixedUpdate(double) {}
+void UISystem::fixedUpdate(uint32_t) {}
 
 void UISystem::onAddPanelComponent(PanelComponent &p)
 {

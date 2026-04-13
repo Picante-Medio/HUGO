@@ -37,10 +37,10 @@ public:
     inline void addSystem(std::shared_ptr<HUGO::System> system) { systems.push_back(system); }
 
     // Logic update
-    void update(double dt);
+    void update(uint32_t dt);
 
     // Physics update
-    void fixedUpdate(double dt);
+    void fixedUpdate(uint32_t dt);
 
     // Entity handling
     EntityID createEntity() override;

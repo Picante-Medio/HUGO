@@ -23,7 +23,7 @@ public:
     virtual void pauseSceneSimulation(std::string sceneName) = 0;
 
     // sync info and step the simulation of active scenes
-    virtual void performSimulations(double dt) = 0;
+    virtual void performSimulations(uint32_t dt) = 0;
 
     // physics visual debugger
     virtual void debugDraw() = 0;

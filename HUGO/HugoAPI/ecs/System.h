@@ -21,8 +21,8 @@ namespace HUGO {
 		//Called every time the scene is loaded
 		virtual void onLoad() = 0;
 
-		virtual void fixedUpdate(double dt) = 0;
-		virtual void update(double dt) = 0;
+		virtual void fixedUpdate(uint32_t dt) = 0;
+		virtual void update(uint32_t dt) = 0;
 	};
 
 }

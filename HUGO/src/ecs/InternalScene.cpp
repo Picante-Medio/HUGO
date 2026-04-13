@@ -46,13 +46,13 @@ void InternalScene::init(){
 }
 
 void 
-InternalScene::update(double dt) {
+InternalScene::update(uint32_t dt) {
 	for(std::shared_ptr<HUGO::System> system : systems) 
 		system->update(dt);
 }
 
 void 
-InternalScene::fixedUpdate(double dt) {
+InternalScene::fixedUpdate(uint32_t dt) {
 	for(std::shared_ptr<HUGO::System> system : systems) 
 		system->fixedUpdate(dt);
 }

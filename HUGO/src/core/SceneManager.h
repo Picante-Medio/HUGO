@@ -63,8 +63,8 @@ namespace HUGO {
         ErrorOrVoid setMainScene();
 
         //---Updates and fixedUpdates of current Scene
-        void updateCurrentScene(double dt);
-        void fixedUpdateCurrentScene(double dt);
+        void updateCurrentScene(uint32_t dt);
+        void fixedUpdateCurrentScene(uint32_t dt);
         void dispatchMessagesCurrentScene();
     };
 

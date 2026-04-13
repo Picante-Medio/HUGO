@@ -18,12 +18,12 @@ EventTestSystem::onLoad() {
 }
 
 void 
-EventTestSystem::fixedUpdate(double dt) {
+EventTestSystem::fixedUpdate(uint32_t) {
 
 }
 
 void 
-EventTestSystem::update(double dt) {
+EventTestSystem::update(uint32_t dt) {
 
     timer += dt;
 

@@ -114,7 +114,7 @@ TestSystemVideo1::onLoad() {
 
 
 void
-TestSystemVideo1::update(double dt) {
+TestSystemVideo1::update(uint32_t) {
     if(scene.getInput()->wasKeyJustPressed(HUGO::KeyCode::THREE)){
         std::cout << "Cambiando escena...\n";
         ChangeSceneMessage c;
@@ -124,4 +124,4 @@ TestSystemVideo1::update(double dt) {
 }
 
 void
-TestSystemVideo1::fixedUpdate(double) {}
+TestSystemVideo1::fixedUpdate(uint32_t) {}

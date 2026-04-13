@@ -13,7 +13,7 @@ void CameraSystem::init(){
     scene.onRemoveComponent<CameraComponent>().connect(this, &CameraSystem::unregisterCameraEntity); 
 }
 
-void CameraSystem::update(double){
+void CameraSystem::update(uint32_t){
     //If there are no cameras, throw error
     if(cameraMap.size() == 0){
         scene.log(std::make_shared<StringError>("[CameraSystem] No cameras in scene"));

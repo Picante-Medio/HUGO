@@ -328,7 +328,7 @@ void AudioSystem::process3DChanges(const AudioComponent& a, const Audio3DInfoCom
 #pragma endregion
 
 #pragma region UPDATES
-void AudioSystem::update(double)
+void AudioSystem::update(uint32_t)
 {
     // cleanup finished voices
     for (auto& pack : scene.query<AudioComponent>())
@@ -344,7 +344,7 @@ void AudioSystem::update(double)
     }
 }
 
-void AudioSystem::fixedUpdate(double)
+void AudioSystem::fixedUpdate(uint32_t)
 {
 }
 

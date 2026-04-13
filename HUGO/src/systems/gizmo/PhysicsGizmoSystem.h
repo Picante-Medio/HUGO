@@ -11,9 +11,9 @@ public:
 
     void onLoad();
 
-    void update(double dt);
+    void update(uint32_t dt);
 
-    void fixedUpdate(double dt);
+    void fixedUpdate(uint32_t dt);
 
     void createGizmo(ColliderComponent& coll);
     void destroyGizmo(ColliderComponent& coll);

@@ -81,10 +81,10 @@ void RenderSystem::updateAnimations(double dt)
     }
 }
 // ==================== Fixed Update ====================
-void RenderSystem::fixedUpdate(double){}
+void RenderSystem::fixedUpdate(uint32_t){}
 
 // ==================== Update ====================
-void RenderSystem::update(double dt)
+void RenderSystem::update(uint32_t dt)
 { 
     updateAnimations(dt);
 

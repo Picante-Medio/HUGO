@@ -39,7 +39,7 @@ void BulletModule::pauseSceneSimulation(std::string sceneName) {
         inactiveSimulations.insert({node.key(), node.mapped()});
 }
 
-void BulletModule::performSimulations(double dt) {
+void BulletModule::performSimulations(uint32_t dt) {
     for(auto it = activeSimulations.begin(); it != activeSimulations.end(); ++it)
         it->second->performSimulation(dt);
 }

@@ -161,7 +161,7 @@ void ConsoleSystem::handleKeyInput(){
     }
 }
 
-void ConsoleSystem::update(double){
+void ConsoleSystem::update(uint32_t){
 
     TextComponent& consoleTextCmp = scene.getComponent<TextComponent>(consoleText);
 
@@ -177,7 +177,7 @@ void ConsoleSystem::update(double){
     handleKeyInput();
 }
 
-void ConsoleSystem::fixedUpdate(double){
+void ConsoleSystem::fixedUpdate(uint32_t){
     
 }
 

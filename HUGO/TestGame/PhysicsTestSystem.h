@@ -12,6 +12,6 @@ public:
     void init();
     void onLoad();
 
-    void fixedUpdate(double);
-    void update(double);
+    void fixedUpdate(uint32_t);
+    void update(uint32_t);
 END_HSYSTEM()

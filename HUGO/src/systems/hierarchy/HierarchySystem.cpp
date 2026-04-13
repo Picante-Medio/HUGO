@@ -209,7 +209,7 @@ void HierarchySystem::propagateNeedUpdateToChildren(EntityID parent)
 }
 
 void 
-HierarchySystem::update(double){
+HierarchySystem::update(uint32_t){
 
     //update needUpdate state
     for (auto& pack : scene.query<TransformComponent>()) {
@@ -228,7 +228,7 @@ HierarchySystem::update(double){
 }
 
 void 
-HierarchySystem::fixedUpdate(double) {}
+HierarchySystem::fixedUpdate(uint32_t) {}
 
 
 void 

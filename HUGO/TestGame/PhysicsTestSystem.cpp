@@ -74,11 +74,11 @@ void PhysicsTestSystem::onLoad(){
     
 }
 
-void PhysicsTestSystem::fixedUpdate(double) {
+void PhysicsTestSystem::fixedUpdate(uint32_t) {
     
 }
 
-void PhysicsTestSystem::update(double) {
+void PhysicsTestSystem::update(uint32_t) {
 
     for(auto collisionId : scene.getComponent<ColliderComponent>(staticBase).getCollisionInfo()){
         if(scene.hasComponent<TestComponent>(collisionId)){

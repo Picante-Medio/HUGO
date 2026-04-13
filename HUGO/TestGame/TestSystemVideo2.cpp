@@ -183,7 +183,7 @@ TestSystemVideo2::onLoad() {}
 
 
 void
-TestSystemVideo2::update(double dt) {
+TestSystemVideo2::update(uint32_t dt) {
 
     auto input = scene.getInput();
     float delta = static_cast<float>(dt);
@@ -220,4 +220,4 @@ TestSystemVideo2::update(double dt) {
 }
 
 void
-TestSystemVideo2::fixedUpdate(double) {}
+TestSystemVideo2::fixedUpdate(uint32_t) {}

@@ -124,8 +124,8 @@ public:
    virtual ~AudioSystem() = default;
 
    // updates
-   void update(double) override;
-   void fixedUpdate(double) override;
+   void update(uint32_t) override;
+   void fixedUpdate(uint32_t) override;
 
    void onLoad() override;
    void init() override;

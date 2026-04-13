@@ -13,10 +13,10 @@ void MessagesTestSystem::init() {
 void MessagesTestSystem::onLoad() {
 
 }
-void MessagesTestSystem::fixedUpdate(double) {
+void MessagesTestSystem::fixedUpdate(uint32_t) {
 
 }
-void MessagesTestSystem::update(double) {
+void MessagesTestSystem::update(uint32_t) {
 
     if(scene.getInput()->wasKeyJustPressed(HUGO::KeyCode::TWO)){
         std::cout << "Cambiando escena...\n";

@@ -39,8 +39,8 @@ public:
     void init();
     void onLoad();
 
-    void update(double) override;
+    void update(uint32_t) override;
 
-    void fixedUpdate(double) override;
+    void fixedUpdate(uint32_t) override;
 
 END_HSYSTEM()

@@ -135,7 +135,7 @@ double timer = 0;
 bool usedTimer = false;
 
 void
-TestSystem::update(double dt) {
+TestSystem::update(uint32_t dt) {
 
     for(auto& elem: scene.query<TransformComponent, LightComponent>()){
         elem.modify<TransformComponent>([dt](TransformComponent& tr){
@@ -145,4 +145,4 @@ TestSystem::update(double dt) {
 }
 
 void
-TestSystem::fixedUpdate(double) {}
+TestSystem::fixedUpdate(uint32_t) {}

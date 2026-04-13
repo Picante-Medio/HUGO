@@ -32,8 +32,8 @@ public:
     void init() override;
     void onLoad() override {}
     
-void fixedUpdate(double) override {}
-    void update(double) override;
+void fixedUpdate(uint32_t) override {}
+    void update(uint32_t) override;
     ~CameraSystem(); 
 
 END_HSYSTEM()

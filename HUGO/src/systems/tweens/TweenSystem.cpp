@@ -7,7 +7,7 @@ void TweenSystem::init() {
 void TweenSystem::onLoad() {
 
 }
-void TweenSystem::update(double dt) {
+void TweenSystem::update(uint32_t dt) {
     for(auto& pack : scene.query<TweenComponent>()) {
         pack.modify<TweenComponent>([this, dt](TweenComponent& comp){
             for(auto it = comp.currentTweens.begin(); it != comp.currentTweens.end();){
@@ -28,4 +28,4 @@ void TweenSystem::update(double dt) {
         });
     }
 }
-void TweenSystem::fixedUpdate(double) {}
+void TweenSystem::fixedUpdate(uint32_t) {}

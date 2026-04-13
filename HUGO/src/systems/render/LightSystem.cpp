@@ -33,7 +33,7 @@ LightSystem::~LightSystem()
     sceneManager = nullptr;
 }
 
-void LightSystem::update(double){
+void LightSystem::update(uint32_t){
     for(auto pack : scene.query<TransformComponent, LightComponent>()){
         TransformComponent transform = pack.getConst<TransformComponent>();
         LightComponent light = pack.getConst<LightComponent>();

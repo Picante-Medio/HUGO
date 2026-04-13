@@ -168,9 +168,9 @@ void ParticleSystem::processChanges(const ParticleEmitterComponent& pe, const Tr
     instance.ps->setSortingEnabled(pe.sorted);
 }
 
-void ParticleSystem::fixedUpdate(double) {}
+void ParticleSystem::fixedUpdate(uint32_t) {}
 
-void ParticleSystem::update(double) {
+void ParticleSystem::update(uint32_t) {
     for (auto& pack: scene.query<TransformComponent, ParticleEmitterComponent>()){
         const TransformComponent& tr = pack.getConst<TransformComponent>();
         processPosition(tr);

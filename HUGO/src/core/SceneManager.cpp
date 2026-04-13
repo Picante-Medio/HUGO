@@ -155,11 +155,11 @@ ErrorOrVoid SceneManager::setMainScene(){
 
 }
 
-void SceneManager::updateCurrentScene(double dt){
+void SceneManager::updateCurrentScene(uint32_t dt){
     m_currentScene.lock()->update(dt);
 }
 
-void SceneManager::fixedUpdateCurrentScene(double dt){
+void SceneManager::fixedUpdateCurrentScene(uint32_t dt){
     m_currentScene.lock()->fixedUpdate(dt);
 }
 

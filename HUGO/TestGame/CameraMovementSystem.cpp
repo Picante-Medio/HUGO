@@ -37,9 +37,9 @@ void CameraMovementSystem::onLoad() {
 
 }
 
-void CameraMovementSystem::fixedUpdate(double){}
+void CameraMovementSystem::fixedUpdate(uint32_t){}
 
-void CameraMovementSystem::update(double dt) {
+void CameraMovementSystem::update(uint32_t dt) {
     for(auto pack : scene.query<CameraComponent, TransformComponent>()) {
         if(!pack.getConst<CameraComponent>().isMain()) continue;
 

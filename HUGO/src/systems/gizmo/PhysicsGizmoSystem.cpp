@@ -146,7 +146,7 @@ void PhysicsGizmoSystem::onUpdateGizmo(ColliderComponent& coll){
 
 #pragma endregion
 
-void PhysicsGizmoSystem::update(double){
+void PhysicsGizmoSystem::update(uint32_t){
 #ifndef NDEBUG
     
     for(auto pack : scene.query<ColliderComponent, TransformComponent>()) {
@@ -171,4 +171,4 @@ void PhysicsGizmoSystem::update(double){
 
 
 
-void PhysicsGizmoSystem::fixedUpdate(double) {}
+void PhysicsGizmoSystem::fixedUpdate(uint32_t) {}
