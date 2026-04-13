@@ -120,8 +120,8 @@ Clase de inicialización. Es responsable de cargar la biblioteca dinámica del j
 
 Una vez inicializado el juego mantiene el bucle de tiempo y se compensa pérdida de frames en caso de que sea necesario.
 
-### Scene Parser
-Clase auxiliar encargada de leer los archivos `.chat` (mapas) de escenas, validarlos y devolver un objeto Scene con la escena construida. 
+### Scene Manager
+Clase encargada del manejo de las escenas de juego. Es la responsable de leer la información de los archivos .chat, crear escenas, destruir escenas, cambiar entre escenas, y actualizar la escena principal. Además, puede crear prefabs especificados en los .chat y meterlos en las escenas. Las escenas pueden comunicarse con el Scene Manager para realizar todas estas operaciones.
 
 ## Factorías
 Se definen dos clases que serviran como factorías de objetos externos:
