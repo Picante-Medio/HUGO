@@ -18,7 +18,8 @@ HCOMPONENT(RigidBodyComponent)
         FORCE_APPLIED = 64,
         TORQUE_APPLIED = 128,
         SLEEP_UPDATED = 256,
-        SLEEPING_THRESHOLD_UPDATED = 512
+        SLEEPING_THRESHOLD_UPDATED = 512,
+        GRAVITY_UPDATED = 1024
     };
 
     int flags = 0;
@@ -29,6 +30,7 @@ HCOMPONENT(RigidBodyComponent)
     
     SERIALIZED_MEMBER(HUGO::Vector3, linearVelocity)
     SERIALIZED_MEMBER(HUGO::Vector3, angularVelocity)
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Vector3, gravity, HUGO::Vector3(0, -9.8, 0))
     
     HUGO::Vector3 impulseApplied = HUGO::Vector3();
     HUGO::Vector3 torqueImpulseApplied = HUGO::Vector3();
@@ -74,7 +76,12 @@ HCOMPONENT(RigidBodyComponent)
         angularVelocity = nVelocity;
         flags = flags | UpdateFlags::ANGULAR_VELOCITY_UPDATED;
     }
-
+    
+    void setGravity(HUGO::Vector3 nGravity){
+        gravity = nGravity;
+        flags = flags | UpdateFlags::GRAVITY_UPDATED;
+    }
+    
     // Modifies linear velocity
     void applyImpulse(HUGO::Vector3 nImpulse){
         impulseApplied = nImpulse;
@@ -122,6 +129,7 @@ HCOMPONENT(RigidBodyComponent)
 
     inline HUGO::Vector3 getLinearVelocity() const { return linearVelocity; }
     inline HUGO::Vector3 getAngularVelocity() const { return angularVelocity; }
+    inline HUGO::Vector3 geGravity() const { return gravity; }
 
     inline bool getAsleep() const { return asleep; }
     inline float getLinearSleepingThreshold() const { return linearSleepingThreshold; }

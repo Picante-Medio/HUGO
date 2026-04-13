@@ -435,6 +435,9 @@ void BulletSimulation::checkRigidBodyFlags(RigidBodyComponent& hgRB)
         if(hgRB.flags & RigidBodyComponent::SLEEPING_THRESHOLD_UPDATED){
             body->setSleepingThresholds(hgRB.linearSleepingThreshold, hgRB.angularSleepingThreshold);
         }
+        if(hgRB.flags & RigidBodyComponent::GRAVITY_UPDATED){
+            body->setGravity(BulletUtils::vector3ToBullet(hgRB.gravity));
+        }
 
         hgRB.flags = 0;
     }

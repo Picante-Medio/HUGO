@@ -61,6 +61,7 @@ void PhysicsTestSystem::init(){
 
     scene.addComponent<RigidBodyComponent>(e3, [](RigidBodyComponent& rb){
         rb.setMass(5.f);
+        rb.setGravity(HUGO::Vector3(0, -3, 0));
     });
 }
 
