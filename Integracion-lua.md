@@ -59,5 +59,18 @@ El usuario puede hacer scripts de lua que interactúen con el motor si son llama
 
 Por defecto, el motor hace `requireFolder` en `src/lua/`, pero no asume nada sobre dónde almacenará el usuario sus scripts.
 
+# Limitaciones
+Puesto que lua solo tiene 5 tipos: `number`, `string`, `boolean`, `function` y `table`, hemos tenido que limitar los tipos registrables en LuaBinder a `int`, `HUGO::Int`, `float`, `double`, `HUGO::Float`, `bool`, `std::string`, `char\*` y `HUGO::String`.
+
+Para registrar una función o método que tenga argumentos o tipo de retorno distintos, se recomienda crear una función análoga, que convierta tipos válidos a tipos no válidos, cuyo nombre tenga el sufijo *LUA*. Por ejemplo, `playAudioLUA`:
+```cpp
+void AudioSystem::playAudioLUA(int id, int type) {
+    if (type >= HUGO::AudioTypes::LAST_TYPE){
+        return;
+    }
+    playAudio(static_cast<HUGO::AudioID>(id), static_cast<HUGO::AudioTypes>(type));
+}
+```
+
 # ¿Dónde se usa lua?
 Lua puede usarse para hacer comportamiento para los juegos, creando entidades y componentes o llamando a funciones de audio, animaciones, etc. aunque, realmente, el uso principal de lua es en *debug de los juegos*, gracias a la consola de comandos que permite interpretar lua en tiempo de ejecución.
