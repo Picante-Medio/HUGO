@@ -187,17 +187,16 @@ TestSystemVideo2::update(double dt) {
 
     auto input = scene.getInput();
     float delta = static_cast<float>(dt);
-    HUGO::Quaternion rot = scene.getComponentConst<TransformComponent>(sinbad).getRotation();
-    scene.modifyComponent<RigidBodyComponent>(sinbad, [input, delta, rot](RigidBodyComponent& rb) {
-        
+    TransformComponent& tr = scene.getComponent<TransformComponent>(sinbad);
+    scene.modifyComponent<RigidBodyComponent>(sinbad, [input, delta, &tr](RigidBodyComponent& rb) {
         if(input->isKeyPressed(HUGO::KeyCode::LEFT_ARROW)) rb.setAngularVelocity(HUGO::Vector3(0, 1.0f, 0));
         else if(input->isKeyPressed(HUGO::KeyCode::RIGHT_ARROW)) rb.setAngularVelocity(HUGO::Vector3(0, -1.0f, 0));
         else rb.setAngularVelocity(HUGO::Vector3());
 
-        if(input->isKeyPressed(HUGO::KeyCode::DOWN_ARROW))rb.applyForce(rot.forward() * (25.0f)* delta);
-        if(input->isKeyPressed(HUGO::KeyCode::UP_ARROW))rb.applyForce(rot.forward() * (-25.0f)* delta);
+        if(input->isKeyPressed(HUGO::KeyCode::DOWN_ARROW))rb.applyForce(tr.getRotation().forward() * (-25.0f)* delta);
+        if(input->isKeyPressed(HUGO::KeyCode::UP_ARROW))rb.applyForce(tr.getRotation().forward() * (25.0f)* delta);
         if(input->isKeyPressed(HUGO::KeyCode::M)) 
-            rb.applyForce(rot.up() * (50.0f)* delta);
+            rb.applyForce(tr.getRotation().up() * (50.0f)* delta);
     });
 
     scene.modifyComponent<AnimationComponent>(sinbad, [input](AnimationComponent& anim) {
