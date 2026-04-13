@@ -48,12 +48,12 @@ ErrorOrVoid Core::init(int argc, char* argv[]){
     initLua();
 
     // Load game as dll
-    GameLibraryLoader::init("TestGame");
+    GameLibraryLoader::init(gamePath);
 
     vt.reset();
     initModules();
 
-    ErrorOrVoid err = sceneManager.initializeParser("../chats", physicsModule);
+    ErrorOrVoid err = sceneManager.initializeParser(chatPath, physicsModule);
 
     if(err.isError()) return err;
     
@@ -64,7 +64,7 @@ ErrorOrVoid Core::init(int argc, char* argv[]){
         err = sceneManager.setMainScene();
         if(err.isError()) return err;
     */
-    sceneManager.setCurrentScene("TestSceneVideo1");
+    sceneManager.setCurrentScene(mainSceneName);
 
     return ErrorOrVoid();
 }
