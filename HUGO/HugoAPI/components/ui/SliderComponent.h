@@ -6,7 +6,7 @@
 HCOMPONENT(SliderComponent)
     // range
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, minValue, 0.0f);
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, maxValue, 100.0f);
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, maxValue, 1.0f);
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, currentValue, 0.0f);
     HUGO::Float previousValue = 0.0f;
     

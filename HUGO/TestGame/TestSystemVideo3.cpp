@@ -4,6 +4,9 @@
 #include "ChangeSceneMessage.h"
 #include "AudioComponent.h"
 #include "Audio3DInfoComponent.h"
+#include "SliderComponent.h"
+#include "PanelComponent.h"
+#include "TextComponent.h"
 
 struct Aux {
     HUGO::String pname = "Particle/Smoke";
@@ -64,6 +67,47 @@ TestSystemVideo3::init() {
     //     a.audioName = "lucky";
     //     a.volume =0.1f;
     // });
+
+    EntityID audioSlider = scene.createEntity();
+    scene.addComponent<PanelComponent>(audioSlider, [](PanelComponent& panel){
+        panel.overlayName = "Menu/Mierdas3";
+        panel.containerName = panel.overlayName + "/Container";
+        panel.material = "UI/Background";
+        panel.metricsMode = HUGO::UIMetricsMode::GMM_RELATIVE;
+        panel.width = 0.25f;
+        panel.height = 0.05f;
+        panel.left = 0.4f;
+        panel.top = 0.8f;
+        panel.isVisible = true;
+        panel.zOrder = 501;
+    });
+
+    scene.addComponent<SliderComponent>(audioSlider, [this](SliderComponent& s){
+        s.trackElementName = "Menu/Mierdas4";
+        s.knobElementName = s.trackElementName + "/Element";
+        s.trackMaterial = "UI/Background";
+        s.knobMaterial = "UI/KnobPressed";
+        s.trackMaterial = "UI/Track";
+        s.knobWidth = 0.05f;
+        s.knobHeight = 0.05f;
+        s.onChangeCallback = [this](HUGO::Float value){
+            scene.modifyComponent<AudioComponent>(this->ent2, [value](AudioComponent& a){
+                a.volume = std::clamp(value, 0.0f, 1.0f);
+            });
+            std::cout << "Volume: " << value << "\n";
+        };
+    });
+
+    EntityID volumeText = scene.createEntity();
+    scene.addComponent<TextComponent>(volumeText, [](TextComponent& text){
+        text.left = 0.1f;
+        text.top = 0.06f;
+        text.colourTop = HUGO::Vector4(1.0f, 0.0f, 1.0f, 1.f);
+        text.colourBottom = HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.f);
+        text.characterHeight = 0.09f;
+        text.spaceWidth = 0.01f;
+        text.text = "Volume";
+    });
 
 
 }

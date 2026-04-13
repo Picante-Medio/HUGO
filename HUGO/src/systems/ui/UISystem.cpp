@@ -536,7 +536,7 @@ void UISystem::processInput()
         // handle active dragging
         if (slider.isDragging)
         {
-            if (input->wasMouseButtonJustPressed(HUGO::MouseCode::MOUSE_LEFT))
+            if (input->isMouseButtonPressed(HUGO::MouseCode::MOUSE_LEFT))
             {
                 HUGO::Float percent = 0.0f;
                 
