@@ -22,7 +22,6 @@ TestSystemVideo1::init() {
         a.isPlaying = true;
         a.type = HUGO::AudioTypes::MUSIC;
         a.audioName = "lucky";
-        a.audioId = 0;
         a.volume = 0.1f;
     });
 
@@ -105,7 +104,6 @@ TestSystemVideo1::init() {
         s.trackMaterial = "UI/Track";
         s.knobWidth = 0.05f;
         s.knobHeight = 0.05f;
-        s.currentValue = 0.5f;
         s.onChangeCallback = [this](HUGO::Float value){
             scene.modifyComponent<AudioComponent>(this->audio, [value](AudioComponent& a){
                 a.volume = value;

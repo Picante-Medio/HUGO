@@ -57,7 +57,7 @@ ErrorOrVoid Core::init(){
         err = sceneManager.setMainScene();
         if(err.isError()) return err;
     */
-    sceneManager.setCurrentScene("TestSceneVideo1");
+    sceneManager.setCurrentScene("TestSceneVideo3");
 
     return ErrorOrVoid();
 }

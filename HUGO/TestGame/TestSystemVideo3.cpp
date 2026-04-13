@@ -52,7 +52,7 @@ TestSystemVideo3::init() {
         a.isPlaying = true;
         a.type = HUGO::AudioTypes::MUSIC;
         a.audioName = "lucky";
-        a.volume =0.0f;
+        a.volume =0.1f;
         a.loop = true;
     });
     // scene.addComponent<Audio3DInfoComponent>(ent2);

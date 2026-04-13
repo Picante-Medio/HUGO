@@ -127,8 +127,17 @@ void AudioSystem::acquireVoice(AudioComponent &c)
 {
     if (c.type < 0 || c.type >= HUGO::AudioTypes::LAST_TYPE) return;
     if (c.activePtr == nullptr) {
-        c.audioId = AudioAssetsModule::Instance().getID(c.audioName);
-        c.activePtr = getSound(c.audioId, static_cast<HUGO::AudioTypes>(c.type));
+        if (c.audioId == -1 && !c.audioName.empty()) {
+            scene.modifyComponent<AudioComponent>(c.entity, [this, c](AudioComponent& a){
+                a.audioId = AudioAssetsModule::Instance().getID(c.audioName);
+            });
+        }
+
+        if (c.audioId != -1) {
+            scene.modifyComponent<AudioComponent>(c.entity, [this, c](AudioComponent& a){
+                a.activePtr = getSound(c.audioId, static_cast<HUGO::AudioTypes>(c.type));
+            });
+        }
     }
 }
 
@@ -280,17 +289,17 @@ void AudioSystem::updateListeners(const AudioListenerComponent& a, const Transfo
 
 void AudioSystem::processChanges(AudioComponent &c)
 {
-    if (!c.activePtr && c.isPlaying)
-    {
+    if (!c.activePtr) {
         acquireVoice(c);
     }
     if (!c.activePtr) return;
     
     setLooping(c.activePtr, c.loop);
     HUGO::Float mult = c.type != HUGO::AudioTypes::MUSIC ? soundsGroupVolume : musicsGroupVolume;
-    HUGO::Float vol = c.volume*mult;    
+    HUGO::Float vol = c.volume * mult;    
     setVolume(c.activePtr, vol);
     setPitch(c.activePtr, c.pitch);
+    
     if (c.startTime >= 0.0){
         setAudioPosition(c.activePtr, c.startTime);
         c.startTime = -1.0;
@@ -298,11 +307,12 @@ void AudioSystem::processChanges(AudioComponent &c)
 
     if (c.isPlaying && !ma_sound_is_playing(c.activePtr)){
         playAudio(c.activePtr);
+        c.wasPlaying = true;
     }
     else if (!c.isPlaying && ma_sound_is_playing(c.activePtr)){
         stopAudio(c.activePtr);
+        c.wasPlaying = false;
     }
-    
 }
 
 void AudioSystem::process3DChanges(const AudioComponent& a, const Audio3DInfoComponent &c)
@@ -372,6 +382,9 @@ void AudioSystem::onAddAudioComponent(AudioComponent &c)
 
 void AudioSystem::onUpdateAudioComponent(AudioComponent &c)
 {
+    if (!c.activePtr && c.isPlaying) {
+        acquireVoice(c);
+    }
     processChanges(c);
 }
 
