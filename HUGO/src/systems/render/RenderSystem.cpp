@@ -115,6 +115,13 @@ void RenderSystem::registerRenderEntity(RenderComponent& comp)
     Ogre::Entity* ent = nullptr;
     Ogre::SceneNode* node = nullptr;
 
+    //if add more than one RenderComponent, use the last one
+    auto it = ogreObjects.find(id);
+    if(it!=ogreObjects.end()){
+        destroyOgreObject(it->second);
+        clearAnimationStates(it->second);
+    }
+
     try {
         //create ogre entity
         ent = sceneManager->createEntity(meshName);
@@ -142,6 +149,9 @@ void RenderSystem::registerRenderEntity(RenderComponent& comp)
 
     //store object
     ogreObjects[id] = std::move(obj);
+    if(scene.hasComponent<AnimationComponent>(id)){
+        onUpdateAnimationComponet(scene.getComponent<AnimationComponent>(id));
+    }
 }
 // ==================== Destroy OgreObject ====================
 void RenderSystem::destroyOgreObject(OgreObject &obj)
@@ -227,9 +237,9 @@ void RenderSystem::onUpdateAnimationComponet(AnimationComponent &animComp)
     }
 
     //Update or create animations that are in the component
-    for(auto& anim : animComp.anims){
-        const HUGO::String& animName = anim.first;
-        const AnimationInfo& animInfo = anim.second;
+    for(auto anim = animComp.anims.begin(); anim != animComp.anims.end();){
+        const HUGO::String& animName = anim->first;
+        const AnimationInfo& animInfo = anim->second;
 
         Ogre::AnimationState* animState = nullptr;
 
@@ -241,6 +251,7 @@ void RenderSystem::onUpdateAnimationComponet(AnimationComponent &animComp)
             if(!ogre_ent->hasAnimationState(animName))
             {
                 scene.log(std::make_shared<StringError>("[RenderSystem] Animation "+ animName + " does not exist in entity " + std::to_string(rc.entity)));
+                anim = animComp.anims.erase(anim);
                 continue;
             }
             //get a new AnimationSate from ogre
@@ -262,6 +273,8 @@ void RenderSystem::onUpdateAnimationComponet(AnimationComponent &animComp)
                     
         if(animInfo.weight != animState->getWeight()) 
             animState->setWeight(animInfo.weight);
+        
+        ++anim;
     }
 
 }

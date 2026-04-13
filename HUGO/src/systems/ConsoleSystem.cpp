@@ -58,14 +58,13 @@ HUGO::String ConsoleSystem::getNextHistoric(){
 }
 
 HUGO::String ConsoleSystem::getPreviousHistoric(){
-    HUGO::String item = "";
+    HUGO::String item = " ";
 
     if(historyIndex < history.size()){
         // item inside of if so when history.size() is reached "" is returned
         historyIndex++;
         if(historyIndex < history.size()) item = history[historyIndex];
     }
-
     return item;
 }
 
@@ -191,7 +190,7 @@ void ConsoleSystem::init(){
     LuaBinder::getInstance().setPrintFunction(consoleLuaPrint);
     active = false;
     historyIndex = 0;
-    input = std::dynamic_pointer_cast<HUGO::Input>(scene.getInput());
+    input = std::static_pointer_cast<HUGO::Input>(scene.getInput());
     input->setConsoleActive(active);
     
     //---------------------------------------Input field
@@ -207,7 +206,7 @@ void ConsoleSystem::init(){
         panel.height = 0.06f;
         panel.left = 0.7f;
         panel.top = 0.41f;
-        
+        panel.zOrder = 501;
         panelContainerName = panel.containerName;
         panel.isVisible = active;
     });
@@ -218,7 +217,7 @@ void ConsoleSystem::init(){
         text.colourTop = HUGO::Vector4(1.0f, 0.0f, 0.0f, 1.f);
         text.colourBottom = HUGO::Vector4(1.0f, 0.0f, 1.0f, 1.f);
         text.characterHeight = 0.025f;
-        text.top = -0.01f;
+        text.top = 0.01f;
         text.spaceWidth = 0.01f;
         text.text = "Click to write...";
     });
@@ -245,6 +244,7 @@ void ConsoleSystem::init(){
         panel2.height = 0.31f;
         panel2.left = 0.7f;
         panel2.top = 0.1f;
+        panel2.zOrder = 501;
         panel2.isVisible = active;
         panelContainerName = panel2.containerName;
     });

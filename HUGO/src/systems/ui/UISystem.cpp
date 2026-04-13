@@ -397,7 +397,7 @@ constexpr HUGO::Int MAX_ACSII = 126;
 
 void UISystem::processInput()
 {
-    std::shared_ptr<HUGO::Input> input = std::dynamic_pointer_cast<HUGO::Input>(scene.getInput());
+    std::shared_ptr<HUGO::Input> input = std::static_pointer_cast<HUGO::Input>(scene.getInput());
     
     // get normalized mouse position
     const HUGO::IInput::MouseRelativePosition& mouse = input->getMouseRelativePosition();

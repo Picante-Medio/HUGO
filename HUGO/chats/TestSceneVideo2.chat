@@ -5,7 +5,6 @@ SYSTEM RenderSystem
 SYSTEM LightSystem
 SYSTEM CameraSystem
 SYSTEM PhysicsGizmoSystem
-SYSTEM PhysicsTestSystem
 SYSTEM UISystem
 SYSTEM ConsoleSystem
 SYSTEM TweenSystem

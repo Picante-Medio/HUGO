@@ -23,6 +23,20 @@ material prueba/ColorRosa
 		}
     }
 }
+
+material prueba/ColorSuelo
+{
+    technique 
+	{
+		pass 
+		{
+			ambient 0.38 0.32 0.35 1.00
+			diffuse 0.31 0.10 0.20 1.00
+			specular 0.3 0.3 0.3 8
+		}
+    }
+}
+
 material prueba/Textura
 {
 	technique
