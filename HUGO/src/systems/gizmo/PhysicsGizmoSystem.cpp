@@ -28,14 +28,10 @@ ErrorOrVoid createGizmoMesh(HUGO::IScene&, EntityID entity, const T& colliderInf
 
 template <>
 ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::BoxColliderInfo& colliderInfo) {
-
-    if(scene.getComponentConst<RenderComponent>(entity).getMeshName() != "cube.mesh") {
-
-        scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
-            gizmoRender.setMeshName("cube.mesh");
-            gizmoRender.setMaterialName("debug/WireframeMaterial");
-        });
-    }
+    scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
+        gizmoRender.setMeshName("cube.mesh");
+        gizmoRender.setMaterialName("debug/WireframeMaterial");
+    });
 
     scene.modifyComponent<TransformComponent>(entity, [&colliderInfo](TransformComponent& gizmoTransform){
         gizmoTransform.setScale(colliderInfo.halfExtents * 2);
@@ -47,13 +43,10 @@ ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::Bo
 template <>
 ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::SphereColliderInfo& colliderInfo) {
 
-    if(scene.getComponentConst<RenderComponent>(entity).getMeshName() != "sphere.mesh") {
-
-        scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
-            gizmoRender.setMeshName("sphere.mesh");
-            gizmoRender.setMaterialName("debug/WireframeMaterial");
-        });
-    }
+    scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
+        gizmoRender.setMeshName("sphere.mesh");
+        gizmoRender.setMaterialName("debug/WireframeMaterial");
+    });
 
     scene.modifyComponent<TransformComponent>(entity, [&colliderInfo](TransformComponent& gizmoTransform){
         gizmoTransform.setScale(colliderInfo.r * 2);
@@ -65,13 +58,10 @@ ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::Sp
 template <>
 ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::CylinderColliderInfo& colliderInfo){
 
-    if(scene.getComponentConst<RenderComponent>(entity).getMeshName() != "cylinder.mesh") {
-
-        scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
-            gizmoRender.setMeshName("cylinder.mesh");
-            gizmoRender.setMaterialName("debug/WireframeMaterial");
-        });
-    }
+    scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
+        gizmoRender.setMeshName("cylinder.mesh");
+        gizmoRender.setMaterialName("debug/WireframeMaterial");
+    });
 
     scene.modifyComponent<TransformComponent>(entity, [&colliderInfo](TransformComponent& gizmoTransform){
         gizmoTransform.setScale(colliderInfo.halfExtents * 2);
@@ -83,13 +73,10 @@ ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::Cy
 template <>
 ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::ConeColliderInfo& colliderInfo){
 
-    if(scene.getComponentConst<RenderComponent>(entity).getMeshName() != "cone.mesh") {
-
-        scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
-            gizmoRender.setMeshName("cone.mesh");
-            gizmoRender.setMaterialName("debug/WireframeMaterial");
-        });
-    }
+    scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
+        gizmoRender.setMeshName("cone.mesh");
+        gizmoRender.setMaterialName("debug/WireframeMaterial");
+    });
 
     scene.modifyComponent<TransformComponent>(entity, [&colliderInfo](TransformComponent& gizmoTransform){
         gizmoTransform.setScale(HUGO::Vector3(colliderInfo.r * 2, colliderInfo.height, colliderInfo.r * 2));
@@ -101,13 +88,10 @@ ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::Co
 template <>
 ErrorOrVoid createGizmoMesh<HUGO::CapsuleColliderInfo>(HUGO::IScene& scene, EntityID entity, const HUGO::CapsuleColliderInfo& colliderInfo){
 
-    if(scene.getComponentConst<RenderComponent>(entity).getMeshName() != "capsule.mesh") {
-
-        scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
-            gizmoRender.setMeshName("capsule.mesh");
-            gizmoRender.setMaterialName("debug/WireframeMaterial");
-        });
-    }
+    scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
+        gizmoRender.setMeshName("capsule.mesh");
+        gizmoRender.setMaterialName("debug/WireframeMaterial");
+    });
 
     scene.modifyComponent<TransformComponent>(entity, [&colliderInfo](TransformComponent& gizmoTransform){
         gizmoTransform.setScale(HUGO::Vector3(colliderInfo.r * 2, colliderInfo.height, colliderInfo.r * 2));
@@ -168,7 +152,7 @@ void PhysicsGizmoSystem::update(double){
     for(auto pack : scene.query<ColliderComponent, TransformComponent>()) {
         const ColliderComponent& collider = pack.getConst<ColliderComponent>();
         const TransformComponent& transform = pack.getConst<TransformComponent>();
-        
+
         //If we dont want gizmos, we skip all of this
         if(!collider.useGizmo) continue;
 
