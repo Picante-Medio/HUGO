@@ -1,16 +1,37 @@
 #pragma once
-#include "Ogre.h"
+#include "OgreOverlay.h"
+#include "HugoError.h"
+#include <OgreOverlayContainer.h>
+#include <OgreTextAreaOverlayElement.h>
+
 namespace HUGO {
     struct Vector3;
     struct Quaternion;
     struct Radian;
     struct Degree;
+
+    struct OgreUtils {
+        // Conversions for math types
+        static Ogre::Vector3 vector3ToOgre(const HUGO::Vector3& vec3);
+        static Ogre::Quaternion quaternionToOgre(const HUGO::Quaternion& q);
+        static Ogre::Radian radianToOgre(const HUGO::Radian& radian);
+        static Ogre::Degree degreeToOgre(const HUGO::Degree& degree);
+        
+        // conversions for UI types
+        static Ogre::GuiMetricsMode toOgre(HUGO::UIMetricsMode mode);
+        static Ogre::GuiHorizontalAlignment toOgre(HUGO::UIHorizontalAlignment align);
+        static Ogre::GuiVerticalAlignment toOgre(HUGO::UIVerticalAlignment align);
+
+        static HUGO::UIMetricsMode toHugo(Ogre::GuiMetricsMode mode);
+        static HUGO::UIHorizontalAlignment toHugo(Ogre::GuiHorizontalAlignment align);
+        static HUGO::UIVerticalAlignment toHugo(Ogre::GuiVerticalAlignment align);
+    };
+
+    struct OgreOverlayUtils{
+        static ErrorOrType<Ogre::Overlay*> getOverlay(const HUGO::String& name);
+        static ErrorOrType<Ogre::OverlayElement*> getElement(const HUGO::String& name, bool isTextArea = false, Ogre::OverlayContainer* containerToAdd = nullptr);
+        static ErrorOrType<Ogre::OverlayContainer*> getContainer(const HUGO::String& name, Ogre::Overlay* overlayToAdd = nullptr);
+    };
+
 }
 
-struct OgreUtils {
-public:
-    static Ogre::Vector3 vector3ToOgre(const HUGO::Vector3& vec3);
-    static Ogre::Quaternion quaternionToOgre(const HUGO::Quaternion& q);
-    static Ogre::Radian radianToOgre(const HUGO::Radian& radian);
-    static Ogre::Degree degreeToOgre(const HUGO::Degree& degree);
-};

@@ -1,5 +1,5 @@
 #include "ComponentDenseTable.h"
-#include "Ecs.h"
+#include "EcsTypes.h"
 #include <vector>
 
 ComponentDenseTable::ComponentDenseTable() {

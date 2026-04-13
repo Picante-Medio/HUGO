@@ -1,0 +1,124 @@
+material prueba/ColorVerde
+{
+    technique 
+	{
+		pass 
+		{
+			ambient 0.3 1.0 0.3
+			diffuse 0.3 1.0 0.3
+			specular 0.3 0.3 0.3 8
+		}
+    }
+}
+
+material prueba/ColorRosa
+{
+    technique 
+	{
+		pass 
+		{
+			ambient 1.0 0.4 0.7
+			diffuse 1.0 0.4 0.7
+			specular 0.3 0.3 0.3 8
+		}
+    }
+}
+
+material prueba/ColorSuelo
+{
+    technique 
+	{
+		pass 
+		{
+			ambient 0.38 0.32 0.35 1.00
+			diffuse 0.31 0.10 0.20 1.00
+			specular 0.3 0.3 0.3 8
+		}
+    }
+}
+
+material prueba/Textura
+{
+	technique
+	{
+		pass
+		{
+            texture_unit{
+                texture spaceSky.jpg
+            }
+		}
+	}
+}
+
+material debug/DefaultMaterial
+{
+	technique 
+	{
+		pass{
+			ambient 1.00 1.00 1.00 1.00
+			diffuse 1.00 1.00 1.00 1.00
+			specular 0.6 0.6 0.6 8
+		}
+	}
+}
+
+material Square/Pedro
+{
+	technique 
+	{
+		pass{
+			 texture_unit{
+                texture pedro.png
+				scale 0.25 0.25
+				rotate 270
+				scroll 0 -0.5
+            }
+		}
+	}
+}
+
+material Square/Pablo
+{
+	technique 
+	{
+		pass{
+			texture_unit{
+                texture pablo.png
+				scale 0.25 0.25
+				rotate 270
+				scroll 0 -0.5
+            }
+		}
+	}
+}
+
+material debug/WireframeMaterial
+{
+	technique 
+	{
+		pass{
+
+			polygon_mode wireframe
+
+			ambient 1.00 1.00 1.00 1.00
+			diffuse 1.00 1.00 1.00 1.00
+			specular 0.6 0.6 0.6 8
+		}
+	}
+}
+
+material debug/Smoke
+{
+    technique {
+        pass {
+            lighting off
+            scene_blend alpha_blend
+            depth_write off   
+            diffuse vertexcolour
+            texture_unit {
+                texture hugu.png
+                tex_address_mode clamp
+            }
+        }
+    }   
+}

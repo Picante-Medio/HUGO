@@ -1,0 +1,64 @@
+#pragma once
+
+#include <memory>
+
+#include "ComponentFactory.h"
+#include "Component.h"
+#include "FieldData.h"
+
+#define HCOMPONENT(COMPONENT_NAME) \
+    struct COMPONENT_NAME: Component { \
+        COMPONENT_NAME(EntityID ent): Component(ent) {} \
+        static inline const char *name = #COMPONENT_NAME; \
+        using ThisComponent = COMPONENT_NAME; \
+        struct Reflection { \
+            static std::unordered_map<std::string, std::unique_ptr<IFieldData<COMPONENT_NAME>>>& members() { \
+                static std::unordered_map<std::string, std::unique_ptr<IFieldData<COMPONENT_NAME>>> inst; \
+                return inst; \
+            } \
+            Reflection() { \
+                HUGO::ComponentFactory::addConstructor(#COMPONENT_NAME, \
+                    [](std::shared_ptr<HUGO::IScene> scene, EntityID ent, const std::unordered_map<std::string, HVariant>& args) -> ErrorOrVoid { \
+                        for(auto& [key,val] : args) { \
+                            if(members().find(key) == members().end()) { \
+                                StringError err; \
+                                err.errorMessage = "No existe un miembro " + key; \
+                                return ErrorOrVoid(err); \
+                            } \
+                        } \
+                        scene->addComponent<COMPONENT_NAME>(ent, [args](COMPONENT_NAME& cmp){ \
+                            for(auto& [key,val] : args) \
+                                members()[key]->Set(cmp,val); \
+                        }); \
+                        return ErrorOrVoid(); \
+                }); \
+                HUGO::ComponentFactory::addDestructor(#COMPONENT_NAME, [](std::shared_ptr<HUGO::IScene> scene, EntityID ent) -> \
+                    ErrorOrVoid { \
+                        scene->removeComponent<COMPONENT_NAME>(ent); \
+                        return ErrorOrVoid(); \
+                }); \
+            } \
+        }; \
+
+#define SERIALIZED_MEMBER(TYPE, NAME) \
+    TYPE NAME; \
+    inline static struct Register_##NAME { \
+        Register_##NAME() { \
+            Reflection::members()[#NAME] = \
+                std::make_unique<FieldData<ThisComponent, TYPE>>(&ThisComponent::NAME); \
+        } \
+    } auto_register_##NAME;
+
+
+#define DEFAULT_SERIALIZED_MEMBER(TYPE, NAME, INIT_VALUE) \
+    TYPE NAME = INIT_VALUE; \
+    inline static struct Register_##NAME { \
+        Register_##NAME() { \
+            Reflection::members()[#NAME] = \
+                std::make_unique<FieldData<ThisComponent, TYPE>>(&ThisComponent::NAME); \
+        } \
+    } auto_register_##NAME;
+
+#define END_HCOMPONENT() \
+    inline static Reflection reflection_instance_ = Reflection(); \
+};

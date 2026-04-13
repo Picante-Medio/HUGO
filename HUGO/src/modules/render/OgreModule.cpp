@@ -1,0 +1,188 @@
+
+#include "OgreModule.h"
+
+#include <Ogre.h>
+#include <OgreRoot.h>
+#include "OgreRenderWindow.h"
+#include "OgreOverlaySystem.h"
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_syswm.h>
+
+#include <iostream>
+#pragma region Resource Helper Functions
+
+void locateResources()
+{
+  Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
+    Ogre::ConfigFile cf;
+    cf.load("resources.cfg");
+
+  Ogre::ConfigFile::SettingsBySection_ seci = cf.getSettingsBySection();
+    Ogre::String sec, type, arch;
+    for(auto& s : cf.getSettingsBySection()) {
+        sec = s.first;
+        for (auto& t : s.second)
+        {
+            type = t.first;
+            arch = t.second;
+            rgm.addResourceLocation(arch,type,sec);
+        }
+    }
+}
+void OgreModule::loadResources()
+{
+    auto renderers = m_ogreRoot->getAvailableRenderers();
+    if (renderers.empty()) {
+        throw std::runtime_error("No renderers found! Check plugins.cfg and plugin paths.");
+    }
+
+    for (auto r : renderers) {
+        std::cout << "Renderer available: " << r->getName() << std::endl;
+    }
+    Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+}
+
+#pragma endregion
+
+OgreModule& OgreModule::Instance(){
+    static OgreModule instance;
+    return instance;
+}
+
+OgreModule::OgreModule(){
+        m_ogreRoot = std::make_shared<Ogre::Root>("plugins.cfg", "ogre.cfg");
+    if (!m_ogreRoot->restoreConfig()) {
+        Ogre::LogManager::getSingleton().logMessage("Initialize::configure_ogre => " +
+        std::string("ERROR: unable to configure Ogre"));
+    }
+    //If there is another rendering system available, we could choose between one or another
+    for(Ogre::RenderSystem* renderSys : m_ogreRoot->getAvailableRenderers()){
+        if(renderSys->getName() == "OpenGL Rendering Subsystem"){
+            m_ogreRoot->setRenderSystem(renderSys);
+            break;
+        }
+    }
+
+    m_ogreRoot->getRenderSystem()->setConfigOption("Full Screen", "No");
+
+    //Must be done before initializing Ogre::Root
+    m_ogreOverlaySystem = std::make_shared<Ogre::OverlaySystem>();
+
+    m_ogreRoot->initialise(false);
+
+    #ifdef __linux__
+        SDL_setenv("SDL_VIDEODRIVER", "x11", 1);
+    #endif
+
+    if (SDL_Init(SDL_INIT_EVENTS) != 0) {
+        throw std::runtime_error("SDL_Init failed");
+    }
+    
+    m_sdlWindow = SDL_CreateWindow("Ogre Test Window",SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                                    1000, 800, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE);
+    SDL_SysWMinfo wmInfo;
+    SDL_VERSION(&wmInfo.version);
+    if (!SDL_GetWindowWMInfo(m_sdlWindow, &wmInfo)) {
+        throw std::runtime_error("SDL_GetWindowWMInfo failed");
+    }
+    SDL_Log("Video driver: %s", SDL_GetCurrentVideoDriver());
+    //SDL_SetWindowFullscreen(sdlWindow,SDL_WINDOW_FULLSCREEN_DESKTOP);
+
+    Ogre::NameValuePairList params;
+    #ifdef __linux__
+    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.x11.window);
+    #elif _WIN32
+    size_t windowHandle = reinterpret_cast<size_t>(wmInfo.info.win.window);
+    #endif
+    
+    params["externalWindowHandle"] = Ogre::StringConverter::toString(windowHandle);
+    m_ogreRenderWindow = m_ogreRoot->createRenderWindow(OGRE_WINDOW_NAME, 1000, 800, false, &params);
+
+    //--------------- VIEWPORT -------------------
+    m_defaultCameraSceneManager = m_ogreRoot->createSceneManager();
+    m_defaultCamera = m_defaultCameraSceneManager->createCamera("Default_camera");
+    m_viewport = m_ogreRenderWindow->addViewport(m_defaultCamera, 0, 0.f, 0.f, 1.f, 1.f); 
+    // default BackgroundColor is black
+    m_viewport->setBackgroundColour(Ogre::ColourValue(0.3f,0.3f,0.5f,1.f));
+    m_viewport->setDimensions(0.0f, 0.0f, 1.0f, 1.0f);
+
+    locateResources();
+    loadResources();
+}
+
+OgreModule::~OgreModule(){
+
+    for(auto& sm: m_sceneManagers){
+        if(sm.second){
+            m_ogreRoot->destroySceneManager(sm.second);
+        }
+    }
+    m_sceneManagers.clear();
+    
+    m_ogreRenderWindow->destroy();
+
+    m_ogreRoot->shutdown();
+
+    SDL_DestroyWindow(m_sdlWindow);
+    SDL_Quit();
+}
+
+void OgreModule::setCurrentSceneManager(HUGO::String sceneName){
+
+    //If requested sceneManager was not created, we create it
+    if(m_sceneManagers.find(sceneName) == m_sceneManagers.end()){
+        createSceneManager(sceneName);
+    }
+
+    m_currentSceneManager = m_sceneManagers[sceneName];
+}
+
+Ogre::SceneManager* OgreModule::getCurrentSceneManager(){
+    return m_currentSceneManager;
+}
+
+Ogre::Viewport* OgreModule::getViewport(){
+    return m_viewport;
+}
+
+void OgreModule::viewportToDefaultCamera(){
+    m_viewport->setCamera(m_defaultCamera);
+}
+
+void OgreModule::createSceneManager(HUGO::String sceneName){
+    if(m_sceneManagers.find(sceneName) == m_sceneManagers.end())
+        m_sceneManagers[sceneName] = m_ogreRoot->createSceneManager();
+}
+
+void OgreModule::destroySceneManager(HUGO::String sceneName){
+    if (m_sceneManagers[sceneName] == m_currentSceneManager) m_currentSceneManager = nullptr;
+    m_ogreRoot->destroySceneManager(m_sceneManagers[sceneName]);
+
+    m_sceneManagers.erase(sceneName);
+}
+
+Ogre::RenderWindow* OgreModule::getOgreRenderWindow() const
+{
+    return m_ogreRenderWindow;
+}
+
+SDL_Window *OgreModule::getSDLWindow() const
+{
+    return m_sdlWindow;
+}
+
+void OgreModule::renderOneFrame(){
+    m_ogreRoot->renderOneFrame();
+}
+
+void OgreModule::updateWindowDimensions()
+{
+    int w,h;
+    SDL_GetWindowSize(OgreModule::Instance().getSDLWindow(), &w, &h);
+    if (w > 0 && h > 0)
+    {
+        m_ogreRenderWindow->resize(w, h);
+        m_ogreRenderWindow->windowMovedOrResized();
+    }
+}

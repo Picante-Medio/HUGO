@@ -1,0 +1,279 @@
+// material for Overlays
+// WE HAVE TO add texture_unit!!!!!
+material UI/Test
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture spaceSky.jpg
+                colour_op replace
+            }
+        }
+    }
+}
+material UI/Test1
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture spaceSky.jpg
+                colour_op replace
+            }
+        }
+    }
+}
+material UI/Test2
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture white.png
+                colour_op replace
+            }
+        }
+    }
+}
+material UI/Background
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture fondo.png
+                colour_op replace
+            }
+        }
+    }
+}
+material UI/HUGOwhite
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture titulo.png
+                colour_op replace
+            }
+        }
+    }
+}
+
+material UI/HUGOPlayBotonHover
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture botonhover.png
+                colour_op replace
+            }
+        }
+    }
+}
+
+material UI/HUGOPlayBoton
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture botoninicio.png
+                colour_op replace
+            }
+        }
+    }
+}
+
+material UI/SliderBackground
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture sliderfondo.png
+                colour_op replace
+            }
+        }
+    }
+}
+
+material UI/BackgroundWhite
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture white.png
+                colour_op replace
+            }
+        }
+    }
+}
+
+material UI/Track
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit
+            {
+                texture white.png
+                colour_op replace
+            }
+
+        }
+    }
+}
+
+material UI/TrackHUGO
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit
+            {
+                texture sliderboton.png
+                colour_op replace
+            }
+
+        }
+    }
+}
+
+material UI/Knob
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture knob.png
+                colour_op replace
+            }
+        }
+    }
+}
+material UI/KnobHover
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture scr-down.png
+                colour_op replace
+            }
+        }
+    }
+}
+material UI/KnobPressed
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture scr-down-p.png
+                colour_op replace
+            }
+        }
+    }
+}

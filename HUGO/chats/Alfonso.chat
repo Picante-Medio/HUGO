@@ -1,11 +1,5 @@
 PREFAB
 
-ENTITY Alfonso 0
+Alfonso 0
 	COMPONENT MeshRendererComponent
-		[mesh] STRING 
-res://sphere.tres
-
-ENTITY David 1
-	COMPONENT ParentComponent
-		[value] int 0
-
+		STRING mesh res://sphere.tres

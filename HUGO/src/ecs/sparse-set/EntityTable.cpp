@@ -1,5 +1,5 @@
 #include "EntityTable.h"
-#include "Ecs.h"
+#include "EcsTypes.h"
 #include <vector>
 
 EntityTable::EntityTable() 
@@ -12,8 +12,8 @@ EntityID EntityTable::createEntity() {
     availableEntitySpaces.pop();
   }
   else {
-    componentDirections.push_back(std::array<DenseListIndex, MAX_COMPONENTS>());
-    componentMask.push_back(std::bitset<MAX_COMPONENTS>());
+    componentDirections.emplace_back();
+    componentMask.emplace_back();
     newID = componentMask.size() - 1;
   }
 
@@ -64,7 +64,12 @@ EntityTable::getAllDenseListIndexes(EntityID entity) {
 
   for(ComponentID id = 0; id < MAX_COMPONENTS; ++id)
     if(componentMask[entity].test(id))
-      list.push_back({id, componentDirections[entity][id]});
+      list.emplace_back(id, componentDirections[entity][id]);
 
   return list;
+}
+
+std::vector<std::bitset<MAX_COMPONENTS>> 
+EntityTable::getComponentMask() {
+  return componentMask;
 }

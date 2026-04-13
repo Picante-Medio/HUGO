@@ -1,0 +1,100 @@
+overlay testCanvas/SimpleTest1
+{
+    zorder 500
+
+    overlay_element testCanvas/SimpleTest1/Container Panel
+    {
+        left 0.5
+        top 0.2
+        width 0.3
+        height 0.1
+
+        overlay_element testCanvas/SimpleTest1/Container/Text TextArea
+        {
+            left 0.075
+            top -0.02
+            font_name Roboto 
+            char_height 0.04 
+            space_width 0.025
+            colour_top 0.0 0.0 0.0 1.0
+            colour_bottom 0.0 0.0 0.0 1.0
+            horz_align left 
+            vert_align center  
+        }
+    }
+}
+
+overlay testCanvas/SimpleTest2
+{
+    zorder 500
+
+    overlay_element testCanvas/SimpleTest2/Container Panel
+    {
+        left 0.5
+        top 0.2
+        width 0.3
+        height 0.1
+
+        overlay_element testCanvas/SimpleTest2/Container/Text TextArea
+        {
+            left 0.075
+            top -0.02
+            font_name Roboto 
+            char_height 0.04 
+            space_width 0.025
+            colour_top 0.0 0.0 0.0 1.0
+            colour_bottom 0.0 0.0 0.0 1.0
+            horz_align left 
+            vert_align center  
+        }
+    }
+}
+
+overlay testCanvas/PBTest
+{
+    zorder 500
+
+    overlay_element testCanvas/PBTest/Background Panel
+    {
+        metrics_mode relative
+        left 0.2
+        top 0.2
+        width 0.3
+        height 0.05
+        overlay_element testCanvas/PBTest/Fill Panel
+        {
+            metrics_mode relative
+        }
+    }
+}
+
+overlay testCanvas/SliderTest
+{
+    // background of the slider
+    overlay_element testCanvas/SliderTest/Background Panel
+    {
+        metrics_mode relative
+        left 0.2
+        top 0.4
+        width 0.4
+        height 0.04
+        // fill 
+        overlay_element testCanvas/SliderTest/Track Panel
+        {
+            metrics_mode relative
+            left 0.0
+            top 0.0
+            width 0.0
+            height 0.0
+        }
+        //knob
+        overlay_element testCanvas/SliderTest/Knob Panel
+        {
+            metrics_mode relative
+            left -0.1 
+            top -0.25
+            width 0.1 
+            height 1.5
+        }
+    }
+}

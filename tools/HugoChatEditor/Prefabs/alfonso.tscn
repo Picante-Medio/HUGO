@@ -1,31 +1,13 @@
 [gd_scene format=3 uid="uid://krs4pyuy4e"]
 
-[ext_resource type="Script" uid="uid://dcc6b5sxl6c7u" path="res://Entities/entity.gd" id="1_4js2q"]
-[ext_resource type="SphereMesh" uid="uid://citadnjn16yba" path="res://sphere.tres" id="2_v4oxg"]
-[ext_resource type="Script" uid="uid://bnjt3w18hk2gs" path="res://NativeComponents/RenderComponent.gd" id="3_odry2"]
+[ext_resource type="Script" uid="uid://bnjt3w18hk2gs" path="res://addons/HugosChatPlugin/NativeComponents/RenderComponent.gd" id="2_8f7sm"]
+[ext_resource type="SphereMesh" uid="uid://citadnjn16yba" path="res://meshes/sphere.tres" id="2_v4oxg"]
+
 
 [node name="Alfonso" type="Node3D" unique_id=307300848]
-script = ExtResource("1_4js2q")
-entities = Dictionary[String, Dictionary]({
-"Alfonso": {
-"MeshRendererComponent": Dictionary[String, Variant]({
-"mesh": "STRING 
-res://sphere.tres"
-})
-},
-"David": {
-"ParentComponent": {
-"value": "int 0"
-}
-}
-})
-metadata/_custom_type_script = "uid://dcc6b5sxl6c7u"
 
 [node name="MeshRenderer" type="MeshInstance3D" parent="." unique_id=2050111520]
 mesh = ExtResource("2_v4oxg")
-script = ExtResource("3_odry2")
-metadata/_custom_type_script = "uid://bnjt3w18hk2gs"
+script = ExtResource("2_8f7sm")
 
 [node name="David" type="Node3D" parent="." unique_id=615026483]
-script = ExtResource("1_4js2q")
-metadata/_custom_type_script = "uid://dcc6b5sxl6c7u"

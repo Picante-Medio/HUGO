@@ -1,44 +1,44 @@
 #include "HugoMotionState.h"
 #include "BulletUtils.h"
+#include "TransformComponent.h"
+#include "ColliderComponent.h"
 
-
-HUGOMotionState::HUGOMotionState(const btTransform initialPos, TransformComponent& transform, btTransform offset)
-: btTransformRegister(initialPos)
-, hugoTransform(transform)
+HUGOMotionState::HUGOMotionState(const btTransform initialPos, std::shared_ptr<InternalScene> scene, unsigned long int id, btTransform offset)
+: entityID(id)
+, hugoScene(scene)
+, btTransformRegister(initialPos)
 , centerOfMassOffset(offset)
 {
 
 }
-
-// void HUGOMotionState::setHugoTransform(TransformComponent& transform)
-// {
-//     hugoTransform = transform;
-// }
     
 void HUGOMotionState::updateBulletTransform()
 {
-    // Uses associated HUGO::TransformComponent to update itself
-    btTransform auxTransform = btTransform(
-                               BulletUtils::quaternionToBullet(hugoTransform.rotation), 
-                               BulletUtils::vector3ToBullet(hugoTransform.position));
 
-    btTransformRegister = auxTransform * centerOfMassOffset;
+    TransformComponent& hugoTransform = hugoScene->getComponent<TransformComponent>(entityID);
+    ColliderComponent hugoCol = hugoScene->getComponentConst<ColliderComponent>(entityID);
+
+    btQuaternion q = BulletUtils::quaternionToBullet(hugoTransform.getRotation()) * BulletUtils::quaternionToBullet(hugoCol.getRotationOffset());
+    q.normalize();
+
+    // Uses associated HUGO::TransformComponent to update itself
+    btTransformRegister = btTransform(q, BulletUtils::vector3ToBullet(hugoTransform.getPosition()) + BulletUtils::vector3ToBullet(hugoCol.getPositionOffset()));
 }
 
 void HUGOMotionState::getWorldTransform(btTransform& worldTrans) const
 {
-    worldTrans = btTransformRegister * centerOfMassOffset;
+    worldTrans = btTransformRegister;
 }
     
 void HUGOMotionState::setWorldTransform(const btTransform& worldTrans)
 {
-    btTransformRegister = worldTrans * centerOfMassOffset;
-    // if(hugoTransform.use_count() == 0){
-    //     return;
-    // }
+    btTransformRegister = worldTrans;
 
+    TransformComponent& hugoTransform = hugoScene->getComponent<TransformComponent>(entityID);
+    ColliderComponent hugoCol = hugoScene->getComponentConst<ColliderComponent>(entityID);
+        
     btQuaternion rot = btTransformRegister.getRotation();
-    hugoTransform.rotation = HUGO::Quaternion(rot.w(), rot.x(), rot.y(), rot.z());
+    hugoTransform.setRotation(hugoCol.getRotationOffset().inverse() * HUGO::Quaternion(rot.w(), rot.x(), rot.y(), rot.z()));
     btVector3 pos = btTransformRegister.getOrigin();
-    hugoTransform.position = HUGO::Vector3(pos.x(), pos.y(), pos.z());
+    hugoTransform.setPosition(HUGO::Vector3(pos.x(), pos.y(), pos.z()) - hugoCol.getPositionOffset());
 }

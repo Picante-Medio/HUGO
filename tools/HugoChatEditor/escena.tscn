@@ -1,81 +1,47 @@
 [gd_scene format=3 uid="uid://dq2fl1vp76r7r"]
 
-[ext_resource type="Script" uid="uid://cft1fgdpqn2vu" path="res://addons/HugosChatPlugin/SceneScripts/scene_tracker.gd" id="1_865ah"]
-[ext_resource type="PackedScene" uid="uid://krs4pyuy4e" path="res://Prefabs/alfonso.tscn" id="2_fanfj"]
-[ext_resource type="Script" uid="uid://dimuk3ggoam44" path="res://Entities/entity3d.gd" id="3_sks45"]
-[ext_resource type="Script" uid="uid://bnjt3w18hk2gs" path="res://NativeComponents/RenderComponent.gd" id="4_d4yc1"]
-[ext_resource type="SphereMesh" uid="uid://citadnjn16yba" path="res://sphere.tres" id="4_ssasw"]
-[ext_resource type="Script" uid="uid://dcc6b5sxl6c7u" path="res://Entities/entity.gd" id="5_d4yc1"]
-[ext_resource type="Script" uid="uid://jpokl8dqfveb" path="res://Components/AudioComponent.gd" id="6_77l53"]
+[ext_resource type="Script" uid="uid://cft1fgdpqn2vu" path="res://addons/HugosChatPlugin/Entities/scene_tracker.gd" id="1_865ah"]
+[ext_resource type="Script" uid="uid://dcc6b5sxl6c7u" path="res://addons/HugosChatPlugin/Entities/entity.gd" id="2_sks45"]
+[ext_resource type="Script" uid="uid://cixepomluit03" path="res://Components/LightComponent.gd" id="3_fanfj"]
+[ext_resource type="BoxMesh" uid="uid://itxokud7cpu8" path="res://meshes/new_box_mesh.tres" id="4_d4yc1"]
+[ext_resource type="Script" uid="uid://bnjt3w18hk2gs" path="res://addons/HugosChatPlugin/NativeComponents/RenderComponent.gd" id="4_fanfj"]
 
 [node name="Escena" type="Node3D" unique_id=1674858039 groups=["SCENE_TRACKER"]]
 script = ExtResource("1_865ah")
 entities = Dictionary[String, Dictionary]({
-"Alfonso": {
-"ParentComponent": {
-"value": "INT 2"
-},
-"RenderComponent": Dictionary[String, Variant]({
-"materialName": "STRING 
-",
-"mesh": "STRING 
-res://sphere.tres",
-"objectID": "INT 0"
-})
-},
-"David": {
-"ParentComponent": {
-"value": "INT 3"
-}
-},
-"Entity": {},
-"Guille": {
-"AudioComponent": Dictionary[String, Variant]({
-"audioId": "INT 0",
-"pitch": "FLOAT 0.0",
-"volume": "FLOAT 0.0"
+"Entity": {
+"LightComponent": Dictionary[String, Variant]({
+"attenuation": "VECTOR_4 attenuation 0.0 0.0 0.0 0.0",
+"diffuse": "VECTOR_4 diffuse 0.0 0.0 0.0 0.0",
+"lightType": "INT lightType 0",
+"shadowFarClipDist": "FLOAT shadowFarClipDist 0.0",
+"shadowFarDist": "FLOAT shadowFarDist 0.0",
+"shadowFarDistSquared": "FLOAT shadowFarDistSquared 0.0",
+"shadowNearClipDist": "FLOAT shadowNearClipDist 0.0",
+"specular": "VECTOR_4 specular 0.0 0.0 0.0 0.0",
+"spotFalloff": "FLOAT spotFalloff 0.0",
+"spotInner": "FLOAT spotInner 0.0",
+"spotNearClip": "FLOAT spotNearClip 0.0",
+"spotOuter": "FLOAT spotOuter 0.0"
 }),
-"ParentComponent": {
-"value": "INT 0"
-},
 "RenderComponent": Dictionary[String, Variant]({
-"materialName": "STRING 
-",
-"mesh": "STRING 
-res://sphere.tres",
-"objectID": "INT 0"
-})
-},
-"Juan": {
-"TransformComponent": Dictionary[String, Variant]({
-"position": "VECTOR_3 0.56475341320038 0.0 0.0",
-"rotation": "VECTOR_3 0.0 0.0 0.0",
-"scale": "VECTOR_3 1.0 1.0 1.0"
+"materialName": "STRING materialName ",
+"mesh": "STRING mesh res://meshes/new_box_mesh.tres",
+"objectID": "INT objectID 0"
 })
 }
 })
-metadata/_custom_type_script = "uid://cft1fgdpqn2vu"
 
-[node name="Juan" type="Node3D" parent="." unique_id=660153118]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5647534, 0, 0)
-script = ExtResource("3_sks45")
-metadata/_custom_type_script = "uid://dimuk3ggoam44"
-
-[node name="Guille" type="Node3D" parent="Juan" unique_id=761297550]
-script = ExtResource("5_d4yc1")
+[node name="Entity" type="Node3D" parent="." unique_id=1869963947]
+script = ExtResource("2_sks45")
+systems = Array[int]([])
 metadata/_custom_type_script = "uid://dcc6b5sxl6c7u"
 
-[node name="MeshRenderer" type="MeshInstance3D" parent="Juan/Guille" unique_id=1900278368]
-mesh = ExtResource("4_ssasw")
-script = ExtResource("4_d4yc1")
+[node name="LightComponent" type="Node" parent="Entity" unique_id=1188881374]
+script = ExtResource("3_fanfj")
+metadata/_custom_type_script = "uid://cixepomluit03"
+
+[node name="RenderComponent" type="MeshInstance3D" parent="Entity" unique_id=1672314433]
+mesh = ExtResource("4_d4yc1")
+script = ExtResource("4_fanfj")
 metadata/_custom_type_script = "uid://bnjt3w18hk2gs"
-
-[node name="AudioComponent" type="Node" parent="Juan/Guille" unique_id=146731479]
-script = ExtResource("6_77l53")
-metadata/_custom_type_script = "uid://chfil18rmq2xi"
-
-[node name="Entity" type="Node3D" parent="." unique_id=402391702]
-script = ExtResource("5_d4yc1")
-metadata/_custom_type_script = "uid://dcc6b5sxl6c7u"
-
-[node name="Alfonso" parent="Entity" unique_id=307300848 instance=ExtResource("2_fanfj")]

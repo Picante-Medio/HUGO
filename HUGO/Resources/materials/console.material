@@ -1,0 +1,38 @@
+// material for Console Overlays
+material Console/LogBackground
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture darkGray.png
+            }
+        }
+    }
+}
+
+material Console/InputBackground
+{
+    technique
+    {
+        pass
+        {
+            // MUST BE INCLUDED
+            lighting off
+            depth_check off
+            depth_write off
+            scene_blend alpha_blend
+
+            texture_unit{
+                texture gray.png
+            }
+        }
+    }
+}

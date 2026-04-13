@@ -2,53 +2,41 @@
 
 #include <memory>
 
-#include "OgreRenderWindow.h"
-#include "OgreRoot.h"
 #include "HugoVirtualTimer.h"
 #include "miniaudio.h"
-#include "BulletModule.h"
+#include "OgreModule.h"
+#include "MiniaudioModule.h"
+#include "AudioAssetsModule.h"
+#include "IPhysicsModule.h"
+#include "HugoError.h"
 
-class Scene;
+#include "SceneManager.h"
+#include "Input.h"
+
+class InternalScene;
 class VirtualTimer;
-class SDL_Window;
+struct SDL_Window;
 
 namespace HUGO {
     class ResourceManager;
 
     class Core {
+        const uint32_t FIXED_STEP = 1000/60;
         void initModules();
-
-        //Ogre
-        void initOgre();
-        void destroyOgre();
-
-        std::shared_ptr<Ogre::Root> m_ogreRoot;
-        Ogre::RenderWindow* m_renderWindow;
-        SDL_Window* sdlWindow;
-
-        //Miniaudio
-        void initMiniaudio();
-        void destroyMiniaudio();
-        std::shared_ptr<ma_engine> maEngine;
+        void initLua();
+        void initAudioAssets();
 
         // Physics
-        void initPhysicsModule();
-        void destroyPhysicsModule();
         std::shared_ptr<IPhysicsModule> physicsModule;
 
         VirtualTimer vt;
-        std::shared_ptr<Scene> scenePtr;
-        
-        void locateResources();
-        void loadResources();
 
-        //Resource Manager
-        std::shared_ptr<ResourceManager> m_resourceManager;
-    
+        std::shared_ptr<Input> input;
+        SceneManager sceneManager;
+
     public:
         Core();
-        void init();
-        void destroy();
+        ErrorOrVoid init(int argc, char* argv[]);
 
         void run();
     };

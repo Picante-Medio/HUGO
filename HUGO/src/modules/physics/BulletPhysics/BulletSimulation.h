@@ -4,14 +4,18 @@
 #include "btBulletDynamicsCommon.h"
 #include "IPhysicsSimulation.h"
 #include "HugoTypes.h"
+#include "EcsTypes.h"
 
-class TransformComponent;
-class RigidBodyComponent;
-class Shape;
+struct TransformComponent;
+struct RigidBodyComponent;
+struct ColliderComponent;
+struct Shape;
 
-struct RigidBodyObject{
-    HUGO::RigidBodyID id;
-    btRigidBody* bulletRB = nullptr;
+struct CollisionObject{
+    std::shared_ptr<InternalScene> scene;
+    HUGO::CollisionObjectID id;
+    EntityID hgId;
+    btCollisionObject* bulletRB = nullptr;
 };
 
 struct ShapeObject{
@@ -29,13 +33,15 @@ class BulletSimulation : public IPhysicsSimulation {
     btSequentialImpulseConstraintSolver* solver;
 
     btDynamicsWorld* btWorld;
+    int numSubSteps;
 
+    btIDebugDraw* debugDrawer;
 
     // ------ Rigidbody & collision shapes management ------
     
     // Same logic as in RenderSystem. Credits to them, they did a really good job.
-    PagedArray<RigidBodyObject, 128> rigidBodies;
-    std::vector<HUGO::RigidBodyID> freeBulletRBObjectId;
+    PagedArray<CollisionObject, 128> rigidBodies;
+    std::vector<HUGO::CollisionObjectID> freeBulletRBObjectId;
     std::vector<std::size_t> rbIdToIndex;
 
     // We use ids to shapes so various rb can use the same shape
@@ -43,34 +49,40 @@ class BulletSimulation : public IPhysicsSimulation {
     std::vector<HUGO::CollisionShapeID> freeBulletShapeId;
     std::vector<std::size_t> shapeIdToIndex;
     
-    HUGO::CollisionShapeID createShapeObject(Shape& shape);
+    HUGO::CollisionShapeID createShapeObject(ColliderComponent& col);
     ShapeObject& getShapeObject(const HUGO::CollisionShapeID id);
     void removeShapeObject(HUGO::CollisionShapeID& id);
     void destroyShapeObject(ShapeObject& shObj);
+    btCollisionShape* getorCreateShape(HUGO::CollisionShapeID& id, ColliderComponent& hgCol);
 
-    HUGO::RigidBodyID createRigidBodyObject(RigidBodyComponent& hgRb, TransformComponent& tf, HUGO::BodyType type);
-    RigidBodyObject& getRigidBodyObject(const HUGO::RigidBodyID id);
-    void removeRigidBodyObject(HUGO::RigidBodyID& id);
-    void destroyRigidBodyObject(RigidBodyObject& RbObj);
+    HUGO::CollisionObjectID createColliderObject(ColliderComponent& hgCol);
+    HUGO::CollisionObjectID upgradeToRigidBodyObject(ColliderComponent& hgCol, RigidBodyComponent& hgRb);
+    CollisionObject& getCollisionObject(const HUGO::CollisionObjectID id);
+    void removeRigidBodyObject(HUGO::CollisionObjectID& id);
+    void removeColliderObject(HUGO::CollisionObjectID& id);
 
-    // Check for updates on a specific RB
-    void checkFlags(RigidBodyComponent& hgRB);
+    // Check for updates on a specific RB or collider
+    void checkRigidBodyFlags(RigidBodyComponent& hgRB);
+    void checkColliderFlags(ColliderComponent& hgCol);
+    void checkTransformFlags(const ColliderComponent& collider, const TransformComponent& transform);
 
     // @brief Creates and adds rigidbodies to simulation. Updates kinematic bodies.
     void syncBodiesToBullet();
 
     void stepSimulation(double dt);
 
-    // Already performed by the motion state
-    // void syncBodiesToGame(); 
+    // @brief Updates the asleep parameter of the RB using their bullet counterpart
+    void syncBodiesToGame(); 
 
 public:
     
-    BulletSimulation(std::shared_ptr<Scene> scene);
+    BulletSimulation(std::shared_ptr<InternalScene> scene);
     ~BulletSimulation();
 
     void destroySimulation();
 
     // Sync bodies to bullet, step simulation, sync bodies back to game
     void performSimulation(double dt) override;
+
+    void debugDraw() override;
 };

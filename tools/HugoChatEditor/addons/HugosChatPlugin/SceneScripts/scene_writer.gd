@@ -2,12 +2,11 @@
 extends EditorScript
 class_name SceneWriter
 
-const CHATS_PATH = "../../HUGO/chats/"
-
 func _run() -> void:
 	write()
 
 static func write():
+	if EditorInterface.get_edited_scene_root() is not SCENE_TRACKER: return
 	var root:SCENE_TRACKER = EditorInterface.get_edited_scene_root()
 	if root == null:
 		push_error("No edited scene root found.")
@@ -17,7 +16,7 @@ static func write():
 	var entity_map:Dictionary[String, int] = root.entities_map
 	
 	var scene_name := root.name
-	var file_path := CHATS_PATH.path_join("%s.chat" % scene_name)
+	var file_path := HugoConfig.CHATS_PATH.path_join("%s.chat" % scene_name)
 	
 	var file := FileAccess.open(file_path, FileAccess.WRITE)
 	if file == null:
@@ -45,7 +44,7 @@ static func write():
 			
 			for parameter_key in component.keys():
 				var value = component[parameter_key]
-				file.store_line("\t\t[%s] %s" % [parameter_key, str(value)])
+				file.store_line("\t\t%s" % [str(value)])
 		
 		file.store_line("")
 	
