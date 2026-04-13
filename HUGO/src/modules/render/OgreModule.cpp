@@ -115,7 +115,6 @@ OgreModule::~OgreModule(){
 
     for(auto& sm: m_sceneManagers){
         if(sm.second){
-
             m_ogreRoot->destroySceneManager(sm.second);
         }
     }
