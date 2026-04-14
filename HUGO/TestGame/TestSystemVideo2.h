@@ -8,6 +8,7 @@ HSYSTEM(TestSystemVideo2)
     EntityID menuButton;
     EntityID sinbad;
     EntityID suelo;
+    EntityID cubo;
 
     void createCube(EntityID ent);
 public:

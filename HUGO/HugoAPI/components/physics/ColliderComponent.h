@@ -30,6 +30,8 @@ HCOMPONENT(ColliderComponent)
     DEFAULT_SERIALIZED_MEMBER(bool, active, true)
 
     DEFAULT_SERIALIZED_MEMBER(bool, useGizmo, true)
+
+    DEFAULT_SERIALIZED_MEMBER(bool, isTrigger, false)
     
     std::vector<EntityID> collisionInfo;
     std::vector<EntityID> collisionBuffer;
