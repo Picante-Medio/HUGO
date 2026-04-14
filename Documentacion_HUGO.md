@@ -507,6 +507,8 @@ Los atributos del ``ColliderComponent`` solamente deben ser accedidos a través 
 
 También es posible dibujar la forma que tiene el **Collider** seteando su atributo ``useGizmo`` a ``true``. Esto es especialmente útil para hacer pruebas y ver el tamaño real del **Collider**. La forma en la que se dibuja se describe más adelante.
 
+Es posible hacer que un collider se comporte como un **Trigger** (es decir, que no colisione contra nada pero detecte cuando un cuerpo choca contra él) seteando su atributo ``isTrigger`` a ``true`` **en la inicialización del componente**. Si no se hace durante la inicialización del componente **no ocurrirá nada**.
+
 ### RigidbodyComponent
 
 Un **Rigidbody**, o un cuerpo rígido, es la forma que tiene **HUGO** y otros muchos motores de definir la forma y las propiedades de objetos que son afectados por el sistema de físicas (gravedad, velocidad, fuerzas, etc.). Para añadir un **RigidBody** a una entidad es necesario que tenga antes un ``ColliderComponent`` que defina su forma. **Si a una entidad se le añade un RigidBody sin tener un Collider, no ocurrirá nada**. En la inicialización del componente se debe definir el tipo de cuerpo que se está creando (**dinámico**, **estático** o **kinemático**, por defecto **dinámico**) utilizando el método ``setBodyType``. El cuerpo se crea del tipo especificado. **Si se cambia el tipo de cuerpo después de haberlo inicializado, no ocurrirá nada**. En nuestro motor un **Rigidbody** define las siguientes propiedades físicas:
