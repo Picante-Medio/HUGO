@@ -20,7 +20,7 @@ func enter_cd(cd):
 	animation.play(&"OpenCD")
 
 func exit_cd(_cd:Draggable):
-	if cd_entered: return
+	if cd_entered or not current_cd: return
 	current_cd.on_drop.disconnect(play_cd)
 	animation.play(&"CloseCD")
 	current_cd = null

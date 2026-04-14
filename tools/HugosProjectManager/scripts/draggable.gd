@@ -24,6 +24,9 @@ func _input_event(_viewport: Viewport, event: InputEvent, _shape_idx: int) -> vo
 func play():
 	project.play()
 
+func get_project_path() -> String:
+	return project.project_path
+
 func set_path(path:String):
 	var splitted_path:PackedStringArray = path.split("/")
 	var project_name:String = splitted_path[splitted_path.size() - 1]

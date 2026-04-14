@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cdjvud3b1372x"]
 
 [ext_resource type="Script" uid="uid://c5vfgqdhdk6as" path="res://scripts/hugo_project_manager.gd" id="1_xy66u"]
+[ext_resource type="PackedScene" uid="uid://m17hgcgl54gp" path="res://scenes/papeador.tscn" id="3_1kt4v"]
 [ext_resource type="PackedScene" uid="uid://d0fahxnpv4rmk" path="res://scenes/cd_reader.tscn" id="4_dbm5h"]
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_hbcep"]
@@ -16,7 +17,7 @@ normal = Vector2(-1, 0)
 
 [node name="Root" type="Node" unique_id=1285502316]
 
-[node name="HugoProjectManager" type="Control" parent="." unique_id=18608563 node_paths=PackedStringArray("world")]
+[node name="HugoProjectManager" type="Control" parent="." unique_id=18608563 node_paths=PackedStringArray("world") groups=["HUGO_PROJECT_MANAGER"]]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -119,3 +120,6 @@ shape = SubResource("WorldBoundaryShape2D_dbm5h")
 
 [node name="CdReader" parent="world" unique_id=1701063322 instance=ExtResource("4_dbm5h")]
 position = Vector2(982, 124)
+
+[node name="papeador" parent="." unique_id=846203302 instance=ExtResource("3_1kt4v")]
+position = Vector2(1067, 572)

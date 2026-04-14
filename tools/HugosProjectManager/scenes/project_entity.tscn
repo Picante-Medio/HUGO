@@ -1,11 +1,12 @@
 [gd_scene format=3 uid="uid://bwijq4iqudax"]
 
-[ext_resource type="Script" uid="uid://cjqgwxn58l25r" path="res://scripts/draggable.gd" id="1_ixvsq"]
-[ext_resource type="Texture2D" uid="uid://cafam0rpluucp" path="res://sprites/cd.png" id="2_ixvsq"]
-[ext_resource type="Script" uid="uid://cxcyumwvsdlnb" path="res://scripts/project_entity.gd" id="3_jhrav"]
+[ext_resource type="Script" uid="uid://cjqgwxn58l25r" path="res://scripts/draggable.gd" id="1_6r7wg"]
+[ext_resource type="Texture2D" uid="uid://cafam0rpluucp" path="res://sprites/cd.png" id="2_kumm5"]
+[ext_resource type="Script" uid="uid://cxcyumwvsdlnb" path="res://scripts/project_entity.gd" id="3_mtdga"]
+[ext_resource type="PackedScene" uid="uid://cluegdpu2ux2g" path="res://scenes/eye.tscn" id="4_kumm5"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_eg0ws"]
-size = Vector2(137, 134)
+[sub_resource type="CircleShape2D" id="CircleShape2D_6r7wg"]
+radius = 67.76614
 
 [sub_resource type="LabelSettings" id="LabelSettings_ixvsq"]
 outline_size = 4
@@ -13,21 +14,22 @@ outline_color = Color(0, 0, 0, 1)
 
 [node name="ProjectEntity" type="RigidBody2D" unique_id=1648274196 node_paths=PackedStringArray("project_name_label", "project")]
 z_index = 2
+collision_layer = 3
 input_pickable = true
-script = ExtResource("1_ixvsq")
+script = ExtResource("1_6r7wg")
 project_name_label = NodePath("project_name")
 project = NodePath("Project")
 metadata/_custom_type_script = "uid://cxcyumwvsdlnb"
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=74255975]
-texture = ExtResource("2_ixvsq")
+texture = ExtResource("2_kumm5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1571882063]
-position = Vector2(5.5, 3)
-shape = SubResource("RectangleShape2D_eg0ws")
+position = Vector2(2, 2)
+shape = SubResource("CircleShape2D_6r7wg")
 
 [node name="Project" type="Node" parent="." unique_id=520511663]
-script = ExtResource("3_jhrav")
+script = ExtResource("3_mtdga")
 metadata/_custom_type_script = "uid://cxcyumwvsdlnb"
 
 [node name="project_name" type="Label" parent="." unique_id=1092537674]
@@ -38,3 +40,9 @@ offset_bottom = 12.0
 text = "MyTestGame"
 label_settings = SubResource("LabelSettings_ixvsq")
 autowrap_mode = 3
+
+[node name="eye" parent="." unique_id=861584955 instance=ExtResource("4_kumm5")]
+position = Vector2(-15, -25)
+
+[node name="eye2" parent="." unique_id=642571989 instance=ExtResource("4_kumm5")]
+position = Vector2(-39, -51)

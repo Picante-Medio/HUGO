@@ -1,4 +1,5 @@
 extends Control
+class_name HugoProjectManager
 
 const ADDONS_ZIP_PATH := "res://addons.zip"
 const REQUIRED_FOLDERS := ["Resources", "Components", "Systems"]
@@ -198,6 +199,10 @@ func _print_error(message: String) -> void:
 func add_project(path:String):
 	projects_paths.push_back(path)
 	instance_project(path)
+	save()
+
+func remove_project(path:String):
+	projects_paths.erase(path)
 	save()
 
 func load_save():
