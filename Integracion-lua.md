@@ -77,3 +77,51 @@ Lua puede usarse para hacer comportamiento para los juegos, creando entidades y 
 
 # Consola de comandos
 
+La consola de comandos es una utilidad integrada en el motor que aprovecha la integración de LUA para ejecutar funciones tanto de LUA como de C++ en tiempo de ejecución. Esto facilita hacer pruebas y permite el uso de "cheats" en los juegos de forma mucho mas sencilla.
+
+La consola de comandos captura todo el output que se haga desde lua, por lo que escribir en una función de lua ``print("Hola")`` hará que en consola se imprima **Hola**.
+
+## Funcionamiento en ejecución
+
+La consola se abre en cualquier juego presionando **ctrl + T**. Una vez abierta el input del juego se inhabilita hasta que se pulse de nuevo **ctrl + T**.
+
+Para ejecutar una función en la consola de comandos hay que escribir su nombre en consola seguido de parentesis ``()`` (y si tiene argumentos con sus argumentos ``(args)``) y al darle a intro se ejecutará dicha función.
+
+Además, si una función devuelve uno de los valores que puede devolver LUA se puede especificar qué valor devuelve para que se imprima en consola el resultado de dicha función. Por ejemplo:
+
+```bash
+# En consola escribimos
+int|funcionquedevuelveint()
+
+# Y si la funcion devuelve 5 en consola se imprimirá
+> 5
+```
+
+Es posible navegar por los inputs que ha escrito el usuario utilizando **la flecha hacia arriba y la flecha hacia abajo**.
+
+## Imprimir
+
+Cuando se abra la consola se debe presionar sobre la zona de input para escribir. Cualquier función de LUA por defecto que se escriba funcionará, además de las funciones registradas, por supuesto.
+
+En esta consola además se imprimirá cualquier error interno del motor que no impida que siga funcionando. El usuario también puede imprimir logs y errores por esta consola utilizando ``scene->log()``. Por ejemplo:
+
+```cpp
+// imprimir hola mundo en consola
+scene->log("Hola Mundo!\n");
+
+// output en consola
+> Hola Mundo!
+
+// imprimir un error en consola
+
+ErrorOrValue<T> error;
+// ocurre el error y se guarda en la variable con mensaje "Ha habido un error"
+
+scene->log(error);
+
+//output en consola
+> ERROR: Ha habido un error
+```
+
+
+
