@@ -230,7 +230,7 @@ HUGO::CollisionObjectID BulletSimulation::createColliderObject(ColliderComponent
     }
     
     //get entity id
-    EntityID hgId = hgCol.objectID;
+    EntityID hgId = hgCol.entity;
 
     //create CollisionObject
     CollisionObject colObj = {scene, id, hgId, obj};
