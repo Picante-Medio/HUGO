@@ -50,12 +50,8 @@ ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
     for(auto systemName : sceneData.getValue().systems){
         ErrorOrType<std::shared_ptr<HUGO::System>> value = HUGO::SystemFactory::makeSystem(*m_sceneMap[sceneName], systemName);
 
-        if(value.isError()) {
-            value = HUGO::GameLibraryLoader::instance().GenerateAndGetSystem(*m_sceneMap[sceneName], systemName);
-            if (value.isError()) {
-                return ErrorOrVoid(value.getError());
-            }
-        }
+        if(value.isError())
+            return ErrorOrVoid(value.getError());
 
         m_sceneMap[sceneName]->addSystem(value.getValue());
         value.getValue()->init();
@@ -69,14 +65,8 @@ ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
             ErrorOrVoid compResult = HUGO::ComponentFactory::makeComponent(m_sceneMap[sceneName], currEntity, 
                 componentData.componentName, componentData.parameters);
 
-            if (compResult.isError()) {
-                compResult = HUGO::GameLibraryLoader::instance().GenerateComponent(m_sceneMap[sceneName], currEntity, 
-                    componentData.componentName, componentData.parameters);
-                if (compResult.isError()) {
-                    return ErrorOrVoid(compResult.getError());
-                }
-            }
-
+            if (compResult.isError())
+                return ErrorOrVoid(compResult.getError());
         }
     }
 
@@ -178,14 +168,8 @@ ErrorOrType<EntityID> SceneManager::instantiatePrefab(const HUGO::String& prefab
             ErrorOrVoid compResult = HUGO::ComponentFactory::makeComponent(scene, currEntity, 
                 componentData.componentName, componentData.parameters);
 
-            if (compResult.isError()) {
-                compResult = HUGO::GameLibraryLoader::instance().GenerateComponent(scene, currEntity, 
-                    componentData.componentName, componentData.parameters);
-                if (compResult.isError()) {
-                    return ErrorOrType<EntityID>(compResult.getError());
-                }
-            }
-
+            if (compResult.isError())
+                return ErrorOrType<EntityID>(compResult.getError());
         }
     
     return ErrorOrType<EntityID>(currEntity);

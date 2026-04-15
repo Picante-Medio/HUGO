@@ -130,12 +130,8 @@ InternalScene::addComponentLUA(int entityID, std::string& componentData) {
 	}
 
 	ErrorOrVoid compResult = HUGO::ComponentFactory::makeComponent(shared_from_this(), static_cast<EntityID>(entityID), componentName, parameters);
-	if(compResult.isError()) {
-		compResult = HUGO::GameLibraryLoader::instance().GenerateComponent(shared_from_this(), static_cast<EntityID>(entityID), componentName, parameters);
-		if(compResult.isError()) {
-			log(compResult.getError().errorMessage);
-		}
-	}
+	if(compResult.isError()) 
+		log(compResult.getError().errorMessage);
 }
 
 void
