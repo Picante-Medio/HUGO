@@ -57,13 +57,6 @@ ErrorOrVoid Core::init(int argc, char* argv[]){
 
     if(err.isError()) return err;
     
-
-    /*
-        Should be changed when implemented in GODOT to:
-        
-        err = sceneManager.setMainScene();
-        if(err.isError()) return err;
-    */
     sceneManager.setCurrentScene(mainSceneName);
 
     return ErrorOrVoid();
@@ -89,8 +82,10 @@ void HUGO::Core::initModules()
     input->setSDLWindow(OgreModule::Instance().getSDLWindow());
 }
 //HUGO main loop
-void Core::run(){
+ErrorOrVoid Core::run(){
     bool exit = false;
+    //If an error is detected, this value is returned
+    ErrorOrVoid exitValue = ErrorOrVoid();
 
     int32_t accumulator = 0;
 
@@ -100,27 +95,33 @@ void Core::run(){
         uint32_t frameTime = vt.getDeltaTime(); //ms
         accumulator += frameTime;
 
-        sceneManager.sceneChangeRequested();
+        exitValue = sceneManager.sceneChangeRequested();
+        if(exitValue.isError()) exit = true;
+        else{
+            while(accumulator > FIXED_STEP) {
+                sceneManager.fixedUpdateCurrentScene(FIXED_STEP);
+                physicsModule->performSimulations(FIXED_STEP);
+                accumulator -= FIXED_STEP;
+            }
+    
+            input->handleInput();
+            if(input->isQuitPressed()) {
+                exit = true;
+            }
+            if(input->windowHasChanged()){   
+                OgreModule::Instance().updateWindowDimensions();
+                input->clearWindowFlag();
+            }
+            sceneManager.updateCurrentScene(frameTime);
+            sceneManager.dispatchMessagesCurrentScene();
+            
+            OgreModule::Instance().renderOneFrame();
 
-        while(accumulator > FIXED_STEP) {
-            sceneManager.fixedUpdateCurrentScene(FIXED_STEP);
-            physicsModule->performSimulations(FIXED_STEP);
-            accumulator -= FIXED_STEP;
         }
 
-        input->handleInput();
-        if(input->isQuitPressed()) {
-            exit = true;
-        }
-        if(input->windowHasChanged()){   
-            OgreModule::Instance().updateWindowDimensions();
-            input->clearWindowFlag();
-        }
-        sceneManager.updateCurrentScene(frameTime);
-        sceneManager.dispatchMessagesCurrentScene();
-        
-        OgreModule::Instance().renderOneFrame();
 	}
+
+    return exitValue;
 }
 
 

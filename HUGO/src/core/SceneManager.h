@@ -62,10 +62,7 @@ namespace HUGO {
         void setCurrentSceneLUA(const HUGO::String sceneName);
 
         //Called by HUGO::Core. If there is a request for a scene change, change m_currentScene
-        void sceneChangeRequested();
-
-        //When SceneManager is initialized, this is called to load and set the main scene of the game. It should be declared through HUGODOT.
-        ErrorOrVoid setMainScene();
+        ErrorOrVoid sceneChangeRequested();
 
         //---Updates and fixedUpdates of current Scene
         void updateCurrentScene(uint32_t dt);

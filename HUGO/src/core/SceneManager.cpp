@@ -107,9 +107,9 @@ void SceneManager::setCurrentSceneAndDestroyPrevious(const HUGO::String& sceneNa
     m_sceneChangeInfo.destroyPreviousScene = true;
 }
 
-void SceneManager::sceneChangeRequested(){
+ErrorOrVoid SceneManager::sceneChangeRequested(){
     //If not requested, return.
-    if(!m_sceneChangeInfo.needsSceneChanged) return;
+    if(!m_sceneChangeInfo.needsSceneChanged) return ErrorOrVoid();
         m_sceneChangeInfo.needsSceneChanged = false;
     if(m_sceneChangeInfo.destroyPreviousScene) unloadScene(m_currentSceneName);
 
@@ -119,9 +119,7 @@ void SceneManager::sceneChangeRequested(){
 
         //Print error in lua console
         if(err.isError()){
-            /* It should call Lua console to show the error */
-            if(!m_currentScene.expired())
-                m_currentScene.lock()->log(std::shared_ptr<Error>(new StringError(err.getError())));
+            return err;
         }
     }
 
@@ -132,17 +130,8 @@ void SceneManager::sceneChangeRequested(){
     m_currentSceneName = m_sceneChangeInfo.nextSceneName;
     
     m_currentScene.lock()->load();
-}
-
-ErrorOrVoid SceneManager::setMainScene(){
-    ErrorOrType<HUGO::String> err = m_chatParser.getMainSceneName();
-
-    if (err.isError()) return ErrorOrVoid(err.getError());
-
-    setCurrentScene(err.getValue());
 
     return ErrorOrVoid();
-
 }
 
 void SceneManager::updateCurrentScene(uint32_t dt){
