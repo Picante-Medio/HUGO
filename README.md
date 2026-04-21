@@ -1,7 +1,7 @@
 # Documento de arquitectura del motor H.U.G.O
 - Escrito por los integrantes de 'Picante Medio' para la asignatura PIII del GDV. 
 - Año 2026
-- Explicación del nombre: HUGO is a unique game originator (sigla recursiva)
+- Explicación del nombre: *HUGO is a unique game originator* (sigla recursiva)
 
 # Arquitectura ECS
 El manejo de entidades del motor se hará a través del patrón de diseño **ECS (Entity Component System).**  Hemos elegido ECS frente a EC para tener mayor control sobre el orden de ejecución del código y también por motivos didácticos: nunca hemos usado ECS en un proyecto de esta escala, es una oportunidad para aprender.
@@ -16,6 +16,8 @@ Los **componentes** solo son responsables de almacenar el estado del juego. Son 
 ```cpp
 struct Component {
     EntityID myEntity;
+public:
+    Component(EntityID myEntity) : myEntity {}
 };
 ```
 
@@ -24,28 +26,44 @@ Los **sistemas** alteran la información provista por los componentes, añadiend
 // Los sistemas operan sobre entidades y componentes, a través de las escenas
 class System {
 protected:
-    std::shared_ptr<Scene> myScene;
+    std::shared_ptr<Scene> scene;
 public:
-    virtual void update(float dt);
+  System(std::shared_ptr<Scene> scene): scene(scene) {}
+  virtual void update(double dt) = 0;
+  virtual void fixedUpdate(double dt) = 0;
 };
 ```
 
 Las **escenas** son los contenedores de componentes y sistemas.
-- Guardan todos los componentes en una tabla densa y los asocian a sus entidades a través de una tabla de indirecciones **(estructura sparse set)**
+- Implementan la estructura sparse-set en dos clases, `EntityTable` y `ComponentDenseTable`, para almacenar los componentes de cada entidad *contiguos en memoria*
 - Almacenan los sitemas en un vector y los actualizan
+- Crean estructuras iterables para recorrer entidades que tienen ciertos componentes (Instancias de la clase `Query`)
+    - La única forma de ver o alterar el contenido de los componentes es a través de estas queries
 ```cpp
 class Scene {
 protected:
-    std::vector<System> systems; //Vector de sistemas
+  EntityTable entityTable;
+  ComponentDenseTable componentTable;
+  std::vector<std::shared_ptr<System>> systems;
 
-    // Implementación de sparse-set de componentes
 public:
-    // Actualización del estado
-    void update(float dt); //Update lógico
+    void update(float dt); //Llama a update de todos los sistemas en la lista
+    void fixedUpdate(float dt); //Llama a fixedUpdate de todos los sistemas en la lista
 
     // Manejo de entidades
+    EntityID createEntity();
+    void removeEntity(EntityID entity);
 
     // Manejo de componentes
+    template <typename T, typename... Ts>
+    void addComponent(EntityID entity, Ts &&...args);
+
+    template<tpename T>
+    void removeComponent(EntityID entity);
+
+    // Accesor a modo de iterador a los componentes
+    template <typename... Ts> 
+    Query<Ts...> query();
 };
 ```
 \
@@ -135,12 +153,12 @@ Se define como clase. Es responsable de cargar los assets de juego y tiene méto
 
 # Dependencias externas
 Las librerías que utilizará el motor son las siguientes:
-| Librería | Versión   | Uso                                                                         |
-| -------- | --------- | --------------------------------------------------------------------------- |
-| OGRE3D   | 14.5.0    | Gráficos 3D (modelos, animaciones, shaders, generación de ventana, layouts) |
-| SDL2     | 2.32.10   | Input (como dependencia de OGRE3D)                                          |
-| FMod     | 2.03.12   | Implementación de efectos de sonido y música                                |
-| Physx    | 9.19.0218 | Físicas y detección de colisiones                                           |
+| Librería  | Versión | Uso                                                                         |
+| --------- | ------- | --------------------------------------------------------------------------- |
+| OGRE3D    | 14.5.0  | Gráficos 3D (modelos, animaciones, shaders, generación de ventana, layouts) |
+| SDL2      | 2.32.10 | Input (como dependencia de OGRE3D)                                          |
+| Miniaudio | 0.11.24 | Implementación de efectos de sonido y música                                |
+| Bullet3   | 3.2.5   | Físicas y detección de colisiones                                           |
 
 
 # Estuctura de directorios del motor
@@ -157,29 +175,31 @@ El proyecto se construye con el uso de cmake, la estructura del directorio del p
 Para permitir la comunicación del motor con librerías externas como OGRE3D, Physx, o FMOD, se ha pensado en la implementación de dichas funcionalidades dentro de los sistemas de las escenas de juego, formando parte de la arquitectura ECS pensada. Estos sistemas serían los principales representantes de dichas librerías, y servirían como capa intermedia de comunicación entre el mundo de nuestro motor y la funcionalidad que proporciona cada librería.
 
 ## Funcionalidad de los sistemas
-Hacen uso de la información que contienen los componentes. Por ejemplo, OgreSystem (sistema de renderizado que hace uso de Ogre3D), recorrería todos las entidades que cuentan con una posición y una malla, y las actualizaría en su propio mundo para así mostrarse correctamente en pantalla. PhysxSystem se encargaría de recorrer a todas las entidades que cuentan con un Rigidbody y actualizaría su posición en base a las posiciones simuladas dentro del mundo de Physx.
+Hacen uso de la información que contienen los componentes. Por ejemplo, RenderSystem (sistema de renderizado que hace uso de Ogre3D), recorrería todos las entidades que cuentan con una posición y una malla, y las actualizaría en su propio mundo para así mostrarse correctamente en pantalla. PhysicsSystem se encargaría de recorrer a todas las entidades que cuentan con un Rigidbody y actualizaría su posición en base a las posiciones simuladas dentro del mundo de Physx.
 
 ## Forma de comunicación con estos sistemas
 Una forma de introducir estas notificaciones es a través de **tags**. Los tags son simplemente componentes que un sistema añade a una entidad para que otro sistema lo detecte y haga algo en consecuencia. 
 
 ```cpp
 // En un sistema cualquiera
-EntityID msg = ECS.createEntity();
-ECS.addComponent<UpdatedMeshMessageComponent>(msg, ...)
+EntityID msg = sene.createEntity();
+sene.addComponent<UpdatedMeshMessageComponent>(msg, ...)
 ...
 
-// En el OgreSystem
-ECS.foreach<UpdatedMeshMessageComponent>([]() { /* Actualizar la malla de la entidad en Ogre3D */ })
+// En el RenderSystem
+for(auto message : scene.query<UpdatedMeshMessageComponent>())
+    ./* Actualizar la malla de la entidad en Ogre3D */
+
 ```
 
 ### Ventajas de esta implementación
 Al implementar las funcionalidades externas de las librerías como sistemas dentro de nuestra propia arquitectura ECS, se garantizan y facilitan varias cosas:
 
-* No se rompe la arquitectura ECS al meter estas funcionalidades. Es decir, no se trata de forma distinta a estas funcionalidades y se garantiza la ejecución ordenada de sistemas que está pensada para el bucle principal.
+- No se rompe la arquitectura ECS al meter estas funcionalidades. Es decir, no se trata de forma distinta a estas funcionalidades y se garantiza la ejecución ordenada de sistemas que está pensada para el bucle principal.
 
-* Como tentativa, se encapsularía toda la funcionalidad de cada librería en un sólo sistema, lo que provoca que el seguimiento de la comunicación con cada librería sea más cómodo e intuitivo.
+- Como tentativa, se encapsularía toda la funcionalidad de cada librería en un sólo sistema, lo que provoca que el seguimiento de la comunicación con cada librería sea más cómodo e intuitivo.
 
-* Se reutiliza código ya hecho. Al tratarse de implementar sistemas, no hace falta programar una infraestructura distinta para estas funcionalidades ni mantenerla, sino que se reutiliza una parte fundamental de la arquitectura.
+- Se reutiliza código ya hecho. Al tratarse de implementar sistemas, no hace falta programar una infraestructura distinta para estas funcionalidades ni mantenerla, sino que se reutiliza una parte fundamental de la arquitectura.
 
 # Pipeline de generación de contenido
 
@@ -192,7 +212,29 @@ A la hora de usar imágenes, hemos distinguido dos tipos de ellas: vectoriales y
 - **No vectoriales:** Los formatos permitidos son .png, .jpg, .bmp. OGRE3D soporta estos tipos de archivos.
 
 ## Audio
-Los archivos de audio que FMOD permite son .mp3, .wav y .ogg. Serán los únicos archivos de audio del motor. 
+Los archivos de audio que Miniaudio permite son .mp3, .wav y .ogg. Serán los únicos archivos de audio del motor. 
 
 ## Mapas de Juego
-Usaremos GodotEngine como editor de escenas 3D, ya que el formato de escena de Godot (.tscn) puede leerse como una lista de nodos con nombres, posiciones y componentes. Implementaremos un lector de .tscn que cree entidades en nuestro motor.
+Usaremos GodotEngine como editor de escenas 3D, pero en vez de usar sus archivos de esccena nativos `.tscn`, crearemos un plugin de Godot que traduzca el contenido del editor a un formato propio que hemos llamado `.chat`, siglas de *chat is HUGO's alternative to tscn* (otra sigla recursiva).
+    - El plugin creará archivos de GDScript a partir de las declaraciones .h de los componentes del motor y los juegos.
+    - Las entidades existirán en un mapa del nodo padre de las escenas.
+    - Los sistemas existirán en un enum del nodo padre de las escenas.
+
+El siguiente es un ejemplo de cómo se verá una escena en un archivo `.chat`
+```chat
+SCENE miEscena
+
+ENTITY Sinbad 0
+
+COMPONENT Nickname
+    label STRING
+        my name is Sinbad!
+
+ENTITY Cube 1
+
+COMPONENT Transform
+    position VECTOR_3 0 1 3
+
+COMPONENT Counter
+    count INT 0
+```

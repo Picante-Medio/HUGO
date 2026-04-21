@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -e
+
+PRINT_INFO=true
+# PRINT_INFO=false
+
+# Choose build type
+BUILD_TYPE="Debug"
+# BUILD_TYPE="Release"
+
+# Choose preset based on build type
+if [[ "$BUILD_TYPE" == "Debug" ]]; then
+    CONFIG_PRESET="Linux-Debug"
+    BUILD_PRESET="DEBUG_LINUX"
+else
+    CONFIG_PRESET="Linux-Release"
+    BUILD_PRESET="RELEASE_LINUX"
+fi
+
+# Print info
+if [[ $PRINT_INFO == true ]]; then
+    echo "Configuring with preset: $CONFIG_PRESET"
+    echo "Build type:              $BUILD_TYPE"
+    echo "Building with preset:   $BUILD_PRESET"
+fi
+
+
+# Configure
+cmake --preset "$CONFIG_PRESET"
+
+# Build
+cmake --build --preset "$BUILD_PRESET" --jobs 8
+
+# Run
+cd bin
+if [[ $BUILD_TYPE == "Debug" ]]; then
+  ./HUGOd
+else
+  ./HUGO
+fi
+

@@ -1,0 +1,81 @@
+{
+    "version": 8,
+    "configurePresets": [
+        {
+            "name": "VS_17_2022_x64",
+            "displayName": "VS 17 2022 x64",
+            "description": "Using compilers for Visual Studio 17 2022 (x64 architecture)",
+            "generator": "Visual Studio 17 2022",
+            "toolset": "host=x64",
+            "architecture": "x64",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/install/${presetName}",
+                "CMAKE_C_COMPILER": "cl.exe",
+                "CMAKE_CXX_COMPILER": "cl.exe",
+                "CMAKE_CXX_FLAGS_DEBUG": "/Od /Zi",
+                "CMAKE_CXX_FLAGS_RELEASE": "/O2",
+                "OGRE_BUILD_MSVC_MP": "ON",
+                "OGRE_BUILD_MSVC_ZM": "ON",
+                "HUGO_BUILD_ENGINE": "OFF"
+            }
+        },
+        {
+            "name": "Linux",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build/linux",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/install/${presetName}",
+                "CMAKE_CXX_FLAGS_DEBUG": "-O0 -g",
+                "CMAKE_CXX_FLAGS_RELEASE": "-O3",
+                "HUGO_BUILD_ENGINE": "OFF"
+            }
+        },
+        {
+            "name": "Linux-Debug",
+            "inherits": "Linux",
+            "binaryDir": "${sourceDir}/build/linux-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "Linux-Release",
+            "inherits": "Linux",
+            "binaryDir": "${sourceDir}/build/linux-release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        }
+
+    ],
+    "buildPresets": [
+        {
+            "name": "DEBUG_VS_17_2022_x64",
+            "displayName": "DEBUG VS 17 2022 x64",
+            "configurePreset": "VS_17_2022_x64",
+            "configuration": "Debug",
+            "jobs": 8
+        },
+        {
+            "name": "RELEASE_VS_17_2022_x64",
+            "displayName": "RELEASE VS 17 2022 x64",
+            "configurePreset": "VS_17_2022_x64",
+            "configuration": "Release",
+            "jobs": 8
+        },
+        {
+            "name": "DEBUG_LINUX",
+            "displayName": "DEBUG Linux GCC x64",
+            "configurePreset": "Linux-Debug",
+            "jobs": 8
+        },
+        {
+            "name": "RELEASE_LINUX",
+            "displayName": "RELEASE Linux GCC x64",
+            "configurePreset": "Linux-Release",
+            "jobs": 8
+        }
+    ]
+
+}
