@@ -10,39 +10,41 @@ BulletModule::BulletModule()
 
 BulletModule::~BulletModule() {
 
-    // These calls are done by BulletSimulation in its destructor. calling it again will result in an unhandled exception
-    // while trying to delete a deleted world
-
-    /* for(std::shared_ptr<IPhysicsSimulation> simulation : inactiveSimulations)
-        simulation->destroySimulation();
-
-    for(std::shared_ptr<IPhysicsSimulation> simulation : activeSimulations)
-        simulation->destroySimulation();*/
-
 }
 
-void BulletModule::createSceneSimulation(std::shared_ptr<Scene> scene) {
+void BulletModule::createSceneSimulation(std::string sceneName, std::shared_ptr<InternalScene> scene) {
     // create BulletSimulation and add it to activeSimulations container
     std::shared_ptr<IPhysicsSimulation> simulation = std::make_shared<BulletSimulation>(scene);
-    activeSimulations.push_back(simulation);
+    activeSimulations.insert({sceneName, simulation});
 }
 
-void BulletModule::destroySceneSimulation(std::shared_ptr<Scene> scene) {
+void BulletModule::destroySceneSimulation(std::string sceneName) {
     // remove BulletSimulation from its container
-    // destroy simulation
+    activeSimulations.erase(sceneName);
 }
 
-void BulletModule::resumeSceneSimulation(std::shared_ptr<Scene> scene) {
+void BulletModule::resumeSceneSimulation(std::string sceneName) {
     // find coresponding BulletSimulation in inactiveSimulations container
     // move it to activeSimulations container 
+    auto node = inactiveSimulations.extract(sceneName);
+    if(node)
+        activeSimulations.insert({node.key(), node.mapped()});
 }
 
-void BulletModule::pauseSceneSimulation(std::shared_ptr<Scene> scene) {
+void BulletModule::pauseSceneSimulation(std::string sceneName) {
     // find coresponding BulletSimulation in activeSimulations container
     // move it to inactiveSimulations container 
+    auto node = activeSimulations.extract(sceneName);
+    if(node)
+        inactiveSimulations.insert({node.key(), node.mapped()});
 }
 
-void BulletModule::performSimulations(double dt) {
-    for(std::shared_ptr<IPhysicsSimulation> simulation : activeSimulations)
-        simulation->performSimulation(dt);
+void BulletModule::performSimulations(uint32_t dt) {
+    for(auto it = activeSimulations.begin(); it != activeSimulations.end(); ++it)
+        it->second->performSimulation(dt);
+}
+
+void BulletModule::debugDraw() {
+    for(auto it = activeSimulations.begin(); it != activeSimulations.end(); ++it)
+        it->second->debugDraw();
 }

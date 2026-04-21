@@ -4,125 +4,103 @@ project(HUGO LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "" FORCE)
+set(CMAKE_WARN_DEPRECATED OFF)
+set(POSITION_INDEPENDENT_CODE ON)
 
-include(FetchContent)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Functions.cmake)
 
-FetchContent_Declare(
-    miniaudio
-    GIT_REPOSITORY https://github.com/mackron/miniaudio.git
-    GIT_TAG 0.11.24
-)
+################################## HugoAPI
 
-FetchContent_Declare(
-    bullet3
-    GIT_REPOSITORY https://github.com/bulletphysics/bullet3.git
-    GIT_TAG 3.25
-)
+# Can be overrided
+set(HUGO_API_LIB_DIR "${CMAKE_SOURCE_DIR}/lib" CACHE STRING "Binary directory for HUGO library files")
 
-set(BUILD_BULLET2_DEMOS OFF CACHE BOOL "" FORCE)
-set(BUILD_CPU_DEMOS OFF CACHE BOOL "" FORCE)
-set(BUILD_OPENGL3_DEMOS OFF CACHE BOOL "" FORCE)
-set(BUILD_PYBULLET OFF CACHE BOOL "" FORCE)
-set(BUILD_EXTRAS OFF CACHE BOOL "" FORCE)
-set(BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
-set(INSTALL_LIBS OFF CACHE BOOL "" FORCE)
-set(INSTALL_CMAKE_FILES OFF CACHE BOOL "" FORCE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Lua.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/HugoAPI.cmake)
 
-FetchContent_MakeAvailable(miniaudio bullet3)
+################################## HUGO executable engine
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+option(HUGO_BUILD_ENGINE "Builds the HUGO executable" ON)
 
-file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cpp)
+if(HUGO_BUILD_ENGINE)
 
-add_executable(${PROJECT_NAME} ${SRC_FILES})
+    # Can be overrided
+    set(HUGO_BIN_DIR "${CMAKE_SOURCE_DIR}/bin" CACHE STRING "Binary directory for HUGO executable")
 
-file(GLOB_RECURSE SRC_DIRS CONFIGURE_DEPENDS LIST_DIRECTORIES true ${CMAKE_SOURCE_DIR}/src/*)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Dependencies.cmake)
 
-set(INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src
-    ${bullet3_SOURCE_DIR}/src)
+    file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
-foreach(path ${SRC_DIRS})
-    if(IS_DIRECTORY "${path}")
-        list(APPEND INCLUDE_DIRS "${path}")
-    endif()
-endforeach()
+    add_executable(${PROJECT_NAME} ${SRC_FILES})
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 
-list(APPEND INCLUDE_DIRS "${bullet3_SOURCE_DIR}/src")
+    enable_warnings(${PROJECT_NAME})
 
-file(GLOB_RECURSE BULLET_SRC_DIRS CONFIGURE_DEPENDS LIST_DIRECTORIES true ${bullet3_SOURCE_DIR}/src/*)
+    file(GLOB_RECURSE SRC_DIRS CONFIGURE_DEPENDS LIST_DIRECTORIES true ${CMAKE_CURRENT_SOURCE_DIR}/src/*)
 
-foreach(path ${BULLET_SRC_DIRS})
-    if(IS_DIRECTORY "${path}")
-        list(APPEND INCLUDE_DIRS "${path}")
-    endif()
-endforeach()
+    set(INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-target_include_directories(${PROJECT_NAME} PRIVATE 
-    ${INCLUDE_DIRS}
-    ${CMAKE_SOURCE_DIR}/HugoCore)
+    foreach(path ${SRC_DIRS})
+        if(IS_DIRECTORY "${path}")
+            list(APPEND INCLUDE_DIRS "${path}")
+        endif()
+    endforeach()
 
-set(BASE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/dependencies/${CMAKE_SYSTEM_PROCESSOR})
+    target_include_directories(${PROJECT_NAME} PRIVATE 
+        ${INCLUDE_DIRS})
 
-if(WIN32)
-    set(CMAKE_PREFIX_PATH 
-        ${BASE_PREFIX_PATH}/sdl2
-        ${BASE_PREFIX_PATH}/ogre
-        CACHE PATH "prefix path"
-    )
-elseif(LINUX)
-    set(CMAKE_PREFIX_PATH
-        ${BASE_PREFIX_PATH}/ogre
-        CACHE PATH "prefix path")
+    target_link_libraries(${PROJECT_NAME} PRIVATE 
+        HugoDeps
+        HugoAPI)
 
-    set(CMAKE_EXE_LINKER_FLAGS "-lpng -lbz2 -lbrotlidec -lpthread -lm")
+    set(CMAKE_SKIP_RPATH FALSE)
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED ON
+        CXX_EXTENSIONS OFF
+        POSITION_INDEPENDENT_CODE ON
+        DEBUG_POSTFIX "d"
+        RUNTIME_OUTPUT_DIRECTORY ${HUGO_BIN_DIR}
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG ${HUGO_BIN_DIR}
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE ${HUGO_BIN_DIR}
+        VS_DEBUGGER_WORKING_DIRECTORY ${HUGO_BIN_DIR}
+        INSTALL_RPATH "$ORIGIN"
+        BUILD_WITH_INSTALL_RPATH TRUE)
+
+
+    # Ogre plugins are independent, so they need to be explicitly copied in both platforms
+    foreach(plugin RenderSystem_GL3Plus RenderSystem_GL Codec_STBI Codec_Assimp Plugin_ParticleFX OgreRTShaderSystem)
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:${plugin}>
+            $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        COMMAND_EXPAND_LISTS)
+    endforeach()
+
+    if (WIN32)
+        add_custom_command(TARGET ${PROJECT_NAME}  POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
+                $<TARGET_FILE_DIR:${PROJECT_NAME}>
+            COMMAND_EXPAND_LISTS
+        )
+    else()
+        # Copy generated .so libs to the bin dir
+        foreach(lib lua_shared OgreMain OgreOverlay)
+            add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                $<TARGET_FILE:${lib}>
+                $<TARGET_FILE_DIR:${PROJECT_NAME}>
+            COMMAND_EXPAND_LISTS)
+        endforeach()
+    endif ()
     
-    # find_package(Threads REQUIRED)
-    # find_library(BROTLIDEC_LIB brotlidec REQUIRED)
-    # find_library(PNG_LIB png REQUIRED)
-    # find_library(BZ2_LIB bz2 REQUIRED)
-    # find_library(M_LIB m REQUIRED)
-
-    # list(APPEND HUGO_LINKED_LIBRARIES
-    #     Threads::Threads
-    #     ${BROTLIDEC_LIB}
-    #     ${PNG_LIB}
-    #     ${BZ2_LIB}
-    #     ${M_LIB})
 endif()
 
-find_package(SDL2 CONFIG REQUIRED)
-find_package(OGRE CONFIG REQUIRED COMPONENTS
-    Overlay)
+################Test Game########################
 
-set(HUGO_LINKED_LIBRARIES
-    BulletDynamics
-    BulletCollision
-    Bullet3Common
-    Bullet3Dynamics
-    Bullet3Collision
-    LinearMath
-    OgreMain
-    OgreOverlay
-    RenderSystem_GL3Plus
-    RenderSystem_GL
-    SDL2::SDL2
-    SDL2::SDL2main
-    miniaudio)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE 
-    ${HUGO_LINKED_LIBRARIES})
-
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    DEBUG_POSTFIX "d"
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin)
-
-if (WIN32)
-    add_custom_command(TARGET ${PROJECT_NAME}  POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>
-        COMMAND_EXPAND_LISTS
-    )
-endif ()
+if(PROJECT_IS_TOP_LEVEL)
+    include(cmake/TestGame.cmake)
+endif()

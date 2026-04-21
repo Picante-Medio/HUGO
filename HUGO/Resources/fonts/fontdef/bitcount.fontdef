@@ -1,0 +1,7 @@
+font Bitcount
+{
+    type truetype
+    source bitcount.ttf
+    size 14
+    resolution 96
+}

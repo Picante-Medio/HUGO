@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="FilesPathArray" format=3 uid="uid://b1tb5hio5233g"]
+
+[ext_resource type="Script" uid="uid://dir011r1dcwgu" path="res://addons/HugosChatPlugin/file_path_array.gd" id="1_pyjdk"]
+
+[resource]
+script = ExtResource("1_pyjdk")
+files_paths = Array[String]([""])
+metadata/_custom_type_script = "uid://dir011r1dcwgu"

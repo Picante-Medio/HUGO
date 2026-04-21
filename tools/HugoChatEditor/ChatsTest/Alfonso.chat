@@ -1,0 +1,11 @@
+PREFAB
+ENTITY Alfonso 0
+	COMPONENT RenderComponent
+		STRING mesh res://sphere.tres
+		STRING materialName 
+		INT 0
+
+ENTITY David 1
+	COMPONENT ParentComponent
+		INT 0
+

@@ -1,0 +1,7 @@
+font Roboto
+{
+    type truetype
+    source roboto.ttf
+    size 32  
+    resolution 192
+}

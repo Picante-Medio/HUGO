@@ -1,0 +1,11 @@
+SCENE TestSceneVideo1
+
+SYSTEM AudioSystem
+SYSTEM RenderSystem
+SYSTEM LightSystem
+SYSTEM CameraSystem
+SYSTEM UISystem
+SYSTEM ConsoleSystem
+SYSTEM CameraMovementSystem
+SYSTEM MessagesTestSystem
+SYSTEM TestSystemVideo1

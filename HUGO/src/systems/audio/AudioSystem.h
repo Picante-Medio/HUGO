@@ -1,167 +1,132 @@
 #pragma once
 
 #include "Audio.h"
-#include "AudioTags.h"
 #include "HugoError.h"
 #include "HugoMath.h"
 #include "HugoTypes.h"
-#include "System.h"
+#include "HugoSystemMacros.h"
 
-#include <functional>
 #include <memory>
-#include <queue>
-#include <string>
-#include <unordered_map>
 #include <vector>
 
 // forward declarations
 struct AudioComponent;
-struct Audio3DInfoComponet;
+struct AudioListenerComponent;
+struct Audio3DInfoComponent;
 struct TransformComponent;
 
 /* ====================
    runtime voice data
    ====================*/
-
 struct AudioInfo {
-    std::shared_ptr<Audio> ptr;
-    bool inUse = false;
-};
-
-struct AudioEntry {
-    std::string name;
-    std::string filename;
-    HUGO::AudioTypes type;
+   std::shared_ptr<Audio> ptr;
+   bool inUse = false;
 };
 
 struct AudioPool {
     std::vector<AudioInfo> voices;
-    size_t stealIndex = 0; // round-robin stealing
+    size_t stealIndex = 0; // round-robin voice stealing
 };
 
-
-/* ===========
-   audio System
-   ===========*/
-
-class AudioSystem : public System
-{
+/* =============
+   audio system
+   ============*/
+HSYSTEM(AudioSystem)
 private:
-    std::shared_ptr<ma_engine> engine;
-    std::string path;
+   std::shared_ptr<ma_engine> engine;
 
-    int queueSize;
-    HUGO::AudioID nextID = 0;
+   const HUGO::Int queueSize = 10;
 
-    float soundsGroupVolume = 1.0f;
-    float musicsGroupVolume = 1.0f;
+   HUGO::Float soundsGroupVolume = 1.0f;
+   HUGO::Float musicsGroupVolume = 1.0f;
 
-    /* ==========
-       audio TADS
-       ==========*/
-    std::vector<AudioEntry> audios; // metadata
-    std::unordered_map<std::string, HUGO::AudioID> nameToID; 
-    std::vector<AudioPool> pools; // runtime voices
+   std::vector<AudioPool> pools; // runtime voices
 
-    /* =================
-       PRIVATE FUNCTIONS
-       =================*/
+   /* =================
+      PRIVATE FUNCTIONS
+      =================*/
 
-    // create a ma_sound ptr
-    ErrorOrType<AudioInfo> createVoice(HUGO::AudioID id);
+   // create a ma_sound ptr
+   ErrorOrType<AudioInfo> createVoice(HUGO::AudioID id, HUGO::AudioTypes type);
 
-    // acquire reusable voice (reuse/create/steal)
-    ma_sound* getSound(HUGO::AudioID id);
+   // acquire reusable voice (reuse/create/steal)
+   ma_sound* getSound(HUGO::AudioID id, HUGO::AudioTypes type);
 
-    // check 3D usage
-    ma_sound* get3DSound(HUGO::AudioID id);
+   // obtains a playable sound for the component
+   void acquireVoice(AudioComponent& c);
 
-    // get the sound already owned by the component
-    ma_sound* getExistingSound(AudioComponent& c);
-    // obtains a playable sound for the component, 
-    // reusing or acquiring a new one from the pool
-    ma_sound* acquireVoice(AudioComponent& c);
+   void ensurePoolSize();
+   void prewarmVoices(size_t voicesPerSound = 2);
 
-    /* ==============================================
-       functions to process changes in some component 
-       and update them with the audios
-       ============================================== */
+   /* ==============================================
+      sync with ECS
+      ============================================== */
 
-    void processChanges(AudioComponent& c, const AudioDirtyTag& t);
-    void process3DChanges(const Audio3DInfoComponet& c,
-                          const TransformComponent& tr,
-                          const Audio3DDirtyTag& t);
+   void updateListeners(const AudioListenerComponent& a,
+                        const TransformComponent& tr);
 
-    /* ================
-       playback control
-       ================ */
+   void processChanges(AudioComponent& c);
 
-    void playAudio(ma_sound* s);
-    void playAudio(HUGO::AudioID id);
+   void process3DChanges(const AudioComponent& a, const Audio3DInfoComponent& c);
 
-    void stopAudio(ma_sound* s);
-    void resumeAudio(ma_sound* s);
+   /* ================
+      playback control
+      ================ */
 
-    /* ================
-       controls 2D
-       ================*/
+   void playAudio(ma_sound* s);
+   void playAudio(HUGO::AudioID id, HUGO::AudioTypes type);
+   void playAudioLUA(int id, int type);
 
-    void setAudioPosition(ma_sound* s, double seconds);
-    double getAudioPosition(ma_sound* s);
+   void stopAudio(ma_sound* s);
+   void resumeAudio(ma_sound* s);
 
-    void setLooping(ma_sound* s, bool loop);
-    void setVolume(HUGO::AudioID id, float vol);
-    void setGroupVolume(HUGO::AudioTypes type, float vol);
-    void setPitch(ma_sound* s, float pitch);
+   /* ================
+      controls 2D
+      ================ */
 
-    /* ===========
-       controls 3D
-       ===========*/
+   void setAudioPosition(ma_sound* s, double seconds);
+   double getAudioPosition(ma_sound* s);
 
-    void set3DPosition(ma_sound* s, const HUGO::Vector3& p);
-    void setVelocity(ma_sound* s, const HUGO::Vector3& v);
-    void setDirection(ma_sound* s, const HUGO::Vector3& d);
+   void setLooping(ma_sound* s, bool loop);
+   void setVolume(ma_sound* s, HUGO::Float volume);
+   void setGroupVolume(HUGO::AudioTypes type, HUGO::Float volume);
+   void setPitch(ma_sound* s, HUGO::Float pitch);
 
-    void setDopplerFactor(ma_sound* s, float factor);
-    void set3DMinDistance(ma_sound* s, float distance);
-    void set3DMaxDistance(ma_sound* s, float distance);
-    void set3DRollof(ma_sound* s, float rollof);
-    void set3DCone(ma_sound* s,
-                   float innerAngle,
-                   float outerAngle,
-                   float outerGain);
+   /* ===========
+      controls 3D
+      =========== */
 
-    
-    // internal callback
-    static void endCallback(void* data, ma_sound* pSound);
+   void set3DPosition(ma_sound* s, const HUGO::Vector3& p);
+   void setVelocity(ma_sound* s, const HUGO::Vector3& v);
+   void setDirection(ma_sound* s, const HUGO::Vector3& d);
 
-    /* ====================================
-       ONLY FOR TESTING! IT WILL BE DELETED
-       ==================================== */
+   void setDopplerFactor(ma_sound* s, HUGO::Float factor);
+   void set3DMinDistance(ma_sound* s, HUGO::Float distance);
+   void set3DMaxDistance(ma_sound* s, HUGO::Float distance);
+   void set3DRollof(ma_sound* s, HUGO::Float rolloff);
 
-    double x = 5000.0;
-    double elapsedTime = 0.0;
-    bool stopTriggered = false;
-    bool startTriggered = false;
+   void set3DCone(ma_sound* s, HUGO::Float innerAngle, HUGO::Float outerAngle, HUGO::Float outerGain);
 
+   // internal callback
+   static void endCallback(void* data, ma_sound*);
+
+   // component events
+   void onAddAudioComponent(AudioComponent& c);
+   void onAdd3DAudioComponent(Audio3DInfoComponent& c);
+
+   void onUpdateAudioComponent(AudioComponent& c);
+   void onUpdate3DAudioComponent(Audio3DInfoComponent& c);
+   void onUpdateAudioListener(AudioListenerComponent& l);
+   
 public:
-    AudioSystem(std::shared_ptr<Scene> scene,
-                std::shared_ptr<ma_engine> maEngine,
-                const std::string& path = "test_media/",
-                int queueSize = 10);
 
-    virtual ~AudioSystem() = default;
-    
-    // Load assets
-    ErrorOrVoid loadAudiosFromFile(const char* path);
-    void update(double dt) override;
-    void fixedUpdate(double dt) override;
+   virtual ~AudioSystem() = default;
 
-    ErrorOrVoid addAudio(const char* name, HUGO::AudioTypes type);
+   // updates
+   void update(uint32_t) override;
+   void fixedUpdate(uint32_t) override;
 
-    /* ====================================
-       ONLY FOR TESTING! IT WILL BE DELETED
-       ==================================== */
+   void onLoad() override;
+   void init() override;
 
-    void createTestEntity();
-};
+END_HSYSTEM()
