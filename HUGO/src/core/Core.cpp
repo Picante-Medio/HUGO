@@ -129,10 +129,13 @@ void
 Core::initLua() {
     //LuaBinder init
 
-    std::filesystem::path luaPath = std::filesystem::absolute(
+    const std::filesystem::path luaPath = std::filesystem::absolute(
         std::filesystem::path("..") / "src" / "lua"
     );
-    LuaBinder::getInstance().requireFolder(luaPath.string());
+
+    if(std::filesystem::exists(luaPath))
+        LuaBinder::getInstance().requireFolder(luaPath.string());
+    
 }
 
 void HUGO::Core::initAudioAssets()
