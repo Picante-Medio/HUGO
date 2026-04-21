@@ -23,7 +23,8 @@ class ComponentEvent : public IComponentEvent {
 
     static_assert(std::is_base_of_v<Component, T>, "T must inherit from Component");
 
-    std::vector<std::shared_ptr<ComponentEventFunctionHandle<T>>> functionList;
+    std::vector<std::shared_ptr<ComponentEventFunctionHandle<T>>> functionList = 
+        std::vector<std::shared_ptr<ComponentEventFunctionHandle<T>>>();
 
 public:
 
