@@ -31,6 +31,7 @@ HUGO/[Bb]in/*
 *.import
 *.uid
 .builds/
+addons.zip
 export_presets.cfg
 
 #Ignores internos
