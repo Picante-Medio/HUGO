@@ -221,6 +221,7 @@ func load_save():
 
 func instance_project(path:String):
 	var project:Draggable = project_scene.instantiate()
+	project.global_position = $"projects_origin".global_position
 	world.add_child(project)
 	project.set_path(path)
 

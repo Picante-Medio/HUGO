@@ -17,8 +17,10 @@ func _input_event(_viewport: Viewport, event: InputEvent, _shape_idx: int) -> vo
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
 			ClickJoint.begin_drag(self, get_global_mouse_position())
+			SignalBus.grab_cd(get_project_path())
 		else:
 			ClickJoint.end_drag()
+			SignalBus.drop_cd()
 			on_drop.emit()
 
 func play():

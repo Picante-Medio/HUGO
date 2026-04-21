@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://m17hgcgl54gp"]
 
 [ext_resource type="Texture2D" uid="uid://66u3tmraoar8" path="res://sprites/bin.png" id="1_krn16"]
+[ext_resource type="Script" uid="uid://cfpwpuxnkd018" path="res://scripts/papeador.gd" id="1_v4vad"]
 [ext_resource type="PackedScene" uid="uid://cluegdpu2ux2g" path="res://scenes/eye.tscn" id="2_5i7mf"]
 [ext_resource type="Script" uid="uid://ce31edcypo6g7" path="res://scenes/paping_area.gd" id="2_q0c40"]
 
@@ -98,6 +99,7 @@ _data = {
 radius = 67.601776
 
 [node name="papeador" type="Node2D" unique_id=846203302]
+script = ExtResource("1_v4vad")
 
 [node name="base" type="Sprite2D" parent="." unique_id=1794121856]
 texture = ExtResource("1_krn16")
@@ -114,8 +116,14 @@ region_rect = Rect2(15, 2, 131, 52)
 [node name="eye" parent="tapa" unique_id=861584955 instance=ExtResource("2_5i7mf")]
 position = Vector2(103, -41)
 
+[node name="pupil" parent="tapa/eye" index="1" unique_id=135547670 node_paths=PackedStringArray("master")]
+master = NodePath("../../..")
+
 [node name="eye2" parent="tapa" unique_id=1926129168 instance=ExtResource("2_5i7mf")]
 position = Vector2(18, -42)
+
+[node name="pupil" parent="tapa/eye2" index="1" unique_id=135547670 node_paths=PackedStringArray("master")]
+master = NodePath("../../..")
 
 [node name="animation" type="AnimationPlayer" parent="." unique_id=1265004577]
 libraries/ = SubResource("AnimationLibrary_q0c40")
@@ -127,3 +135,6 @@ animation = NodePath("../animation")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="paping_area" unique_id=1843689363]
 shape = SubResource("CircleShape2D_krn16")
+
+[editable path="tapa/eye"]
+[editable path="tapa/eye2"]

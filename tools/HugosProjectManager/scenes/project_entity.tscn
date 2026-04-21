@@ -44,5 +44,14 @@ autowrap_mode = 3
 [node name="eye" parent="." unique_id=861584955 instance=ExtResource("4_kumm5")]
 position = Vector2(-15, -25)
 
+[node name="pupil" parent="eye" index="1" unique_id=135547670 node_paths=PackedStringArray("master")]
+master = NodePath("../..")
+
 [node name="eye2" parent="." unique_id=642571989 instance=ExtResource("4_kumm5")]
 position = Vector2(-39, -51)
+
+[node name="pupil" parent="eye2" index="1" unique_id=135547670 node_paths=PackedStringArray("master")]
+master = NodePath("../..")
+
+[editable path="eye"]
+[editable path="eye2"]
