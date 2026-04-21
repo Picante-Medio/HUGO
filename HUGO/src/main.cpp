@@ -17,8 +17,8 @@ int main(int argc, char* argv[]) {
     if(err.isError()) std::cerr << "[ERROR] Initializing HUGO::Core: {" << err.getError().errorMessage << "}. HUGO Engine will be closing now." << '\n';
     else{
         
-        ErrorOrVoid err = core.run();
-        if(err.isError()) std::cerr << "[ERROR] Updating HUGO::Core: {" << err.getError().errorMessage << "}. HUGO Engine will be closing now." << '\n';
+        ErrorOrVoid error = core.run();
+        if(error.isError()) std::cerr << "[ERROR] Updating HUGO::Core: {" << error.getError().errorMessage << "}. HUGO Engine will be closing now." << '\n';
     }
     return 0;
 }
