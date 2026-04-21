@@ -24,7 +24,6 @@ text = "Components Path: "
 [node name="components_path_text" type="LineEdit" parent="." unique_id=1093726090]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
-placeholder_text = "Puñetazo al taxista"
 
 [node name="components_path_button" type="Button" parent="." unique_id=123431872]
 layout_mode = 2
