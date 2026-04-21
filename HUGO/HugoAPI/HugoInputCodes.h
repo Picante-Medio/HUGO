@@ -63,6 +63,7 @@ namespace HUGO{
         RMAYUS,
         TAB,
         ESC,
+        SPACE,
         SUPR,
         SUPER,
         BACKLASH,

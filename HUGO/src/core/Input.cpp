@@ -629,6 +629,9 @@ namespace HUGO
         case(KeyCode::F12):
             sdlKey = SDLK_F12;
             break;
+        case(KeyCode::SPACE):
+            sdlKey = SDLK_SPACE;
+            break;
         default:
             sdlKey = SDLK_UNKNOWN;
             break;
