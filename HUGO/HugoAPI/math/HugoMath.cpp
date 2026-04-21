@@ -50,7 +50,7 @@ namespace HUGO {
 		return x == other.x && y == other.y;
 	}
 	bool Vector2::operator!=(const Vector2& other) const{
-		return x != other.x && y != other.y;
+		return x != other.x || y != other.y;
 	}
 
     Vector3::Vector3()
@@ -97,7 +97,7 @@ namespace HUGO {
 
 	bool Vector3::operator!=(const Vector3 &other) const
 	{
-		return x != other.x && y != other.y && z != other.z;
+		return x != other.x || y != other.y || z != other.z;
 	}
 
 	bool Vector3::operator==(const Vector3 &other) const
