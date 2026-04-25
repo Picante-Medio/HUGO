@@ -26,6 +26,7 @@ static func sync():
 	parse_components(HugoConfig.COMPONENTS_PATH)
 	create_prefabs(PREFABS_PATH)
 	write_components()
+	write_systems()
 	EditorInterface.get_resource_filesystem().scan_sources()
 
 static func create_prefabs(path:String):
@@ -88,6 +89,37 @@ static func write_components():
 
 		file.close()
 
+static func write_systems():
+	var systems_file := "res://addons/HugosChatPlugin/Systems.gd"
+	var dir := DirAccess.open(HugoConfig.SYSTEMS_PATH)
+	var systems_names:Array[String]
+	
+	dir.list_dir_begin()
+	var name := dir.get_next()
+	while name != "":
+		if name != "." and name != "..":
+			systems_names.push_back(name.split(".")[0])
+		name = dir.get_next()
+	dir.list_dir_end()
+	
+	var file := FileAccess.open(systems_file, FileAccess.WRITE)
+	var native_systems := '	ConsoleSystem,
+							AudioSystem,
+							PhysicsGizmoSystem,
+							HierarchySystem,
+							ParticleSystem,
+							CameraSystem,
+							LightSystem,
+							RenderSystem,
+							TweenSystem,
+							UISystem,'
+	file.store_string(native_systems)
+	file.store_line("class_name SYSTEMS")
+	file.store_line("enum system {")
+	for system:String in systems_names:
+		file.store_line(system)
+	file.store_line("}")
+
 static func write_enums():
 	parse_hugo_types()
 	
@@ -115,7 +147,6 @@ static func hugo_check_line(line: String) -> void:
 		#var enum_values:PackedStringArray = line.split("{")[1].split("}")[0].split(",")
 		#var enum_name:String = line.split("}")[1].split(";")[0].strip_edges()
 		#enums_dictionary.get_or_add(enum_name, enum_values)
-	
 	
 static func parse_hugo_types() -> void:
 	var file := FileAccess.open(HUGO_TYPES_PATH, FileAccess.READ)

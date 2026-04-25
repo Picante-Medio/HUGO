@@ -1,47 +1,7 @@
 [gd_scene format=3 uid="uid://dq2fl1vp76r7r"]
 
 [ext_resource type="Script" uid="uid://cft1fgdpqn2vu" path="res://addons/HugosChatPlugin/Entities/scene_tracker.gd" id="1_865ah"]
-[ext_resource type="Script" uid="uid://dcc6b5sxl6c7u" path="res://addons/HugosChatPlugin/Entities/entity.gd" id="2_sks45"]
-[ext_resource type="Script" uid="uid://cixepomluit03" path="res://Components/LightComponent.gd" id="3_fanfj"]
-[ext_resource type="BoxMesh" uid="uid://itxokud7cpu8" path="res://meshes/new_box_mesh.tres" id="4_d4yc1"]
-[ext_resource type="Script" uid="uid://bnjt3w18hk2gs" path="res://addons/HugosChatPlugin/NativeComponents/RenderComponent.gd" id="4_fanfj"]
 
-[node name="Escena" type="Node3D" unique_id=1674858039 groups=["SCENE_TRACKER"]]
+[node name="SCENE_TRACKER" type="Node3D" unique_id=1228723441]
 script = ExtResource("1_865ah")
-entities = Dictionary[String, Dictionary]({
-"Entity": {
-"LightComponent": Dictionary[String, Variant]({
-"attenuation": "VECTOR_4 attenuation 0.0 0.0 0.0 0.0",
-"diffuse": "VECTOR_4 diffuse 0.0 0.0 0.0 0.0",
-"lightType": "INT lightType 0",
-"shadowFarClipDist": "FLOAT shadowFarClipDist 0.0",
-"shadowFarDist": "FLOAT shadowFarDist 0.0",
-"shadowFarDistSquared": "FLOAT shadowFarDistSquared 0.0",
-"shadowNearClipDist": "FLOAT shadowNearClipDist 0.0",
-"specular": "VECTOR_4 specular 0.0 0.0 0.0 0.0",
-"spotFalloff": "FLOAT spotFalloff 0.0",
-"spotInner": "FLOAT spotInner 0.0",
-"spotNearClip": "FLOAT spotNearClip 0.0",
-"spotOuter": "FLOAT spotOuter 0.0"
-}),
-"RenderComponent": Dictionary[String, Variant]({
-"materialName": "STRING materialName ",
-"mesh": "STRING mesh res://meshes/new_box_mesh.tres",
-"objectID": "INT objectID 0"
-})
-}
-})
-
-[node name="Entity" type="Node3D" parent="." unique_id=1869963947]
-script = ExtResource("2_sks45")
-systems = Array[int]([])
-metadata/_custom_type_script = "uid://dcc6b5sxl6c7u"
-
-[node name="LightComponent" type="Node" parent="Entity" unique_id=1188881374]
-script = ExtResource("3_fanfj")
-metadata/_custom_type_script = "uid://cixepomluit03"
-
-[node name="RenderComponent" type="MeshInstance3D" parent="Entity" unique_id=1672314433]
-mesh = ExtResource("4_d4yc1")
-script = ExtResource("4_fanfj")
-metadata/_custom_type_script = "uid://bnjt3w18hk2gs"
+metadata/_custom_type_script = "uid://cft1fgdpqn2vu"

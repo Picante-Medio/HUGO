@@ -16,12 +16,12 @@ func _enter_tree():
 	plugin = preload("res://addons/HugosChatPlugin/hugos_chat_plugin.gd").new()
 	add_inspector_plugin(plugin)
 	
-	play_button = PlayButton.new()
-	play_button.text = "Run"
-	play_button.icon = get_editor_interface().get_base_control().get_theme_icon("Play", "EditorIcons")
-	play_button.custom_minimum_size = Vector2(80, 28)
-	play_button.flat = false
-	add_control_to_container(CONTAINER_TOOLBAR, play_button)
+	#play_button = PlayButton.new()
+	#play_button.text = "Run"
+	#play_button.icon = get_editor_interface().get_base_control().get_theme_icon("Play", "EditorIcons")
+	#play_button.custom_minimum_size = Vector2(80, 28)
+	#play_button.flat = false
+	#add_control_to_container(CONTAINER_TOOLBAR, play_button)
 	
 	config_dock = preload("res://addons/HugosChatPlugin/Dock/hugo_config.tscn").instantiate()
 	add_control_to_dock(EditorPlugin.DOCK_SLOT_RIGHT_UL, config_dock)

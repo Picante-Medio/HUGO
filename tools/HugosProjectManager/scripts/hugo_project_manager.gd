@@ -2,7 +2,7 @@ extends Control
 class_name HugoProjectManager
 
 const ADDONS_ZIP_PATH := "res://addons.zip"
-const REQUIRED_FOLDERS := ["Resources", "Components", "Systems"]
+const REQUIRED_FOLDERS := ["Resources", "MyComponents", "Systems", "Chats", "Prefabs", "Scenes"]
 const ENGINE_PATH := ""
 
 @onready var project_name_line_edit: LineEdit = $PanelContainer/MarginContainer/VBoxContainer/ProjectNameLineEdit
@@ -94,22 +94,35 @@ func _write_project_file(project_name: String, file_dir: String) -> bool:
 	file.store_string(_build_project_config(project_name))
 	file.close()
 	
-	var launch_config := file_dir.path_join("launch.config")
-	var config_file := FileAccess.open(launch_config, FileAccess.WRITE)
+	var game_config := file_dir.path_join("game.config")
+	var config_file := FileAccess.open(game_config, FileAccess.WRITE)
 	if config_file == null:
-		_print_error("No se pudo crear launch.config en %s" % launch_config)
+		_print_error("No se pudo crear game.config en %s" % game_config)
 		return false
 		
-	var folder = OS.get_executable_path().get_base_dir()
-	config_file.store_line(folder.path_join("/bin/HUGO.exe"))
-	config_file.store_line(file_dir)
-	config_file.store_line(file_dir.path_join("Chats"))
-	config_file.store_line("main_scene.tscn")
+	config_file.store_line(project_name)
+	config_file.store_line("../Chats")
+	config_file.store_line("Scenes/main_scene.tscn")
 	
 	config_file.close()
+	create_main_scene(file_dir)
 	
-	compile_executable(file_dir)
+	#compile_executable(file_dir)
 	return true
+
+func create_main_scene(file_dir:String):
+	var scene_path := file_dir.path_join("Scenes/main_scene.tscn")
+	var scene_file := FileAccess.open(scene_path, FileAccess.WRITE)
+	var main_scene:String = '[gd_scene format=3 uid="uid://dq2fl1vp76r7r"]
+
+	[ext_resource type="Script" uid="uid://cft1fgdpqn2vu" path="res://addons/HugosChatPlugin/Entities/scene_tracker.gd" id="1_865ah"]
+
+	[node name="SCENE_TRACKER" type="Node3D" unique_id=1228723441]
+	script = ExtResource("1_865ah")
+	metadata/_custom_type_script = "uid://cft1fgdpqn2vu"
+	'
+	scene_file.store_string(main_scene)
+	scene_file.close()
 
 func compile_executable(output_dir_path:String) -> int:
 	var absolute_file_path = ProjectSettings.globalize_path("res://launcher.c")
@@ -174,7 +187,9 @@ config_version=5
 config/name=\"%s\"
 config/features=PackedStringArray(\"4.6\", \"GL Compatibility\")
 config/icon=\"res://icon.svg\"
-config/hugo/exe_path=\"res://game.exe\"
+
+[hugo]
+config/hugo/chats_path=\"Chats\"
 
 [editor_plugins]
 

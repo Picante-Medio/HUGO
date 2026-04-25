@@ -34,7 +34,7 @@ namespace HUGO {
         }
 
         StringError err;
-        err.errorMessage = "El componente solicitado no existe o no ha sido registrado para fabricar";
+        err.errorMessage = "El componente solicitado (" + name + ") no existe o no ha sido registrado para fabricar";
         return ErrorOrVoid(err);
     }
 
@@ -47,7 +47,7 @@ namespace HUGO {
         }
 
         StringError err;
-        err.errorMessage = "El componente solicitado no existe o no ha sido registrado para fabricar";
+        err.errorMessage = "El componente solicitado (" + name + ") no existe o no ha sido registrado para fabricar";
         return ErrorOrVoid(err);
     }
 
