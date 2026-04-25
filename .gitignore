@@ -6,9 +6,6 @@ HUGO/[Bb]in/*
 **/.obsidian/*
 **/.git/*
 
-#Dependencias compiladas
-HUGO/[Dd]ependencies/*
-
 # Ficheros
 *.dll
 *.so

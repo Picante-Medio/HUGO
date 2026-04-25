@@ -2,8 +2,9 @@
 
 [ext_resource type="Script" uid="uid://cgt6dd2vlwyuh" path="res://addons/HugosChatPlugin/hugo_config.gd" id="1_yp3x2"]
 [ext_resource type="PackedScene" uid="uid://bd8gmlf8r68yr" path="res://addons/HugosChatPlugin/Dock/path_container.tscn" id="2_6l8ao"]
+[ext_resource type="Script" uid="uid://qm0380g1405i" path="res://addons/HugosChatPlugin/sync_scripts_button.gd" id="3_6l8ao"]
 
-[node name="HugoConfig" type="Control" unique_id=590554959 node_paths=PackedStringArray("components_path_container", "chats_path_container", "lua_path_container")]
+[node name="HugoConfig" type="Control" unique_id=590554959 node_paths=PackedStringArray("components_path_container", "chats_path_container", "lua_path_container", "systems_path_container")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -14,6 +15,7 @@ script = ExtResource("1_yp3x2")
 components_path_container = NodePath("VBoxContainer/components_path_container")
 chats_path_container = NodePath("VBoxContainer/chats_path_container")
 lua_path_container = NodePath("VBoxContainer/lua_path_container")
+systems_path_container = NodePath("VBoxContainer/systems_path_container")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=919406182]
 layout_mode = 0
@@ -22,18 +24,26 @@ offset_bottom = 40.0
 
 [node name="components_path_container" parent="VBoxContainer" unique_id=743859217 instance=ExtResource("2_6l8ao")]
 layout_mode = 2
-filters = PackedStringArray()
 is_file_path = 2
 path_label = "Components Path:"
 
+[node name="systems_path_container" parent="VBoxContainer" unique_id=314283311 instance=ExtResource("2_6l8ao")]
+layout_mode = 2
+is_file_path = 2
+path_label = "Systems Path:"
+
 [node name="chats_path_container" parent="VBoxContainer" unique_id=1288727775 instance=ExtResource("2_6l8ao")]
 layout_mode = 2
-filters = PackedStringArray()
 is_file_path = 2
 path_label = "Chats Path:"
 
 [node name="lua_path_container" parent="VBoxContainer" unique_id=512333233 instance=ExtResource("2_6l8ao")]
 layout_mode = 2
 filters = PackedStringArray("*.lua")
-is_file_path = 0
 path_label = "Lua Path:"
+
+[node name="SyncScripts" type="Button" parent="VBoxContainer" unique_id=285193557]
+custom_minimum_size = Vector2(0, 25)
+layout_mode = 2
+text = "Syncronize Scripts"
+script = ExtResource("3_6l8ao")

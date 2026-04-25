@@ -4,6 +4,7 @@
 #include "CameraComponent.h"
 #include "TransformComponent.h"
 #include "HugoInputCodes.h"
+#include "AudioListenerComponent.h"
 
 EntityID cam1;
 EntityID cam2;
@@ -21,6 +22,7 @@ void CameraMovementSystem::init() {
     scene.addComponent<CameraComponent>(cam1, [](CameraComponent& comp){
         comp.setMain(true);
     });
+    scene.addComponent<AudioListenerComponent>(cam1);
 
     cam2 = scene.createEntity();
 

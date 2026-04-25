@@ -18,7 +18,7 @@
 #else
     #include <dlfcn.h>
     #define LIBRARY_HANDLE void*
-    #define LOAD_DYNAMIC_LIBRARY(path) dlopen(path.c_str(), RTLD_LAZY)
+    #define LOAD_DYNAMIC_LIBRARY(path) dlopen(path.c_str(), RTLD_NOW)
     #define GET_FUNC(handle, func) dlsym(handle, func)
     #define CLOSE_DYNAMIC_LIBRARY(handle) dlclose(handle)
 #endif
@@ -27,20 +27,10 @@ namespace HUGO {
 
 class GameLibraryLoader {
 
-    typedef bool (*GenerateComponentFn)(std::shared_ptr<HUGO::IScene>, EntityID, const std::string&,
-        const std::unordered_map<std::string, HVariant>&);
-
-    typedef bool (*GenerateAndGetSystemFn)(HUGO::IScene&, const std::string&,
-        std::shared_ptr<HUGO::System>&);
-
-
     GameLibraryLoader(const std::string& gameLibraryName);
 
     static inline std::unique_ptr<GameLibraryLoader> loaderInstance = nullptr;
-
     LIBRARY_HANDLE gameHandle = nullptr;
-    GenerateComponentFn generateComponentFnPointer = nullptr;    
-    GenerateAndGetSystemFn generateAndGetSystemFnPointer = nullptr;
 
 public:
 
@@ -50,12 +40,6 @@ public:
     static GameLibraryLoader& instance();
 
     ~GameLibraryLoader();
-
-    ErrorOrVoid GenerateComponent(std::shared_ptr<HUGO::IScene> scene, EntityID ent, const std::string& component, 
-        const std::unordered_map<std::string, HVariant>& componentMembers);
-
-    ErrorOrType<std::shared_ptr<HUGO::System>>GenerateAndGetSystem(HUGO::IScene& scene, 
-        const std::string& systemName);
 };
 
 }

@@ -1,7 +1,21 @@
 [gd_scene format=3 uid="uid://cdjvud3b1372x"]
 
-[ext_resource type="Script" uid="uid://c5vfgqdhdk6as" path="res://scripts/hugo_project_manager.gd" id="1_xy66u"]
+[ext_resource type="Script" uid="uid://cgj26kbq8cpqf" path="res://scripts/hugo_project_manager.gd" id="1_xy66u"]
+[ext_resource type="PackedScene" uid="uid://dq6susyxfugfw" path="res://scenes/file_dialog.tscn" id="2_ydl4q"]
+[ext_resource type="PackedScene" uid="uid://m17hgcgl54gp" path="res://scenes/papeador.tscn" id="3_1kt4v"]
 [ext_resource type="PackedScene" uid="uid://d0fahxnpv4rmk" path="res://scenes/cd_reader.tscn" id="4_dbm5h"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1kt4v"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.21664238, 0.22816423, 0.24263763, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_hbcep"]
 
@@ -16,7 +30,7 @@ normal = Vector2(-1, 0)
 
 [node name="Root" type="Node" unique_id=1285502316]
 
-[node name="HugoProjectManager" type="Control" parent="." unique_id=18608563 node_paths=PackedStringArray("world")]
+[node name="HugoProjectManager" type="Control" parent="." unique_id=18608563 node_paths=PackedStringArray("world") groups=["HUGO_PROJECT_MANAGER"]]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -35,6 +49,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1kt4v")
 
 [node name="MarginContainer" type="MarginContainer" parent="HugoProjectManager/PanelContainer" unique_id=671451414]
 layout_mode = 2
@@ -88,14 +103,15 @@ text = "Crear proyecto"
 [node name="StatusLabel" type="RichTextLabel" parent="HugoProjectManager/PanelContainer/MarginContainer/VBoxContainer" unique_id=133452165]
 custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
+mouse_filter = 2
 bbcode_enabled = true
 scroll_following = true
 
-[node name="FileDialog" type="FileDialog" parent="HugoProjectManager" unique_id=776237365]
-oversampling_override = 1.0
-title = "Open a Directory"
-file_mode = 2
-access = 2
+[node name="FileDialog" parent="HugoProjectManager" unique_id=666587267 instance=ExtResource("2_ydl4q")]
+visible = false
+
+[node name="projects_origin" type="Node2D" parent="HugoProjectManager" unique_id=562040168]
+position = Vector2(997, 477)
 
 [node name="world" type="Node2D" parent="." unique_id=2119291917]
 
@@ -119,3 +135,6 @@ shape = SubResource("WorldBoundaryShape2D_dbm5h")
 
 [node name="CdReader" parent="world" unique_id=1701063322 instance=ExtResource("4_dbm5h")]
 position = Vector2(982, 124)
+
+[node name="papeador" parent="." unique_id=846203302 instance=ExtResource("3_1kt4v")]
+position = Vector2(93, 572)

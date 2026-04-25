@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://cluegdpu2ux2g"]
+
+[ext_resource type="Texture2D" uid="uid://cypo8d47gjoj" path="res://sprites/eye.png" id="1_xbsf0"]
+[ext_resource type="Script" uid="uid://ci6lk440uipjh" path="res://scripts/pupil.gd" id="2_60o0r"]
+
+[node name="eye" type="Node2D" unique_id=861584955]
+
+[node name="base" type="Sprite2D" parent="." unique_id=2016852769]
+texture = ExtResource("1_xbsf0")
+region_enabled = true
+region_rect = Rect2(5, 5, 40, 42)
+
+[node name="pupil" type="Sprite2D" parent="." unique_id=135547670]
+texture = ExtResource("1_xbsf0")
+region_enabled = true
+region_rect = Rect2(51, 18, 16, 16)
+script = ExtResource("2_60o0r")

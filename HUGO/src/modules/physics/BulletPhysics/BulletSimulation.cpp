@@ -8,6 +8,7 @@
 #include "TransformComponent.h"
 #include "ParentComponent.h"
 #include "HugoPhysics.h"
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
 
 #include "OgreBulletDebugger.h"
 #include <cstddef>
@@ -205,7 +206,15 @@ HUGO::CollisionObjectID BulletSimulation::createColliderObject(ColliderComponent
     btCollisionShape* shape = getorCreateShape(hgCol.shapeID, hgCol);
 
     // Create collision object
-    btCollisionObject* obj = new btCollisionObject();
+    btCollisionObject* obj;
+    if(hgCol.isTrigger){
+        obj = new btGhostObject();
+        obj->setCollisionFlags(obj->getCollisionFlags() | btGhostObject::CF_NO_CONTACT_RESPONSE);
+    }
+    else{
+        obj = new btCollisionObject();
+    }
+
     obj->setCollisionShape(shape);
 
     btTransform bodyTransform;
@@ -230,7 +239,7 @@ HUGO::CollisionObjectID BulletSimulation::createColliderObject(ColliderComponent
     }
     
     //get entity id
-    EntityID hgId = hgCol.objectID;
+    EntityID hgId = hgCol.entity;
 
     //create CollisionObject
     CollisionObject colObj = {scene, id, hgId, obj};

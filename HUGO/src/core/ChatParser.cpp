@@ -63,6 +63,7 @@ ErrorOrVoid ChatParser::readChat(const HUGO::String& chatPath){
 
         err = handleSceneType(true);
     }
+    else return ErrorOrVoid(StringError{"Chat file is neither a scene or a prefab"});
 
     std::cin.rdbuf(cinbuf);
     file.close();

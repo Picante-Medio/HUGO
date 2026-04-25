@@ -25,8 +25,8 @@ static func write():
 	
 	if root is not Entity:
 		file.store_line("SCENE")
-		for system:SCENE_TRACKER.SYSTEMS in root.systems:
-			var system_name:String = SCENE_TRACKER.SYSTEMS.keys()[system]
+		for system:SYSTEMS.system in root.systems:
+			var system_name:String = SYSTEMS.system.keys()[system]
 			file.store_line("SYSTEM " + system_name)
 		file.store_line("")
 	else:

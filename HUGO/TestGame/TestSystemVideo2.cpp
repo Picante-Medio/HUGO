@@ -144,9 +144,9 @@ TestSystemVideo2::init() {
     });
 
     //cubo
-    EntityID cubo = scene.createEntity();
+    cubo = scene.createEntity();
     scene.addComponent<TransformComponent>(cubo, [](TransformComponent& transform){
-        transform.setPosition(HUGO::Vector3(5.0f,10.f,0.0f));
+        transform.setPosition(HUGO::Vector3(5.0f,-5.f,0.0f));
         transform.setScale(HUGO::Vector3(2.f, 2.f, 2.f));
     });
     scene.addComponent<RenderComponent>(cubo, [](RenderComponent& rc){
@@ -156,11 +156,12 @@ TestSystemVideo2::init() {
 
     scene.addComponent<ColliderComponent>(cubo, [](ColliderComponent& collider){
         collider.info = HUGO::BoxColliderInfo{HUGO::Vector3(1.f, 1.0f, 1.f)};
+        collider.isTrigger = true;
     });
-    scene.addComponent<RigidBodyComponent>(cubo, [](RigidBodyComponent& rb){
-        rb.setMass(1.f);
-        rb.setBodyType(HUGO::BodyType::DYNAMIC);
-    });
+    //scene.addComponent<RigidBodyComponent>(cubo, [](RigidBodyComponent& rb){
+    //    rb.setMass(1.f);
+    //    rb.setBodyType(HUGO::BodyType::DYNAMIC);
+    //});
 
     ///luz
     EntityID light = scene.createEntity();
@@ -257,6 +258,11 @@ TestSystemVideo2::update(uint32_t dt) {
             a.isPlaying = true;
         }
     });
+
+    ColliderComponent col = scene.getComponentConst<ColliderComponent>(cubo);
+    for(EntityID col : col.getCollisionInfo()){
+        std::cout << "Trigger funciona\n";
+    }
 }
 
 void

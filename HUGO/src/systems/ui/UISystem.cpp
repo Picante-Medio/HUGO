@@ -414,7 +414,6 @@ void UISystem::processInput()
     if (input->wasMouseButtonJustPressed(HUGO::MouseCode::MOUSE_LEFT)) {
         for (auto& pack : scene.query<PanelComponent, TextComponent, InputFieldComponent>()) {
             const PanelComponent& panel = pack.getConst<PanelComponent&>();
-            const TextComponent& text = pack.getConst<TextComponent&>();
             const InputFieldComponent& field = pack.getConst<InputFieldComponent&>();
 
             if (isMouseOverPanel(panel, mouse.x, mouse.y)) {
