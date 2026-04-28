@@ -2,9 +2,6 @@
 
 #include <iostream>
 
-#include "OgreOverlaySystem.h"
-#include "SDL_video.h"
-
 #include "InternalScene.h"
 #include "LuaBinder.h"
 
@@ -209,7 +206,8 @@ void RenderSystem::onUpdateRenderComponet(RenderComponent &rc)
             }
         }
 
-        obj.ogreEntity->setMaterialName(rc.materialName);
+        if(!rc.materialName.empty())obj.ogreEntity->setMaterialName(rc.materialName);
+        obj.ogreEntity->setVisible(rc.visible);
     }
 }
 #pragma endregion

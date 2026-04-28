@@ -11,7 +11,6 @@ HierarchySystem::init()
 {
     scene.onAddComponent<ChildrenComponent>().connect(this, &HierarchySystem::onUpdateChildrenComponent);
     scene.onAddComponent<ParentComponent>().connect(this, &HierarchySystem::onUpdateParentComponent);
-    scene.onAddComponent<TransformComponent>().connect(this, &HierarchySystem::onAddTransformComponent);
     
     scene.onUpdateComponent<ChildrenComponent>().connect(this, &HierarchySystem::onUpdateChildrenComponent);
     scene.onUpdateComponent<ParentComponent>().connect(this, &HierarchySystem::onUpdateParentComponent);
@@ -229,15 +228,6 @@ HierarchySystem::update(uint32_t){
 
 void 
 HierarchySystem::fixedUpdate(uint32_t) {}
-
-
-void 
-HierarchySystem::onAddTransformComponent(TransformComponent& tr){
-    tr.needUpdateLocalPosition = tr.worldPosition!=HUGO::Vector3();
-    tr.needUpdateLocalRotation = tr.worldRotation!=HUGO::Quaternion();
-    tr.needUpdateLocalScale = tr.worldScale!=HUGO::Vector3();
-    getFullTransform(tr.entity);
-}
 
 void 
 HierarchySystem::onUpdateChildrenComponent(ChildrenComponent& childrenComp)

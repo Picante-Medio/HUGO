@@ -8,21 +8,21 @@ HCOMPONENT(TransformComponent)
 private:
 
     //Local transform
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Vector3, position ,HUGO::Vector3(0, 0, 0));
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Quaternion, rotation, HUGO::Quaternion(1.0f,0,0,0));
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Vector3, scale, HUGO::Vector3(1.0f, 1.0f, 1.0f));
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Vector3, position ,HUGO::Vector3());
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Quaternion, rotation, HUGO::Quaternion());
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Vector3, scale, HUGO::Vector3(1.0f));
 
     //World transform
     HUGO::Vector3 worldPosition = HUGO::Vector3();
     HUGO::Quaternion worldRotation =  HUGO::Quaternion();
-    HUGO::Vector3 worldScale = HUGO::Vector3(1.0f, 1.0f, 1.0f);
+    HUGO::Vector3 worldScale = HUGO::Vector3(1.0f);
 
     bool needUpdateLocalPosition = false;
-    bool needUpdateWorldPosition = false;
+    bool needUpdateWorldPosition = true;
     bool needUpdateLocalRotation = false;
-    bool needUpdateWorldRotation = false;
+    bool needUpdateWorldRotation = true;
     bool needUpdateLocalScale = false;
-    bool needUpdateWorldScale = false;
+    bool needUpdateWorldScale = true;
 
 public:
     enum UpdateFlags{
@@ -30,7 +30,7 @@ public:
         ROTATION_UPDATED = 2
     };
 
-    int flags = 0;
+    int flags = 3;
 
     inline void setPosition(HUGO::Vector3 newPosition){
         position = newPosition;
