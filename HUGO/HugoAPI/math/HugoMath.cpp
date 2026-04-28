@@ -208,6 +208,9 @@ namespace HUGO {
         z = sin*k.z;
 	}
 
+	Quaternion::Quaternion(Vector4 vec4)
+		: w(vec4.w), x(vec4.x), y(vec4.y), z(vec4.z) {}
+
     Quaternion Quaternion::inverse() const
     {
         float norm = w*w + x*x + y*y + z*z;

@@ -93,6 +93,7 @@ namespace HUGO {
 		Quaternion();
 		Quaternion(float w, float x, float y, float z);
 		Quaternion(Radian angle, const Vector3& axis);
+		Quaternion(Vector4 vec4);
 
 		//helpers which are useful to audio listener and other contexts
 		Quaternion inverse() const;

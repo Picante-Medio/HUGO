@@ -68,11 +68,31 @@ ErrorOrVoid ChatParser::readChat(const HUGO::String& chatPath){
 
 #pragma region ReadTypeFunctions
 
+ErrorOrType<HUGO::Vector2> readVector2(){
+    Vector2 res;
+    if (std::cin >> res.x >> res.y) return ErrorOrType<HUGO::Vector2>(res);
+    else return ErrorOrType<HUGO::Vector2>(StringError{HUGO::String("Error reading VECTOR_2")});
+}
+
 ErrorOrType<HUGO::Vector3> readVector3(){
     Vector3 res;
     if (std::cin >> res.x >> res.y >> res.z) return ErrorOrType<HUGO::Vector3>(res);
     else return ErrorOrType<HUGO::Vector3>(StringError{HUGO::String("Error reading VECTOR_3")});
 }
+
+ErrorOrType<HUGO::Vector4> readVector4(){
+    Vector4 res;
+    if (std::cin >> res.x >> res.y >> res.z >> res.w) return ErrorOrType<HUGO::Vector4>(res);
+    else return ErrorOrType<HUGO::Vector4>(StringError{HUGO::String("Error reading VECTOR_4")});
+}
+
+ErrorOrType<HUGO::Quaternion> readQuaternion(){
+    ErrorOrType<HUGO::Vector4> vec4 = readVector4();
+    if(!vec4.isError()) return ErrorOrType<HUGO::Quaternion>(vec4.getValue());
+    else return ErrorOrType<HUGO::Quaternion>(StringError{HUGO::String("Error reading QUATERNION")});
+}
+
+
 
 ErrorOrType<HUGO::Int> readInt(){
     HUGO::Int res;
@@ -87,6 +107,12 @@ ErrorOrType<HUGO::Float> readFloat(){
     HUGO::Float res;
     if (std::cin >> res) return ErrorOrType<HUGO::Float>(res);
     else return ErrorOrType<HUGO::Float>(StringError{HUGO::String("Error reading FLOAT")});
+}
+
+ErrorOrType<HUGO::Double> readDouble(){
+    HUGO::Double res;
+    if (std::cin >> res) return ErrorOrType<HUGO::Double>(res);
+    else return ErrorOrType<HUGO::Double>(StringError{HUGO::String("Error reading DOUBLE")});
 }
 
 ErrorOrType<HUGO::String> readString(){
@@ -106,18 +132,44 @@ ErrorOrType<HUGO::Bool> readBool(){
 
 //Checks if input is BOOL, VEC3, FLOAT, INT, or STRING and adds it to the parameters of compData. If an error occurred, returns the error.
 ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData& compData){
-    if(input == "VECTOR_3"){
+        if(input == "VECTOR_2"){
+            HUGO::String parameterName;
+            std::cin >> parameterName;
 
-        HUGO::String parameterName;
-        std::cin >> parameterName;
+            ErrorOrType<HUGO::Vector2> vec2 = readVector2();
+
+            if(vec2.isError()) return ErrorOrVoid(vec2.getError());
+            compData.parameters[parameterName] = {vec2.getValue()};
+        }
+
+        if(input == "VECTOR_3"){
+            HUGO::String parameterName;
+            std::cin >> parameterName;
 
             ErrorOrType<HUGO::Vector3> vec3 = readVector3();
 
             if(vec3.isError()) return ErrorOrVoid(vec3.getError());
-
-            //Might be terrorism
-            //Adds it to the parameters of the last component added to the last entity of the scene
             compData.parameters[parameterName] = {vec3.getValue()};
+        }
+
+        if(input == "VECTOR_4"){
+            HUGO::String parameterName;
+            std::cin >> parameterName;
+
+            ErrorOrType<HUGO::Vector4> vec4 = readVector4();
+
+            if(vec4.isError()) return ErrorOrVoid(vec4.getError());
+            compData.parameters[parameterName] = {vec4.getValue()};
+        }
+
+        if(input == "QUATERNION"){
+            HUGO::String parameterName;
+            std::cin >> parameterName;
+
+            ErrorOrType<HUGO::Quaternion> quat = readQuaternion();
+
+            if(quat.isError()) return ErrorOrVoid(quat.getError());
+            compData.parameters[parameterName] = {quat.getValue()};
         }
 
         if(input == "FLOAT"){
@@ -129,6 +181,17 @@ ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData& comp
             if(f.isError()) return ErrorOrVoid(f.getError());
 
             compData.parameters[parameterName] = {f.getValue()};
+        }
+
+        if(input == "DOUBLE"){
+            HUGO::String parameterName;
+            std::cin >> parameterName;
+
+            ErrorOrType<HUGO::Double> d = readDouble();
+
+            if(d.isError()) return ErrorOrVoid(d.getError());
+
+            compData.parameters[parameterName] = {d.getValue()};
         }
 
         if(input == "INT"){
