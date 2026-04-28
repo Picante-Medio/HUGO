@@ -90,19 +90,19 @@ HCOMPONENT(RigidBodyComponent)
 
     // Modifies angular velocity
     void applyTorqueImpulse(HUGO::Vector3 nImpulse){
-        torqueImpulseApplied = nImpulse;
+        torqueImpulseApplied += nImpulse;
         flags = flags | UpdateFlags::TORQUE_IMPULSE_APPLIED;
     }
 
     // Modifies linear acceleration
     void applyForce(HUGO::Vector3 nForce){
-        forceApplied = nForce;
+        forceApplied += nForce;
         flags = flags | UpdateFlags::FORCE_APPLIED;
     }
 
     // Modifies angular acceleration
     void applyTorque(HUGO::Vector3 nTorque){
-        torqueApplied = nTorque;
+        torqueApplied += nTorque;
         flags = flags | UpdateFlags::TORQUE_APPLIED;
     }
 
