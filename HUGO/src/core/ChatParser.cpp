@@ -292,10 +292,14 @@ ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData& comp
         }
 
         if(input == "COLLIDER_INFO"){
+            HUGO::String parameterName;
+            std::cin >> parameterName;
+
+            std::cin.get();
             ErrorOrType<HUGO::ColliderInfo> b = readColliderInfo();
             if(b.isError()) return ErrorOrVoid(b.getError());
 
-           compData.parameters["info"] = {b.getValue()};
+           compData.parameters[parameterName] = {b.getValue()};
         }
 
     return ErrorOrVoid();
