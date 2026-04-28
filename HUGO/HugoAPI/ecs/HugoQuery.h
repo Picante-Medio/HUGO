@@ -15,10 +15,10 @@ namespace HUGO {
 
 		std::tuple<Ts&...> pack;
 		
-		std::tuple<std::shared_ptr<ComponentEvent<Ts>>...>& updateEvents;
+		std::tuple<std::shared_ptr<ComponentEvent<Ts>>...> updateEvents;
 
 	public:
-		ComponentTuple(Ts&... components, std::tuple<std::shared_ptr<ComponentEvent<Ts>>...>& updateEvents) 
+		ComponentTuple(Ts&... components, std::tuple<std::shared_ptr<ComponentEvent<Ts>>...> updateEvents) 
 			: pack(components...), updateEvents(updateEvents)
 		{}
 
