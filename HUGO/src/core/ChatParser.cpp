@@ -130,7 +130,69 @@ ErrorOrType<HUGO::Bool> readBool(){
     return ErrorOrType<HUGO::Bool>("Error reading BOOL");
 }
 
-//Checks if input is BOOL, VEC3, FLOAT, INT, or STRING and adds it to the parameters of compData. If an error occurred, returns the error.
+ErrorOrType <HUGO::ColliderInfo> readColliderInfo(){
+    HUGO::ColliderInfo res;
+
+    HUGO::String col_shape;
+    std::cin >> col_shape;
+
+    if(col_shape == "BOX_COLLIDER"){
+        //vec3 half_extents
+        ErrorOrType<Vector3> half_extents = readVector3();
+        if(half_extents.isError()) return ErrorOrType<HUGO::ColliderInfo>(half_extents.getError());
+        res = BoxColliderInfo{half_extents.getValue()};
+
+        return ErrorOrType<HUGO::ColliderInfo>(res);
+    }
+
+    if(col_shape == "SPHERE_COLLIDER"){
+        //float radius
+        ErrorOrType<Float> radius = readFloat();
+        if(radius.isError()) return ErrorOrType<HUGO::ColliderInfo>(radius.getError());
+        res = SphereColliderInfo{radius.getValue()};
+
+        return ErrorOrType<HUGO::ColliderInfo>(res);
+    }
+
+    if(col_shape == "CAPSULE_COLLIDER"){
+        //float radius
+        ErrorOrType<Float> radius = readFloat();
+        if(radius.isError()) return ErrorOrType<HUGO::ColliderInfo>(radius.getError());
+
+        //float height
+        ErrorOrType<Float> height = readFloat();
+        if(height.isError()) return ErrorOrType<HUGO::ColliderInfo>(height.getError());
+        res = CapsuleColliderInfo{radius.getValue(), height.getValue()};
+
+        return ErrorOrType<HUGO::ColliderInfo>(res);
+    }
+
+    if(col_shape == "CYLINDER_COLLIDER"){
+        //vec3 half_extents
+        ErrorOrType<Vector3> half_extents = readVector3();
+        if(half_extents.isError()) return ErrorOrType<HUGO::ColliderInfo>(half_extents.getError());
+        res = CylinderColliderInfo{half_extents.getValue()};
+
+        return ErrorOrType<HUGO::ColliderInfo>(res);
+    }
+
+    if(col_shape == "CONE_COLLIDER"){
+        //float radius
+        ErrorOrType<Float> radius = readFloat();
+        if(radius.isError()) return ErrorOrType<HUGO::ColliderInfo>(radius.getError());
+
+        //float height
+        ErrorOrType<Float> height = readFloat();
+        if(height.isError()) return ErrorOrType<HUGO::ColliderInfo>(height.getError());
+        res = ConeColliderInfo{radius.getValue(), height.getValue()};
+
+        return ErrorOrType<HUGO::ColliderInfo>(res);
+    }
+
+    return ErrorOrType<HUGO::ColliderInfo>(StringError{"Error reading ColliderInfo"});
+}
+
+//Checks if input is BOOL, VEC3, FLOAT, INT, STRING... and adds it to the parameters of compData. If an error occurred, returns the error.
 ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData& compData){
         if(input == "VECTOR_2"){
             HUGO::String parameterName;
@@ -223,6 +285,18 @@ ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData& comp
 
             std::cin.get();
             ErrorOrType<HUGO::Bool> b = readBool();
+
+            if(b.isError()) return ErrorOrVoid(b.getError());
+
+           compData.parameters[parameterName] = {b.getValue()};
+        }
+
+        if(input == "COLLIDER_INFO"){
+            HUGO::String parameterName;
+            std::cin >> parameterName;
+
+            std::cin.get();
+            ErrorOrType<HUGO::ColliderInfo> b = readColliderInfo();
 
             if(b.isError()) return ErrorOrVoid(b.getError());
 

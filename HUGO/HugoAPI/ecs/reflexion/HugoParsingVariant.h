@@ -22,8 +22,9 @@ using HVariant = std::variant<
     HUGO::Degree, //FLOAT
     HUGO::Radian, //FLOAT
 
-    //----------------------ENUMS THAT CAN BE REPRESENTED AS INTS----------------
+    //-------------------SPECIAL TREATMENT-----------------
     HUGO::ColliderInfo, //COLLIDER_TYPE
+    //----------------------ENUMS THAT CAN BE REPRESENTED AS INTS----------------
     HUGO::BodyType, //INT
     HUGO::LightType, //INT
     HUGO::UIMetricsMode, //INT
