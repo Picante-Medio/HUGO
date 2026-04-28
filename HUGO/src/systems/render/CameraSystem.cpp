@@ -27,8 +27,8 @@ void CameraSystem::update(uint32_t){
         TransformComponent& tr = pack.getConst<TransformComponent&>();
         CameraComponent& camera = pack.getConst<CameraComponent&>();
 
-        cameraMap[camera.entity].node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getPosition()));
-        cameraMap[camera.entity].node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getRotation()));
+        cameraMap[camera.entity].node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getWorldPosition()));
+        cameraMap[camera.entity].node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getWorldRotation()));
 
         // update projection parameters
         if (camera.getProjectionType() == HUGO::ProjectionType::Perspective) {
@@ -89,8 +89,8 @@ void CameraSystem::registerCameraEntity(CameraComponent& cameraComp){
     // create node and attach camera
     res.node = sceneManager->getRootSceneNode()->createChildSceneNode(nodeName);
     res.node->attachObject(res.ogreCamera);
-    res.node->setPosition(HUGO::OgreUtils::vector3ToOgre(transformComp.getPosition()));
-    res.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(transformComp.getRotation()));
+    res.node->setPosition(HUGO::OgreUtils::vector3ToOgre(transformComp.getWorldPosition()));
+    res.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(transformComp.getWorldRotation()));
 
     cameraMap[entity] = res;
 
