@@ -26,6 +26,23 @@ ErrorOrVoid SceneManager::initializeParser(const HUGO::String& chatFolder, std::
     return m_chatParser.readChatFolder(chatFolder);
 }
 
+ErrorOrType<EntityID> createEntity(std::shared_ptr<InternalScene> scene, const EntityData& entityData){
+    
+    EntityID currEntity = scene->createEntity();
+
+        for(auto componentData : entityData.components){
+            ErrorOrVoid compResult = HUGO::ComponentFactory::makeComponent(scene, currEntity, 
+                componentData.componentName, componentData.parameters);
+
+            if (compResult.isError())
+                return ErrorOrType<EntityID>(compResult.getError());
+        }
+
+        //Parenting is missing
+
+    return ErrorOrType<EntityID>(currEntity);
+}
+
 ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
     ErrorOrType<HUGO::SceneData> sceneData = m_chatParser.getSceneData(sceneName);
 
@@ -59,15 +76,7 @@ ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
 
     
     for(auto entityData: sceneData.getValue().entities){
-        EntityID currEntity = m_sceneMap[sceneName]->createEntity();
-
-        for(auto componentData : entityData){
-            ErrorOrVoid compResult = HUGO::ComponentFactory::makeComponent(m_sceneMap[sceneName], currEntity, 
-                componentData.componentName, componentData.parameters);
-
-            if (compResult.isError())
-                return ErrorOrVoid(compResult.getError());
-        }
+        createEntity(m_sceneMap[sceneName], entityData);
     }
 
     OgreModule::Instance().setCurrentSceneManager(m_currentSceneName);
@@ -150,16 +159,6 @@ ErrorOrType<EntityID> SceneManager::instantiatePrefab(const HUGO::String& prefab
     ErrorOrType<EntityData> prefabData = m_chatParser.getPrefabData(prefabName);
     
     if(prefabData.isError()) return ErrorOrType<EntityID>(prefabData.getError().description());
-
-    EntityID currEntity = scene->createEntity();
-
-        for(auto componentData : prefabData.getValue()){
-            ErrorOrVoid compResult = HUGO::ComponentFactory::makeComponent(scene, currEntity, 
-                componentData.componentName, componentData.parameters);
-
-            if (compResult.isError())
-                return ErrorOrType<EntityID>(compResult.getError());
-        }
     
-    return ErrorOrType<EntityID>(currEntity);
+    return createEntity(scene, prefabData.getValue());
 }

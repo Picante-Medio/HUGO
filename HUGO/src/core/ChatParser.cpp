@@ -330,20 +330,12 @@ ErrorOrVoid ChatParser::handleSceneType(){
         }
 
         if (input == "ENTITY"){
-            std::vector<HUGO::EntityData>& sceneEntities = m_sceneData[sceneName].entities;
-            sceneEntities.push_back(EntityData());
-        }
+            ErrorOrType<EntityData> entData = handleEntity();
+            if(entData.isError()){
+                return ErrorOrVoid(entData.getError());
+            }
 
-        if(input == "COMPONENT"){
-            ComponentData compData;
-            std::cin >> compData.componentName;
-            m_sceneData[sceneName].entities.back().push_back(compData);
-        }
-
-        //If it already has an entity and this entity has a component, it can check if possible parameters for the component have been read.
-        if(m_sceneData[sceneName].entities.size() > 0 && m_sceneData[sceneName].entities.back().size() > 0){
-            ErrorOrVoid parameterReadErr = parameterReaderHelper(input, m_sceneData[sceneName].entities.back().back());
-            if(parameterReadErr.isError()) return parameterReadErr;
+            m_sceneData[sceneName].entities.push_back(entData.getValue());
         }
 
         std::cin >> input;
@@ -353,36 +345,61 @@ ErrorOrVoid ChatParser::handleSceneType(){
 }
 
 ErrorOrVoid ChatParser::handlePrefabType(){
-
+    
     HUGO::String prefabName;
     std::cin >> prefabName;
 
-    HUGO::String aux;
-    std::cin >> aux;
-    std::cin >> aux;
+    HUGO::String input;
+    std::cin >> input;
 
-    HUGO::Int prefabID;
-    std::cin >> prefabID;
+    if(input != "ENTITY"){
+        return ErrorOrVoid(StringError{"Bad format in prefab .chat"});
+    }
 
-    m_prefabData[prefabName] = EntityData();
+    ErrorOrType<EntityData> entData = handleEntity();
+
+    if(entData.isError()) return ErrorOrVoid(entData.getError());
+
+    m_prefabData[prefabName] = entData.getValue();
+
+    return ErrorOrVoid();
+
+}
+
+ErrorOrType<EntityData> ChatParser::handleEntity(){
+    EntityData entityData;
+    HUGO::String entityName;
+    HUGO::Int entityID;
+    std::cin >> entityName >> entityID;
 
     HUGO::String input;
     std::cin >> input;
-    while(std::cin){
+    while(input != "END_ENTITY"){
         if(input == "COMPONENT"){
             ComponentData compData;
             std::cin >> compData.componentName;
-
-            m_prefabData[prefabName].push_back(compData);
+            entityData.components.push_back(compData);
         }
+        else if(input == "START_CHILDREN"){
+            std::cin >> input;
+            while(input != "END_CHILDREN"){
+                ErrorOrType<EntityData> childEnt = handleEntity();
+                //if(childEnt.isError()) ...
+                entityData.children.push_back(childEnt.getValue());
 
-        ErrorOrVoid parameterReadErr = parameterReaderHelper(input, m_prefabData[prefabName].back());
-        if(parameterReadErr.isError()) return parameterReadErr;
+                std::cin >> input;
+            }
+        }
+        //If it already has an entity and this entity has a component, it can check if possible parameters for the component have been read.
+        else if(entityData.components.size() > 0){
+            ErrorOrVoid parameterReadErr = parameterReaderHelper(input, entityData.components.back());
+            //if(parameterReadErr.isError()) return parameterReadErr;
+        }
 
         std::cin >> input;
     }
 
-    return ErrorOrVoid();
+    return ErrorOrType<EntityData>(entityData);
 }
 
 ErrorOrType<EntityData> ChatParser::getPrefabData(const HUGO::String& prefabName){

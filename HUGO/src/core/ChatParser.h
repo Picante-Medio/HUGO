@@ -13,7 +13,10 @@ namespace HUGO{
 		std::unordered_map<HUGO::String, HVariant> parameters;
 	};
 
-	using EntityData = std::vector<ComponentData>;
+	struct EntityData{
+		std::vector<ComponentData> components;
+		std::vector<EntityData> children;
+	};
 
 	struct SceneData {
 		
@@ -33,6 +36,10 @@ namespace HUGO{
 
 		//Read previously opened file as Scene.
 		ErrorOrVoid handleSceneType();
+
+		//Reads Entity until it reads END_ENTITY
+		ErrorOrType<EntityData> handleEntity();
+
 		//Read previously opened file as Prefab
 		ErrorOrVoid handlePrefabType();
 	public:

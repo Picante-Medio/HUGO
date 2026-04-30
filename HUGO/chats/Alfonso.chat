@@ -1,5 +1,0 @@
-PREFAB
-
-Alfonso 0
-	COMPONENT MeshRendererComponent
-		STRING mesh res://sphere.tres
