@@ -11,6 +11,17 @@ void CameraSystem::init(){
 
     scene.onAddComponent<CameraComponent>().connect(this, &CameraSystem::registerCameraEntity);
     scene.onRemoveComponent<CameraComponent>().connect(this, &CameraSystem::unregisterCameraEntity); 
+    scene.onUpdateComponent<CameraComponent>().connect(this, &CameraSystem::cameraChanged);
+}
+
+void 
+CameraSystem::onLoad() {
+    for(auto pack : scene.query<CameraComponent>()) {
+        const CameraComponent& comp = pack.getConst<CameraComponent>();
+        if(comp.isMain()) {
+            setMainCamera(comp);
+        }
+    }
 }
 
 void CameraSystem::update(uint32_t){
@@ -125,7 +136,7 @@ void CameraSystem::unregisterCameraEntity(CameraComponent& comp){
     cameraMap.erase(entity);
 }
 
-void CameraSystem::setMainCamera(CameraComponent& camComp){
+void CameraSystem::setMainCamera(const CameraComponent& camComp){
     EntityID camID = camComp.entity;
     Ogre::Viewport* viewport = OgreModule::Instance().getViewport();
     viewport->setCamera(cameraMap[camID].ogreCamera);
@@ -138,4 +149,12 @@ void CameraSystem::setMainCamera(CameraComponent& camComp){
     ));
 
     m_mainCamera = camID;
+}
+
+
+void 
+CameraSystem::cameraChanged(CameraComponent& comp) {
+    if(comp.isMain()) {
+        setMainCamera(comp);
+    }
 }
