@@ -7,6 +7,8 @@
 #include "IPhysicsModule.h"
 #include "IInput.h"
 #include "OgreModule.h"
+#include "ParentComponent.h"
+#include "ChildrenComponent.h"
 
 #include "GameLibraryLoader.h"
 #include <memory>
@@ -30,6 +32,7 @@ ErrorOrType<EntityID> createEntity(std::shared_ptr<InternalScene> scene, const E
     
     EntityID currEntity = scene->createEntity();
 
+        //======Creates components========
         for(auto componentData : entityData.components){
             ErrorOrVoid compResult = HUGO::ComponentFactory::makeComponent(scene, currEntity, 
                 componentData.componentName, componentData.parameters);
@@ -38,7 +41,23 @@ ErrorOrType<EntityID> createEntity(std::shared_ptr<InternalScene> scene, const E
                 return ErrorOrType<EntityID>(compResult.getError());
         }
 
-        //Parenting is missing
+        //Put childrenComponent to parentEntity if it has any
+        if(entityData.children.size() > 0){
+            scene->addComponent<ChildrenComponent>(currEntity);
+        }
+        //Iterate through children. Creates the child with components, then parents them with currentEntity. This is donde recursively
+        for(auto childrenData : entityData.children){
+            ErrorOrType<EntityID> err = createEntity(scene, childrenData);
+            if(err.isError()) return err;
+            EntityID childID = err.getValue();
+
+            scene->addComponent<ParentComponent>(childID, [currEntity](ParentComponent& cmp){
+                cmp.setParent(currEntity);
+            });
+            scene->modifyComponent<ChildrenComponent>(currEntity, [childID](ChildrenComponent& cmp){
+                cmp.addChild(childID);
+            });
+        }
 
     return ErrorOrType<EntityID>(currEntity);
 }
