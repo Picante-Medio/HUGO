@@ -30,5 +30,6 @@ using HVariant = std::variant<
     HUGO::UIMetricsMode, //INT
     HUGO::ProjectionType, //INT
     HUGO::ProgressBarFillMode, //INT
-    HUGO::SliderOrientation //INT
+    HUGO::SliderOrientation, //INT
+    HUGO::AudioTypes //INT
 >;

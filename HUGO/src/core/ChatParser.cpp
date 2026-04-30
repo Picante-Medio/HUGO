@@ -353,11 +353,13 @@ ErrorOrVoid ChatParser::handleSceneType(){
 }
 
 ErrorOrVoid ChatParser::handlePrefabType(){
-    char emptySpaceChar;
-    std::cin >> emptySpaceChar;
 
     HUGO::String prefabName;
-    getline(std::cin, prefabName);
+    std::cin >> prefabName;
+
+    HUGO::String aux;
+    std::cin >> aux;
+    std::cin >> aux;
 
     HUGO::Int prefabID;
     std::cin >> prefabID;

@@ -8,7 +8,7 @@
 struct ma_sound;
 HCOMPONENT(AudioComponent)
     //serialization
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Int, type, HUGO::AudioTypes::LAST_TYPE)
+    DEFAULT_SERIALIZED_MEMBER(HUGO::AudioTypes, type, HUGO::AudioTypes::LAST_TYPE)
     DEFAULT_SERIALIZED_MEMBER(HUGO::String, audioName, "")
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, volume, 1.0f)
     DEFAULT_SERIALIZED_MEMBER(HUGO::Bool, loop, false)
