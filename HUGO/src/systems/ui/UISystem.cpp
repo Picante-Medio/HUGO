@@ -394,7 +394,7 @@ void UISystem::onUpdateTextComponent(TextComponent& t)
     Ogre::TextAreaOverlayElement* area = static_cast<Ogre::TextAreaOverlayElement*>(HUGO::OgreOverlayUtils::getElement(t.textAreaName).getValue());
 
     if(t.maxWidth || t.maxHeight){
-        t.text = formatText(t.text, area, t.maxWidth.value_or(area->getWidth()), t.maxHeight.value_or(area->getHeight()));
+        t.text = formatText(t.text, area, t.maxWidth, t.maxHeight);
     }
     syncText(t);
 }
@@ -770,6 +770,11 @@ void UISystem::onAddTextComponent(TextComponent &t)
     UIElementCache *cache = getCache(t.entity);
     if (!cache) 
         return;
+    
+    if (t.textAreaName.empty()){
+        const PanelComponent& p = scene.getComponentConst<PanelComponent>(t.entity);
+        t.textAreaName = p.containerName +"/Text";
+    }
 
     ErrorOrType<Ogre::OverlayElement *> elementResult = HUGO::OgreOverlayUtils::getElement(t.textAreaName, true, cache->container);
     if (elementResult.isError())
@@ -788,6 +793,10 @@ void UISystem::onAddProgressBarComponent(ProgressBarComponent &pb)
     if (!cache) 
         return;
 
+    const PanelComponent& p = scene.getComponentConst<PanelComponent>(pb.entity);
+    if (pb.fillElementName.empty()){
+        pb.fillElementName = p.containerName +"/Fill";
+    }
     ErrorOrType<Ogre::OverlayElement *> elementResult = HUGO::OgreOverlayUtils::getElement(pb.fillElementName, false, cache->container);
     if (elementResult.isError())
         return;
@@ -797,7 +806,6 @@ void UISystem::onAddProgressBarComponent(ProgressBarComponent &pb)
     
     cache->element = area;
 
-    PanelComponent& p = scene.getComponent<PanelComponent>(pb.entity);
     syncProgressBar(p, pb);
 }
 
@@ -806,6 +814,15 @@ void UISystem::onAddSliderComponent(SliderComponent &s)
     UIElementCache *cache = getCache(s.entity);
     if (!cache) 
         return;
+
+    const PanelComponent& p = scene.getComponentConst<PanelComponent>(s.entity);
+
+    if (s.trackElementName.empty()){
+        s.trackElementName = p.containerName +"/Track";
+    }
+    if (s.knobElementName.empty()){
+        s.knobElementName = p.containerName +"/Knob";
+    }
 
     ErrorOrType<Ogre::OverlayElement*> trackResult = HUGO::OgreOverlayUtils::getElement(s.trackElementName, false, cache->container);
     if (trackResult.isError())
@@ -831,6 +848,5 @@ void UISystem::onAddSliderComponent(SliderComponent &s)
     cache->container->addChild(track);
     cache->container->addChild(knob);
 
-    PanelComponent& p = scene.getComponent<PanelComponent>(s.entity);
     syncSlider(p, s);
 }
