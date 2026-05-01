@@ -24,6 +24,8 @@ using HVariant = std::variant<
 
     //-------------------SPECIAL TREATMENT-----------------
     HUGO::ColliderInfo, //COLLIDER_TYPE
+    
+
     //----------------------ENUMS THAT CAN BE REPRESENTED AS INTS----------------
     HUGO::BodyType, //INT
     HUGO::LightType, //INT

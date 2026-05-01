@@ -27,6 +27,9 @@ namespace HUGO {
 		bool operator==(const Vector2& other) const;
 		bool operator!=(const Vector2& other) const;
 
+		float operator[](int i) const;
+		float& operator[](int i);
+
 		float dot(const Vector2& other) const;
 
 		float length() const;
@@ -55,6 +58,9 @@ namespace HUGO {
 
 		bool operator==(const Vector3& other) const;
 		bool operator!=(const Vector3& other) const;
+
+		float operator[](int i) const;
+		float& operator[](int i);
 		
 		Vector3 cross(const Vector3& other) const;
 
@@ -80,6 +86,9 @@ namespace HUGO {
 		
         bool operator== (const Vector4& other) const;
 		bool operator!= (const Vector4& other) const;
+
+		float operator[](int i) const;
+		float& operator[](int i);
 
 		float length() const;
 		Vector4 normalized() const;

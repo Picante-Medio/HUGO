@@ -1,4 +1,5 @@
 #include <cmath>
+#include <cassert>
 #include "HugoMath.h"
 #include "HugoTypes.h"
 
@@ -53,6 +54,16 @@ namespace HUGO {
 		return x != other.x || y != other.y;
 	}
 
+	float Vector2::operator[](int i) const {
+		assert(i >= 0 && i < 2);
+		return (&x)[i];
+	}
+
+	float& Vector2::operator[](int i) {
+		assert(i >= 0 && i < 2);
+		return (&x)[i];
+	}
+
     Vector3::Vector3()
 		: x(0.0f), y(0.0f), z(0.0f) {}
     Vector3::Vector3(float n)
@@ -103,6 +114,16 @@ namespace HUGO {
 	bool Vector3::operator==(const Vector3 &other) const
 	{
 		return x == other.x && y == other.y && z == other.z;
+	}
+
+	float Vector3::operator[](int i) const {
+		assert(i >= 0 && i < 3);
+		return (&x)[i];
+	}
+
+	float& Vector3::operator[](int i) {
+		assert(i >= 0 && i < 3);
+		return (&x)[i];
 	}
 
     Vector3 Vector3::cross(const Vector3 &other) const
@@ -168,6 +189,16 @@ namespace HUGO {
 
 	bool Vector4::operator!= (const Vector4& other) const {
 		return !(*this == other);
+	}
+
+	float Vector4::operator[](int i) const {
+		assert(i >= 0 && i < 4);
+		return (&x)[i];
+	}
+
+	float& Vector4::operator[](int i) {
+		assert(i >= 0 && i < 4);
+		return (&x)[i];
 	}
 
 	float Vector4::length() const {
