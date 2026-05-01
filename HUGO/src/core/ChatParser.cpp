@@ -384,7 +384,7 @@ ErrorOrType<EntityData> ChatParser::handleEntity(){
             std::cin >> input;
             while(input != "END_CHILDREN"){
                 ErrorOrType<EntityData> childEnt = handleEntity();
-                //if(childEnt.isError()) ...
+                if(childEnt.isError()) return ErrorOrType<EntityData>(childEnt.getError());
                 entityData.children.push_back(childEnt.getValue());
 
                 std::cin >> input;
@@ -393,7 +393,7 @@ ErrorOrType<EntityData> ChatParser::handleEntity(){
         //If it already has an entity and this entity has a component, it can check if possible parameters for the component have been read.
         else if(entityData.components.size() > 0){
             ErrorOrVoid parameterReadErr = parameterReaderHelper(input, entityData.components.back());
-            //if(parameterReadErr.isError()) return parameterReadErr;
+            if(parameterReadErr.isError()) return ErrorOrType<EntityData>(parameterReadErr.getError());
         }
 
         std::cin >> input;
