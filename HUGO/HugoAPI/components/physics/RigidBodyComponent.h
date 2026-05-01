@@ -38,6 +38,7 @@ HCOMPONENT(RigidBodyComponent)
     HUGO::Vector3 torqueApplied = HUGO::Vector3();
 
     bool asleep = false;
+    bool dontRotateWithPhysicsOnDynamic = false;
     DEFAULT_SERIALIZED_MEMBER(float, linearSleepingThreshold, 0.8f)
     DEFAULT_SERIALIZED_MEMBER(float, angularSleepingThreshold, 1.f)
 

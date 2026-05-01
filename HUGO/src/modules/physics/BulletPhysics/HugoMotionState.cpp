@@ -2,6 +2,7 @@
 #include "BulletUtils.h"
 #include "TransformComponent.h"
 #include "ColliderComponent.h"
+#include "RigidBodyComponent.h"
 
 HUGOMotionState::HUGOMotionState(const btTransform initialPos, std::shared_ptr<InternalScene> scene, unsigned long int id, btTransform offset)
 : entityID(id)
@@ -36,9 +37,13 @@ void HUGOMotionState::setWorldTransform(const btTransform& worldTrans)
 
     TransformComponent& hugoTransform = hugoScene->getComponent<TransformComponent>(entityID);
     ColliderComponent hugoCol = hugoScene->getComponentConst<ColliderComponent>(entityID);
-        
-    btQuaternion rot = btTransformRegister.getRotation();
-    hugoTransform.setRotation(hugoCol.getRotationOffset().inverse() * HUGO::Quaternion(rot.w(), rot.x(), rot.y(), rot.z()));
+    RigidBodyComponent hugoRB = hugoScene->getComponentConst<RigidBodyComponent>(entityID);
+    
+    if(!hugoRB.dontRotateWithPhysicsOnDynamic){
+        btQuaternion rot = btTransformRegister.getRotation();
+        hugoTransform.setRotation(hugoCol.getRotationOffset().inverse() * HUGO::Quaternion(rot.w(), rot.x(), rot.y(), rot.z()));
+    }
+    
     btVector3 pos = btTransformRegister.getOrigin();
     hugoTransform.setPosition(HUGO::Vector3(pos.x(), pos.y(), pos.z()) - hugoCol.getPositionOffset());
 }
