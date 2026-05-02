@@ -13,12 +13,12 @@ namespace HUGO {
     class UTILS_API SystemFactory {
     public:
         //Returns shared_ptr of the system because the Scene that holds it must reference it to update it.
-        using SystemGeneratorFn = ErrorOrType<std::shared_ptr<HUGO::System>>(*)(IScene&); 
+        using SystemGeneratorFn = HUGO::ErrorOrType<std::shared_ptr<HUGO::System>>(*)(IScene&); 
     private:
         static std::unordered_map<std::string, SystemGeneratorFn>& generators();
     public:
         static void add(const std::string& name, SystemGeneratorFn generator);
-        static ErrorOrType<std::shared_ptr<HUGO::System>> makeSystem(HUGO::IScene& scene,
+        static HUGO::ErrorOrType<std::shared_ptr<HUGO::System>> makeSystem(HUGO::IScene& scene,
             const std::string& name);
     };
 }

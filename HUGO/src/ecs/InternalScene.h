@@ -18,7 +18,7 @@ namespace HUGO {
 class InternalScene : public HUGO::IScene, public std::enable_shared_from_this<InternalScene>
 {
     std::vector<std::shared_ptr<HUGO::System>> systems;
-    std::queue<std::shared_ptr<Error>> errorsToLog;
+    std::queue<std::shared_ptr<HUGO::Error>> errorsToLog;
     std::queue<HUGO::String> stringsToLog;
 
     std::shared_ptr<HUGO::IInput> input;
@@ -58,11 +58,11 @@ public:
     void printEntity(int id);
     void printEntities();
 
-    void log(std::shared_ptr<Error> error) override;
+    void log(std::shared_ptr<HUGO::Error> error) override;
     void log(HUGO::String log) override;
 
-    ErrorOrType<HUGO::String> getNextError() override;
-    ErrorOrType<HUGO::String> getNextLog() override;
+    HUGO::ErrorOrType<HUGO::String> getNextError() override;
+    HUGO::ErrorOrType<HUGO::String> getNextLog() override;
 
     void dispatchMessages() override;
 
@@ -72,5 +72,5 @@ public:
 
     void changeAndDestroyPreviousScene(const HUGO::String& sceneName) override;
 
-    ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName) override;
+    HUGO::ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName) override;
 };

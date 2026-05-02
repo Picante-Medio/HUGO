@@ -27,9 +27,9 @@ namespace HUGO {
         HUGO::String m_currentSceneName;
 
         //Reads chatParser, creates a scene based on the SceneData, and indexes it in m_sceneMap.
-        ErrorOrVoid loadScene(const HUGO::String& sceneName);
+        HUGO::ErrorOrVoid loadScene(const HUGO::String& sceneName);
         //Removes a scene from m_sceneMap, to free space that is not used.
-        ErrorOrVoid unloadScene(const HUGO::String& sceneName);
+        HUGO::ErrorOrVoid unloadScene(const HUGO::String& sceneName);
 
         //Physics module
         std::shared_ptr<IPhysicsModule> m_physicsModule;
@@ -50,7 +50,7 @@ namespace HUGO {
         SceneManager(std::shared_ptr<HUGO::IInput> inputModule);
 
         //Initializes the parser with chat folder and sets physicsModule
-        ErrorOrVoid initializeParser(const HUGO::String& chatFolder, std::shared_ptr<IPhysicsModule> physicsModule);
+        HUGO::ErrorOrVoid initializeParser(const HUGO::String& chatFolder, std::shared_ptr<IPhysicsModule> physicsModule);
 
         /*
         Requests SceneManager to change to scene [sceneName].
@@ -62,14 +62,14 @@ namespace HUGO {
         void setCurrentSceneLUA(const HUGO::String sceneName);
 
         //Called by HUGO::Core. If there is a request for a scene change, change m_currentScene
-        ErrorOrVoid sceneChangeRequested();
+        HUGO::ErrorOrVoid sceneChangeRequested();
 
         //---Updates and fixedUpdates of current Scene
         void updateCurrentScene(uint32_t dt);
         void fixedUpdateCurrentScene(uint32_t dt);
         void dispatchMessagesCurrentScene();
 
-        ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName, std::shared_ptr<InternalScene> scene);
+        HUGO::ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName, std::shared_ptr<InternalScene> scene);
     };
 
 }

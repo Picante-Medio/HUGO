@@ -19,24 +19,25 @@
             } \
             Reflection() { \
                 HUGO::ComponentFactory::addConstructor(#COMPONENT_NAME, \
-                    [](std::shared_ptr<HUGO::IScene> scene, EntityID ent, const std::unordered_map<std::string, HVariant>& args) -> ErrorOrVoid { \
+                    [](std::shared_ptr<HUGO::IScene> scene, EntityID ent, const std::unordered_map<std::string, HVariant>& args) \
+                     -> HUGO::ErrorOrVoid { \
                         for(auto& [key,val] : args) { \
                             if(members().find(key) == members().end()) { \
-                                StringError err; \
+                                HUGO::StringError err; \
                                 err.errorMessage = "No existe un miembro " + key; \
-                                return ErrorOrVoid(err); \
+                                return HUGO::ErrorOrVoid(err); \
                             } \
                         } \
                         scene->addComponent<COMPONENT_NAME>(ent, [args](COMPONENT_NAME& cmp){ \
                             for(auto& [key,val] : args) \
                                 members()[key]->Set(cmp,val); \
                         }); \
-                        return ErrorOrVoid(); \
+                        return HUGO::ErrorOrVoid(); \
                 }); \
                 HUGO::ComponentFactory::addDestructor(#COMPONENT_NAME, [](std::shared_ptr<HUGO::IScene> scene, EntityID ent) -> \
-                    ErrorOrVoid { \
+                    HUGO::ErrorOrVoid { \
                         scene->removeComponent<COMPONENT_NAME>(ent); \
-                        return ErrorOrVoid(); \
+                        return HUGO::ErrorOrVoid(); \
                 }); \
             } \
         }; \

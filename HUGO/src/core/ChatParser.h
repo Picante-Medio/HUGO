@@ -32,16 +32,16 @@ namespace HUGO{
 		std::unordered_map<HUGO::String, EntityData> m_prefabData;
 
 		//Open .chat file and read it
-		ErrorOrVoid readChat(const HUGO::String& chatPath);
+		HUGO::ErrorOrVoid readChat(const HUGO::String& chatPath);
 
 		//Read previously opened file as Scene.
-		ErrorOrVoid handleSceneType();
+		HUGO::ErrorOrVoid handleSceneType();
 
 		//Reads Entity until it reads END_ENTITY
-		ErrorOrType<EntityData> handleEntity();
+		HUGO::ErrorOrType<EntityData> handleEntity();
 
 		//Read previously opened file as Prefab
-		ErrorOrVoid handlePrefabType();
+		HUGO::ErrorOrVoid handlePrefabType();
 	public:
 
 		//Initialize empty database. Function readChatFolder must be called to fill the database.
@@ -49,13 +49,13 @@ namespace HUGO{
 
 		//Adds to the database the data from all .chat files of chatFolder path.
 		//@param chatFolder Path relative to the executable file (normally HUGO/bin)
-		ErrorOrVoid readChatFolder(const HUGO::String& chatFolder);
+		HUGO::ErrorOrVoid readChatFolder(const HUGO::String& chatFolder);
 
 		//Returns entity data associated with prefabName
-		ErrorOrType<EntityData> getPrefabData(const HUGO::String& prefabName);
+		HUGO::ErrorOrType<EntityData> getPrefabData(const HUGO::String& prefabName);
 
 		//Returns scene data associated with sceneName
-		ErrorOrType<SceneData> getSceneData(const HUGO::String& sceneName);
+		HUGO::ErrorOrType<SceneData> getSceneData(const HUGO::String& sceneName);
 	};
 
 }

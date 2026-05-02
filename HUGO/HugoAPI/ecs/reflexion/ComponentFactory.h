@@ -14,8 +14,8 @@ namespace HUGO {
 
     class UTILS_API ComponentFactory {
     public:
-        using ComponentConstructorFn = ErrorOrVoid(*)(std::shared_ptr<IScene>, EntityID, const std::unordered_map<std::string, HVariant>&);
-        using ComponentDestructorFn = ErrorOrVoid(*)(std::shared_ptr<IScene>, EntityID);
+        using ComponentConstructorFn = HUGO::ErrorOrVoid(*)(std::shared_ptr<IScene>, EntityID, const std::unordered_map<std::string, HVariant>&);
+        using ComponentDestructorFn = HUGO::ErrorOrVoid(*)(std::shared_ptr<IScene>, EntityID);
 
     private:
         static std::unordered_map<std::string, ComponentConstructorFn>& constructors();
@@ -25,9 +25,9 @@ namespace HUGO {
         static void addConstructor(const std::string& name, ComponentConstructorFn generator);
         static void addDestructor(const std::string& name, ComponentDestructorFn destructor);
 
-        static ErrorOrVoid makeComponent(std::shared_ptr<IScene> scene, EntityID ent,
+        static HUGO::ErrorOrVoid makeComponent(std::shared_ptr<IScene> scene, EntityID ent,
             const std::string& name, const std::unordered_map<std::string, HVariant>& args);
-        static ErrorOrVoid removeComponent(std::shared_ptr<IScene> scene, EntityID ent, const std::string& name);
+        static HUGO::ErrorOrVoid removeComponent(std::shared_ptr<IScene> scene, EntityID ent, const std::string& name);
     };
 
 }

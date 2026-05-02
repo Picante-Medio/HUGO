@@ -240,7 +240,7 @@ HierarchySystem::onUpdateChildrenComponent(ChildrenComponent& childrenComp)
     while(!toAdd.empty()){
         EntityID child = toAdd.front();toAdd.pop();
         if(child == parent || hasCycle(child, parent)){
-            scene.log(std::make_shared<StringError>("[HierarchySystem] Cannot add child "+ std::to_string(child) + " for entity " + std::to_string(parent)));
+            scene.log(std::make_shared<HUGO::StringError>("[HierarchySystem] Cannot add child "+ std::to_string(child) + " for entity " + std::to_string(parent)));
             childrenComp.children.erase(child);
             return;
         } 
@@ -252,7 +252,7 @@ HierarchySystem::onUpdateChildrenComponent(ChildrenComponent& childrenComp)
     while(!toRemove.empty()){
         EntityID child = toRemove.front();toRemove.pop();
         if(child == parent){
-            scene.log(std::make_shared<StringError>("[HierarchySystem] Cannot remove child "+ std::to_string(child) + " for entity " + std::to_string(parent)));
+            scene.log(std::make_shared<HUGO::StringError>("[HierarchySystem] Cannot remove child "+ std::to_string(child) + " for entity " + std::to_string(parent)));
             return;
          }  
         //remove the parent
@@ -270,7 +270,7 @@ HierarchySystem::onUpdateParentComponent(ParentComponent& parentComp)
     std::optional<EntityID> oldParent= parentComp.previousParent;
     if (newParent == child || hasCycle(child, newParent) || newParent == oldParent) {
         if(oldParent)parentComp.parent = oldParent;
-        scene.log(std::make_shared<StringError>("[HierarchySystem] Cannot set parent "+ std::to_string(newParent) + " for entity " + std::to_string(child)));
+        scene.log(std::make_shared<HUGO::StringError>("[HierarchySystem] Cannot set parent "+ std::to_string(newParent) + " for entity " + std::to_string(child)));
         return;
     }
  

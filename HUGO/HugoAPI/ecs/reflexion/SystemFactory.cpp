@@ -13,16 +13,16 @@ SystemFactory::add(const std::string& name, SystemGeneratorFn generator) {
     generators()[name] = generator;
 }
 
-ErrorOrType<std::shared_ptr<HUGO::System>> 
+HUGO::ErrorOrType<std::shared_ptr<HUGO::System>> 
 SystemFactory::makeSystem(HUGO::IScene& scene, const std::string& name) {
 
     if (generators().count(name)) {
         return generators()[name](scene);
     }
 
-    StringError err;
+    HUGO::StringError err;
     err.errorMessage = "Requested system doesn't exist or hasn't been registered for creation";
-    return ErrorOrType<std::shared_ptr<HUGO::System>>(err);
+    return HUGO::ErrorOrType<std::shared_ptr<HUGO::System>>(err);
 }
 
 }

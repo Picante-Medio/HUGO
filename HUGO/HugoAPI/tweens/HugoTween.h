@@ -13,7 +13,7 @@ namespace HUGO{
     class ITween{
         public:
     
-        virtual ErrorOrType<bool> tweenParameter(HUGO::IScene& scene, HUGO::Float dt) = 0;
+        virtual HUGO::ErrorOrType<bool> tweenParameter(HUGO::IScene& scene, HUGO::Float dt) = 0;
     };
 
     //Factory for just using Tween<EasingType>::makeTween(..)
@@ -45,10 +45,10 @@ namespace HUGO{
             }
         
             //Apply interpolation value to the referenced HUGO::Float parameter. Returns if Tween has finished or not.
-            ErrorOrType<bool> tweenParameter(HUGO::IScene& scene, HUGO::Float dt) override{
+            HUGO::ErrorOrType<bool> tweenParameter(HUGO::IScene& scene, HUGO::Float dt) override{
 
                 //If entity component was removed, tween is finished
-                if(!scene.hasComponent<ClassType>(m_componentEntity)) return ErrorOrType<bool>(true);
+                if(!scene.hasComponent<ClassType>(m_componentEntity)) return HUGO::ErrorOrType<bool>(true);
                 
                 m_currentTime += dt;
                 if(m_currentTime > m_totalTime) m_currentTime = m_totalTime;
@@ -69,9 +69,9 @@ namespace HUGO{
                 });
         
         
-                if(m_currentTime >= m_totalTime) return ErrorOrType<bool>(true);
+                if(m_currentTime >= m_totalTime) return HUGO::ErrorOrType<bool>(true);
         
-                return ErrorOrType<bool>(false);
+                return HUGO::ErrorOrType<bool>(false);
             }
         };
 

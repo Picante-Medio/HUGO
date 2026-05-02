@@ -27,10 +27,10 @@ CameraSystem::onLoad() {
 void CameraSystem::update(uint32_t){
     //If there are no cameras, throw error
     if(cameraMap.size() == 0){
-        scene.log(std::make_shared<StringError>("[CameraSystem] No cameras in scene"));
+        scene.log(std::make_shared<HUGO::StringError>("[CameraSystem] No cameras in scene"));
     }
     if(m_mainCamera == NULL){
-        scene.log(std::make_shared<StringError>("[CameraSystem] Main camera is not set"));
+        scene.log(std::make_shared<HUGO::StringError>("[CameraSystem] Main camera is not set"));
     }
 
     // Camera update
@@ -73,7 +73,7 @@ void CameraSystem::registerCameraEntity(CameraComponent& cameraComp){
     // Get the transformComponent and CameraComponent of the camera to set the initial configuration
 
     if(!scene.hasComponent<TransformComponent>(entity)){
-        scene.log(std::make_shared<StringError>("[CameraSystem] Camera entity " + std::to_string(entity) + " missing required components"));
+        scene.log(std::make_shared<HUGO::StringError>("[CameraSystem] Camera entity " + std::to_string(entity) + " missing required components"));
         return;
     }
     TransformComponent& transformComp = scene.getComponent<TransformComponent>(entity);

@@ -5,7 +5,7 @@
 
 template<typename Cmp>
 struct IFieldData {
-    virtual ErrorOrVoid Set(Cmp& obj, const HVariant& value) const = 0;
+    virtual HUGO::ErrorOrVoid Set(Cmp& obj, const HVariant& value) const = 0;
     virtual ~IFieldData() = default;
 };
 
@@ -15,16 +15,16 @@ struct FieldData: IFieldData<Cmp> {
 
     FieldData(T Cmp::*ptr) : member_ptr(ptr) {}
 
-    ErrorOrVoid Set(Cmp& component, const HVariant& value) const override
+    HUGO::ErrorOrVoid Set(Cmp& component, const HVariant& value) const override
     {
         if (auto val = std::get_if<T>(&value)) {
             component.*member_ptr = *val;
-            return ErrorOrVoid();
+            return HUGO::ErrorOrVoid();
         }
         else {
-            StringError err;
+            HUGO::StringError err;
             err.errorMessage = "Tipo incorrecto para campo";
-            return ErrorOrVoid(err);
+            return HUGO::ErrorOrVoid(err);
         }
     }
 };

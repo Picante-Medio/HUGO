@@ -35,7 +35,7 @@ Core::Core(): input(std::make_shared<Input>()), sceneManager(input)
 }
 
 //Initialization of HUGO modules and loading of games dynamic lib
-ErrorOrVoid Core::init(int argc, char* argv[]){
+HUGO::ErrorOrVoid Core::init(int argc, char* argv[]){
     std::string gamePath = "TestGame";
     std::string chatPath = "../chats";
     std::string mainSceneName = "TestSceneVideo1";
@@ -53,13 +53,13 @@ ErrorOrVoid Core::init(int argc, char* argv[]){
     vt.reset();
     initModules();
 
-    ErrorOrVoid err = sceneManager.initializeParser(chatPath, physicsModule);
+    HUGO::ErrorOrVoid err = sceneManager.initializeParser(chatPath, physicsModule);
 
     if(err.isError()) return err;
     
     sceneManager.setCurrentScene(mainSceneName);
 
-    return ErrorOrVoid();
+    return HUGO::ErrorOrVoid();
 }
 
 //--------------------------- IMODULES INITIALIZATION --------------------
@@ -82,10 +82,10 @@ void HUGO::Core::initModules()
     input->setSDLWindow(OgreModule::Instance().getSDLWindow());
 }
 //HUGO main loop
-ErrorOrVoid Core::run(){
+HUGO::ErrorOrVoid Core::run(){
     bool exit = false;
     //If an error is detected, this value is returned
-    ErrorOrVoid exitValue = ErrorOrVoid();
+    HUGO::ErrorOrVoid exitValue = HUGO::ErrorOrVoid();
 
     int32_t accumulator = 0;
 

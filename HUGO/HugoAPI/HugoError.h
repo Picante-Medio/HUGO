@@ -5,6 +5,8 @@
 
 #include "HugoTypes.h"
 
+namespace HUGO {
+
 // Generic struct error
 struct Error {
 	virtual ~Error() = default;
@@ -44,3 +46,5 @@ public:
 	inline ErrorOrVoid() : ErrorOrType<std::monostate> (std::monostate()) {}
 	inline ErrorOrVoid(StringError err) : ErrorOrType<std::monostate> (err) {}
 };
+
+} // namespace HUGO

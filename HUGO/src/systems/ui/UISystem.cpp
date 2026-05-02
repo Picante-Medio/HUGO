@@ -46,12 +46,12 @@ std::shared_ptr<UIElementCache> UISystem::createElementCache(
     std::shared_ptr<UIElementCache> cache = std::make_shared<UIElementCache>();
 
     // overlay
-    ErrorOrType<Ogre::Overlay*> overlayRes = HUGO::OgreOverlayUtils::getOverlay(overlayName);
+    HUGO::ErrorOrType<Ogre::Overlay*> overlayRes = HUGO::OgreOverlayUtils::getOverlay(overlayName);
     if (!overlayRes.isError())
         cache->overlay = overlayRes.getValue();
 
     // container (ROOT UI ELEMENT)
-    ErrorOrType<Ogre::OverlayContainer*> containerRes = HUGO::OgreOverlayUtils::getContainer(containerName, cache->overlay);
+    HUGO::ErrorOrType<Ogre::OverlayContainer*> containerRes = HUGO::OgreOverlayUtils::getContainer(containerName, cache->overlay);
     if (!containerRes.isError())
         cache->container = containerRes.getValue();
 
@@ -776,7 +776,7 @@ void UISystem::onAddTextComponent(TextComponent &t)
         t.textAreaName = p.containerName +"/Text";
     }
 
-    ErrorOrType<Ogre::OverlayElement *> elementResult = HUGO::OgreOverlayUtils::getElement(t.textAreaName, true, cache->container);
+    HUGO::ErrorOrType<Ogre::OverlayElement *> elementResult = HUGO::OgreOverlayUtils::getElement(t.textAreaName, true, cache->container);
     if (elementResult.isError())
         return;
     Ogre::TextAreaOverlayElement *area = dynamic_cast<Ogre::TextAreaOverlayElement *>(elementResult.getValue());
@@ -797,7 +797,7 @@ void UISystem::onAddProgressBarComponent(ProgressBarComponent &pb)
     if (pb.fillElementName.empty()){
         pb.fillElementName = p.containerName +"/Fill";
     }
-    ErrorOrType<Ogre::OverlayElement *> elementResult = HUGO::OgreOverlayUtils::getElement(pb.fillElementName, false, cache->container);
+    HUGO::ErrorOrType<Ogre::OverlayElement *> elementResult = HUGO::OgreOverlayUtils::getElement(pb.fillElementName, false, cache->container);
     if (elementResult.isError())
         return;
     Ogre::OverlayElement *area = elementResult.getValue();
@@ -824,7 +824,7 @@ void UISystem::onAddSliderComponent(SliderComponent &s)
         s.knobElementName = p.containerName +"/Knob";
     }
 
-    ErrorOrType<Ogre::OverlayElement*> trackResult = HUGO::OgreOverlayUtils::getElement(s.trackElementName, false, cache->container);
+    HUGO::ErrorOrType<Ogre::OverlayElement*> trackResult = HUGO::OgreOverlayUtils::getElement(s.trackElementName, false, cache->container);
     if (trackResult.isError())
         return;
     Ogre::OverlayElement *track = trackResult.getValue();
@@ -833,7 +833,7 @@ void UISystem::onAddSliderComponent(SliderComponent &s)
     
     cache->element = track;
 
-    ErrorOrType<Ogre::OverlayElement*> knobResult = HUGO::OgreOverlayUtils::getElement(s.knobElementName, false, cache->container);
+    HUGO::ErrorOrType<Ogre::OverlayElement*> knobResult = HUGO::OgreOverlayUtils::getElement(s.knobElementName, false, cache->container);
     if (knobResult.isError())
         return;
     Ogre::OverlayElement *knob = knobResult.getValue();

@@ -57,7 +57,7 @@ static void lua_push_result(lua_State* lua, T value) {
 #pragma endregion
 
 #pragma region error
-struct LuaRuntimeError : Error {
+struct LuaRuntimeError : HUGO::Error {
     HUGO::String error;
     HUGO::String description() override { return error; }
 
@@ -72,7 +72,7 @@ class UTILS_API LuaBinder {
     // private functions that relates a given lua name to a function pointer call
     template<typename ReturnType, typename ...ArgTypes, std::size_t... I>
     static int callLuaFunc(lua_State* lua, ReturnType(*func)(ArgTypes...), std::index_sequence<I...>) {
-        if constexpr (std::is_same_v<ReturnType, void> || std::is_same_v<ReturnType, ErrorOrVoid>) {
+        if constexpr (std::is_same_v<ReturnType, void> || std::is_same_v<ReturnType, HUGO::ErrorOrVoid>) {
             func(lua_get<ArgTypes>(lua, I + 1)...);
             return 0; 
         }
@@ -86,7 +86,7 @@ class UTILS_API LuaBinder {
     // private functions that relates a given lua name to an object method call
     template<typename ClassType, typename ReturnType, typename... ArgTypes, std::size_t... I>
     static int callLuaMethod(lua_State* lua, ClassType* obj, ReturnType(ClassType::*fn)(ArgTypes...), std::index_sequence<I...>) {
-        if constexpr (std::is_same_v<ReturnType, void> || std::is_same_v<ReturnType, ErrorOrVoid>) {
+        if constexpr (std::is_same_v<ReturnType, void> || std::is_same_v<ReturnType, HUGO::ErrorOrVoid>) {
             (obj->*fn)(lua_get<ArgTypes>(lua, I + 1)...);
             return 0;
         } else {
@@ -154,52 +154,52 @@ public:
     // Call a lua script and get its value as a T. If the value can't be converted to T.
     // it returns an error if the file is not found, lua rises an error or the value is not a T
     template<typename T>
-    ErrorOrType<T, StringError> getFromFile(HUGO::String path) {
+    HUGO::ErrorOrType<T, HUGO::StringError> getFromFile(HUGO::String path) {
         // If path is invalid
        if (luaL_loadfile(lua, path.c_str()) != LUA_OK) {
-            StringError error = StringError(HUGO::String(lua_tostring(lua, -1)));
+            HUGO::StringError error = HUGO::StringError(HUGO::String(lua_tostring(lua, -1)));
             lua_pop(lua, 1);
-            return ErrorOrType<T, StringError>(error);
+            return HUGO::ErrorOrType<T, HUGO::StringError>(error);
         }
 
         // If lua crashes on runtime or returns nil
         if (lua_pcall(lua, 0, 1, 0) != LUA_OK) {
-            StringError error = StringError(HUGO::String(lua_tostring(lua, -1)));
+            HUGO::StringError error = HUGO::StringError(HUGO::String(lua_tostring(lua, -1)));
             lua_pop(lua, 1);
-            return ErrorOrType<T, StringError>(error);
+            return HUGO::ErrorOrType<T, HUGO::StringError>(error);
         }
 
         // Otherwise
         T result = lua_get<T>(lua, -1);
         lua_pop(lua, 1);
-        return ErrorOrType<T, StringError>(result);
+        return HUGO::ErrorOrType<T, HUGO::StringError>(result);
     }
 
     //Functions to call strings as lua code
 
     // Interpret a cpp string like its a standalone lua statement and ignore its return value if it exists.
     // it returns an error if the string cannot be interpreted as valid lua or if lua rises an error
-    ErrorOrVoid interpretString(HUGO::String command);
+    HUGO::ErrorOrVoid interpretString(HUGO::String command);
 
     // Interpret a cpp string like its a standalone lua statement and get its return value as a T.
     // it returns an error if the string cannot be interpreted as valid lua, if lua rises an error or if the value is not a T
     template<typename T>
-    ErrorOrType<T> getFromString(HUGO::String command) {
+    HUGO::ErrorOrType<T> getFromString(HUGO::String command) {
         // Add return statement to ensure the return value is written to the stack
         // This will fail if the function's return type is 'nil' - I don't know how to change that
         HUGO::String returnCommand = "return " + command;
 
         //if string is invalid
         if (luaL_dostring(lua, returnCommand.c_str()) != LUA_OK) {
-            StringError error = StringError(HUGO::String(lua_tostring(lua, -1)));
+            HUGO::StringError error = HUGO::StringError(HUGO::String(lua_tostring(lua, -1)));
             lua_pop(lua, 1);
-            return ErrorOrType<T>(error);
+            return HUGO::ErrorOrType<T>(error);
         }
 
         //Otherwise
         T result = lua_get<T>(lua, -1);
         lua_pop(lua, 1);
-        return ErrorOrType<T, StringError>(result);
+        return HUGO::ErrorOrType<T, HUGO::StringError>(result);
     }
 
     // Send a vector to lua as an ipair iterable table (table as an array).

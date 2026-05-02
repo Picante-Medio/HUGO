@@ -24,31 +24,31 @@ namespace HUGO {
         destructors()[name] = destructor;
     }
 
-    ErrorOrVoid 
+    HUGO::ErrorOrVoid 
     ComponentFactory::makeComponent(std::shared_ptr<IScene> scene, EntityID ent,
         const std::string& name, const std::unordered_map<std::string, HVariant>& args) {
 
         if (constructors().count(name)) {
             constructors()[name](scene, ent, args);
-            return ErrorOrVoid();
+            return HUGO::ErrorOrVoid();
         }
 
-        StringError err;
+        HUGO::StringError err;
         err.errorMessage = "El componente solicitado (" + name + ") no existe o no ha sido registrado para fabricar";
-        return ErrorOrVoid(err);
+        return HUGO::ErrorOrVoid(err);
     }
 
-    ErrorOrVoid
+    HUGO::ErrorOrVoid
     ComponentFactory::removeComponent(std::shared_ptr<IScene> scene, EntityID ent, const std::string& name) {
 
         if (destructors().count(name)) {
             destructors()[name](scene, ent);
-            return ErrorOrVoid();
+            return HUGO::ErrorOrVoid();
         }
 
-        StringError err;
+        HUGO::StringError err;
         err.errorMessage = "El componente solicitado (" + name + ") no existe o no ha sido registrado para fabricar";
-        return ErrorOrVoid(err);
+        return HUGO::ErrorOrVoid(err);
     }
 
 }

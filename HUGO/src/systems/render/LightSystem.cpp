@@ -54,7 +54,7 @@ void LightSystem::registerLightEntity(LightComponent& lightComp)
     
     // Get the transformComponent and LightComponentof the light to set the initial configuration
     if(!scene.hasComponent<TransformComponent>(entity)){
-        scene.log(std::make_shared<StringError>("[LightSystem] Light entity "+ std::to_string(entity) + "missing required components"));
+        scene.log(std::make_shared<HUGO::StringError>("[LightSystem] Light entity "+ std::to_string(entity) + "missing required components"));
         return;
     }
 
@@ -148,7 +148,7 @@ void LightSystem::onUpdateLightComponent(LightComponent &light)
 {
     EntityID entity = light.entity;
     if(!scene.hasComponent<TransformComponent>(entity)){
-        scene.log(std::make_shared<StringError>("[LightSystem] Light " + std::to_string(entity) + " has not trasnform"));
+        scene.log(std::make_shared<HUGO::StringError>("[LightSystem] Light " + std::to_string(entity) + " has not trasnform"));
         return;
     }
     TransformComponent& tr =scene.getComponent<TransformComponent>(entity);

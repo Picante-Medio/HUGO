@@ -103,12 +103,12 @@ HUGO::UIVerticalAlignment HUGO::OgreUtils::toHugo(Ogre::GuiVerticalAlignment ali
     }
 }
 
-ErrorOrType<Ogre::Overlay*> HUGO::OgreOverlayUtils::getOverlay(const HUGO::String& name)
+HUGO::ErrorOrType<Ogre::Overlay*> HUGO::OgreOverlayUtils::getOverlay(const HUGO::String& name)
 {
-    StringError e;
+    HUGO::StringError e;
     if (name.empty()) {
         e.errorMessage = "Overlay name is empty";
-        return ErrorOrType<Ogre::Overlay*>(e);
+        return HUGO::ErrorOrType<Ogre::Overlay*>(e);
     }
     
     Ogre::Overlay* overlay = Ogre::OverlayManager::getSingleton().getByName(name);
@@ -117,20 +117,20 @@ ErrorOrType<Ogre::Overlay*> HUGO::OgreOverlayUtils::getOverlay(const HUGO::Strin
         overlay = Ogre::OverlayManager::getSingleton().create(name);
         if (!overlay) {
             e.errorMessage = "Cannot create overlay: " + name;
-            return ErrorOrType<Ogre::Overlay*>(e);
+            return HUGO::ErrorOrType<Ogre::Overlay*>(e);
         }
     }
-    return ErrorOrType<Ogre::Overlay*>(overlay);
+    return HUGO::ErrorOrType<Ogre::Overlay*>(overlay);
 }
-ErrorOrType<Ogre::OverlayElement*> HUGO::OgreOverlayUtils::getElement(const HUGO::String& name, bool isTextArea,
+HUGO::ErrorOrType<Ogre::OverlayElement*> HUGO::OgreOverlayUtils::getElement(const HUGO::String& name, bool isTextArea,
     Ogre::OverlayContainer* containerToAdd)
 {
-    StringError e;
+    HUGO::StringError e;
 
     if (name.empty())
     {
         e.errorMessage = "[OgreUtils] Element name is empty";
-        return ErrorOrType<Ogre::OverlayElement*>(e);
+        return HUGO::ErrorOrType<Ogre::OverlayElement*>(e);
     }
 
     Ogre::OverlayElement* element = nullptr;
@@ -151,26 +151,26 @@ ErrorOrType<Ogre::OverlayElement*> HUGO::OgreOverlayUtils::getElement(const HUGO
         element = Ogre::OverlayManager::getSingleton().getOverlayElement(name);
     }
 
-    return ErrorOrType<Ogre::OverlayElement*>(element);
+    return HUGO::ErrorOrType<Ogre::OverlayElement*>(element);
 }
 
 
-ErrorOrType<Ogre::OverlayContainer*> HUGO::OgreOverlayUtils::getContainer(const HUGO::String& name, Ogre::Overlay* overlayToAdd)
+HUGO::ErrorOrType<Ogre::OverlayContainer*> HUGO::OgreOverlayUtils::getContainer(const HUGO::String& name, Ogre::Overlay* overlayToAdd)
 {
-    StringError e;
-    ErrorOrType<Ogre::OverlayElement*> elementResult = getElement(name);
+    HUGO::StringError e;
+    HUGO::ErrorOrType<Ogre::OverlayElement*> elementResult = getElement(name);
     if (elementResult.isError()){
         e.errorMessage = elementResult.getError().errorMessage;
-        return ErrorOrType<Ogre::OverlayContainer*>(e);
+        return HUGO::ErrorOrType<Ogre::OverlayContainer*>(e);
     }
 
     Ogre::OverlayContainer* container = dynamic_cast<Ogre::OverlayContainer*>(elementResult.getValue());
     if (!container){
         e.errorMessage = "Element exists but is not a container: " + name;
-        return ErrorOrType<Ogre::OverlayContainer*>(e);
+        return HUGO::ErrorOrType<Ogre::OverlayContainer*>(e);
     }
     if (overlayToAdd != nullptr && container->getParent() == nullptr) {
         overlayToAdd->add2D(container);
     }
-    return ErrorOrType<Ogre::OverlayContainer*>(container);
+    return HUGO::ErrorOrType<Ogre::OverlayContainer*>(container);
 }

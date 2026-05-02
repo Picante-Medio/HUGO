@@ -170,8 +170,8 @@ public:
     virtual void log(HUGO::String message) = 0; 
     virtual void log(std::shared_ptr<Error>) = 0;
 
-    virtual ErrorOrType<HUGO::String> getNextError() = 0;
-    virtual ErrorOrType<HUGO::String> getNextLog() = 0;
+    virtual HUGO::ErrorOrType<HUGO::String> getNextError() = 0;
+    virtual HUGO::ErrorOrType<HUGO::String> getNextLog() = 0;
 
 
 	// Message handling
@@ -200,7 +200,7 @@ public:
     virtual void changeScene(const HUGO::String& sceneName) = 0;
 	virtual void changeAndDestroyPreviousScene(const HUGO::String& sceneName) = 0;
 
-	virtual ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName) =0;
+	virtual HUGO::ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName) =0;
 };
 
 }

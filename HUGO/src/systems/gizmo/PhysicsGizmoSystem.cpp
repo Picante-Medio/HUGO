@@ -22,12 +22,12 @@ void PhysicsGizmoSystem::onLoad(){
 
 //If updateGizmo has no specialization, then it is not supported
 template <typename T>
-ErrorOrVoid createGizmoMesh(HUGO::IScene&, EntityID entity, const T& colliderInfo){
-    return ErrorOrVoid(StringError{"Collider shape not contemplated by PhysicsGizmoSystem"});
+HUGO::ErrorOrVoid createGizmoMesh(HUGO::IScene&, EntityID entity, const T& colliderInfo){
+    return HUGO::ErrorOrVoid(HUGO::StringError{"Collider shape not contemplated by PhysicsGizmoSystem"});
 }
 
 template <>
-ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::BoxColliderInfo& colliderInfo) {
+HUGO::ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::BoxColliderInfo& colliderInfo) {
     scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
         gizmoRender.setMeshName("cube.mesh");
         gizmoRender.setMaterialName("debug/WireframeMaterial");
@@ -37,11 +37,11 @@ ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::Bo
         gizmoTransform.setScale(colliderInfo.halfExtents * 2);
     });
 
-    return ErrorOrVoid();
+    return HUGO::ErrorOrVoid();
 }
 
 template <>
-ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::SphereColliderInfo& colliderInfo) {
+HUGO::ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::SphereColliderInfo& colliderInfo) {
 
     scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
         gizmoRender.setMeshName("sphere.mesh");
@@ -52,11 +52,11 @@ ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::Sp
         gizmoTransform.setScale(colliderInfo.r * 2);
     });
 
-    return ErrorOrVoid();
+    return HUGO::ErrorOrVoid();
 }
 
 template <>
-ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::CylinderColliderInfo& colliderInfo){
+HUGO::ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::CylinderColliderInfo& colliderInfo){
 
     scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
         gizmoRender.setMeshName("cylinder.mesh");
@@ -67,11 +67,11 @@ ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::Cy
         gizmoTransform.setScale(colliderInfo.halfExtents * 2);
     });
 
-    return ErrorOrVoid();
+    return HUGO::ErrorOrVoid();
 }
 
 template <>
-ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::ConeColliderInfo& colliderInfo){
+HUGO::ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::ConeColliderInfo& colliderInfo){
 
     scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
         gizmoRender.setMeshName("cone.mesh");
@@ -82,11 +82,11 @@ ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HUGO::Co
         gizmoTransform.setScale(HUGO::Vector3(colliderInfo.r * 2, colliderInfo.height, colliderInfo.r * 2));
     });
 
-    return ErrorOrVoid();
+    return HUGO::ErrorOrVoid();
 }
 
 template <>
-ErrorOrVoid createGizmoMesh<HUGO::CapsuleColliderInfo>(HUGO::IScene& scene, EntityID entity, const HUGO::CapsuleColliderInfo& colliderInfo){
+HUGO::ErrorOrVoid createGizmoMesh<HUGO::CapsuleColliderInfo>(HUGO::IScene& scene, EntityID entity, const HUGO::CapsuleColliderInfo& colliderInfo){
 
     scene.modifyComponent<RenderComponent>(entity, [](RenderComponent& gizmoRender) {
         gizmoRender.setMeshName("capsule.mesh");
@@ -97,7 +97,7 @@ ErrorOrVoid createGizmoMesh<HUGO::CapsuleColliderInfo>(HUGO::IScene& scene, Enti
         gizmoTransform.setScale(HUGO::Vector3(colliderInfo.r * 2, colliderInfo.height, colliderInfo.r * 2));
     });
 
-    return ErrorOrVoid();
+    return HUGO::ErrorOrVoid();
 }
 
 //------------------GIZMO CREATION------------------------
@@ -113,10 +113,10 @@ void PhysicsGizmoSystem::createGizmo(ColliderComponent& collider){
     scene.addComponent<RenderComponent>(newID);
 
     //C++ magic to determine the type that holds collider.info without if-else madness
-    ErrorOrVoid res = std::visit([&](auto&& info) {return createGizmoMesh(scene, newID, info);}, collider.info);
+    HUGO::ErrorOrVoid res = std::visit([&](auto&& info) {return createGizmoMesh(scene, newID, info);}, collider.info);
 
     if(res.isError()) {
-        scene.log(std::make_shared<StringError>("[PhysicsGizmoSystem] Error creating Gizmo: "+ res.getError().errorMessage));
+        scene.log(std::make_shared<HUGO::StringError>("[PhysicsGizmoSystem] Error creating Gizmo: "+ res.getError().errorMessage));
         return;
     }
 

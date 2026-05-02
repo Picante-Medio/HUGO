@@ -80,7 +80,7 @@ InternalScene::addComponentLUA(int entityID, std::string& componentData) {
 
 	std::string parameterNameBuffer = "";
 	std::string_view parameterType = "";
-	ErrorOrVoid error = ErrorOrVoid();
+	HUGO::ErrorOrVoid error = HUGO::ErrorOrVoid();
 
 	for(size_t c = 2; c < splittedData.size(); c++) {
 		std::string stringValue = std::string{splittedData[c]};
@@ -96,7 +96,7 @@ InternalScene::addComponentLUA(int entityID, std::string& componentData) {
 			float x = std::stof(stringValue);
 			float y = 0;
 
-			if(c+1 >= splittedData.size()) error = ErrorOrVoid(StringError{"Faltan argumentos para Vector2"});
+			if(c+1 >= splittedData.size()) error = HUGO::ErrorOrVoid(HUGO::StringError{"Faltan argumentos para Vector2"});
 			else y = std::stof(std::string{splittedData[c]});
 
 			parameterValue = HUGO::Vector2(x, y);
@@ -107,10 +107,10 @@ InternalScene::addComponentLUA(int entityID, std::string& componentData) {
 			float y = 0;
 			float z = 0;
 			
-			if(c+1 >= splittedData.size()) error = ErrorOrVoid(StringError{"Faltan argumentos para Vector2"});
+			if(c+1 >= splittedData.size()) error = HUGO::ErrorOrVoid(HUGO::StringError{"Faltan argumentos para Vector2"});
 			else y = std::stof(std::string{splittedData[c]});
 
-			if(c+2 >= splittedData.size()) error = ErrorOrVoid(StringError{"Faltan argumentos para Vector2"});
+			if(c+2 >= splittedData.size()) error = HUGO::ErrorOrVoid(HUGO::StringError{"Faltan argumentos para Vector2"});
 			else y = std::stof(std::string{splittedData[c]});
 
 			parameterValue = HUGO::Vector3(x, y, z);
@@ -129,14 +129,14 @@ InternalScene::addComponentLUA(int entityID, std::string& componentData) {
 		return;
 	}
 
-	ErrorOrVoid compResult = HUGO::ComponentFactory::makeComponent(shared_from_this(), static_cast<EntityID>(entityID), componentName, parameters);
+	HUGO::ErrorOrVoid compResult = HUGO::ComponentFactory::makeComponent(shared_from_this(), static_cast<EntityID>(entityID), componentName, parameters);
 	if(compResult.isError()) 
 		log(compResult.getError().errorMessage);
 }
 
 void
 InternalScene::removeComponentLUA(int entityID, std::string& componentName) {
-	ErrorOrVoid result = HUGO::ComponentFactory::removeComponent(shared_from_this(), entityID, componentName);
+	HUGO::ErrorOrVoid result = HUGO::ComponentFactory::removeComponent(shared_from_this(), entityID, componentName);
 
 	if(result.isError()) {
 		log(result.getError().errorMessage);
@@ -198,7 +198,7 @@ InternalScene::printEntities() {
 }
 
 void 
-InternalScene::log(std::shared_ptr<Error> error) {
+InternalScene::log(std::shared_ptr<HUGO::Error> error) {
     errorsToLog.push(error);
 }
 
@@ -207,22 +207,22 @@ InternalScene::log(HUGO::String log) {
     stringsToLog.push(log);
 }
 
-ErrorOrType<HUGO::String> 
+HUGO::ErrorOrType<HUGO::String> 
 InternalScene::getNextError() {
-    if(errorsToLog.empty()) return ErrorOrType<HUGO::String>(StringError{"La cola está vacía"});
+    if(errorsToLog.empty()) return HUGO::ErrorOrType<HUGO::String>(HUGO::StringError{"La cola está vacía"});
 
     HUGO::String ret = errorsToLog.front()->description();
     errorsToLog.pop();
-    return ErrorOrType<HUGO::String>(ret);
+    return HUGO::ErrorOrType<HUGO::String>(ret);
 }
 
-ErrorOrType<HUGO::String> 
+HUGO::ErrorOrType<HUGO::String> 
 InternalScene::getNextLog() {
-    if(stringsToLog.empty()) return ErrorOrType<HUGO::String>(StringError{"La cola está vacía"});
+    if(stringsToLog.empty()) return HUGO::ErrorOrType<HUGO::String>(HUGO::StringError{"La cola está vacía"});
 
     HUGO::String ret = stringsToLog.front();
     stringsToLog.pop();
-    return ErrorOrType<HUGO::String>(ret);
+    return HUGO::ErrorOrType<HUGO::String>(ret);
 }
 
 void
@@ -259,10 +259,10 @@ InternalScene::changeAndDestroyPreviousScene(const HUGO::String& sceneName) {
     sceneManager.setCurrentSceneAndDestroyPrevious(sceneName);
 }
 
-ErrorOrType<EntityID> InternalScene::instantiatePrefab(const HUGO::String& prefabName){
-	ErrorOrType<EntityID> prefabID = sceneManager.instantiatePrefab(prefabName, shared_from_this());
+HUGO::ErrorOrType<EntityID> InternalScene::instantiatePrefab(const HUGO::String& prefabName){
+	HUGO::ErrorOrType<EntityID> prefabID = sceneManager.instantiatePrefab(prefabName, shared_from_this());
 
-	if(prefabID.isError()) log(std::make_shared<StringError>("Error instantiating prefab " + prefabName + ": "+ prefabID.getError().description()));
+	if(prefabID.isError()) log(std::make_shared<HUGO::StringError>("Error instantiating prefab " + prefabName + ": "+ prefabID.getError().description()));
 
 	return prefabID;
 }

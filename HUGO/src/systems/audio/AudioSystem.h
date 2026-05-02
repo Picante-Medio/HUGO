@@ -47,7 +47,7 @@ private:
       =================*/
 
    // create a ma_sound ptr
-   ErrorOrType<AudioInfo> createVoice(HUGO::AudioID id, HUGO::AudioTypes type);
+   HUGO::ErrorOrType<AudioInfo> createVoice(HUGO::AudioID id, HUGO::AudioTypes type);
 
    // acquire reusable voice (reuse/create/steal)
    ma_sound* getSound(HUGO::AudioID id, HUGO::AudioTypes type);

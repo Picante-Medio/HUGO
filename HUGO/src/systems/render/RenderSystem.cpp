@@ -131,12 +131,12 @@ void RenderSystem::registerRenderEntity(RenderComponent& comp)
         node->attachObject(ent);
     }
     catch (const Ogre::Exception& e){
-        StringError err;
+        HUGO::StringError err;
         err.errorMessage = "[RenderSystem] Failed to create OgreObject: "+ std::string(e.getDescription());
         if (ent) sceneManager->destroyEntity(ent);
         if (node) sceneManager->destroySceneNode(node);
         
-        scene.log(std::make_shared<StringError>(err));
+        scene.log(std::make_shared<HUGO::StringError>(err));
         return;
     }
     
@@ -252,7 +252,7 @@ void RenderSystem::onUpdateAnimationComponet(AnimationComponent &animComp)
         {
             if(!ogre_ent->hasAnimationState(animName))
             {
-                scene.log(std::make_shared<StringError>("[RenderSystem] Animation "+ animName + " does not exist in entity " + std::to_string(rc.entity)));
+                scene.log(std::make_shared<HUGO::StringError>("[RenderSystem] Animation "+ animName + " does not exist in entity " + std::to_string(rc.entity)));
                 anim = animComp.anims.erase(anim);
                 continue;
             }

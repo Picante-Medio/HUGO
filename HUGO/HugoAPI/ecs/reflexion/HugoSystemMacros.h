@@ -11,8 +11,8 @@ private:\
     struct Reflection{ \
         Reflection(){\
             HUGO::SystemFactory::add(#SYSTEM_NAME, \
-            [](HUGO::IScene& sceneRef) -> ErrorOrType<std::shared_ptr<HUGO::System>> { \
-                return ErrorOrType<std::shared_ptr<HUGO::System>>(std::make_shared<SYSTEM_NAME>(sceneRef)); \
+            [](HUGO::IScene& sceneRef) -> HUGO::ErrorOrType<std::shared_ptr<HUGO::System>> { \
+                return HUGO::ErrorOrType<std::shared_ptr<HUGO::System>>(std::make_shared<SYSTEM_NAME>(sceneRef)); \
             });\
         }\
     };\

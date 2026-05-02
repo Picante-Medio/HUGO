@@ -18,17 +18,17 @@ LuaBinder::getInstance() {
     return instance;
 }
 
-ErrorOrVoid
+HUGO::ErrorOrVoid
 LuaBinder::interpretString(HUGO::String command) {
     //if string is invalid
     if (luaL_dostring(lua, command.c_str()) != LUA_OK) {
-        StringError error = StringError(HUGO::String(lua_tostring(lua, -1)));
+        HUGO::StringError error = HUGO::StringError(HUGO::String(lua_tostring(lua, -1)));
         lua_pop(lua, 1);
-        return ErrorOrVoid(error);
+        return HUGO::ErrorOrVoid(error);
     }
 
     //Otherwise
-    return ErrorOrVoid();
+    return HUGO::ErrorOrVoid();
 }
 
 void LuaBinder::setLuaPath(HUGO::String path )

@@ -15,14 +15,14 @@
 #include <memory>
 #include <sstream>
 
-ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id, HUGO::AudioTypes type)
+HUGO::ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id, HUGO::AudioTypes type)
 {
-    StringError e;
+    HUGO::StringError e;
     AudioAssetInfo* asset = AudioAssetsModule::Instance().getAsset(id);
     
     if (!asset) {       
         e.errorMessage = "[AudioSystem]: Audio ID not found";
-        return ErrorOrType<AudioInfo>(e);
+        return HUGO::ErrorOrType<AudioInfo>(e);
     }
     
     AudioInfo info;
@@ -31,7 +31,7 @@ ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id, HUGO::AudioTyp
     if (!info.ptr->init(engine.get(), asset->fullPath.c_str(), 0))
     {
         e.errorMessage = "[AudioSystem] Failed loading audio: " + asset->fullPath;
-        return ErrorOrType<AudioInfo>(e);
+        return HUGO::ErrorOrType<AudioInfo>(e);
     }
     
     // configuration
@@ -45,7 +45,7 @@ ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id, HUGO::AudioTyp
         ma_sound_set_spatialization_enabled(info.ptr->get(), MA_FALSE);
     }
     
-    return ErrorOrType<AudioInfo>(std::move(info));
+    return HUGO::ErrorOrType<AudioInfo>(std::move(info));
 }
 
 void AudioSystem::ensurePoolSize()
@@ -85,7 +85,7 @@ ma_sound* AudioSystem::getSound(HUGO::AudioID id, HUGO::AudioTypes type)
     // STEP 2: create new
     if (pool.voices.size() < static_cast<size_t>(queueSize))
     {   
-        ErrorOrType<AudioInfo> result = createVoice(id, type);
+        HUGO::ErrorOrType<AudioInfo> result = createVoice(id, type);
         
         if (result.isError())
             return nullptr;

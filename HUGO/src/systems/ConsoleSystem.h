@@ -52,11 +52,11 @@ static inline std::queue<HUGO::String> luaOutput = std::queue<HUGO::String>();
     void updateInputField(HUGO::String nText);
 
     template<typename T>
-    void handleReturn(ErrorOrType<T>& returnedInfo){
+    void handleReturn(HUGO::ErrorOrType<T>& returnedInfo){
 
         std::variant<int, float, bool, HUGO::String>  lastValueReturned;
 
-        if(returnedInfo.isError()) scene.log(std::make_shared<StringError>(returnedInfo.getError()));
+        if(returnedInfo.isError()) scene.log(std::make_shared<HUGO::StringError>(returnedInfo.getError()));
         else lastValueReturned = returnedInfo.getValue();
 
         if(std::holds_alternative<HUGO::Int>(lastValueReturned)){

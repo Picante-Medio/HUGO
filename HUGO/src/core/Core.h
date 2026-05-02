@@ -36,9 +36,9 @@ namespace HUGO {
 
     public:
         Core();
-        ErrorOrVoid init(int argc, char* argv[]);
+        HUGO::ErrorOrVoid init(int argc, char* argv[]);
 
-        ErrorOrVoid run();
+        HUGO::ErrorOrVoid run();
     };
 
 }
