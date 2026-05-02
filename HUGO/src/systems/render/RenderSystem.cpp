@@ -143,7 +143,7 @@ void RenderSystem::registerRenderEntity(RenderComponent& comp)
     //create OgreObject
     OgreObject obj = {ent, node};
     obj.meshName = meshName;
-
+    obj.ogreEntity->setVisible(comp.visible);
     //store object
     ogreObjects[id] = std::move(obj);
     if(scene.hasComponent<AnimationComponent>(id)){
@@ -224,6 +224,10 @@ void RenderSystem::onUpdateAnimationComponet(AnimationComponent &animComp)
     OgreObject& ogreObj = ogreObjects[rc.entity];
     Ogre::Entity* ogre_ent = ogreObj.ogreEntity;
 
+    if(!ogre_ent) {
+        scene.log(std::make_shared<StringError>("[RenderSystem] Entity "+  std::to_string(entity) + " has not created the Ogre Entity"));
+        return;
+    }
     //remove animations that does exist in the Component
     for(auto it = ogreObj.animationStates.begin(); it != ogreObj.animationStates.end(); )
     {

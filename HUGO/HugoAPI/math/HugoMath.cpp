@@ -133,6 +133,10 @@ namespace HUGO {
 		float cz = x * other.y - y * other.x;
 		return { cx, cy, cz };
     }
+	
+	float Vector3::dot(const Vector3& other) const{
+		return x * other.x + y * other.y + z * other.z;
+	}
 
     float Vector3::length() const {
 		return std::sqrt(x * x + y * y + z * z);

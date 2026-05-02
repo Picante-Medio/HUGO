@@ -63,7 +63,8 @@ namespace HUGO {
 		float& operator[](int i);
 		
 		Vector3 cross(const Vector3& other) const;
-
+		float dot(const Vector3& other) const;
+		
 		float length() const;
 		void normalize();
 		Vector3 normalized() const;
