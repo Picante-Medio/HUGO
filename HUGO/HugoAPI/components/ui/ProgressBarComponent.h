@@ -13,7 +13,7 @@ HCOMPONENT(ProgressBarComponent)
     DEFAULT_SERIALIZED_MEMBER(HUGO::ProgressBarFillMode, fillMode, HUGO::ProgressBarFillMode::HORIZONTAL_LEFT_TO_RIGHT);
 
     // name of the fill element
-    HUGO::String fillElementName = "";
+    DEFAULT_SERIALIZED_MEMBER(HUGO::String, fillElementName, "");
 
     // relative width and height
     HUGO::Float fillWidth = 0.0f;

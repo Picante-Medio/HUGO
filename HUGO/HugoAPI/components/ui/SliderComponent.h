@@ -14,8 +14,8 @@ HCOMPONENT(SliderComponent)
     DEFAULT_SERIALIZED_MEMBER(HUGO::SliderOrientation, orientation, HUGO::SliderOrientation::HORIZONTAL);
 
     // knob name
-    HUGO::String trackElementName = "";
-    HUGO::String knobElementName = "";
+    DEFAULT_SERIALIZED_MEMBER(HUGO::String, trackElementName, "");
+    DEFAULT_SERIALIZED_MEMBER(HUGO::String, knobElementName, "");
 
     // materials
     DEFAULT_SERIALIZED_MEMBER(HUGO::String, trackMaterial, "");

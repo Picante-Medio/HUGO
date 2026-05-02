@@ -4,7 +4,7 @@
 #include "HugoTypes.h"
 #include <optional>
 HCOMPONENT(TextComponent)
-    HUGO::String textAreaName = "";     // text area element name
+    DEFAULT_SERIALIZED_MEMBER(HUGO::String, textAreaName, "");      // text area element name
 
     // text content
     DEFAULT_SERIALIZED_MEMBER(HUGO::String, text, "");              // text to display
@@ -20,7 +20,7 @@ HCOMPONENT(TextComponent)
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, left, 0.0f);
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, top, 0.0f);
 
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, maxWidth, 1.0f);
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, maxHeight, 1.0f);
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, maxWidth, 0.0f);
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, maxHeight, 0.0f);
 END_HCOMPONENT()
 
