@@ -106,7 +106,7 @@ namespace HUGO {
 		Quaternion(Degree angle, const Vector3 &axis);
 		Quaternion(Vector4 vec4);
 
-		//helpers which are useful to audio listener and other contexts
+		//helpers
 		Quaternion inverse() const;
 
 		Vector3 forward() const;
@@ -120,12 +120,16 @@ namespace HUGO {
 		void normalize();
 	};
 	Quaternion UTILS_API operator*(const Quaternion& a, const Quaternion& b);
-		// multiplying a quaternion
+	// multiplying a quaternion
 	Vector3 UTILS_API operator*(const Quaternion& q, const Vector3& v);
 
 	Quaternion UTILS_API operator+(const Quaternion& l, const Quaternion& r);
 
 	Quaternion UTILS_API operator* (const Quaternion& q, const float& f);
+	// Returns the rotation between the two vectors
+	Quaternion UTILS_API rotationBetweenVectors(Vector3 from, Vector3 to);
+	// Returns the Quaternion representing the rotation so that the original forward vector matches the new direction
+	Quaternion UTILS_API lookAt(Vector3 forward, Vector3 up, Vector3 newForward);
 	
 	struct UTILS_API Radian {
         float rad;

@@ -291,8 +291,14 @@ namespace HUGO {
 		z = nz;
     }
 
-	void Quaternion::normalize()
-	{
+	bool Quaternion::operator==(const Quaternion& other) const{
+		return w == other.w && x == other.x && y == other.y && z == other.z;
+	}
+	bool Quaternion::operator!=(const Quaternion& other) const{
+		return !operator==(other);
+	}
+
+	void Quaternion::normalize() {
 		float mod = std::sqrt(w*w + x*x + y*y + z*z);
 		if(mod > 0.0f){
 			w /= mod;
@@ -300,13 +306,6 @@ namespace HUGO {
 			y /= mod;
 			z /= mod;
 		}
-	}
-
-	bool Quaternion::operator==(const Quaternion& other) const{
-		return w == other.w && x == other.x && y == other.y && z == other.z;
-	}
-	bool Quaternion::operator!=(const Quaternion& other) const{
-		return !operator==(other);
 	}
 
     Quaternion operator*(const Quaternion& a, const Quaternion& b)
@@ -335,6 +334,44 @@ namespace HUGO {
 
 	Quaternion operator* (const Quaternion& q, const float& f){
 		return Quaternion(q.w*f, q.x*f, q.y*f, q.z*f);
+	}
+
+	Quaternion rotationBetweenVectors(Vector3 from, Vector3 to) {
+		from.normalize();
+        to.normalize();
+
+        float cosTheta = from.dot(to);
+        Vector3 axis;
+
+		// special case when vectors in opposite directions
+        if (cosTheta < -1 + 0.001f) {
+            axis = Vector3(0.0f, 0.0f, 1.0f).cross(from);
+
+            if (axis.length() * axis.length() < 0.01)
+                axis = Vector3(1.0f, 0.0f, 0.0f).cross(from);
+
+            axis.normalize();
+            return Quaternion(Degree(0.f), axis);
+        }
+
+        axis = from.cross(to);
+        float s = sqrt((1 + cosTheta) * 2);
+        float invs = 1 / s;
+
+        return Quaternion( Radian(s*0.5f), axis * invs);
+	}
+
+	Quaternion lookAt(Vector3 forward, Vector3 up, Vector3 newForward) {
+		
+        Quaternion rot1 = rotationBetweenVectors(forward, newForward);
+        Vector3 right = newForward.cross(up);
+        up = right.cross(newForward);
+        Vector3 realUp(0.f, 1.f, 0.f);
+        Vector3 newUp = rot1 * realUp;
+        Quaternion rot2 = rotationBetweenVectors(newUp, up);
+        Quaternion res = rot2 * rot1;
+
+        return Quaternion(res.w, res.x, res.y, res.z);
 	}
 
     // --------------------- RADIAN ---------------------
