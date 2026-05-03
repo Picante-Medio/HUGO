@@ -106,7 +106,7 @@ public:
 		DenseListIndex oldIndex = entityTable->getDenseListIndex(entity, id);
 
 		// Calls removal event before removing
-		componentTable->getAddEvent<T>()->dispatch(componentTable->getComponent<T>(oldIndex));
+		componentTable->getRemoveEvent<T>()->dispatch(componentTable->getComponent<T>(oldIndex));
 
 		// Deleting the component
 		entityTable->deRegisterComponent(entity, id);

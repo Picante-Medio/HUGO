@@ -32,13 +32,13 @@ namespace HUGO {
 
         template<typename TMessage>
         void subscribe(std::function<void(std::shared_ptr<Message>)> callback) {
-            MsgID msgID = getMsgID<TMessage>();
+            MsgID msgID = MessageHandler::getMsgID<TMessage>();
             internalSubscribe(msgID, callback);
         }
 
         template<typename TMessage>
         void enqueue(const TMessage& msg) {
-            MsgID msgID = getMsgID<TMessage>();
+            MsgID msgID = MessageHandler::getMsgID<TMessage>();
             std::shared_ptr<Message> m = std::static_pointer_cast<Message>(std::make_shared<TMessage>(msg));
             internalEnqueue(msgID, m);
         }

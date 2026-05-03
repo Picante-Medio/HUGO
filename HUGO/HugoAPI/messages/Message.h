@@ -9,11 +9,19 @@ namespace HUGO {
 
     const MsgID MAX_MESSAGES = 1024u;
 
-    static MsgID counter = 0;
+    class MessageHandler{
 
-    template<typename TMessage>
-    static MsgID getMsgID() {
-        static MsgID msg = counter++; 
-        return msg;
-    }
+    public:
+
+        static inline MsgID MSGCounter() {
+            static MsgID counter = 0;
+            return counter++;
+        }
+
+        template <typename T>
+        static inline MsgID getMsgID() {
+            static MsgID id = MSGCounter();
+            return id;
+        }
+    };
 }
