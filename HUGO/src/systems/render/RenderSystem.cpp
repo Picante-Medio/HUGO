@@ -225,7 +225,7 @@ void RenderSystem::onUpdateAnimationComponet(AnimationComponent &animComp)
     Ogre::Entity* ogre_ent = ogreObj.ogreEntity;
 
     if(!ogre_ent) {
-        scene.log(std::make_shared<StringError>("[RenderSystem] Entity "+  std::to_string(entity) + " has not created the Ogre Entity"));
+        scene.log(std::make_shared<HUGO::StringError>("[RenderSystem] Entity "+  std::to_string(entity) + " has not created the Ogre Entity"));
         return;
     }
     //remove animations that does exist in the Component
