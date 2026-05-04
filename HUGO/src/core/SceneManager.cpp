@@ -140,6 +140,7 @@ HUGO::ErrorOrVoid SceneManager::sceneChangeRequested(){
     if(!m_sceneChangeInfo.needsSceneChanged) return HUGO::ErrorOrVoid();
         m_sceneChangeInfo.needsSceneChanged = false;
     if(m_sceneChangeInfo.destroyPreviousScene) unloadScene(m_currentSceneName);
+    else m_physicsModule->pauseSceneSimulation(m_currentSceneName);
 
     //If requested scene is not loaded in the map, load it
     if(m_sceneMap.find(m_sceneChangeInfo.nextSceneName) == m_sceneMap.end()){
@@ -153,6 +154,7 @@ HUGO::ErrorOrVoid SceneManager::sceneChangeRequested(){
 
     //Sets current sceneManager for the new one.
     OgreModule::Instance().setCurrentSceneManager(m_sceneChangeInfo.nextSceneName);
+    m_physicsModule->resumeSceneSimulation(m_sceneChangeInfo.nextSceneName);
 
     m_currentScene = m_sceneMap[m_sceneChangeInfo.nextSceneName];
     m_currentSceneName = m_sceneChangeInfo.nextSceneName;
