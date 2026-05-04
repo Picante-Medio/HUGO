@@ -2,7 +2,7 @@
 extends Component
 class_name AudioComponent
 
-@export var type:int
+@export var type:ENUMS.AudioTypes
 @export var audioName:String
 @export var volume:float
 @export var loop:bool
