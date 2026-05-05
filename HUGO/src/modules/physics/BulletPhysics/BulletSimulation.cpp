@@ -219,10 +219,10 @@ HUGO::CollisionObjectID BulletSimulation::createColliderObject(ColliderComponent
 
     btTransform bodyTransform;
     bodyTransform.setIdentity();
-    btQuaternion q = BulletUtils::quaternionToBullet(scene->getComponent<TransformComponent>(hgCol.entity).getRotation());
+    btQuaternion q = BulletUtils::quaternionToBullet(scene->getComponent<TransformComponent>(hgCol.entity).getWorldRotation());
     q.normalize();
     bodyTransform.setRotation(q);
-    bodyTransform.setOrigin(BulletUtils::vector3ToBullet(scene->getComponent<TransformComponent>(hgCol.entity).getPosition()));
+    bodyTransform.setOrigin(BulletUtils::vector3ToBullet(scene->getComponent<TransformComponent>(hgCol.entity).getWorldPosition()));
     
     obj->setWorldTransform(bodyTransform);
 
@@ -275,10 +275,10 @@ HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderCompo
     btVector3 startingInertia(0, 0, 0);
     if(hgRb.getMass() > 0) shape->calculateLocalInertia(hgRb.getMass(), startingInertia);
 
-    btQuaternion q = BulletUtils::quaternionToBullet(scene->getComponent<TransformComponent>(hgCol.entity).getRotation());
+    btQuaternion q = BulletUtils::quaternionToBullet(scene->getComponent<TransformComponent>(hgCol.entity).getWorldRotation());
     q.normalize();
     bodyTransform.setRotation(q);
-    bodyTransform.setOrigin(BulletUtils::vector3ToBullet(scene->getComponent<TransformComponent>(hgRb.entity).getPosition()));
+    bodyTransform.setOrigin(BulletUtils::vector3ToBullet(scene->getComponent<TransformComponent>(hgRb.entity).getWorldPosition()));
     
     // Create state
     HUGOMotionState* state = new HUGOMotionState(bodyTransform, scene, hgRb.entity);
