@@ -96,7 +96,7 @@ HUGO::ErrorOrVoid Core::run(){
         accumulator += frameTime;
 
         exitValue = sceneManager.sceneChangeRequested();
-        if(exitValue.isError()) exit = true;
+        if(sceneManager.getQuit() || exitValue.isError()) exit = true;
         else{
             while(accumulator > FIXED_STEP) {
                 sceneManager.fixedUpdateCurrentScene(FIXED_STEP);
