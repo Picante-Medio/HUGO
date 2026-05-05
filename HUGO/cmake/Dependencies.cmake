@@ -80,9 +80,12 @@ set(ASSIMP_BUILD_OGRE_IMPORTER OFF CACHE BOOL "")
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "")
 set(ASSIMP_BUILD_MINIZIP ON CACHE BOOL "")
 FetchContent_MakeAvailable(assimp)
-if (TARGET assimp)
-    target_compile_options(assimp PRIVATE -Wno-error)
-    target_compile_options(assimp PRIVATE -Wno-unused-but-set-variable)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND
+   CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    if (TARGET assimp)
+        target_compile_options(assimp PRIVATE -Wno-error)
+        target_compile_options(assimp PRIVATE -Wno-unused-but-set-variable)
+    endif()
 endif()
 
 # makes it visible for Ogre to compile the Codec_Assimp plugin target
