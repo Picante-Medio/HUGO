@@ -45,8 +45,6 @@ namespace HUGO {
         };
 
         SceneChangeInfo m_sceneChangeInfo;
-
-        bool quit = false;
     public:
         //initializeParser() must be called after this.
         SceneManager(std::shared_ptr<HUGO::IInput> inputModule);
@@ -72,9 +70,6 @@ namespace HUGO {
         void dispatchMessagesCurrentScene();
 
         HUGO::ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName, std::shared_ptr<InternalScene> scene);
-
-        inline bool quit() const { return quit; }
-        inline void startQuit() { quit = true; }
     };
 
 }

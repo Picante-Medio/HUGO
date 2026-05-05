@@ -266,9 +266,3 @@ HUGO::ErrorOrType<EntityID> InternalScene::instantiatePrefab(const HUGO::String&
 
 	return prefabID;
 }
-
-void 
-InternalScene::exitGame() {
-	sceneManager.startQuit();
-}
-
