@@ -1,6 +1,4 @@
 #pragma once
-#pragma warning(push)
-#pragma warning(disable:4251) // this warning is a false positive
 
 #include "UtilsAPI.h"
 
@@ -30,4 +28,3 @@ namespace HUGO {
         void enqueueMessage(std::shared_ptr<Message> msg);
     };
 }
-#pragma warning(pop)

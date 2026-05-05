@@ -1,6 +1,4 @@
 #pragma once
-#pragma warning(push)
-#pragma warning(disable:4251) // this warning is a false positive
 
 #include "UtilsAPI.h"
 
@@ -46,4 +44,3 @@ namespace HUGO {
         void sendAll();
     };
 }
-#pragma warning(pop)
