@@ -95,8 +95,10 @@ HUGO::ErrorOrVoid Core::run(){
         uint32_t frameTime = vt.getDeltaTime(); //ms
         accumulator += frameTime;
 
+       
+
         exitValue = sceneManager.sceneChangeRequested();
-        if(exitValue.isError()) exit = true;
+        if(sceneManager.quit() || exitValue.isError()) exit = true;
         else{
             while(accumulator > FIXED_STEP) {
                 sceneManager.fixedUpdateCurrentScene(FIXED_STEP);

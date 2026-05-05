@@ -73,4 +73,6 @@ public:
     void changeAndDestroyPreviousScene(const HUGO::String& sceneName) override;
 
     HUGO::ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName) override;
+
+    void exitGame() override;
 };

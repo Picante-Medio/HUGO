@@ -201,6 +201,8 @@ public:
 	virtual void changeAndDestroyPreviousScene(const HUGO::String& sceneName) = 0;
 
 	virtual HUGO::ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName) =0;
+
+    virtual void exitGame() = 0;
 };
 
 }
