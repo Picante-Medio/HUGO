@@ -7,6 +7,7 @@
 
 #include "HugoTypes.h"
 #include "HugoError.h"
+#include "HugoMath.h"
 #include "IEntityTable.h"
 #include "IComponentDenseTable.h"
 #include "EcsTypes.h"
@@ -201,6 +202,8 @@ public:
 	virtual void changeAndDestroyPreviousScene(const HUGO::String& sceneName) = 0;
 
 	virtual ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName) =0;
+
+	virtual void changeAmbientLight(const HUGO::Vector3& l) = 0;
 };
 
 }

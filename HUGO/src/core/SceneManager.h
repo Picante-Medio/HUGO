@@ -6,6 +6,7 @@
 
 #include "HugoError.h"
 #include "EcsTypes.h"
+#include "HugoMath.h"
 
 #ifdef __linux__
 #include <stdint.h>
@@ -70,6 +71,8 @@ namespace HUGO {
         void dispatchMessagesCurrentScene();
 
         ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName, std::shared_ptr<InternalScene> scene);
+        
+        void setAmbientLight(const HUGO::Vector3& l);
     };
 
 }
