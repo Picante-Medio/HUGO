@@ -21,7 +21,7 @@ namespace HUGO {
     class ResourceManager;
 
     class Core {
-        const uint32_t FIXED_STEP = 1000/60;
+        const int32_t FIXED_STEP = 1000/60;
         void initModules();
         void initLua();
         void initAudioAssets();
