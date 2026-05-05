@@ -80,6 +80,11 @@ set(ASSIMP_BUILD_OGRE_IMPORTER OFF CACHE BOOL "")
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "")
 set(ASSIMP_BUILD_MINIZIP ON CACHE BOOL "")
 FetchContent_MakeAvailable(assimp)
+if (TARGET assimp)
+    target_compile_options(assimp PRIVATE -Wno-error)
+    target_compile_options(assimp PRIVATE -Wno-unused-but-set-variable)
+endif()
+
 # makes it visible for Ogre to compile the Codec_Assimp plugin target
 get_target_property(_assimp_includes assimp INTERFACE_INCLUDE_DIRECTORIES)
 set(ASSIMP_INCLUDE_DIRS ${_assimp_includes})
