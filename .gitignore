@@ -36,3 +36,4 @@ export_presets.cfg
 
 #Ignores internos
 HUGO/.gitignore
+HUGO/dependencies/

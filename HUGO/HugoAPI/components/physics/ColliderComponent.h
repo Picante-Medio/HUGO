@@ -19,7 +19,7 @@ HCOMPONENT(ColliderComponent)
         ACTIVE_UPDATED = 8
     };
 
-    int flags = 0;
+    int flags = 15;
 
     DEFAULT_SERIALIZED_MEMBER(float, restitution, 0.f)
     DEFAULT_SERIALIZED_MEMBER(float, friction, 0.5f)

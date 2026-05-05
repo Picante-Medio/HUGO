@@ -22,7 +22,7 @@ HCOMPONENT(RigidBodyComponent)
         GRAVITY_UPDATED = 1024
     };
 
-    int flags = 0;
+    int flags = 2047;
 
     DEFAULT_SERIALIZED_MEMBER(float, mass, 0.f)
     DEFAULT_SERIALIZED_MEMBER(float, linearDamping, 0.f)
