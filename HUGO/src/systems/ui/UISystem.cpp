@@ -25,9 +25,18 @@
 
 UISystem::~UISystem()
 {
+    auto& mng = Ogre::OverlayManager::getSingleton();
+    for (auto ptr: uiCache){
+        if (ptr.second->element){
+            mng.destroyOverlayElement(ptr.second->element);
+        }
+        if (ptr.second->extra){
+            mng.destroyOverlayElement(ptr.second->extra);
+        }
+        mng.destroyOverlayElement(ptr.second->container);
+        mng.destroy(ptr.second->overlay);
+    }
     clearAllCaches();
-    Ogre::OverlayManager::getSingleton().destroyAllOverlayElements();
-    Ogre::OverlayManager::getSingleton().destroyAll();
 }
 
 //====================================================
