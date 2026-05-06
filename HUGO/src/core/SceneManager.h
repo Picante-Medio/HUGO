@@ -6,6 +6,7 @@
 
 #include "HugoError.h"
 #include "EcsTypes.h"
+#include "HugoMath.h"
 
 #ifdef __linux__
 #include <stdint.h>
@@ -75,6 +76,8 @@ namespace HUGO {
 
         inline bool getQuit() const { return quit; }
         inline void setQuit(bool newQuit) { quit = newQuit; }
+        
+        void setAmbientLight(const HUGO::Vector3& l);
     };
 
 }

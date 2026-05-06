@@ -9,6 +9,7 @@
 #include "OgreRoot.h"
 #include <unordered_map>
 #include "HugoTypes.h"
+#include "HugoMath.h"
 
 namespace Ogre{
     class OverlaySystem;
@@ -69,4 +70,6 @@ public:
 
     Ogre::RenderWindow* getOgreRenderWindow() const;
     SDL_Window* getSDLWindow() const;
+
+    void setAmbientLight(const HUGO::Vector3& l);
 };

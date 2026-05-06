@@ -194,6 +194,8 @@ TestSystemVideo2::init() {
         text.spaceWidth = 0.01f;
         text.text = "Pulsa P, hay sorpresa";
     });
+    
+    scene.changeAmbientLight(HUGO::Vector3(0.1f));
 }
 
 void TestSystemVideo2::createCube(EntityID cube){

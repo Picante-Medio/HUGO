@@ -271,3 +271,7 @@ void
 InternalScene::exitGame() {
     sceneManager.setQuit(true);
 }
+void
+InternalScene::changeAmbientLight(const HUGO::Vector3& l){
+	sceneManager.setAmbientLight(l);
+}

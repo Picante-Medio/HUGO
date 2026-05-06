@@ -75,4 +75,5 @@ public:
     HUGO::ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName) override;
 
     void exitGame() override;
+    void changeAmbientLight(const HUGO::Vector3& l) override;
 };
