@@ -161,8 +161,8 @@ void PhysicsGizmoSystem::update(uint32_t){
         EntityID gizmoID= m_gizmoEntities[transform.entity];
 
         scene.modifyComponent<TransformComponent>(gizmoID, [&transform, &collider](TransformComponent& gizmoTr){
-            gizmoTr.setPosition(transform.getWorldPosition() + collider.getPositionOffset());
-            gizmoTr.setRotation(transform.getWorldRotation() * collider.getRotationOffset());
+            gizmoTr.setWorldPosition(transform.getWorldPosition() + collider.getPositionOffset());
+            gizmoTr.setWorldRotation(transform.getWorldRotation() * collider.getRotationOffset());
         });
     }
 
