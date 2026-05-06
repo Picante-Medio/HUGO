@@ -8,6 +8,7 @@ HCOMPONENT(ButtonComponent)
     HUGO::TrayLocationTypes mTrayLoc;
 
     std::function<void()> onClickCallback;
+    HUGO::Bool wasOver = false;
     
     // appearance - normal state
     DEFAULT_SERIALIZED_MEMBER(HUGO::String, normalMaterial, "Button/Normal");
