@@ -1,5 +1,6 @@
 #pragma once
 #include "OgreOverlay.h"
+#include "OgreLight.h"
 #include "HugoError.h"
 #include <OgreOverlayContainer.h>
 #include <OgreTextAreaOverlayElement.h>
@@ -9,6 +10,7 @@ namespace HUGO {
     struct Quaternion;
     struct Radian;
     struct Degree;
+    enum LightType;
 
     struct OgreUtils {
         // Conversions for math types
@@ -25,6 +27,9 @@ namespace HUGO {
         static HUGO::UIMetricsMode toHugo(Ogre::GuiMetricsMode mode);
         static HUGO::UIHorizontalAlignment toHugo(Ogre::GuiHorizontalAlignment align);
         static HUGO::UIVerticalAlignment toHugo(Ogre::GuiVerticalAlignment align);
+
+        //Conversions for LightTypes
+        static Ogre::Light::LightTypes toOgre(HUGO::LightType type);
     };
 
     struct OgreOverlayUtils{

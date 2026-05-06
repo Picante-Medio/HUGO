@@ -103,6 +103,17 @@ HUGO::UIVerticalAlignment HUGO::OgreUtils::toHugo(Ogre::GuiVerticalAlignment ali
     }
 }
 
+Ogre::Light::LightTypes HUGO::OgreUtils::toOgre(HUGO::LightType type)
+{
+    switch (type) {
+        case HUGO::LightType::LT_POINT: return Ogre::Light::LT_POINT;
+        case HUGO::LightType::LT_DIRECTIONAL: return Ogre::Light::LT_DIRECTIONAL;
+        case HUGO::LightType::LT_SPOTLIGHT: return Ogre::Light::LT_SPOTLIGHT;
+        case HUGO::LightType::LT_RECTLIGHT: return Ogre::Light::LT_RECTLIGHT;
+        default: return Ogre::Light::LT_POINT;
+    }
+}
+
 HUGO::ErrorOrType<Ogre::Overlay*> HUGO::OgreOverlayUtils::getOverlay(const HUGO::String& name)
 {
     HUGO::StringError e;

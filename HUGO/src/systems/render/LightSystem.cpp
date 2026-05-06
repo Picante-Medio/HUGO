@@ -67,21 +67,7 @@ void LightSystem::registerLightEntity(LightComponent& lightComp)
     res.ogreLight = sceneManager->createLight(lightName);
 
     // Get Ogre light type from LightComponent
-    Ogre::Light::LightTypes ogreType;
-    switch (lightComp.getLightType()) {
-        case HUGO::LightType::LT_POINT:
-            ogreType = Ogre::Light::LT_POINT;
-            break;
-        case HUGO::LightType::LT_DIRECTIONAL:
-            ogreType = Ogre::Light::LT_DIRECTIONAL;
-            break;
-        case HUGO::LightType::LT_SPOTLIGHT:
-            ogreType = Ogre::Light::LT_SPOTLIGHT;
-            break;
-        default:
-            ogreType = Ogre::Light::LT_POINT;
-            break;
-    }
+    Ogre::Light::LightTypes ogreType = HUGO::OgreUtils::toOgre(lightComp.getLightType());
 
     res.ogreLight->setType(ogreType);
     res.ogreLight->setDiffuseColour(Ogre::ColourValue(lightComp.getDiffuse().x, lightComp.getDiffuse().y, lightComp.getDiffuse().z, lightComp.getDiffuse().w));
@@ -154,36 +140,40 @@ void LightSystem::onUpdateLightComponent(LightComponent &light)
     TransformComponent& tr =scene.getComponent<TransformComponent>(entity);
 
     // update position
-        lightMap[entity].node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getPosition()));
-        
-        // for dirrectonal light
-        if (light.getLightType() == HUGO::LightType::LT_DIRECTIONAL) {
-            lightMap[entity].node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getRotation()));
-        }
+    lightMap[entity].node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getPosition()));
+    
+    //update type
+    Ogre::Light::LightTypes ogreType = HUGO::OgreUtils::toOgre(light.getLightType());
+    lightMap[entity].ogreLight->setType(ogreType);
 
-        // update diffuse and specular
-        lightMap[entity].ogreLight->setDiffuseColour(Ogre::ColourValue(light.getDiffuse().x, light.getDiffuse().y, light.getDiffuse().z, light.getDiffuse().w));
-        lightMap[entity].ogreLight->setSpecularColour(Ogre::ColourValue(light.getSpecular().x, light.getSpecular().y, light.getSpecular().z, light.getSpecular().w));
-        
-        if (light.getLightType() == HUGO::LightType::LT_SPOTLIGHT) {
-            lightMap[entity].ogreLight->setSpotlightRange(Ogre::Radian(light.getSpotInner().valueRadians())
-                , Ogre::Radian(light.getSpotOuter().valueRadians()), light.getSpotFallOff());
+    // for dirrectonal light
+    if (light.getLightType() == HUGO::LightType::LT_DIRECTIONAL) {
+        lightMap[entity].node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getRotation()));
+    }
 
-            if (light.getSpotNearClip() > 0) {
-                lightMap[entity].ogreLight->setSpotlightNearClipDistance(light.getSpotNearClip());
-            }
-        }
-        
-        // parameters for directional light
-        if (light.getLightType() != HUGO::LightType::LT_DIRECTIONAL) {
-            lightMap[entity].ogreLight->setAttenuation( light.getAttenuation().w, light.getAttenuation().x,  
-                                        light.getAttenuation().y, light.getAttenuation().z);
-        }
+    // update diffuse and specular
+    lightMap[entity].ogreLight->setDiffuseColour(Ogre::ColourValue(light.getDiffuse().x, light.getDiffuse().y, light.getDiffuse().z, light.getDiffuse().w));
+    lightMap[entity].ogreLight->setSpecularColour(Ogre::ColourValue(light.getSpecular().x, light.getSpecular().y, light.getSpecular().z, light.getSpecular().w));
+    
+    if (light.getLightType() == HUGO::LightType::LT_SPOTLIGHT) {
+        lightMap[entity].ogreLight->setSpotlightRange(Ogre::Radian(light.getSpotInner().valueRadians())
+            , Ogre::Radian(light.getSpotOuter().valueRadians()), light.getSpotFallOff());
 
-        // shadows
-        if(light.getShadowFarDistance() > 0){
-            lightMap[entity].ogreLight->setShadowFarDistance(light.getShadowFarDistance());
+        if (light.getSpotNearClip() > 0) {
+            lightMap[entity].ogreLight->setSpotlightNearClipDistance(light.getSpotNearClip());
         }
+    }
+    
+    // parameters for directional light
+    if (light.getLightType() != HUGO::LightType::LT_DIRECTIONAL) {
+        lightMap[entity].ogreLight->setAttenuation( light.getAttenuation().w, light.getAttenuation().x,  
+                                    light.getAttenuation().y, light.getAttenuation().z);
+    }
+
+    // shadows
+    if(light.getShadowFarDistance() > 0){
+        lightMap[entity].ogreLight->setShadowFarDistance(light.getShadowFarDistance());
+    }
 }
 #pragma endregion
 
