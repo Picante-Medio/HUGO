@@ -186,7 +186,3 @@ void OgreModule::updateWindowDimensions()
         m_ogreRenderWindow->windowMovedOrResized();
     }
 }
-
-void OgreModule::setAmbientLight(const HUGO::Vector3& l){
-    m_currentSceneManager->setAmbientLight(Ogre::ColourValue(l.x, l.y, l.z));
-}

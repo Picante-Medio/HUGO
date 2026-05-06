@@ -266,8 +266,3 @@ ErrorOrType<EntityID> InternalScene::instantiatePrefab(const HUGO::String& prefa
 
 	return prefabID;
 }
-
-void 
-InternalScene::changeAmbientLight(const HUGO::Vector3& l){
-	sceneManager.setAmbientLight(l);
-}

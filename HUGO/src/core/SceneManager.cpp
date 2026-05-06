@@ -163,8 +163,3 @@ ErrorOrType<EntityID> SceneManager::instantiatePrefab(const HUGO::String& prefab
     
     return ErrorOrType<EntityID>(currEntity);
 }
-
-void HUGO::SceneManager::setAmbientLight(const HUGO::Vector3 &l)
-{
-    OgreModule::Instance().setAmbientLight(l);
-}
