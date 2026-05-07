@@ -51,7 +51,7 @@ OgreModule& OgreModule::Instance(){
 }
 
 OgreModule::OgreModule(){
-        m_ogreRoot = std::make_shared<Ogre::Root>("plugins.cfg", "ogre.cfg");
+    m_ogreRoot = std::make_shared<Ogre::Root>("plugins.cfg", "ogre.cfg");
     if (!m_ogreRoot->restoreConfig()) {
         Ogre::LogManager::getSingleton().logMessage("Initialize::configure_ogre => " +
         std::string("ERROR: unable to configure Ogre"));
@@ -189,4 +189,9 @@ void OgreModule::updateWindowDimensions()
 
 void OgreModule::setAmbientLight(const HUGO::Vector3& l){
     m_currentSceneManager->setAmbientLight(Ogre::ColourValue(l.x, l.y, l.z));
+}
+
+void OgreModule::setFullscreen(bool fullscreen)
+{
+    SDL_SetWindowFullscreen(m_sdlWindow, fullscreen? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
 }

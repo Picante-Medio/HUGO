@@ -33,7 +33,8 @@ namespace HUGO {
 
         std::shared_ptr<Input> input;
         SceneManager sceneManager;
-
+        
+        bool fullscreen = false;
     public:
         Core();
         HUGO::ErrorOrVoid init(int argc, char* argv[]);

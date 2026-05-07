@@ -19,7 +19,6 @@
 #include "UISystem.h"
 #include "InternalScene.h"
 #include "BulletModule.h"
-//#include "ResourceManager.h"
 
 #include "ChatParser.h"
 
@@ -30,9 +29,7 @@
 // se podría hacer clase singleton¿? -Marco
 using namespace HUGO;
 Core::Core(): input(std::make_shared<Input>()), sceneManager(input)
-{
-
-}
+{}
 
 //Initialization of HUGO modules and loading of games dynamic lib
 HUGO::ErrorOrVoid Core::init(int argc, char* argv[]){
@@ -43,6 +40,7 @@ HUGO::ErrorOrVoid Core::init(int argc, char* argv[]){
     if (argc > 1) gamePath = argv[1];
     if (argc > 2) chatPath = argv[2];
     if (argc > 3) mainSceneName = argv[3];
+    if (argc > 4) fullscreen = argv[4];
 
     //LuaBinder initialization
     initLua();
@@ -73,10 +71,10 @@ void HUGO::Core::initModules()
 
     //OgreModule init
     OgreModule::Instance();
+    OgreModule::Instance().setFullscreen(fullscreen);
 
     //BulletoModule init
     physicsModule = std::make_shared<BulletModule>();
-
 
     // Input
     input->setSDLWindow(OgreModule::Instance().getSDLWindow());

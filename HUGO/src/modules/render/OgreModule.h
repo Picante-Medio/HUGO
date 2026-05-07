@@ -72,4 +72,5 @@ public:
     SDL_Window* getSDLWindow() const;
 
     void setAmbientLight(const HUGO::Vector3& l);
+    void setFullscreen(bool fullscreen);
 };
