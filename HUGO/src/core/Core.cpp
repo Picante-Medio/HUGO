@@ -11,6 +11,9 @@
 #include <memory>
 #include <SDL2/SDL_syswm.h>
 #include <string>
+#include <unordered_map>
+#include <iostream>
+#include <fstream>
 
 #include "HugoError.h"
 #include "Input.h"
@@ -26,36 +29,86 @@
 
 #include "GameLibraryLoader.h"
 
-// se podría hacer clase singleton¿? -Marco
 using namespace HUGO;
 Core::Core(): input(std::make_shared<Input>()), sceneManager(input)
 {}
 
 //Initialization of HUGO modules and loading of games dynamic lib
-HUGO::ErrorOrVoid Core::init(int argc, char* argv[]){
-    std::string gamePath = "TestGame";
-    std::string chatPath = "../chats";
-    std::string mainSceneName = "TestSceneVideo1";
+HUGO::ErrorOrVoid Core::init() {
 
-    if (argc > 1) gamePath = argv[1];
-    if (argc > 2) chatPath = argv[2];
-    if (argc > 3) mainSceneName = argv[3];
-    if (argc > 4) fullscreen = argv[4];
+    std::unordered_map<std::string, std::string> initParams = std::unordered_map<std::string, std::string>();
+
+    // Read config file
+
+    std::ifstream configFile("./hugo.config");
+
+    if (!configFile.is_open()) {
+        
+        throw "hugo.config not found";
+    }
+
+    std::string line;
+
+    while (std::getline(configFile, line)) {
+        // Ignore empty lines and commented (start with #)
+        if(line.empty() || line[0] == '#') continue;
+
+        size_t pos = line.find('=');
+
+        if(pos == std::string::npos) {
+            std::cerr << "[hugo.config] Invalid line: " << line;
+            continue;
+        } 
+
+        std::string key = line.substr(0, pos);
+        std::string value = line.substr(pos + 1);
+
+        if((key == "GAME_LIB" || key == "CHATS" || key == "MAIN_SCENE" || key == "FULLSCREEN")
+        && value.size() > 0) {
+            if (initParams.count(key)) {
+                std::cerr << "[hugo.config] " << key << " field duplcated at line: " << line;
+                continue;
+            }
+
+            initParams[key] = value;
+        }
+    }
+
+    configFile.close();
+
+    // Validation part
+
+    // Default chat location
+    if(!initParams.count("CHATS")) {
+        initParams["CHATS"] = "../chats";
+    }
+    // Default fullscreen is false
+    if(!initParams.count("FULLSCREEN") || (initParams["FULLSCREEN"] != "TRUE")) {
+        fullscreen = false;
+    }
+    else {
+        fullscreen = true;
+    }
+
+
+    if(!initParams.count("GAME_LIB") || !initParams.count("MAIN_SCENE")) {
+        throw "[hugo.config] GAME_LIB or MAIN_SCENE field empty or missing";
+    }
 
     //LuaBinder initialization
     initLua();
 
     // Load game as dll
-    GameLibraryLoader::init(gamePath);
+    GameLibraryLoader::init(initParams["GAME_LIB"]);
 
     vt.reset();
     initModules();
 
-    HUGO::ErrorOrVoid err = sceneManager.initializeParser(chatPath, physicsModule);
+    HUGO::ErrorOrVoid err = sceneManager.initializeParser(initParams["CHATS"], physicsModule);
 
     if(err.isError()) return err;
     
-    sceneManager.setCurrentScene(mainSceneName);
+    sceneManager.setCurrentScene(initParams["MAIN_SCENE"]);
 
     return HUGO::ErrorOrVoid();
 }

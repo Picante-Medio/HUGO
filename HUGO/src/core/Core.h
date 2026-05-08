@@ -37,7 +37,7 @@ namespace HUGO {
         bool fullscreen = false;
     public:
         Core();
-        HUGO::ErrorOrVoid init(int argc, char* argv[]);
+        HUGO::ErrorOrVoid init();
 
         HUGO::ErrorOrVoid run();
     };

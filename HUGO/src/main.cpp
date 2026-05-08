@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
     config.generatePluginsConfig();
 
     HUGO::Core core = HUGO::Core();
-    HUGO::ErrorOrVoid err = core.init(argc, argv);
+    HUGO::ErrorOrVoid err = core.init();
     
     if(err.isError()) std::cerr << "[ERROR] Initializing HUGO::Core: {" << err.getError().errorMessage << "}. HUGO Engine will be closing now." << '\n';
     else{
