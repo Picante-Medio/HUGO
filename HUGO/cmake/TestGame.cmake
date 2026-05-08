@@ -15,3 +15,9 @@ target_include_directories(TestGame PRIVATE ${CMAKE_SOURCE_DIR}/TestGame)
 
 target_link_libraries(TestGame PRIVATE 
     HugoAPI)
+
+add_custom_command(TARGET TestGame POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    ${CMAKE_SOURCE_DIR}/TestGame/hugo.config
+    $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    COMMAND_EXPAND_LISTS)
