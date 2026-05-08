@@ -8,15 +8,15 @@ namespace HUGO {
     struct Channel::Impl {
         std::queue<std::shared_ptr<Message>> messages;
         std::vector<std::function<void(std::shared_ptr<Message>)>> callbacks;
-
     };
 
     Channel::Channel() 
-    : pImpl(std::make_unique<Channel::Impl>())
-    {
-    }
+    : pImpl(new Channel::Impl()){}
 
-    Channel::~Channel() = default;
+    Channel::~Channel() {
+        delete pImpl;
+        pImpl = nullptr;
+    }
 
     void HUGO::Channel::sendMessages() {
         std::queue<std::shared_ptr<Message>> currentIterationMessages = std::move(pImpl->messages);

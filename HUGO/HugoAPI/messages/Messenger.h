@@ -17,8 +17,10 @@ namespace HUGO {
 
         // pImpl idiom to hide implementation details
         struct Impl;
-        std::unique_ptr<Impl> pImpl; // Ignore warning, Impl is an incomplete type here. Its full definition is in the implementation file
-
+        Impl *pImpl;
+        // Must be raw pointer to prevent warning (4251) and to prevent 
+        // exporting interface of stl shared pointers
+        
         void internalEnqueue(MsgID msgID, std::shared_ptr<Message> m);
         void internalSubscribe(MsgID msgID, std::function<void(std::shared_ptr<Message>)> callback);
 

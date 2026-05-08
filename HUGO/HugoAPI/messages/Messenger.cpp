@@ -10,11 +10,12 @@ namespace HUGO {
         std::unordered_set<MsgID> activeChannels;
     };
 
-    Messenger::Messenger() {
-        pImpl = std::make_unique<Messenger::Impl>();
-    }
+    Messenger::Messenger(): pImpl(new Messenger::Impl()) {}
 
-    Messenger::~Messenger() = default;
+    Messenger::~Messenger() {
+        delete pImpl;
+        pImpl = nullptr;
+    }
 
     void 
     Messenger::sendAll() {
