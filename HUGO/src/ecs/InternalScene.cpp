@@ -263,3 +263,8 @@ void
 InternalScene::changeAmbientLight(const HUGO::Vector3& l){
 	sceneManager.setAmbientLight(l);
 }
+
+void
+InternalScene::loadScene(const HUGO::String& sceneName) {
+    sceneManager.loadScene(sceneName);
+}

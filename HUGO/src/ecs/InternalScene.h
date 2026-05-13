@@ -77,4 +77,6 @@ public:
 
     void exitGame() override;
     void changeAmbientLight(const HUGO::Vector3& l) override;
+
+    void loadScene(const HUGO::String& sceneName) override;
 };

@@ -206,6 +206,8 @@ public:
     virtual void exitGame() = 0;
 	virtual HUGO::ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName) =0;
 	virtual void changeAmbientLight(const HUGO::Vector3& l) = 0;
+
+    virtual void loadScene(const HUGO::String& sceneName) = 0;
 };
 
 }
