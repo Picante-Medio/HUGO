@@ -64,7 +64,7 @@ TestSystemVideo2::init() {
     //Sinbad
     sinbad = scene.createEntity();
     scene.addComponent<TransformComponent>(sinbad, [](TransformComponent& tr){
-        tr.setPosition(HUGO::Vector3(0.0f,20.f,0.0f));
+        tr.position = {0.0f,20.f,0.0f};
     });
 
     scene.addComponent<AnimationComponent>(sinbad, [](AnimationComponent& anim){
@@ -96,43 +96,45 @@ TestSystemVideo2::init() {
     //Suelo
     suelo = scene.createEntity();
     scene.addComponent<TransformComponent>(suelo, [](TransformComponent& transform){
-        transform.setPosition(HUGO::Vector3(0.0f,-10.f,0.0f));
-        transform.setScale(HUGO::Vector3(40.f, 0.5f, 40.f));
+        transform.position = {0.0f,-10.f,0.0f};
+        transform.scale = {40.f, 0.5f, 40.f};
     });
     createCube(suelo);
 
     //pared fondo
     EntityID paredFondo = scene.createEntity();
     scene.addComponent<TransformComponent>(paredFondo, [](TransformComponent& transform){
-        transform.setPosition(HUGO::Vector3(0.0f,10.f,-20.0f));
-        transform.setScale(HUGO::Vector3(40.f, 0.5f, 40.f));
-        transform.setRotation(HUGO::Quaternion(HUGO::Radian(HUGO::Degree(90.0f)), HUGO::Vector3(1,0,0)));
+        transform.position = {0.0f,10.f,-20.0f};
+        transform.scale = {40.f, 0.5f, 40.f};
+        transform.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(90.0f)), HUGO::Vector3(1,0,0));
     });
     createCube(paredFondo);
 
     //pared der
     EntityID paredDer = scene.createEntity();
     scene.addComponent<TransformComponent>(paredDer, [](TransformComponent& transform){
-        transform.setPosition(HUGO::Vector3(20.0f,10.f,0.0f));
-        transform.setScale(HUGO::Vector3(40.f, 0.5f, 40.f));
-        transform.setRotation(HUGO::Quaternion(HUGO::Radian(HUGO::Degree(90.0f)), HUGO::Vector3(1,0,0)) * HUGO::Quaternion(HUGO::Radian(HUGO::Degree(90.0f)), HUGO::Vector3(0,0,1)));
+        transform.position = {20.0f,10.f,0.0f};
+        transform.scale = {40.f, 0.5f, 40.f};
+        transform.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(90.0f)), HUGO::Vector3(1,0,0)) * HUGO::Quaternion(HUGO::Radian(HUGO::Degree(90.0f)), HUGO::Vector3(0,0,1));
     });
     createCube(paredDer);
 
     //pared izq
     EntityID paredIzq = scene.createEntity();
     scene.addComponent<TransformComponent>(paredIzq, [](TransformComponent& transform){
-        transform.setPosition(HUGO::Vector3(-20.0f,10.f,0.0f));
-        transform.setScale(HUGO::Vector3(40.f, 0.5f, 40.f));
-        transform.setRotation(HUGO::Quaternion(HUGO::Radian(HUGO::Degree(90.0f)), HUGO::Vector3(1,0,0)) * HUGO::Quaternion(HUGO::Radian(HUGO::Degree(90.0f)), HUGO::Vector3(0,0,1)));
+
+        transform.position = {-20.0f,10.f,0.0f};
+        transform.scale = {40.f, 0.5f, 40.f};
+        transform.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(90.0f)), HUGO::Vector3(1,0,0)) * HUGO::Quaternion(HUGO::Radian(HUGO::Degree(90.0f)), HUGO::Vector3(0,0,1));
     });
     createCube(paredIzq);
 
     EntityID collider = scene.createEntity();
     scene.addComponent<TransformComponent>(collider, [](TransformComponent& transform){
-        transform.setPosition(HUGO::Vector3(0.0f,10.f,20.0f));
-        transform.setScale(HUGO::Vector3(40.f, 0.5f, 40.f));
-        transform.setRotation(HUGO::Quaternion(HUGO::Radian(HUGO::Degree(90.0f)), HUGO::Vector3(1,0,0)));
+
+        transform.position = {0.0f,10.f,20.0f};
+        transform.scale = {40.f, 0.5f, 40.f};
+        transform.rotation = HUGO::Quaternion(HUGO::Radian(HUGO::Degree(90.0f)), HUGO::Vector3(1,0,0));
     });
     scene.addComponent<ColliderComponent>(collider, [](ColliderComponent& collider){
         collider.info = HUGO::BoxColliderInfo{HUGO::Vector3(20.f, 0.5f, 20.f)};
@@ -146,8 +148,8 @@ TestSystemVideo2::init() {
     //cubo
     cubo = scene.createEntity();
     scene.addComponent<TransformComponent>(cubo, [](TransformComponent& transform){
-        transform.setPosition(HUGO::Vector3(5.0f,-5.f,0.0f));
-        transform.setScale(HUGO::Vector3(2.f, 2.f, 2.f));
+        transform.position = {5.0f,-5.f,0.0f};
+        transform.scale = {2.f, 2.f, 2.f};
     });
     scene.addComponent<RenderComponent>(cubo, [](RenderComponent& rc){
         rc.setMeshName("cube.mesh");
@@ -165,9 +167,7 @@ TestSystemVideo2::init() {
 
     ///luz
     EntityID light = scene.createEntity();
-    scene.addComponent<TransformComponent>(light, [](TransformComponent& tr){
-        tr.setPosition(HUGO::Vector3(0, 0, 0));
-    });
+    scene.addComponent<TransformComponent>(light);
 
     scene.addComponent<LightComponent>(light, [](LightComponent& lg){
          lg.setLightType(HUGO::LightType::LT_POINT);
@@ -230,10 +230,10 @@ TestSystemVideo2::update(uint32_t dt) {
         else if(input->isKeyPressed(HUGO::KeyCode::RIGHT_ARROW)) rb.setAngularVelocity(HUGO::Vector3(0, -1.0f, 0));
         else rb.setAngularVelocity(HUGO::Vector3());
 
-        if(input->isKeyPressed(HUGO::KeyCode::DOWN_ARROW))rb.applyForce(tr.getRotation().forward() * (-25.0f)* delta);
-        if(input->isKeyPressed(HUGO::KeyCode::UP_ARROW))rb.applyForce(tr.getRotation().forward() * (25.0f)* delta);
+        if(input->isKeyPressed(HUGO::KeyCode::DOWN_ARROW))rb.applyForce(tr.rotation.forward() * (-25.0f)* delta);
+        if(input->isKeyPressed(HUGO::KeyCode::UP_ARROW))rb.applyForce(tr.rotation.forward() * (25.0f)* delta);
         if(input->isKeyPressed(HUGO::KeyCode::M)) 
-            rb.applyForce(tr.getRotation().up() * (50.0f)* delta);
+            rb.applyForce(tr.rotation.up() * (50.0f)* delta);
     });
 
     scene.modifyComponent<AnimationComponent>(sinbad, [input](AnimationComponent& anim) {

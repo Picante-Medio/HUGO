@@ -1,6 +1,6 @@
 #include "CameraSystem.h"
 #include "CameraComponent.h"
-#include "TransformComponent.h"
+#include "WorldTransformComponent.h"
 #include "OgreUtils.h"
 #include "OgreModule.h"
 
@@ -34,12 +34,12 @@ void CameraSystem::update(uint32_t){
     }
 
     // Camera update
-    for(auto& pack : scene.query<TransformComponent, CameraComponent>()) {
-        TransformComponent& tr = pack.getConst<TransformComponent&>();
+    for(auto& pack : scene.query<WorldTransformComponent, CameraComponent>()) {
+        WorldTransformComponent& tr = pack.getConst<WorldTransformComponent&>();
         CameraComponent& camera = pack.getConst<CameraComponent&>();
 
-        cameraMap[camera.entity].node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getWorldPosition()));
-        cameraMap[camera.entity].node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getWorldRotation()));
+        cameraMap[camera.entity].node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.worldPosition));
+        cameraMap[camera.entity].node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.worldRotation));
 
         // update projection parameters
         if (camera.getProjectionType() == HUGO::ProjectionType::Perspective) {
@@ -72,11 +72,11 @@ void CameraSystem::registerCameraEntity(CameraComponent& cameraComp){
     CameraInfo res;
     // Get the transformComponent and CameraComponent of the camera to set the initial configuration
 
-    if(!scene.hasComponent<TransformComponent>(entity)){
+    if(!scene.hasComponent<WorldTransformComponent>(entity)){
         scene.log(std::make_shared<HUGO::StringError>("[CameraSystem] Camera entity " + std::to_string(entity) + " missing required components"));
         return;
     }
-    TransformComponent& transformComp = scene.getComponent<TransformComponent>(entity);
+    WorldTransformComponent& wTransformComp = scene.getComponent<WorldTransformComponent>(entity);
 
     // Unique name for the camera
     std::string camName = "Camera_" + std::to_string(entity);
@@ -100,8 +100,8 @@ void CameraSystem::registerCameraEntity(CameraComponent& cameraComp){
     // create node and attach camera
     res.node = sceneManager->getRootSceneNode()->createChildSceneNode(nodeName);
     res.node->attachObject(res.ogreCamera);
-    res.node->setPosition(HUGO::OgreUtils::vector3ToOgre(transformComp.getWorldPosition()));
-    res.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(transformComp.getWorldRotation()));
+    res.node->setPosition(HUGO::OgreUtils::vector3ToOgre(wTransformComp.worldPosition));
+    res.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(wTransformComp.worldRotation));
 
     cameraMap[entity] = res;
 

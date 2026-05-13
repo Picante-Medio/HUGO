@@ -7,6 +7,7 @@
 #include "EcsTypes.h"
 
 struct TransformComponent;
+struct WorldTransformComponent;
 struct RigidBodyComponent;
 struct ColliderComponent;
 struct Shape;
@@ -64,7 +65,9 @@ class BulletSimulation : public IPhysicsSimulation {
     // Check for updates on a specific RB or collider
     void checkRigidBodyFlags(RigidBodyComponent& hgRB);
     void checkColliderFlags(ColliderComponent& hgCol);
-    void checkTransformFlags(const ColliderComponent& collider, const TransformComponent& transform);
+
+    void updateColliderTransform(const ColliderComponent& collider, 
+        const WorldTransformComponent& wTransform);
 
     // @brief Creates and adds rigidbodies to simulation. Updates kinematic bodies.
     void syncBodiesToBullet();

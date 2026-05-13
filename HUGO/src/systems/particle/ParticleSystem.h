@@ -9,7 +9,7 @@
 #include <unordered_map>
 
 struct ParticleEmitterComponent;
-struct TransformComponent;
+struct WorldTransformComponent;
 HSYSTEM(ParticleSystem)
 private:
 
@@ -23,8 +23,8 @@ private:
 
     void createParticleSystem(EntityID id, const HUGO::String& particleName, ParticleEmitterComponent& pe, const HUGO::Vector3& iniPos);
     void destroyParticleSystem(EntityID id);
-    void processChanges(const ParticleEmitterComponent& pe, const TransformComponent& tr);
-    void processPosition(const TransformComponent &tr);
+    void processChanges(const ParticleEmitterComponent& pe, const WorldTransformComponent& tr);
+    void processPosition(const WorldTransformComponent &tr);
     // component events handlers
     void onAddParticleEmitterComponent(ParticleEmitterComponent& pe);
     void onUpdateParticleEmitterComponent(ParticleEmitterComponent& pe);

@@ -1,5 +1,5 @@
 #include "TestSystemVideo3.h"
-#include "ChildrenComponent.h"
+#include "ParentComponent.h"
 #include "EcsTypes.h"
 #include "HugoMath.h"
 #include "TransformComponent.h"
@@ -44,8 +44,8 @@ TestSystemVideo3::init() {
     // -------------------------------------------------------------------------------------
     cuboPedro = scene.createEntity();
     scene.addComponent<TransformComponent>(cuboPedro, [](TransformComponent& transform){
-        transform.setPosition(HUGO::Vector3(-offset, 00.0f, 0.0f));
-        transform.setScale(HUGO::Vector3(4, 4, 4));
+        transform.position.x = -offset;
+        transform.scale = {4, 4, 4};
     });
 
     scene.addComponent<RenderComponent>(cuboPedro, [](RenderComponent& r){
@@ -75,8 +75,8 @@ TestSystemVideo3::init() {
     // -------------------------------------------------------------------------------------
     cuboPablo = scene.createEntity();
     scene.addComponent<TransformComponent>(cuboPablo, [](TransformComponent& transform){
-        transform.setPosition(HUGO::Vector3(offset, 0.0f, 0.0f));
-        transform.setScale(HUGO::Vector3(4, 4, 4));
+        transform.position.x = offset;
+        transform.scale = {4, 4, 4};
     });
 
     scene.addComponent<RenderComponent>(cuboPablo, [](RenderComponent& r){
@@ -115,10 +115,13 @@ TestSystemVideo3::init() {
         a.addAnimation("Dance", true, true);
     });
 
-    scene.addComponent<ChildrenComponent>(sinabd, [this](ChildrenComponent& children) {
-        children.addChild(cuboPablo);
-        children.addChild(cuboPedro);
+    scene.addComponent<ParentComponent>(cuboPablo, [this](ParentComponent& child){
+        child.parent = sinabd;
     });
+
+    scene.addComponent<ParentComponent>(cuboPedro, [this](ParentComponent& child){
+        child.parent = sinabd;
+    });;
 
     // -------------------------------------------------------------------------------------
     
@@ -219,7 +222,7 @@ TestSystemVideo3::update(uint32_t) {
     }
 
     scene.modifyComponent<TransformComponent>(sinabd, [this](TransformComponent& t){
-        t.setRotation(t.getRotation() * HUGO::Quaternion(HUGO::Radian(HUGO::Degree(rotationFactor)), HUGO::Vector3{0, 1, 0}));
+        t.rotation *= HUGO::Quaternion(HUGO::Radian(HUGO::Degree(rotationFactor)), HUGO::Vector3{0, 1, 0});
     });
 }
 

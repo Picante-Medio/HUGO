@@ -13,7 +13,7 @@
 struct AudioComponent;
 struct AudioListenerComponent;
 struct Audio3DInfoComponent;
-struct TransformComponent;
+struct WorldTransformComponent;
 
 /* ====================
    runtime voice data
@@ -63,7 +63,7 @@ private:
       ============================================== */
 
    void updateListeners(const AudioListenerComponent& a,
-                        const TransformComponent& tr);
+                        const WorldTransformComponent& tr);
 
    void processChanges(AudioComponent& c);
 

@@ -15,8 +15,8 @@ void PhysicsTestSystem::init(){
     staticBase = scene.createEntity();
 
     scene.addComponent<TransformComponent>(staticBase, [](TransformComponent& transform){
-        transform.setPosition(HUGO::Vector3(1.f, -3.f, 0.f));
-        transform.setScale(HUGO::Vector3(1., 1.f, 1.f));
+        transform.position = {1.f, -3.f, 0.f};
+        transform.scale = {1., 1.f, 1.f};
     });
 
     scene.addComponent<ColliderComponent>(staticBase, [](ColliderComponent& collider){
@@ -33,8 +33,8 @@ void PhysicsTestSystem::init(){
     EntityID e2 = scene.createEntity();
 
     scene.addComponent<TransformComponent>(e2, [](TransformComponent& transform){
-        transform.setPosition(HUGO::Vector3(0.f, 5, 0.f));
-        transform.setScale(HUGO::Vector3(1.f, 1.f, 1.f));
+        transform.position = {0.f, 5, 0.f};
+        transform.scale = {1.f, 1.f, 1.f};
     });
     //scene.addComponent<TransformChangedTag>(e2);
 
@@ -53,7 +53,7 @@ void PhysicsTestSystem::init(){
 
     EntityID e3 = scene.createEntity();
     scene.addComponent<TransformComponent>(e3,[](TransformComponent& transform){
-        transform.setPosition(HUGO::Vector3(5.f, 5, 0.f));
+        transform.position = {5.f, 5.f, 0.f};
     });
     
     scene.addComponent<ColliderComponent>(e3, [](ColliderComponent& col){

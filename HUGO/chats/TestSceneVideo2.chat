@@ -8,7 +8,7 @@ SYSTEM PhysicsGizmoSystem
 SYSTEM UISystem
 SYSTEM ConsoleSystem
 SYSTEM TweenSystem
-SYSTEM HierarchySystem
+SYSTEM TransformSystem
 SYSTEM ParticleSystem
 SYSTEM CameraMovementSystem
 SYSTEM TestSystemVideo2

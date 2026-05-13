@@ -10,7 +10,7 @@
 
 #include "RenderComponent.h"
 #include "AnimationComponent.h"
-#include "TransformComponent.h"
+#include "WorldTransformComponent.h"
 
 #pragma region Destructor
 RenderSystem::~RenderSystem()
@@ -86,14 +86,14 @@ void RenderSystem::update(uint32_t dt)
     updateAnimations(dt);
 
     //Update transform of entity with renderComponent
-    for(auto& pack : scene.query<TransformComponent,RenderComponent>()) {
-        TransformComponent& tr=pack.getConst<TransformComponent&>();
+    for(auto& pack : scene.query<WorldTransformComponent,RenderComponent>()) {
+        const WorldTransformComponent& tr=pack.getConst<WorldTransformComponent&>();
         OgreObject& obj = ogreObjects[tr.entity];
         if(obj.ogreSceneNode){
             //update transform
-            obj.ogreSceneNode->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getWorldPosition()));
-            obj.ogreSceneNode->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getWorldRotation()));
-            obj.ogreSceneNode->setScale(HUGO::OgreUtils::vector3ToOgre(tr.getWorldScale()));
+            obj.ogreSceneNode->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.worldPosition));
+            obj.ogreSceneNode->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.worldRotation));
+            obj.ogreSceneNode->setScale(HUGO::OgreUtils::vector3ToOgre(tr.worldScale));
         } 
     }
 }

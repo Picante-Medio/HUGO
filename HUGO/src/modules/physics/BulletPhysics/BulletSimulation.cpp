@@ -9,6 +9,7 @@
 #include "ParentComponent.h"
 #include "HugoPhysics.h"
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
+#include "WorldTransformComponent.h"
 
 #include "OgreBulletDebugger.h"
 #include <cstddef>
@@ -219,11 +220,6 @@ HUGO::CollisionObjectID BulletSimulation::createColliderObject(ColliderComponent
 
     btTransform bodyTransform;
     bodyTransform.setIdentity();
-    btQuaternion q = BulletUtils::quaternionToBullet(scene->getComponent<TransformComponent>(hgCol.entity).getWorldRotation());
-    q.normalize();
-    bodyTransform.setRotation(q);
-    bodyTransform.setOrigin(BulletUtils::vector3ToBullet(scene->getComponent<TransformComponent>(hgCol.entity).getWorldPosition()));
-    
     obj->setWorldTransform(bodyTransform);
 
     HUGO::CollisionObjectID id;
@@ -257,7 +253,8 @@ HUGO::CollisionObjectID BulletSimulation::createColliderObject(ColliderComponent
     return id;
 }
 
-HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderComponent& hgCol, RigidBodyComponent& hgRb)
+HUGO::CollisionObjectID 
+BulletSimulation::upgradeToRigidBodyObject(ColliderComponent& hgCol, RigidBodyComponent& hgRb)
 {
     // If the collider doesn't exist return invalid ID
     if(hgCol.objectID != HUGO::INVALID_COL_OBJ_ID){
@@ -275,10 +272,12 @@ HUGO::CollisionObjectID BulletSimulation::upgradeToRigidBodyObject(ColliderCompo
     btVector3 startingInertia(0, 0, 0);
     if(hgRb.getMass() > 0) shape->calculateLocalInertia(hgRb.getMass(), startingInertia);
 
-    btQuaternion q = BulletUtils::quaternionToBullet(scene->getComponent<TransformComponent>(hgCol.entity).getWorldRotation());
+    btQuaternion q = BulletUtils::quaternionToBullet(
+        scene->getComponentConst<WorldTransformComponent>(hgCol.entity).worldRotation);
     q.normalize();
     bodyTransform.setRotation(q);
-    bodyTransform.setOrigin(BulletUtils::vector3ToBullet(scene->getComponent<TransformComponent>(hgRb.entity).getWorldPosition()));
+    bodyTransform.setOrigin(BulletUtils::vector3ToBullet(
+        scene->getComponentConst<WorldTransformComponent>(hgRb.entity).worldPosition));
     
     // Create state
     HUGOMotionState* state = new HUGOMotionState(bodyTransform, scene, hgRb.entity);
@@ -481,19 +480,15 @@ void BulletSimulation::checkColliderFlags(ColliderComponent& hgCol)
     }
 }
 
-void BulletSimulation::checkTransformFlags(const ColliderComponent& collider, const TransformComponent& transform) {
-    if(transform.flags != 0) {
-        CollisionObject obj = rigidBodies[rbIdToIndex[collider.objectID]];
+void BulletSimulation::updateColliderTransform(const ColliderComponent& collider,
+    const WorldTransformComponent& wTransform) {
+        
+    CollisionObject obj = rigidBodies[rbIdToIndex[collider.objectID]];
 
-        if(transform.flags & TransformComponent::POSITION_UPDATED) {
-            btTransform tr = obj.bulletRB->getWorldTransform();
-            tr.setOrigin(BulletUtils::vector3ToBullet(transform.getPosition()));
-        }
-        if(transform.flags & TransformComponent::ROTATION_UPDATED) {
-            btTransform tr = obj.bulletRB->getWorldTransform();
-            tr.setRotation(BulletUtils::quaternionToBullet(transform.getRotation()));
-        }
-    }
+    btTransform tr = obj.bulletRB->getWorldTransform();
+
+    tr.setOrigin(BulletUtils::vector3ToBullet(wTransform.worldPosition));
+    tr.setRotation(BulletUtils::quaternionToBullet(wTransform.worldRotation));
 }
 
 void BulletSimulation::syncBodiesToBullet() {
@@ -519,7 +514,7 @@ void BulletSimulation::syncBodiesToBullet() {
     }
 
     // Add colliders to simulation
-     for(auto& item : scene->query<ColliderComponent, TransformComponent>()){
+     for(auto& item : scene->query<ColliderComponent, WorldTransformComponent>()){
         item.modify<ColliderComponent>([item, this](ColliderComponent &col){
     
             if(col.objectID == HUGO::INVALID_COL_OBJ_ID){
@@ -527,14 +522,14 @@ void BulletSimulation::syncBodiesToBullet() {
             }
 
             checkColliderFlags(col);
-            checkTransformFlags(col, item.getConst<TransformComponent>());
+            updateColliderTransform(col, item.getConst<WorldTransformComponent>());
         });
     }
 }
 
 void BulletSimulation::syncBodiesToGame() {
 
-    for(auto& item : scene->query<ColliderComponent, RigidBodyComponent, TransformComponent>()) {
+    for(auto& item : scene->query<ColliderComponent, RigidBodyComponent, WorldTransformComponent>()) {
         item.modify<RigidBodyComponent>([this](RigidBodyComponent &rb){
 
             btRigidBody* btRb = btRigidBody::upcast(getCollisionObject(rb.objectID).bulletRB);
@@ -554,8 +549,9 @@ void BulletSimulation::syncBodiesToGame() {
         });
     }
 
+    // If substeps is 0 that means nothing happened
     if (numSubSteps != 0){
-        for(auto& item : scene->query<ColliderComponent, TransformComponent>()) {
+        for(auto& item : scene->query<ColliderComponent, WorldTransformComponent>()) {
             item.modify<ColliderComponent>([this](ColliderComponent &col){
         
                 col.collisionInfo.clear();

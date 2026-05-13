@@ -2,6 +2,7 @@
 #include "OgreModule.h"
 #include "LightComponent.h"
 #include "OgreUtils.h"
+#include "WorldTransformComponent.h"
 #include "TransformComponent.h"
 #include "LuaBinder.h"
 
@@ -34,16 +35,16 @@ LightSystem::~LightSystem()
 }
 
 void LightSystem::update(uint32_t){
-    for(auto pack : scene.query<TransformComponent, LightComponent>()){
-        TransformComponent transform = pack.getConst<TransformComponent>();
-        LightComponent light = pack.getConst<LightComponent>();
+    for(auto pack : scene.query<WorldTransformComponent, LightComponent>()){
+        const WorldTransformComponent& transform = pack.getConst<WorldTransformComponent>();
+        const LightComponent& light = pack.getConst<LightComponent>();
 
         EntityID entID = light.entity;
 
         //Update lights transform
-        lightMap[entID].node->setPosition(HUGO::OgreUtils::vector3ToOgre(transform.getWorldPosition()));
-        lightMap[entID].node->setOrientation(HUGO::OgreUtils::quaternionToOgre(transform.getWorldRotation()));
-        lightMap[entID].node->setScale(HUGO::OgreUtils::vector3ToOgre(transform.getWorldScale()));
+        lightMap[entID].node->setPosition(HUGO::OgreUtils::vector3ToOgre(transform.worldPosition));
+        lightMap[entID].node->setOrientation(HUGO::OgreUtils::quaternionToOgre(transform.worldRotation));
+        lightMap[entID].node->setScale(HUGO::OgreUtils::vector3ToOgre(transform.worldScale));
     }
 }
 // ==================== Register Light Entity ====================
@@ -53,12 +54,12 @@ void LightSystem::registerLightEntity(LightComponent& lightComp)
     LightInfo res;
     
     // Get the transformComponent and LightComponentof the light to set the initial configuration
-    if(!scene.hasComponent<TransformComponent>(entity)){
+    if(!scene.hasComponent<WorldTransformComponent>(entity)){
         scene.log(std::make_shared<HUGO::StringError>("[LightSystem] Light entity "+ std::to_string(entity) + "missing required components"));
         return;
     }
 
-    TransformComponent& transformComp = scene.getComponent<TransformComponent>(entity);
+    const WorldTransformComponent& transformComp = scene.getComponentConst<WorldTransformComponent>(entity);
 
     // Unique name for the light
     std::string lightName = "Light_" + std::to_string(entity);
@@ -96,11 +97,11 @@ void LightSystem::registerLightEntity(LightComponent& lightComp)
 
     res.node = sceneManager->getRootSceneNode()->createChildSceneNode(nodeName);
     res.node->attachObject(res.ogreLight);
-    res.node->setPosition(HUGO::OgreUtils::vector3ToOgre(transformComp.getPosition()));
+    res.node->setPosition(HUGO::OgreUtils::vector3ToOgre(transformComp.worldPosition));
 
     // for dirrectonal light
     if (lightComp.getLightType() == HUGO::LightType::LT_DIRECTIONAL) {
-        res.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(transformComp.getRotation()));
+        res.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(transformComp.worldRotation));
     }
 
     lightMap[entity] = res;
@@ -137,10 +138,10 @@ void LightSystem::onUpdateLightComponent(LightComponent &light)
         scene.log(std::make_shared<HUGO::StringError>("[LightSystem] Light " + std::to_string(entity) + " has not trasnform"));
         return;
     }
-    TransformComponent& tr =scene.getComponent<TransformComponent>(entity);
+    const WorldTransformComponent& tr = scene.getComponent<WorldTransformComponent>(entity);
 
     // update position
-    lightMap[entity].node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.getPosition()));
+    lightMap[entity].node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.worldPosition));
     
     //update type
     Ogre::Light::LightTypes ogreType = HUGO::OgreUtils::toOgre(light.getLightType());
@@ -148,7 +149,7 @@ void LightSystem::onUpdateLightComponent(LightComponent &light)
 
     // for dirrectonal light
     if (light.getLightType() == HUGO::LightType::LT_DIRECTIONAL) {
-        lightMap[entity].node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.getRotation()));
+        lightMap[entity].node->setOrientation(HUGO::OgreUtils::quaternionToOgre(tr.worldRotation));
     }
 
     // update diffuse and specular

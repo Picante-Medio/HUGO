@@ -6,6 +6,7 @@
 #include "HugoTypes.h"
 #include "InternalScene.h"
 #include "TransformComponent.h"
+#include "WorldTransformComponent.h"
 #include "LuaBinder.h"
 
 #include "MiniaudioModule.h"
@@ -279,12 +280,13 @@ void AudioSystem::set3DCone(ma_sound* s, HUGO::Float innerAngle, HUGO::Float out
 #pragma endregion
 
 #pragma region synchronization
-void AudioSystem::updateListeners(const AudioListenerComponent& a, const TransformComponent& tr)
+void AudioSystem::updateListeners(const AudioListenerComponent& a, const WorldTransformComponent& tr)
 {
-    const HUGO::Vector3& forward = tr.getRotation().forward();
-    const HUGO::Vector3& up = tr.getRotation().up();
+    const HUGO::Vector3& forward = tr.worldRotation.forward();
+    const HUGO::Vector3& up = tr.worldRotation.up();
 
-    ma_engine_listener_set_position(engine.get(), 0, tr.getWorldPosition().x, tr.getWorldPosition().y, tr.getWorldPosition().z);
+    ma_engine_listener_set_position(engine.get(), 0, 
+        tr.worldPosition.x, tr.worldPosition.y, tr.worldPosition.z);
 
     ma_engine_listener_set_direction(engine.get(), 0, forward.x, forward.y,forward.z);
 
@@ -337,17 +339,17 @@ void AudioSystem::process3DChanges(const AudioComponent& a, const Audio3DInfoCom
 #pragma region UPDATES
 void AudioSystem::update(uint32_t)
 {
-    for (auto& pack : scene.query<AudioListenerComponent, TransformComponent>()){
+    for (auto& pack : scene.query<AudioListenerComponent, WorldTransformComponent>()){
         const AudioListenerComponent& a = pack.getConst<AudioListenerComponent>();
-        const TransformComponent& tr = pack.getConst<TransformComponent>();
+        const WorldTransformComponent& tr = pack.getConst<WorldTransformComponent>();
 
         updateListeners(a, tr);
     }
     //3d position
-    for (auto& pack : scene.query<AudioComponent, Audio3DInfoComponent, TransformComponent>()){
+    for (auto& pack : scene.query<AudioComponent, Audio3DInfoComponent, WorldTransformComponent>()){
         const AudioComponent& a = pack.getConst<AudioComponent>();
-        const TransformComponent& tr = pack.getConst<TransformComponent>();
-        set3DPosition(a.activePtr, tr.getWorldPosition());
+        const WorldTransformComponent& tr = pack.getConst<WorldTransformComponent>();
+        set3DPosition(a.activePtr, tr.worldPosition);
     }
 
     // cleanup finished voices
@@ -424,7 +426,7 @@ void AudioSystem::onUpdateAudioListener(AudioListenerComponent &l)
 {
     EntityID id = l.entity;
     if (scene.hasComponent<TransformComponent>(id)){
-        const TransformComponent& tr = scene.getComponentConst<TransformComponent>(id);
+        const WorldTransformComponent& tr = scene.getComponentConst<WorldTransformComponent>(id);
         updateListeners(l, tr);
     }
 }
@@ -432,11 +434,11 @@ void AudioSystem::onUpdateAudioListener(AudioListenerComponent &l)
 void AudioSystem::onAdd3DAudioComponent(Audio3DInfoComponent &c)
 {
     const AudioComponent& a = scene.getComponentConst<AudioComponent>(c.entity);
-    const TransformComponent& tr = scene.getComponentConst<TransformComponent>(c.entity);
+    const WorldTransformComponent& tr = scene.getComponentConst<WorldTransformComponent>(c.entity);
     // just to be sure the type is correctly chosen
     scene.modifyComponent<AudioComponent>(c.entity, [this, c](AudioComponent& a){
         a.type = HUGO::AudioTypes::SOUND3D;
     });
     process3DChanges(a, c);
-    set3DPosition(a.activePtr, tr.getPosition());
+    set3DPosition(a.activePtr, tr.worldPosition);
 }

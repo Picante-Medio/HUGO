@@ -1,6 +1,6 @@
 #include "ParticleSystem.h"
 #include "ParticleEmitterComponent.h"
-#include "TransformComponent.h"
+#include "WorldTransformComponent.h"
 
 #include <OgreParticleSystemManager.h> 
 #include <OgreResourceGroupManager.h>
@@ -90,7 +90,7 @@ void ParticleSystem::destroyParticleSystem(EntityID id) {
     activeParticleSystems.erase(it);
 }
 
-void ParticleSystem::processPosition(const TransformComponent &tr)
+void ParticleSystem::processPosition(const WorldTransformComponent &tr)
 {
     // set every particle system in their position correctly
     // get the specific particle system
@@ -106,10 +106,10 @@ void ParticleSystem::processPosition(const TransformComponent &tr)
     if (!instance.node || !instance.ps) return;
 
     // transform
-    instance.node->setPosition(tr.getWorldPosition().x, tr.getWorldPosition().y, tr.getWorldPosition().z);
+    instance.node->setPosition(tr.worldPosition.x, tr.worldPosition.y, tr.worldPosition.z);
 }
 
-void ParticleSystem::processChanges(const ParticleEmitterComponent& pe, const TransformComponent& tr) {
+void ParticleSystem::processChanges(const ParticleEmitterComponent& pe, const WorldTransformComponent& tr) {
     // get the specific particle system
     EntityID id = tr.entity;
     auto it = activeParticleSystems.find(id);
@@ -171,24 +171,24 @@ void ParticleSystem::processChanges(const ParticleEmitterComponent& pe, const Tr
 void ParticleSystem::fixedUpdate(uint32_t) {}
 
 void ParticleSystem::update(uint32_t) {
-    for (auto& pack: scene.query<TransformComponent, ParticleEmitterComponent>()){
-        const TransformComponent& tr = pack.getConst<TransformComponent>();
+    for (auto& pack: scene.query<WorldTransformComponent, ParticleEmitterComponent>()){
+        const WorldTransformComponent& tr = pack.getConst<WorldTransformComponent>();
         processPosition(tr);
     }
 }
 
 void ParticleSystem::onAddParticleEmitterComponent(ParticleEmitterComponent &pe)
 {
-    if (scene.hasComponent<TransformComponent>(pe.entity)) {
-        const TransformComponent& tr = scene.getComponentConst<TransformComponent>(pe.entity);
-        createParticleSystem(tr.entity, pe.particleName, pe, tr.getPosition());
+    if (scene.hasComponent<WorldTransformComponent>(pe.entity)) {
+        const WorldTransformComponent& tr = scene.getComponentConst<WorldTransformComponent>(pe.entity);
+        createParticleSystem(tr.entity, pe.particleName, pe, tr.worldPosition);
     }
 }
 
 void ParticleSystem::onUpdateParticleEmitterComponent(ParticleEmitterComponent &pe)
 {
-    if (scene.hasComponent<TransformComponent>(pe.entity)) {
-        const TransformComponent& tr = scene.getComponentConst<TransformComponent>(pe.entity);
+    if (scene.hasComponent<WorldTransformComponent>(pe.entity)) {
+        const WorldTransformComponent& tr = scene.getComponentConst<WorldTransformComponent>(pe.entity);
         processChanges(pe, tr);
     }
 }

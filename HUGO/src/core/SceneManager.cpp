@@ -8,7 +8,6 @@
 #include "IInput.h"
 #include "OgreModule.h"
 #include "ParentComponent.h"
-#include "ChildrenComponent.h"
 
 #include "GameLibraryLoader.h"
 #include <memory>
@@ -41,10 +40,6 @@ HUGO::ErrorOrType<EntityID> createEntity(std::shared_ptr<InternalScene> scene, c
                 return HUGO::ErrorOrType<EntityID>(compResult.getError());
         }
 
-        //Put childrenComponent to parentEntity if it has any
-        if(entityData.children.size() > 0){
-            scene->addComponent<ChildrenComponent>(currEntity);
-        }
         //Iterate through children. Creates the child with components, then parents them with currentEntity. This is donde recursively
         for(auto childrenData : entityData.children){
             HUGO::ErrorOrType<EntityID> err = createEntity(scene, childrenData);
@@ -52,10 +47,7 @@ HUGO::ErrorOrType<EntityID> createEntity(std::shared_ptr<InternalScene> scene, c
             EntityID childID = err.getValue();
 
             scene->addComponent<ParentComponent>(childID, [currEntity](ParentComponent& cmp){
-                cmp.setParent(currEntity);
-            });
-            scene->modifyComponent<ChildrenComponent>(currEntity, [childID](ChildrenComponent& cmp){
-                cmp.addChild(childID);
+                cmp.parent = currEntity;
             });
         }
 

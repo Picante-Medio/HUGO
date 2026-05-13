@@ -15,7 +15,7 @@ void CameraMovementSystem::init() {
     cam1 = scene.createEntity();
 
     scene.addComponent<TransformComponent>(cam1, [](TransformComponent& comp){
-        comp.setPosition(HUGO::Vector3(0,0,30));
+        comp.position = HUGO::Vector3(0,0,30);
 
     });
 
@@ -27,7 +27,7 @@ void CameraMovementSystem::init() {
     cam2 = scene.createEntity();
 
     scene.addComponent<TransformComponent>(cam2, [](TransformComponent& comp){
-        comp.setPosition(HUGO::Vector3(0,0,200));
+        comp.position = HUGO::Vector3(0,0,200);
     });
 
     scene.addComponent<CameraComponent>(cam2, [](CameraComponent& comp){
@@ -49,10 +49,10 @@ void CameraMovementSystem::update(uint32_t dt) {
         float delta = static_cast<float>(dt);
 
         pack.modify<TransformComponent>([input, delta](TransformComponent& tr) {
-            if(input->isKeyPressed(HUGO::KeyCode::W)) tr.setPosition(tr.getPosition() + tr.getRotation().forward() * (-0.05f)* delta);
-            if(input->isKeyPressed(HUGO::KeyCode::A)) tr.setPosition(tr.getPosition() + tr.getRotation().right() *(-0.05f)* delta);
-            if(input->isKeyPressed(HUGO::KeyCode::S)) tr.setPosition(tr.getPosition() + tr.getRotation().forward() * (0.05f)* delta);
-            if(input->isKeyPressed(HUGO::KeyCode::D)) tr.setPosition(tr.getPosition() + tr.getRotation().right() *(0.05f)* delta);
+            if(input->isKeyPressed(HUGO::KeyCode::W)) tr.position += tr.rotation.forward() * (-0.05f) * delta;
+            if(input->isKeyPressed(HUGO::KeyCode::A)) tr.position += tr.rotation.right() *(-0.05f)* delta;
+            if(input->isKeyPressed(HUGO::KeyCode::S)) tr.position += tr.rotation.forward() * (0.05f)* delta;
+            if(input->isKeyPressed(HUGO::KeyCode::D)) tr.position += tr.rotation.right() *(0.05f)* delta;
         });
     }
 
