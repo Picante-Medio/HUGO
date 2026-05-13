@@ -38,13 +38,13 @@ public:
 	 */
 	DenseListIndex addComponent(const T &component, EntityID entity) {
 		if (activeComponentCount == components.size()) {
-		components.push_back(component);
-		entityIdList.push_back(entity);
+			components.push_back(component);
+			entityIdList.push_back(entity);
 		}
 
 		else {
-		components[activeComponentCount] = component;
-		entityIdList[activeComponentCount] = entity;
+			components[activeComponentCount] = component;
+			entityIdList[activeComponentCount] = entity;
 		}
 
 		activeComponentCount++;
