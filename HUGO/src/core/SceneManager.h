@@ -27,8 +27,6 @@ namespace HUGO {
         std::weak_ptr<InternalScene> m_currentScene;
         HUGO::String m_currentSceneName;
 
-        //Reads chatParser, creates a scene based on the SceneData, and indexes it in m_sceneMap.
-        HUGO::ErrorOrVoid loadScene(const HUGO::String& sceneName);
         //Removes a scene from m_sceneMap, to free space that is not used.
         HUGO::ErrorOrVoid unloadScene(const HUGO::String& sceneName);
 
@@ -54,6 +52,9 @@ namespace HUGO {
 
         //Initializes the parser with chat folder and sets physicsModule
         HUGO::ErrorOrVoid initializeParser(const HUGO::String& chatFolder, std::shared_ptr<IPhysicsModule> physicsModule);
+
+        //Reads chatParser, creates a scene based on the SceneData, and indexes it in m_sceneMap.
+        HUGO::ErrorOrVoid loadScene(const HUGO::String& sceneName);
 
         /*
         Requests SceneManager to change to scene [sceneName].
