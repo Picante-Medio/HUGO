@@ -15,7 +15,6 @@ namespace HUGO {
 	protected:
 		// std::shared_ptr<HUGO::IScene> scene = nullptr;
 		IScene& scene;
-
 	public:
 		explicit System(IScene& scene): scene(scene) {}
 		virtual ~System() {}
@@ -29,5 +28,4 @@ namespace HUGO {
 		virtual void fixedUpdate(uint32_t dt) = 0;
 		virtual void update(uint32_t dt) = 0;
 	};
-
 }
