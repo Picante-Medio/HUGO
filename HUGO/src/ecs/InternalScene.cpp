@@ -18,8 +18,6 @@
 #include "ComponentFactory.h"
 #include "GameLibraryLoader.h"
 #include "HStringUtils.h"
-#include "ParentComponent.h"
-#include "ChildrenComponent.h"
 
 InternalScene::InternalScene(std::shared_ptr<HUGO::IInput> input, HUGO::SceneManager& sceneManager) 
     : input(input), sceneManager(sceneManager)
@@ -145,27 +143,13 @@ InternalScene::removeComponentLUA(int entityID, std::string& componentName) {
 
 void
 InternalScene::removeEntity(EntityID entity) {
-	// If the entity has children, remove them
-	if(hasComponent<ChildrenComponent>(entity)){
-		std::unordered_set<EntityID> children = getComponent<ChildrenComponent>(entity).getChildren();
-		for(EntityID child : children){
-			removeEntity(child);
-		}
-	}
-
-	// If the entity had a parent, notify them
-	if(hasComponent<ParentComponent>(entity)){
-		std::optional<EntityID> parent = getComponent<ParentComponent>(entity).getParent();
-		if(parent && hasComponent<ChildrenComponent>(parent.value())){
-			getComponent<ChildrenComponent>(parent.value()).removeChild(entity);
-		}
-	}
-    
 	// Delete the components that the entity had
 	std::vector<std::pair<ComponentID, DenseListIndex>> componentsToDelete = entityTable->getAllDenseListIndexes(entity);
-	for(auto [componentID, direction] : componentsToDelete)
-        removeComponentAux(entity, componentID, direction);
-		
+	for(auto [componentID, direction] : componentsToDelete) {
+		// prevent trying to delete already deleted (a delet event could delete components)
+		if (hasComponent(entity, componentID))
+			removeComponentAux(entity, componentID, direction);
+	}
 	// Delete the entity
 	entityTable->removeEntity(entity);
 }
@@ -235,6 +219,10 @@ InternalScene::getInput() {
 	return input;
 }
 
+bool
+InternalScene::hasComponent(EntityID entity, ComponentID componentID) {
+	return entityTable->hasComponent(entity, componentID);
+}
 
 void 
 InternalScene::removeComponentAux(EntityID entity, ComponentID componentID, DenseListIndex index) {
