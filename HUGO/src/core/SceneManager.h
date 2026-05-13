@@ -30,7 +30,6 @@ namespace HUGO {
         //Reads chatParser, creates a scene based on the SceneData, and indexes it in m_sceneMap.
         HUGO::ErrorOrVoid loadScene(const HUGO::String& sceneName);
         //Removes a scene from m_sceneMap, to free space that is not used.
-        HUGO::ErrorOrVoid unloadScene(const HUGO::String& sceneName);
 
         //Physics module
         std::shared_ptr<IPhysicsModule> m_physicsModule;
@@ -72,11 +71,17 @@ namespace HUGO {
         void fixedUpdateCurrentScene(uint32_t dt);
         void dispatchMessagesCurrentScene();
 
+        // Prefabs
         HUGO::ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName, std::shared_ptr<InternalScene> scene);
 
+        // Quit game
         inline bool getQuit() const { return quit; }
         inline void setQuit(bool newQuit) { quit = newQuit; }
-        
+
+        // Manually delete scenes
+        HUGO::ErrorOrVoid unloadScene(const HUGO::String& sceneName);
+
+        // Light
         void setAmbientLight(const HUGO::Vector3& l);
     };
 

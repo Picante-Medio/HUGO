@@ -259,6 +259,11 @@ InternalScene::changeAndDestroyPreviousScene(const HUGO::String& sceneName) {
     sceneManager.setCurrentSceneAndDestroyPrevious(sceneName);
 }
 
+void
+InternalScene::unloadScene(const HUGO::String& sceneName) {
+    sceneManager.unloadScene(sceneName);
+}
+
 HUGO::ErrorOrType<EntityID> InternalScene::instantiatePrefab(const HUGO::String& prefabName){
 	HUGO::ErrorOrType<EntityID> prefabID = sceneManager.instantiatePrefab(prefabName, shared_from_this());
 

@@ -69,8 +69,10 @@ public:
     std::shared_ptr<HUGO::IInput> getInput() override;
 
     void changeScene(const HUGO::String& sceneName) override;
-
     void changeAndDestroyPreviousScene(const HUGO::String& sceneName) override;
+    void unloadScene(const HUGO::String& sceneName) override;
+
+
 
     HUGO::ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName) override;
 

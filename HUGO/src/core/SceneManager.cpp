@@ -108,7 +108,7 @@ HUGO::ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
 }
 
 HUGO::ErrorOrVoid SceneManager::unloadScene(const HUGO::String& sceneName){
-    if(m_sceneMap.find(sceneName) == m_sceneMap.end()) return HUGO::ErrorOrVoid(HUGO::StringError{"Scene " + sceneName + " can't be unloaded because it doesn't exist"});
+    if(!m_sceneMap.count(sceneName)) return HUGO::ErrorOrVoid(HUGO::StringError{"Scene " + sceneName + " can't be unloaded because it doesn't exist"});
 
     m_physicsModule->destroySceneSimulation(sceneName);
     m_sceneMap.erase(sceneName);
@@ -130,7 +130,7 @@ void SceneManager::setCurrentScene(const HUGO::String& sceneName){
 }
 
 void SceneManager::setCurrentSceneAndDestroyPrevious(const HUGO::String& sceneName){
-     m_sceneChangeInfo.needsSceneChanged = true;
+    m_sceneChangeInfo.needsSceneChanged = true;
     m_sceneChangeInfo.nextSceneName = sceneName;
     m_sceneChangeInfo.destroyPreviousScene = true;
 }
@@ -143,7 +143,7 @@ HUGO::ErrorOrVoid SceneManager::sceneChangeRequested(){
     else m_physicsModule->pauseSceneSimulation(m_currentSceneName);
 
     //If requested scene is not loaded in the map, load it
-    if(m_sceneMap.find(m_sceneChangeInfo.nextSceneName) == m_sceneMap.end()){
+    if(!m_sceneMap.count(m_sceneChangeInfo.nextSceneName)){
         HUGO::ErrorOrVoid err = loadScene(m_sceneChangeInfo.nextSceneName);
 
         //Print error in lua console
