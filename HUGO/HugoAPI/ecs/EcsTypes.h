@@ -1,7 +1,13 @@
 #pragma once
 
+#include <limits>
+
 // Entities are just numbers
 using EntityID = unsigned long int;
+
+namespace HUGO {
+    constexpr EntityID INVALID_ENTITY = std::numeric_limits<EntityID>::max();
+}
 
 // Identifier assigned dynamically to every component
 using ComponentID = unsigned int;
