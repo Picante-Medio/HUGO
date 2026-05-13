@@ -100,9 +100,9 @@ namespace HUGO {
 
     Vector3 Vector3::operator/(const Vector3 &other) const
     {
-		float nx = other.x != 0.0f? x / other.x : x;
-		float ny = other.y != 0.0f? y / other.y : x;
-		float nz = other.z != 0.0f? z / other.z : x;
+		float nx = (other.x != 0.0f) ? x / other.x : x;
+		float ny = (other.y != 0.0f) ? y / other.y : x;
+		float nz = (other.z != 0.0f) ? z / other.z : x;
         return {nx, ny, nz};
     }
 
