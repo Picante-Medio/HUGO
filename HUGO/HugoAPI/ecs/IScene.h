@@ -38,7 +38,7 @@ public:
 	}
 
 	template<typename T> 
-	const T& getComponentConst(EntityID entity) {
+	const T& getComponentConst(EntityID entity) const {
 		ComponentID componentID = HUGO::ComponentRegistry::getComponentId<T>();
 		return componentTable->getComponent<T>(entityTable->getDenseListIndex(entity, componentID));
 	}
@@ -84,6 +84,8 @@ public:
 	void addComponent(EntityID entity, Func&& initializer) {
 		
 		static_assert(std::is_invocable_r_v<void, Func, T&>, "initializer() must have void(T&) signature");
+
+		if (hasComponent<T>(entity)) throw "Component already exists";
 
 		// Creating the component
 		T component(entity);
