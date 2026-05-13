@@ -453,7 +453,13 @@ TransformSystem::addTransform(TransformComponent& trCmp) {
     if (!scene.hasComponent<WorldTransformComponent>(trCmp.entity)) {
 
         eventsDisconnected = true;
-        scene.addComponent<WorldTransformComponent>(trCmp.entity);
+        // Very important, if not all will be 0
+        scene.addComponent<WorldTransformComponent>(trCmp.entity, [&trCmp](WorldTransformComponent& worldTr){
+            worldTr.worldPosition = trCmp.position;
+            worldTr.worldRotation = trCmp.rotation;
+            worldTr.worldScale = trCmp.scale;
+        });
+
         eventsDisconnected = false;
     }
 
