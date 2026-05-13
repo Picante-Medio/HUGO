@@ -18,7 +18,7 @@ class PagedArray{
             throw  std::out_of_range("invalid index");
         } 
     }
-public:    
+public:
     PagedArray() = default;
     ~PagedArray() = default;
 
@@ -27,18 +27,11 @@ public:
      * @param element Element to add
      * @return Index where the element was stored
      */
-    std::size_t push_back(const T& element){
-        if(pages.empty() || totalSize == pages.size() * PageSize){
-                pages.emplace_back(); //add new page
-        }
-        pages[totalSize/PageSize][totalSize%PageSize] = element;
-        return totalSize++;
-    }
     std::size_t push_back(T&& element){
         if(pages.empty() || totalSize == pages.size() * PageSize){
                 pages.emplace_back(); //add new page
         }
-        pages[totalSize/PageSize][totalSize%PageSize] = std::move(element);
+        pages[totalSize/PageSize][totalSize%PageSize] = std::forward<T>(element);
         return totalSize++;
     }
 
@@ -51,11 +44,12 @@ public:
         std::size_t lastIndex = totalSize - 1;
         if (index != lastIndex) {
             //swap with last element
-            pages[index/PageSize][index%PageSize] = std::move(pages[lastIndex/PageSize][lastIndex%PageSize]);
+            pages[index/PageSize][index%PageSize] 
+                = std::move(pages[lastIndex/PageSize][lastIndex%PageSize]);
         }
         --totalSize;
         
-        //free last page if it becomes empty
+        //free page if it becomes empty
         if (totalSize % PageSize == 0 && !pages.empty()) {
             pages.pop_back();
         }
@@ -63,19 +57,15 @@ public:
 
     //------access---------------
     T& operator[] (std::size_t index){
-        checkRange(index);
         return pages[index/PageSize][index%PageSize];
     }
     const T& operator[] (std::size_t index) const{
-        checkRange(index);
         return pages[index/PageSize][index%PageSize];
     }
     T& at(std::size_t index){
-        checkRange(index);
         return pages[index/PageSize][index%PageSize];
     }
     const T& at(std::size_t index) const {
-        checkRange(index);
         return pages[index/PageSize][index%PageSize];
     }
 
@@ -97,7 +87,6 @@ public:
      */
     template <typename U, typename Array> 
     class Iterator{
-    private:
         Array* array;
         std::size_t index;
     public:
@@ -112,12 +101,12 @@ public:
             :array(arr), index(idx){}
         
         //-----operators----------
-        U& operator*() {return (*array)[index];}
-        U* operator->() { return &(*array)[index];}
+        reference operator*() {return (*array)[index];}
+        pointer operator->() { return &(*array)[index];}
         Iterator& operator++() { ++index; return *this;}
         Iterator operator++(int) {
             Iterator tmp = *this;
-            ++index;
+            ++(*this);
             return tmp;
         }
 
