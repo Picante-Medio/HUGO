@@ -6,7 +6,7 @@
 #include <iostream>
 
 // Aunque de warning esto no puede borrarse, en windows no compila porque SDL busca esta implementacion
-int main(int argc, char* argv[]) {
+int main(int, char*[]) {
     HUGO::ConfigGenerator config;
     config.generateResourcesConfig();
     config.generatePluginsConfig();

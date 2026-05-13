@@ -31,8 +31,9 @@ TransformSystem::init() {
     scene.onUpdateComponent<TransformComponent>().connect(this, &TransformSystem::updateTransform);
     scene.onRemoveComponent<TransformComponent>().connect(this, &TransformSystem::removeTransform);
 
-    scene.onAddComponent<WorldTransformComponent>().connect(this, &TransformSystem::updateWorldTransform);
+    scene.onAddComponent<WorldTransformComponent>().connect(this, &TransformSystem::addWorldTransform);
     scene.onUpdateComponent<WorldTransformComponent>().connect(this, &TransformSystem::updateWorldTransform);
+    scene.onRemoveComponent<WorldTransformComponent>().connect(this, &TransformSystem::removeWorldTransform);
 
     scene.onAddComponent<ParentComponent>().connect(this, &TransformSystem::addChild);
     scene.onUpdateComponent<ParentComponent>().connect(this, &TransformSystem::updateChild);
@@ -303,9 +304,9 @@ TransformSystem::swapAndDelete(size_t deleted) {
 void 
 TransformSystem::worldToLocal(const WorldTransformComponent& worldTrCmp) {
 
-    if (!scene.hasComponent<TransformComponent>(worldTrCmp.entity)) return;
-
     eventsDisconnected = true;
+
+    markDirty(sparse[worldTrCmp.entity]);
 
     TreeNode& node = dense[sparse[worldTrCmp.entity]];
 
@@ -345,9 +346,9 @@ TransformSystem::worldToLocal(const WorldTransformComponent& worldTrCmp) {
 void 
 TransformSystem::localToWorld(const TransformComponent& trCmp) {
 
-    if (!scene.hasComponent<WorldTransformComponent>(trCmp.entity)) return;
-
     eventsDisconnected = true;
+
+    markDirty(sparse[trCmp.entity]);
 
     TreeNode& node = dense[sparse[trCmp.entity]];
 
@@ -378,12 +379,9 @@ TransformSystem::localToWorld(const TransformComponent& trCmp) {
     eventsDisconnected = false;
 }
 
-//--------------Transform events
 
 void
-TransformSystem::addTransform(TransformComponent& trCmp) {
-
-    if (eventsDisconnected) return;
+TransformSystem::initNode(TransformComponent& trCmp) {
 
     EntityID ent = trCmp.entity;
 
@@ -409,25 +407,12 @@ TransformSystem::addTransform(TransformComponent& trCmp) {
 
     sparse[ent] = dense.size() - 1;
 
-    localToWorld(trCmp);
+    markDirty(dense.size() - 1);
 }
 
 void
-TransformSystem::updateTransform(TransformComponent& trCmp) {
-
-    if (eventsDisconnected) return;
-
-    size_t nodeIndex = sparse[trCmp.entity];
-    markDirty(nodeIndex);
-
-    localToWorld(trCmp);
-}
-
-void
-TransformSystem::removeTransform(TransformComponent& trCmp) {
-
-    if (eventsDisconnected) return;
-
+TransformSystem::destroyNode(const TransformComponent& trCmp) { 
+    
     size_t deletedIndex = sparse[trCmp.entity];
 
     TreeNode& node = dense[deletedIndex];
@@ -458,16 +443,85 @@ TransformSystem::removeTransform(TransformComponent& trCmp) {
     }
 }
 
+//--------------Transform events
+
+void
+TransformSystem::addTransform(TransformComponent& trCmp) {
+
+    if (eventsDisconnected) return;
+
+    if (!scene.hasComponent<WorldTransformComponent>(trCmp.entity)) {
+
+        eventsDisconnected = true;
+        scene.addComponent<WorldTransformComponent>(trCmp.entity);
+        eventsDisconnected = false;
+    }
+
+    initNode(trCmp);
+
+    localToWorld(trCmp);
+}
+
+void
+TransformSystem::updateTransform(TransformComponent& trCmp) {
+
+    if (eventsDisconnected) return;
+
+    localToWorld(trCmp);
+}
+
+void
+TransformSystem::removeTransform(TransformComponent& trCmp) {
+
+    if (eventsDisconnected) return;
+
+    destroyNode(trCmp);
+
+    if (scene.hasComponent<WorldTransformComponent>(trCmp.entity)) {
+        eventsDisconnected = true;
+        scene.removeComponent<WorldTransformComponent>(trCmp.entity);
+        eventsDisconnected = false;
+    }
+}
+
 //--------------WorldTransform events
+
+void
+TransformSystem::addWorldTransform(WorldTransformComponent& worldTrCmp) { 
+
+    if (eventsDisconnected) return;
+    
+    if (!scene.hasComponent<TransformComponent>(worldTrCmp.entity)) {
+        eventsDisconnected = true;
+        scene.addComponent<TransformComponent>(worldTrCmp.entity, [this](TransformComponent& trCmp){
+            initNode(trCmp);
+        });
+        eventsDisconnected = false;
+    }
+
+    updateWorldTransform(worldTrCmp);
+}
 
 void
 TransformSystem::updateWorldTransform(WorldTransformComponent& worldTrCmp) {
 
     if (eventsDisconnected) return;
 
-    if (!sparse.count(worldTrCmp.entity)) return;
-
     worldToLocal(worldTrCmp);
+}
+
+void
+TransformSystem::removeWorldTransform(WorldTransformComponent& worldTrCmp) {
+
+    if (eventsDisconnected) return;
+
+    if (scene.hasComponent<TransformComponent>(worldTrCmp.entity)) {
+        eventsDisconnected = true;
+        destroyNode(scene.getComponentConst<TransformComponent>(worldTrCmp.entity)); 
+        scene.removeComponent<TransformComponent>(worldTrCmp.entity);
+        eventsDisconnected = false;
+    }
+
 }
 
 //--------------Child events

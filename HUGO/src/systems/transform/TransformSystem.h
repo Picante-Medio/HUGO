@@ -41,12 +41,17 @@ HSYSTEM(TransformSystem)
     void worldToLocal(const WorldTransformComponent& worldTrCmp);
     void localToWorld(const TransformComponent& localToWorld);
 
+    void initNode(TransformComponent& trCmp);
+    void destroyNode(const TransformComponent& trCmp);
+
     void addTransform(TransformComponent& trCmp);
     void updateTransform(TransformComponent& trCmp);
     void removeTransform(TransformComponent& trCmp);
 
     // Add and update is the same in case of world transform
+    void addWorldTransform(WorldTransformComponent& worldTrCmp);
     void updateWorldTransform(WorldTransformComponent& worldTrCmp);
+    void removeWorldTransform(WorldTransformComponent& trCmp);
 
     void addChild(ParentComponent& childCmp);
     void updateChild(ParentComponent& childCmp);
