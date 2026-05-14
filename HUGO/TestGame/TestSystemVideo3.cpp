@@ -35,7 +35,7 @@ TestSystemVideo3::init() {
     // -------------------------------------------------------------------------------------
     scene.subscribe<ChangeSceneMessageVideo3>([this](std::shared_ptr<HUGO::Message> msg) {
         std::shared_ptr<ChangeSceneMessageVideo3> m = std::static_pointer_cast<ChangeSceneMessageVideo3>(msg);
-        scene.changeScene(m->sceneName);
+        scene.changeAndDestroyPreviousScene(m->sceneName);
     });
     // -------------------------------------------------------------------------------------
 
