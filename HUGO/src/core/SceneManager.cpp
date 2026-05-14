@@ -116,48 +116,47 @@ void SceneManager::setCurrentSceneLUA(const HUGO::String sceneName){
 }
 
 void SceneManager::setCurrentScene(const HUGO::String& sceneName){
-    m_sceneChangeInfo.needsSceneChanged = true;
-    m_sceneChangeInfo.nextSceneName = sceneName;
-    m_sceneChangeInfo.destroyPreviousScene = false;
+    m_sceneQueries.push_back({SceneQuery::QueryType::CHANGE_SCENE, sceneName});
 }
 
 void SceneManager::setCurrentSceneAndDestroyPrevious(const HUGO::String& sceneName){
-    m_sceneChangeInfo.needsSceneChanged = true;
-    m_sceneChangeInfo.nextSceneName = sceneName;
-    m_sceneChangeInfo.destroyPreviousScene = true;
+    m_sceneQueries.push_back({SceneQuery::QueryType::CHANGE_SCENE, sceneName});
+    m_sceneQueries.push_back({SceneQuery::QueryType::DELETE_SCENE, m_currentSceneName});
+
 }
 
-HUGO::ErrorOrVoid SceneManager::sceneChangeRequested(){
-    //If not requested, return.
-    if(!m_sceneChangeInfo.needsSceneChanged) return HUGO::ErrorOrVoid();
-    
-    m_sceneChangeInfo.needsSceneChanged = false;
-    //Exit current scene
-    if(!m_currentScene.expired()) {
-        m_currentScene.lock()->exit();
-    }
+HUGO::ErrorOrVoid SceneManager::manageQueries(){
+    for(const auto& query: m_sceneQueries){
+        if(query.queryType == SceneQuery::QueryType::DELETE_SCENE){
+            ErrorOrVoid res = unloadScene(query.sceneName);
+            if(res.isError()) return res;
+        }
+        else if(query.queryType == SceneQuery::QueryType::CHANGE_SCENE){
+            //Exit current scene
+            if(!m_currentScene.expired()) m_currentScene.lock()->exit();
+            m_physicsModule->pauseSceneSimulation(m_currentSceneName);
 
-    if(m_sceneChangeInfo.destroyPreviousScene) unloadScene(m_currentSceneName);
-    else m_physicsModule->pauseSceneSimulation(m_currentSceneName);
+            if(m_sceneMap.find(query.sceneName) == m_sceneMap.end()){
+                HUGO::ErrorOrVoid err = loadScene(query.sceneName);
 
-    //If requested scene is not loaded in the map, load it
-    if(m_sceneMap.find(m_sceneChangeInfo.nextSceneName) == m_sceneMap.end()){
-        HUGO::ErrorOrVoid err = loadScene(m_sceneChangeInfo.nextSceneName);
+                //Print error in lua console
+                if(err.isError()){
+                    return err;
+                }
+            }
 
-        //Print error in lua console
-        if(err.isError()){
-            return err;
+            //Sets current sceneManager for the new one.
+            OgreModule::Instance().setCurrentSceneManager(query.sceneName);
+            m_physicsModule->resumeSceneSimulation(query.sceneName);
+
+            m_currentScene = m_sceneMap[query.sceneName];
+            m_currentSceneName = query.sceneName;
+            
+            //Enter current scene
+            m_currentScene.lock()->load();
         }
     }
-
-    //Sets current sceneManager for the new one.
-    OgreModule::Instance().setCurrentSceneManager(m_sceneChangeInfo.nextSceneName);
-    m_physicsModule->resumeSceneSimulation(m_sceneChangeInfo.nextSceneName);
-
-    m_currentScene = m_sceneMap[m_sceneChangeInfo.nextSceneName];
-    m_currentSceneName = m_sceneChangeInfo.nextSceneName;
-    
-    m_currentScene.lock()->load();
+    m_sceneQueries.clear();
 
     return HUGO::ErrorOrVoid();
 }

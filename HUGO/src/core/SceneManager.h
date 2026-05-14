@@ -7,6 +7,7 @@
 #include "HugoError.h"
 #include "EcsTypes.h"
 #include "HugoMath.h"
+#include <vector>
 
 #ifdef __linux__
 #include <stdint.h>
@@ -37,13 +38,16 @@ namespace HUGO {
         std::shared_ptr<HUGO::IInput> m_input;
 
         //Checkers for scene-changing requests
-        struct SceneChangeInfo{
-            bool needsSceneChanged = false;
-            HUGO::String nextSceneName;
-            bool destroyPreviousScene = false;
+        struct SceneQuery{
+            enum class QueryType{
+                CHANGE_SCENE, DELETE_SCENE
+            };
+
+            QueryType queryType;
+            HUGO::String sceneName;
         };
 
-        SceneChangeInfo m_sceneChangeInfo;
+        std::vector<SceneQuery> m_sceneQueries;
 
         bool quit = false;
     public:
@@ -66,7 +70,7 @@ namespace HUGO {
         void setCurrentSceneLUA(const HUGO::String sceneName);
 
         //Called by HUGO::Core. If there is a request for a scene change, change m_currentScene
-        HUGO::ErrorOrVoid sceneChangeRequested();
+        HUGO::ErrorOrVoid manageQueries();
 
         //---Updates and fixedUpdates of current Scene
         void updateCurrentScene(uint32_t dt);
