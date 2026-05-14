@@ -19,6 +19,7 @@
 #include "PanelComponent.h"
 #include "TextComponent.h"
 #include "ButtonComponent.h"
+#include "WorldTransformComponent.h"
 
 #include <iostream>
 
@@ -196,6 +197,12 @@ TestSystemVideo2::init() {
     });
     
     scene.changeAmbientLight(HUGO::Vector3(0.1f));
+
+    auto camID = scene.createEntity();
+    scene.addComponent<WorldTransformComponent>(camID);
+    scene.addComponent<CameraComponent>(camID, [](CameraComponent& cmp){
+        cmp.setMain(true);
+    });
 }
 
 void TestSystemVideo2::createCube(EntityID cube){

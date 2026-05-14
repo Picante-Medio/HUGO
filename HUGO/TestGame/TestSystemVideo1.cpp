@@ -9,6 +9,8 @@
 #include "AudioComponent.h"
 #include "ChangeSceneMessage.h"
 #include <iostream>
+#include "CameraComponent.h"
+#include "WorldTransformComponent.h"
 
 void
 TestSystemVideo1::init() {
@@ -105,6 +107,12 @@ TestSystemVideo1::init() {
                 a.volume = value;
             });
         };
+    });
+
+    auto camID = scene.createEntity();
+    scene.addComponent<WorldTransformComponent>(camID);
+    scene.addComponent<CameraComponent>(camID, [](CameraComponent& cmp){
+        cmp.setMain(true);
     });
 }
 

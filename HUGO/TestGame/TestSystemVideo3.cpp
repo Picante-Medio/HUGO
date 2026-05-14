@@ -12,6 +12,8 @@
 #include "RenderComponent.h"
 #include "ButtonComponent.h"
 #include "AnimationComponent.h"
+#include "WorldTransformComponent.h"
+#include "CameraComponent.h"
 
 struct Aux {
     HUGO::String pname = "Particle/Smoke";
@@ -205,6 +207,12 @@ TestSystemVideo3::init() {
         };
     });
     // -------------------------------------------------------------------------------------
+
+    auto camID = scene.createEntity();
+    scene.addComponent<WorldTransformComponent>(camID);
+    scene.addComponent<CameraComponent>(camID, [](CameraComponent& cmp){
+        cmp.setMain(true);
+    });
 }
 
 
