@@ -128,5 +128,6 @@ public:
 
    void onLoad() override;
    void init() override;
+   void onExit() override;
 
 END_HSYSTEM()

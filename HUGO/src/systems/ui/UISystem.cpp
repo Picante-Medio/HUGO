@@ -25,20 +25,8 @@
 
 UISystem::~UISystem()
 {
-    auto& mng = Ogre::OverlayManager::getSingleton();
-    for (auto ptr: uiCache){
-        if (ptr.second->element){
-            mng.destroyOverlayElement(ptr.second->element);
-        }
-        if (ptr.second->extra){
-            mng.destroyOverlayElement(ptr.second->extra);
-        }
-        mng.destroyOverlayElement(ptr.second->container);
-        mng.destroy(ptr.second->overlay);
-    }
     clearAllCaches();
 }
-
 //====================================================
 // CACHE CREATION
 //====================================================
@@ -698,40 +686,41 @@ void UISystem::onUpdateSliderComponent(SliderComponent& s)
 //====================================================
 // CACHE MANAGEMENT
 //====================================================
-void UISystem::hideCache(UIElementCache* cache)
+void UISystem::hideCache(UIElementCache* cache, Ogre::OverlayManager& mng)
 {
     if (!cache) return;
 
-    auto& overlayMgr = Ogre::OverlayManager::getSingleton();
-
-    if (cache->overlay)
-    {
-        overlayMgr.destroy(cache->overlay);
-        cache->overlay = nullptr;
-    }
-
-    if (cache->container)
-    {
-        overlayMgr.destroyOverlayElement(cache->container);
-        cache->container = nullptr;
-    }
-
     if (cache->element)
     {
-        overlayMgr.destroyOverlayElement(cache->element);
+        mng.destroyOverlayElement(cache->element);
         cache->element = nullptr;
     }
 
     if (cache->extra) // knob or opcional
     {
-        overlayMgr.destroyOverlayElement(cache->extra);
+        mng.destroyOverlayElement(cache->extra);
         cache->extra = nullptr;
+    }
+
+    if (cache->container)
+    {
+        mng.destroyOverlayElement(cache->container);
+        cache->container = nullptr;
+    }
+
+    if (cache->overlay)
+    {
+        mng.destroy(cache->overlay);
+        cache->overlay = nullptr;
     }
 }
 
 void UISystem::clearAllCaches()
 {
-
+    auto& overlayMng = Ogre::OverlayManager::getSingleton();
+    for (auto ptr: uiCache){
+        hideCache(ptr.second.get(), overlayMng);
+    }
     uiCache.clear();
 }
 
@@ -759,8 +748,17 @@ void UISystem::init()
     scene.onUpdateComponent<SliderComponent>().connect(this, &UISystem::onUpdateSliderComponent);
 }
 
-void UISystem::onLoad() {}
-
+void UISystem::onLoad() {
+    for (auto& pack: scene.query<PanelComponent>()){
+        
+        syncPanel(pack.getConst<PanelComponent>());
+    }
+}
+void UISystem::onExit(){
+    for (auto ptr: uiCache){
+        ptr.second->setVisible(false);
+    }
+}
 void UISystem::update(uint32_t)
 {
     processInput();

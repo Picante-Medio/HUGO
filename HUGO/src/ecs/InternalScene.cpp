@@ -43,6 +43,13 @@ void InternalScene::init(){
 	}
 }
 
+void InternalScene::exit()
+{
+	for(std::shared_ptr<HUGO::System> system : systems) {
+		system->onExit();
+	}
+}
+
 void 
 InternalScene::update(uint32_t dt) {
 	for(std::shared_ptr<HUGO::System> system : systems) 

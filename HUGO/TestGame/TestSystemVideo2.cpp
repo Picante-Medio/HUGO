@@ -27,7 +27,7 @@ void
 TestSystemVideo2::init() {
     scene.subscribe<ChangeSceneMessageVideo2>([this](std::shared_ptr<HUGO::Message> msg) {
     std::shared_ptr<ChangeSceneMessageVideo2> m = std::static_pointer_cast<ChangeSceneMessageVideo2>(msg);
-    scene.changeAndDestroyPreviousScene(m->sceneName);
+    scene.changeScene(m->sceneName);
     });
 
     menuButton = scene.createEntity();

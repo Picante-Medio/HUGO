@@ -373,6 +373,12 @@ void AudioSystem::fixedUpdate(uint32_t)
 void AudioSystem::onLoad(){
     LuaBinder& luaBinder = LuaBinder::getInstance();
     luaBinder.registerMethod<AudioSystem, void, int, int>(*this, &AudioSystem::playAudioLUA, "playAudio");
+
+    for (auto& pack: scene.query<AudioComponent>()){
+        pack.modify<AudioComponent>([this](AudioComponent& a){
+            processChanges(a);
+        });
+    }
 }
 
 void AudioSystem::init(){
@@ -441,4 +447,15 @@ void AudioSystem::onAdd3DAudioComponent(Audio3DInfoComponent &c)
     });
     process3DChanges(a, c);
     set3DPosition(a.activePtr, tr.worldPosition);
+}
+
+void AudioSystem::onExit()
+{
+    for (auto& pack: scene.query<AudioComponent>()){
+        pack.modify<AudioComponent>([this](AudioComponent& a){
+            a.startTime = getAudioPosition(a.activePtr);
+        });
+        ma_sound* ptr = pack.getConst<AudioComponent>().activePtr;
+        stopAudio(ptr);
+    }
 }

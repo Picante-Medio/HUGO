@@ -35,7 +35,7 @@ TestSystemVideo3::init() {
     // -------------------------------------------------------------------------------------
     scene.subscribe<ChangeSceneMessageVideo3>([this](std::shared_ptr<HUGO::Message> msg) {
         std::shared_ptr<ChangeSceneMessageVideo3> m = std::static_pointer_cast<ChangeSceneMessageVideo3>(msg);
-        scene.changeAndDestroyPreviousScene(m->sceneName);
+        scene.changeScene(m->sceneName);
     });
     // -------------------------------------------------------------------------------------
 
@@ -131,7 +131,7 @@ TestSystemVideo3::init() {
     // -------------------------------------------------------------------------------------
     EntityID audioSlider = scene.createEntity();
     scene.addComponent<PanelComponent>(audioSlider, [](PanelComponent& panel){
-        panel.overlayName = "Menu/Mierdas3";
+        panel.overlayName = "Menu/Mierdas3jdoaDJAO";
         panel.containerName = panel.overlayName + "/Container";
         panel.material = "UI/Background";
         panel.metricsMode = HUGO::UIMetricsMode::GMM_RELATIVE;
@@ -144,7 +144,7 @@ TestSystemVideo3::init() {
     });
 
     scene.addComponent<SliderComponent>(audioSlider, [this](SliderComponent& s){
-        s.trackElementName = "Menu/Mierdas34";
+        s.trackElementName = "Menu/Mierdas34FAFJ";
         s.knobElementName = s.trackElementName + "/Element";
         s.trackMaterial = "UI/Background";
         s.knobMaterial = "UI/KnobPressed";
@@ -162,7 +162,7 @@ TestSystemVideo3::init() {
         };
     });
 
-    HUGO::String aux = "Menu/Mierdas35";
+    HUGO::String aux = "Menu/Mierdas35FAFAWFW";
     EntityID volumeText = scene.createEntity();
     scene.addComponent<PanelComponent>(volumeText, [&aux](PanelComponent& panel){
         panel.overlayName = aux;
@@ -186,7 +186,7 @@ TestSystemVideo3::init() {
     // -------------------------------------------------------------------------------------
     EntityID menuButton = scene.createEntity();
     scene.addComponent<PanelComponent>(menuButton, [](PanelComponent& panel){
-        panel.overlayName = "Menu/Mierdas10";
+        panel.overlayName = "Menu/Mierdas10FGEFWA";
         panel.containerName = panel.overlayName + "/Container";
         panel.material = "UI/HUGOPlayBoton";
         panel.metricsMode = HUGO::UIMetricsMode::GMM_RELATIVE;

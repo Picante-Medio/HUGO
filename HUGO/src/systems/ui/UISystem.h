@@ -81,13 +81,14 @@ private:
     //====================================================
     // CACHE
     //====================================================
-    void hideCache(UIElementCache* cache);
+    void hideCache(UIElementCache* cache, Ogre::OverlayManager& mng);
     void clearAllCaches();
 public:
     virtual ~UISystem();
 
-    void init();
-    void onLoad();
+    void init() override;
+    void onLoad() override;
+    void onExit() override;
 
     void update(uint32_t dt) override;
     void fixedUpdate(uint32_t dt) override;

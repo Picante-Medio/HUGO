@@ -24,6 +24,7 @@ std::shared_ptr<HUGO::Input> input;
 HUGO::String logIni = ">  ";
 bool active; // to set weather the console is active or not
 
+static HUGO::Int AUX_CONSOLE_INDEX;
 static inline std::queue<HUGO::String> luaOutput = std::queue<HUGO::String>();
 
     static int consoleLuaPrint(lua_State* lua){

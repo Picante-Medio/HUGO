@@ -35,6 +35,9 @@ public:
     //Calls init() on all systems. Must be used only by SceneManager
     void init();
 
+    //Calls exit() on all systems. Must be used only by SceneManager
+    void exit();
+
     inline void addSystem(std::shared_ptr<HUGO::System> system) { systems.push_back(system); }
 
     // Logic update

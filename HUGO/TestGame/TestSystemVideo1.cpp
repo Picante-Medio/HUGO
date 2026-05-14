@@ -16,7 +16,7 @@ void
 TestSystemVideo1::init() {
     scene.subscribe<ChangeSceneMessageVideo1>([this](std::shared_ptr<HUGO::Message> msg) {
         std::shared_ptr<ChangeSceneMessageVideo1> m = std::static_pointer_cast<ChangeSceneMessageVideo1>(msg);
-        scene.changeAndDestroyPreviousScene(m->sceneName);
+        scene.changeScene(m->sceneName);
     });
 
     audio = scene.createEntity();

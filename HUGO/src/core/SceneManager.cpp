@@ -122,7 +122,7 @@ void SceneManager::setCurrentScene(const HUGO::String& sceneName){
 }
 
 void SceneManager::setCurrentSceneAndDestroyPrevious(const HUGO::String& sceneName){
-     m_sceneChangeInfo.needsSceneChanged = true;
+    m_sceneChangeInfo.needsSceneChanged = true;
     m_sceneChangeInfo.nextSceneName = sceneName;
     m_sceneChangeInfo.destroyPreviousScene = true;
 }
@@ -130,7 +130,13 @@ void SceneManager::setCurrentSceneAndDestroyPrevious(const HUGO::String& sceneNa
 HUGO::ErrorOrVoid SceneManager::sceneChangeRequested(){
     //If not requested, return.
     if(!m_sceneChangeInfo.needsSceneChanged) return HUGO::ErrorOrVoid();
-        m_sceneChangeInfo.needsSceneChanged = false;
+    
+    m_sceneChangeInfo.needsSceneChanged = false;
+    //Exit current scene
+    if(!m_currentScene.expired()) {
+        m_currentScene.lock()->exit();
+    }
+
     if(m_sceneChangeInfo.destroyPreviousScene) unloadScene(m_currentSceneName);
     else m_physicsModule->pauseSceneSimulation(m_currentSceneName);
 

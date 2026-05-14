@@ -6,6 +6,8 @@
 #include "InputFieldComponent.h"
 #include "Input.h"
 
+HUGO::Int ConsoleSystem::AUX_CONSOLE_INDEX = 0;
+
 void ConsoleSystem::printLuaOutput(TextComponent& consoleTextCmp){
     while(!ConsoleSystem::luaOutput.empty()){
         scene.modifyComponent<TextComponent>(consoleTextCmp.entity, [this](TextComponent& t){
@@ -199,7 +201,7 @@ void ConsoleSystem::init(){
     std::string panelContainerName;
 
     scene.addComponent<PanelComponent>(consoleInput, [this, &panelContainerName](PanelComponent& panel){
-        panel.overlayName = "Console/InputText";
+        panel.overlayName = "Console/InputText" + std::to_string(ConsoleSystem::AUX_CONSOLE_INDEX);
         panel.containerName = panel.overlayName + "/Container";
         panel.material = "Console/InputBackground";
         panel.width = 0.3f;
@@ -237,7 +239,7 @@ void ConsoleSystem::init(){
 
     // Reuse panelContainerName
     scene.addComponent<PanelComponent>(consoleText, [this, &panelContainerName](PanelComponent& panel2){
-        panel2.overlayName = "Console/LogText";
+        panel2.overlayName = "Console/LogText"+std::to_string(ConsoleSystem::AUX_CONSOLE_INDEX);
         panel2.containerName = panel2.overlayName + "/Container";
         panel2.material = "Console/LogBackground";
         panel2.width = 0.3f;
@@ -264,7 +266,7 @@ void ConsoleSystem::init(){
     //-------------------------------Console Input Info
     consoleInfo = scene.createEntity();
     scene.addComponent<PanelComponent>(consoleInfo, [this, &panelContainerName](PanelComponent& panel3){
-        panel3.overlayName = "Console/InfoText";
+        panel3.overlayName = "Console/InfoText"+std::to_string(ConsoleSystem::AUX_CONSOLE_INDEX);
         panel3.containerName = panel3.overlayName + "/Container";
         panel3.material = "Console/InputBackground";
         panel3.width = 0.3f;
@@ -285,4 +287,6 @@ void ConsoleSystem::init(){
         text3.spaceWidth = 0.01f;
         text3.text = "Show/Hide Console: Ctrl + T\n";
     });
+
+    AUX_CONSOLE_INDEX++;
 }
