@@ -275,3 +275,8 @@ void
 InternalScene::loadScene(const HUGO::String& sceneName) {
     sceneManager.loadScene(sceneName);
 }
+
+void
+InternalScene::unloadScene(const HUGO::String& sceneName) {
+    sceneManager.unloadScene(sceneName);
+}

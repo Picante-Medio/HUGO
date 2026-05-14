@@ -198,7 +198,7 @@ public:
 	virtual std::shared_ptr<IInput> getInput() = 0;
 
     /** Scene changing
-     * ERROR POSSIBLE: If the scene to change does not exist, logs an error to debug console
+     * POSSIBLE ERROR: If the scene to change does not exist, logs an error to debug console
      */
     virtual void changeScene(const HUGO::String& sceneName) = 0;
 	virtual void changeAndDestroyPreviousScene(const HUGO::String& sceneName) = 0;
@@ -208,6 +208,7 @@ public:
 	virtual void changeAmbientLight(const HUGO::Vector3& l) = 0;
 
     virtual void loadScene(const HUGO::String& sceneName) = 0;
+	virtual void unloadScene(const HUGO::String& sceneName) = 0;
 };
 
 }

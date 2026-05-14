@@ -82,4 +82,5 @@ public:
     void changeAmbientLight(const HUGO::Vector3& l) override;
 
     void loadScene(const HUGO::String& sceneName) override;
+    void unloadScene(const HUGO::String& sceneName) override;
 };

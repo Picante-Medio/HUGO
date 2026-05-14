@@ -29,7 +29,10 @@ namespace HUGO {
         HUGO::String m_currentSceneName;
 
         //Removes a scene from m_sceneMap, to free space that is not used.
-        HUGO::ErrorOrVoid unloadScene(const HUGO::String& sceneName);
+        HUGO::ErrorOrVoid destroyScene(const HUGO::String& sceneName);
+
+        //Reads chatParser, creates a scene based on the SceneData, and indexes it in m_sceneMap.
+        HUGO::ErrorOrVoid createScene(const HUGO::String& sceneName);
 
         //Physics module
         std::shared_ptr<IPhysicsModule> m_physicsModule;
@@ -40,7 +43,7 @@ namespace HUGO {
         //Checkers for scene-changing requests
         struct SceneQuery{
             enum class QueryType{
-                CHANGE_SCENE, DELETE_SCENE
+                CHANGE_SCENE, DELETE_SCENE, LOAD_SCENE
             };
 
             QueryType queryType;
@@ -57,8 +60,11 @@ namespace HUGO {
         //Initializes the parser with chat folder and sets physicsModule
         HUGO::ErrorOrVoid initializeParser(const HUGO::String& chatFolder, std::shared_ptr<IPhysicsModule> physicsModule);
 
-        //Reads chatParser, creates a scene based on the SceneData, and indexes it in m_sceneMap.
-        HUGO::ErrorOrVoid loadScene(const HUGO::String& sceneName);
+        //Unloads scene from memory
+        void loadScene(const HUGO::String& sceneName);
+
+        //Unloads scene from memory
+        void unloadScene(const HUGO::String& sceneName);
 
         /*
         Requests SceneManager to change to scene [sceneName].

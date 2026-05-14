@@ -54,7 +54,7 @@ HUGO::ErrorOrType<EntityID> createEntity(std::shared_ptr<InternalScene> scene, c
     return HUGO::ErrorOrType<EntityID>(currEntity);
 }
 
-HUGO::ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
+HUGO::ErrorOrVoid SceneManager::createScene(const HUGO::String& sceneName){
     HUGO::ErrorOrType<HUGO::SceneData> sceneData = m_chatParser.getSceneData(sceneName);
 
     if(sceneData.isError()) return HUGO::ErrorOrVoid(HUGO::StringError{"Error loading scene: " + sceneData.getError().errorMessage});
@@ -99,7 +99,15 @@ HUGO::ErrorOrVoid SceneManager::loadScene(const HUGO::String& sceneName){
     return HUGO::ErrorOrVoid();
 }
 
-HUGO::ErrorOrVoid SceneManager::unloadScene(const HUGO::String& sceneName){
+void SceneManager::unloadScene(const HUGO::String& sceneName){
+    m_sceneQueries.push_back({SceneQuery::QueryType::DELETE_SCENE, sceneName});
+}
+
+void SceneManager::loadScene(const HUGO::String& sceneName){
+    m_sceneQueries.push_back({SceneQuery::QueryType::LOAD_SCENE, sceneName});
+}
+
+HUGO::ErrorOrVoid SceneManager::destroyScene(const HUGO::String& sceneName){
     if(m_sceneMap.find(sceneName) == m_sceneMap.end()) return HUGO::ErrorOrVoid(HUGO::StringError{"Scene " + sceneName + " can't be unloaded because it doesn't exist"});
 
     m_physicsModule->destroySceneSimulation(sceneName);
@@ -128,7 +136,7 @@ void SceneManager::setCurrentSceneAndDestroyPrevious(const HUGO::String& sceneNa
 HUGO::ErrorOrVoid SceneManager::manageQueries(){
     for(const auto& query: m_sceneQueries){
         if(query.queryType == SceneQuery::QueryType::DELETE_SCENE){
-            ErrorOrVoid res = unloadScene(query.sceneName);
+            ErrorOrVoid res = destroyScene(query.sceneName);
             if(res.isError()) return res;
         }
         else if(query.queryType == SceneQuery::QueryType::CHANGE_SCENE){
@@ -137,7 +145,7 @@ HUGO::ErrorOrVoid SceneManager::manageQueries(){
             m_physicsModule->pauseSceneSimulation(m_currentSceneName);
 
             if(m_sceneMap.find(query.sceneName) == m_sceneMap.end()){
-                HUGO::ErrorOrVoid err = loadScene(query.sceneName);
+                HUGO::ErrorOrVoid err = createScene(query.sceneName);
 
                 //Print error in lua console
                 if(err.isError()){
@@ -154,6 +162,10 @@ HUGO::ErrorOrVoid SceneManager::manageQueries(){
             
             //Enter current scene
             m_currentScene.lock()->load();
+        }
+        else if(query.queryType == SceneQuery::QueryType::LOAD_SCENE){
+            ErrorOrVoid res = createScene(query.sceneName);
+            if(res.isError()) return res;
         }
     }
     m_sceneQueries.clear();
