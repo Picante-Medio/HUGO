@@ -66,6 +66,7 @@ namespace HUGO {
 		float dot(const Vector3& other) const;
 		
 		float length() const;
+		float lengthSquared() const;
 		void normalize();
 		Vector3 normalized() const;
 	};
@@ -118,6 +119,8 @@ namespace HUGO {
 
 		void operator*=(const Quaternion& other);
 		void normalize();
+
+		static Quaternion identity();
 	};
 	Quaternion UTILS_API operator*(const Quaternion& a, const Quaternion& b);
 	// multiplying a quaternion

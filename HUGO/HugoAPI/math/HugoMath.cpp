@@ -1,4 +1,5 @@
 #include <cmath>
+#include <algorithm>
 #include <cassert>
 #include "HugoMath.h"
 #include "HugoTypes.h"
@@ -140,6 +141,10 @@ namespace HUGO {
 
     float Vector3::length() const {
 		return std::sqrt(x * x + y * y + z * z);
+	}
+
+	float Vector3::lengthSquared() const {
+		return x * x + y * y + z * z;
 	}
 
     void Vector3::normalize()
@@ -308,6 +313,10 @@ namespace HUGO {
 		}
 	}
 
+	Quaternion Quaternion::identity() {
+		return Quaternion(1,0,0,0);
+	}
+
     Quaternion operator*(const Quaternion& a, const Quaternion& b)
 	{
 		return Quaternion(
@@ -336,43 +345,79 @@ namespace HUGO {
 		return Quaternion(q.w*f, q.x*f, q.y*f, q.z*f);
 	}
 
-	Quaternion rotationBetweenVectors(Vector3 from, Vector3 to) {
-		from.normalize();
-        to.normalize();
+Quaternion rotationBetweenVectors(Vector3 from, Vector3 to)
+{
+    const float alpha = 0.00001f;
 
-        float cosTheta = from.dot(to);
-        Vector3 axis;
+    if(from.lengthSquared() < alpha || to.lengthSquared() < alpha)
+        return Quaternion::identity();
 
-		// special case when vectors in opposite directions
-        if (cosTheta < -1 + 0.001f) {
-            axis = Vector3(0.0f, 0.0f, 1.0f).cross(from);
+    from.normalize();
+    to.normalize();
 
-            if (axis.length() * axis.length() < 0.01)
-                axis = Vector3(1.0f, 0.0f, 0.0f).cross(from);
+    float cosTheta = from.dot(to);
 
-            axis.normalize();
-            return Quaternion(Degree(0.f), axis);
-        }
+    // Clamp to avoid numerical issues
+    cosTheta = std::clamp(cosTheta, -1.0f, 1.0f);
 
-        axis = from.cross(to);
-        float s = sqrt((1 + cosTheta) * 2);
-        float invs = 1 / s;
+    // vectors in opposite directions
+    if(cosTheta < -1.0f + alpha) {
+        Vector3 axis = Vector3(0.f, 0.f, 1.f).cross(from);
 
-        return Quaternion( Radian(s*0.5f), axis * invs);
-	}
+        if(axis.lengthSquared() < alpha)
+            axis = Vector3(1.f, 0.f, 0.f).cross(from);
 
-	Quaternion lookAt(Vector3 forward, Vector3 up, Vector3 newForward) {
-		
-        Quaternion rot1 = rotationBetweenVectors(forward, newForward);
-        Vector3 right = newForward.cross(up);
-        up = right.cross(newForward);
-        Vector3 realUp(0.f, 1.f, 0.f);
-        Vector3 newUp = rot1 * realUp;
-        Quaternion rot2 = rotationBetweenVectors(newUp, up);
-        Quaternion res = rot2 * rot1;
+        axis.normalize();
 
-        return Quaternion(res.w, res.x, res.y, res.z);
-	}
+        return Quaternion(Degree(180.f), axis);
+    }
+
+    Vector3 axis = from.cross(to);
+
+    float s = sqrt((1.f + cosTheta) * 2.f);
+    float invs = 1.f / s;
+
+    return Quaternion(s * 0.5f, axis.x * invs, axis.y * invs, axis.z * invs);
+}
+
+Quaternion lookAt(Vector3 currentForward, Vector3 desiredForward, Vector3 worldUp)
+{
+    const float alpha = 0.00001f;
+
+    if(desiredForward.lengthSquared() < alpha)
+        return Quaternion::identity();
+
+    desiredForward.normalize();
+    currentForward.normalize();
+    worldUp.normalize();
+
+    // Rotate forward vector into target direction
+    Quaternion rot1 = rotationBetweenVectors(currentForward, desiredForward);
+
+    // Recompute up vector after rotation
+    Vector3 newUp = rot1 * worldUp;
+
+    // Compute desired right vector
+    Vector3 right = desiredForward.cross(worldUp);
+
+    if(right.lengthSquared() < alpha)
+        return rot1;
+
+    right.normalize();
+
+    // Compute corrected up vector
+    Vector3 desiredUp = right.cross(desiredForward);
+    desiredUp.normalize();
+
+    // Align up vector
+    Quaternion rot2 = rotationBetweenVectors(newUp, desiredUp);
+
+    Quaternion result = rot2 * rot1;
+
+    result.normalize();
+
+    return result;
+}
 
     // --------------------- RADIAN ---------------------
 	Radian::Radian(float r) 
