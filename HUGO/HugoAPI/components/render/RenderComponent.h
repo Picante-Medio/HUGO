@@ -5,7 +5,7 @@
 HCOMPONENT(RenderComponent)
     DEFAULT_SERIALIZED_MEMBER(HUGO::String, meshName, "cube.mesh")
     DEFAULT_SERIALIZED_MEMBER(HUGO::String, materialName, "")
-    DEFAULT_SERIALIZED_MEMBER(bool, visible, true)
+    DEFAULT_SERIALIZED_MEMBER(bool, isVisible, true)
 
     // Setter
     inline void setMeshName(const HUGO::String& newMeshName) { meshName = newMeshName; }

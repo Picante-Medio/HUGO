@@ -143,7 +143,7 @@ void RenderSystem::registerRenderEntity(RenderComponent& comp)
     //create OgreObject
     OgreObject obj = {ent, node};
     obj.meshName = meshName;
-    obj.ogreEntity->setVisible(comp.visible);
+    obj.ogreEntity->setVisible(comp.isVisible);
     //store object
     ogreObjects[id] = std::move(obj);
     if(scene.hasComponent<AnimationComponent>(id)){
@@ -207,7 +207,7 @@ void RenderSystem::onUpdateRenderComponet(RenderComponent &rc)
         }
 
         if(!rc.materialName.empty())obj.ogreEntity->setMaterialName(rc.materialName);
-        obj.ogreEntity->setVisible(rc.visible);
+        obj.ogreEntity->setVisible(rc.isVisible);
     }
 }
 #pragma endregion
