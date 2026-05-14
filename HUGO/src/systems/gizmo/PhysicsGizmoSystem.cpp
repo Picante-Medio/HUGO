@@ -161,6 +161,7 @@ void PhysicsGizmoSystem::update(uint32_t){
     
     for(auto pack : scene.query<ColliderComponent, WorldTransformComponent>()) {
         const ColliderComponent& collider = pack.getConst<ColliderComponent>();
+        const WorldTransformComponent& collTr = pack.getConst<WorldTransformComponent>();
 
         //If we dont want gizmos, we skip all of this
         if(!collider.useGizmo) continue;
@@ -169,9 +170,10 @@ void PhysicsGizmoSystem::update(uint32_t){
         EntityID gizmoID= m_gizmoEntities[collider.entity];
 
         scene.modifyComponent<WorldTransformComponent>(gizmoID, 
-            [&collider](WorldTransformComponent& gizmoTr){
-                gizmoTr.worldPosition += collider.getPositionOffset();
-                gizmoTr.worldRotation *= collider.getRotationOffset();
+            [&collider, &collTr](WorldTransformComponent& gizmoTr){
+                
+                gizmoTr.worldPosition = collTr.worldPosition + collider.positionOffset;
+                gizmoTr.worldRotation = collTr.worldRotation * collider.rotationOffset;
             }
         );
     }
