@@ -8,6 +8,8 @@
 #include "IInput.h"
 #include "OgreModule.h"
 #include "ParentComponent.h"
+#include "WorldTransformComponent.h"
+#include "TransformComponent.h"
 
 #include "GameLibraryLoader.h"
 #include <memory>
@@ -46,9 +48,21 @@ HUGO::ErrorOrType<EntityID> createEntity(std::shared_ptr<InternalScene> scene, c
             if(err.isError()) return err;
             EntityID childID = err.getValue();
 
-            scene->addComponent<ParentComponent>(childID, [currEntity](ParentComponent& cmp){
-                cmp.parent = currEntity;
-            });
+            if (scene->hasComponent<WorldTransformComponent>(currEntity)
+            && scene->hasComponent<WorldTransformComponent>(childID)) {
+
+                const TransformComponent intendedLocalTrCopy = scene->getComponentConst<TransformComponent>(childID);
+
+                scene->addComponent<ParentComponent>(childID, [currEntity](ParentComponent& cmp){
+                    cmp.parent = currEntity;
+                });
+
+                scene->modifyComponent<TransformComponent>(childID, [&intendedLocalTrCopy](TransformComponent& tr){
+                    tr.position = intendedLocalTrCopy.position;
+                    tr.rotation = intendedLocalTrCopy.rotation;
+                    tr.scale = intendedLocalTrCopy.scale;
+                });
+            }
         }
 
     return HUGO::ErrorOrType<EntityID>(currEntity);
