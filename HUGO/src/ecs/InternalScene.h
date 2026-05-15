@@ -83,4 +83,6 @@ public:
 
     void loadScene(const HUGO::String& sceneName) override;
     void unloadScene(const HUGO::String& sceneName) override;
+
+    using IScene::hasComponent; 
 };
