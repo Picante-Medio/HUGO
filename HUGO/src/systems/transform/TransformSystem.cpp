@@ -8,13 +8,9 @@
 
 static constexpr size_t INVALID_NODE = std::numeric_limits<size_t>::max();
 
-struct TransformSystem::TreeNode {
+struct TransformSystem::Node {
 
     EntityID entity;
-
-    HUGO::Vector3 worldPosition = HUGO::Vector3();
-    HUGO::Quaternion worldRotation = HUGO::Quaternion();
-    HUGO::Vector3 worldScale = HUGO::Vector3(1.);
 
     bool dirty = false;
 
@@ -52,22 +48,20 @@ TransformSystem::update(uint32_t) {
     eventsDisconnected = true;
 
     std::vector<size_t> dirtyRoots = std::vector<size_t>();
-    dirtyRoots.reserve(dense.size());
+    dirtyRoots.reserve(dirtyEntities.size());
 
-    for (EntityID dirtyEntity : dirtySet) {
-        size_t dirtyNodeIndex = sparse[dirtyEntity];
+    for (EntityID dirtyEntity : dirtyEntities) {
+        size_t dirtyNodeIndex = entityToIndex[dirtyEntity];
         if (!hasDirtyAncestor(dirtyNodeIndex)) {
             dirtyRoots.push_back(dirtyNodeIndex);
         }
     }
 
-    dirtyRoots.shrink_to_fit();
-
     for (size_t root : dirtyRoots) {
         calculateWorldTransform(root);
     }
 
-    dirtySet.clear();
+    dirtyEntities.clear();
 
     // VERY IMPORTANT
     // we need to reconnect all the previous events that were disconnected
@@ -77,12 +71,17 @@ TransformSystem::update(uint32_t) {
 void 
 TransformSystem::fixedUpdate(uint32_t) {}
 
+size_t 
+TransformSystem::getIndex(EntityID e) const {
+    return entityToIndex.at(e);
+}
+
 bool
 TransformSystem::isLoop(size_t parentIndex, size_t childIndex) {
 
     // To prevent a stack overflow
     std::vector<size_t> stack;
-    stack.reserve(dense.size());
+    stack.reserve(nodes.size());
     stack.push_back(parentIndex);
 
     size_t stackStart = 0;
@@ -97,7 +96,7 @@ TransformSystem::isLoop(size_t parentIndex, size_t childIndex) {
         if (parentIndex == childIndex)
             return true;
 
-        stack.push_back(dense[parentIndex].parent);
+        stack.push_back(nodes[parentIndex].parent);
 
         ++stackStart;
     }
@@ -111,53 +110,54 @@ TransformSystem::calculateWorldTransform(size_t rootIndex) {
     // To prevent a stack overflow creates BFS search 
     // instead of DFS that recursion would create it still works fine
     std::vector<size_t> stack;
-    stack.reserve(dense.size());
+    stack.reserve(nodes.size());
     stack.push_back(rootIndex);
 
     size_t stackStart = 0;
 
     while(stackStart < stack.size()) {
         
-        TreeNode& node = dense[stack[stackStart]];
+        Node& node = nodes[stack[stackStart]];
 
         const TransformComponent& localTransform =
             scene.getComponentConst<TransformComponent>(node.entity);
 
         // If no parent then local and world are the same
         if (node.parent == INVALID_NODE) {
-            node.worldPosition = localTransform.position;
-            node.worldRotation = localTransform.rotation;
-            node.worldScale = localTransform.scale;
+            scene.modifyComponent<WorldTransformComponent>(node.entity, 
+                [&localTransform](WorldTransformComponent& worldTr){
+                    worldTr.worldPosition = localTransform.position;
+                    worldTr.worldRotation = localTransform.rotation;
+                    worldTr.worldScale = localTransform.scale;
+                }
+            );
         }
         // If parent, get world of parent (it is ensured that it is calculated)
         else {
 
-            TreeNode& parent = dense[node.parent];
+            Node& parent = nodes[node.parent];
+            const WorldTransformComponent& parentWTr = scene.getComponentConst<WorldTransformComponent>(parent.entity);
 
-            node.worldPosition = parent.worldPosition + parent.worldRotation * (
-                localTransform.position * parent.worldScale
+            // This modification will not reset the world component or change local since 
+            // the events should be disconnected
+            scene.modifyComponent<WorldTransformComponent>(node.entity, 
+                [&localTransform, &parentWTr](WorldTransformComponent& worldTr){
+                    worldTr.worldPosition = parentWTr.worldPosition + parentWTr.worldRotation * (
+                        localTransform.position * parentWTr.worldScale
+                    );
+                    worldTr.worldRotation = parentWTr.worldRotation * localTransform.rotation;
+                    worldTr.worldScale = parentWTr.worldScale * localTransform.scale;
+                }
             );
-            node.worldRotation = parent.worldRotation * localTransform.rotation;
-            node.worldScale = parent.worldScale * localTransform.scale;
         }
 
         if (!scene.hasComponent<WorldTransformComponent>(node.entity)) {
             scene.addComponent<WorldTransformComponent>(node.entity);
         }
 
-        // This modification will not reset the world component or change local since 
-        // the events should be disconnected
-        scene.modifyComponent<WorldTransformComponent>(node.entity, 
-            [&node](WorldTransformComponent& worldTr){
-                worldTr.worldPosition = node.worldPosition;
-                worldTr.worldRotation = node.worldRotation;
-                worldTr.worldScale = node.worldScale;
-            }
-        );
-
         node.dirty = false;
 
-        for (size_t i = node.firstChild; i != INVALID_NODE; i = dense[i].nextSibling) {
+        for (size_t i = node.firstChild; i != INVALID_NODE; i = nodes[i].nextSibling) {
             // Recurse down to children to update whole subtree
             stack.push_back(i);
         }
@@ -167,48 +167,48 @@ TransformSystem::calculateWorldTransform(size_t rootIndex) {
 }
 
 bool 
-TransformSystem::hasDirtyAncestor(size_t potentialDirtyRoot) {
+TransformSystem::hasDirtyAncestor(size_t idx) {
 
-    size_t parentIndex = dense[potentialDirtyRoot].parent;
 
-    if (parentIndex == INVALID_NODE)
-        return false;
+    size_t p = nodes[idx].parent;
 
-    // Here I would use a stack, but I wanna kill myself
-    if (dense[parentIndex].dirty || hasDirtyAncestor(parentIndex)) {
-        dense[potentialDirtyRoot].dirty = true;
-        return true;
-    } 
+    while (p != INVALID_NODE) {
+        if (nodes[p].dirty) {
+            nodes[idx].dirty = true;
+            return true;
+        }
+        p = nodes[p].parent;
+    }
 
     return false;
 }
 
 void 
 TransformSystem::markDirty(size_t dirtyIndex) {
-    dirtySet.insert(dense[dirtyIndex].entity);
-    dense[dirtyIndex].dirty = true;
+    dirtyEntities.insert(nodes[dirtyIndex].entity);
+    nodes[dirtyIndex].dirty = true;
 }
 
 void
 TransformSystem::removeFromParent(size_t childIndex) {
 
-    TreeNode& node = dense[childIndex];
+    Node& node = nodes[childIndex];
 
     size_t parent = node.parent;
 
     if (parent == INVALID_NODE) return;
 
-    if (dense[parent].firstChild == childIndex) {
-        dense[parent].firstChild = node.nextSibling;
+    if (nodes[parent].firstChild == childIndex) {
+        nodes[parent].firstChild = node.nextSibling;
     }
     else {
         if (node.previousSibling != INVALID_NODE) {
-            dense[node.previousSibling].nextSibling = node.nextSibling;
+            nodes[node.previousSibling].nextSibling = node.nextSibling;
         }
     }
 
     if (node.nextSibling != INVALID_NODE) {
-        dense[node.nextSibling].previousSibling = node.previousSibling;
+        nodes[node.nextSibling].previousSibling = node.previousSibling;
     }
 
     node.parent = INVALID_NODE;
@@ -219,12 +219,12 @@ TransformSystem::removeFromParent(size_t childIndex) {
 void
 TransformSystem::attachNode(size_t parentIndex, size_t childIndex) {
 
-    TreeNode& childNode  = dense[childIndex];
+    Node& childNode  = nodes[childIndex];
 
     if (childNode.parent == parentIndex)
         return;
 
-    TreeNode& parentNode = dense[parentIndex];
+    Node& parentNode = nodes[parentIndex];
 
     // detach from parent if any
     removeFromParent(childIndex);
@@ -236,9 +236,8 @@ TransformSystem::attachNode(size_t parentIndex, size_t childIndex) {
     childNode.nextSibling = parentNode.firstChild;
     childNode.previousSibling = INVALID_NODE;
 
-    if (parentNode.firstChild != INVALID_NODE)
-    {
-        dense[parentNode.firstChild].previousSibling = childIndex;
+    if (parentNode.firstChild != INVALID_NODE){
+        nodes[parentNode.firstChild].previousSibling = childIndex;
     }
 
     parentNode.firstChild = childIndex;
@@ -257,48 +256,48 @@ TransformSystem::detachNode(size_t detachedNode) {
     removeFromParent(detachedNode);
     markDirty(detachedNode);
 
-    if (scene.hasComponent<WorldTransformComponent>(dense[detachedNode].entity)) {
-        worldToLocal(scene.getComponentConst<WorldTransformComponent>(dense[detachedNode].entity));
+    if (scene.hasComponent<WorldTransformComponent>(nodes[detachedNode].entity)) {
+        worldToLocal(scene.getComponentConst<WorldTransformComponent>(nodes[detachedNode].entity));
     }
 }
 
 void
 TransformSystem::swapAndDelete(size_t deleted) {
 
-    size_t swapIndex = dense.size() - 1;
+    size_t swapIndex = nodes.size() - 1;
     
-    EntityID swappedEntity = dense[swapIndex].entity;
-    EntityID deletedEntity = dense[deleted].entity;
+    EntityID swappedEntity = nodes[swapIndex].entity;
+    EntityID deletedEntity = nodes[deleted].entity;
 
-    dirtySet.erase(deletedEntity);
-    sparse.erase(deletedEntity);
+    dirtyEntities.erase(deletedEntity);
+    entityToIndex.erase(deletedEntity);
 
     if (deleted != swapIndex) {
-        dense[deleted] = std::move(dense.back());
-        sparse[swappedEntity] = deleted;
+        nodes[deleted] = std::move(nodes.back());
+        entityToIndex[swappedEntity] = deleted;
 
-        TreeNode& swaped = dense[deleted];
+        Node& swaped = nodes[deleted];
 
         if (swaped.parent != INVALID_NODE) {
-            if (dense[swaped.parent].firstChild == swapIndex) {
-                dense[swaped.parent].firstChild = deleted;
+            if (nodes[swaped.parent].firstChild == swapIndex) {
+                nodes[swaped.parent].firstChild = deleted;
             }
             else {
                 if (swaped.previousSibling != INVALID_NODE) {
-                    dense[swaped.previousSibling].nextSibling = deleted;
+                    nodes[swaped.previousSibling].nextSibling = deleted;
                 }
             }
             if (swaped.nextSibling != INVALID_NODE) {
-                dense[swaped.nextSibling].previousSibling = deleted;
+                nodes[swaped.nextSibling].previousSibling = deleted;
             }
         }
-        for (size_t i = swaped.firstChild; i != INVALID_NODE; i = dense[i].nextSibling) {
+        for (size_t i = swaped.firstChild; i != INVALID_NODE; i = nodes[i].nextSibling) {
             
-            dense[i].parent = deleted;
+            nodes[i].parent = deleted;
         }
     }
 
-    dense.pop_back();
+    nodes.pop_back();
 }
 
 void 
@@ -306,9 +305,9 @@ TransformSystem::worldToLocal(const WorldTransformComponent& worldTrCmp) {
 
     eventsDisconnected = true;
 
-    markDirty(sparse[worldTrCmp.entity]);
+    markDirty(entityToIndex[worldTrCmp.entity]);
 
-    TreeNode& node = dense[sparse[worldTrCmp.entity]];
+    Node& node = nodes[entityToIndex[worldTrCmp.entity]];
 
     if (node.parent == INVALID_NODE) {
         scene.modifyComponent<TransformComponent>(worldTrCmp.entity, 
@@ -321,21 +320,23 @@ TransformSystem::worldToLocal(const WorldTransformComponent& worldTrCmp) {
     }
     else {
 
-        TreeNode& parentNode = dense[node.parent];
+        Node& parent = nodes[node.parent];
+
+        const WorldTransformComponent& parentWTr = scene.getComponentConst<WorldTransformComponent>(parent.entity);
 
         // Calculate new local from parent, this way local stays as updated 
         // source of truth for sync
         scene.modifyComponent<TransformComponent>(worldTrCmp.entity, 
-            [&parentNode, &worldTrCmp](TransformComponent& localTransform){
+            [&parentWTr, &worldTrCmp](TransformComponent& localTransform){
 
-                localTransform.position = parentNode.worldRotation.inverse() * 
-                    (worldTrCmp.worldPosition - parentNode.worldPosition) / 
-                    parentNode.worldScale;
+                localTransform.position = parentWTr.worldRotation.inverse() * 
+                    (worldTrCmp.worldPosition - parentWTr.worldPosition) / 
+                    parentWTr.worldScale;
 
-                localTransform.rotation = parentNode.worldRotation.inverse() * 
+                localTransform.rotation = parentWTr.worldRotation.inverse() * 
                     worldTrCmp.worldRotation;
 
-                localTransform.scale = worldTrCmp.worldScale / parentNode.worldScale;
+                localTransform.scale = worldTrCmp.worldScale / parentWTr.worldScale;
             }
         );
     }
@@ -348,9 +349,9 @@ TransformSystem::localToWorld(const TransformComponent& trCmp) {
 
     eventsDisconnected = true;
 
-    markDirty(sparse[trCmp.entity]);
+    markDirty(entityToIndex[trCmp.entity]);
 
-    TreeNode& node = dense[sparse[trCmp.entity]];
+    Node& node = nodes[entityToIndex[trCmp.entity]];
 
     // If no parent then local and world are the same
     if (node.parent == INVALID_NODE) {
@@ -362,16 +363,17 @@ TransformSystem::localToWorld(const TransformComponent& trCmp) {
             }
         );
     }
-    // If parent, get world of parent (it is ensured that it is calculated)
     else {
-        TreeNode& parent = dense[node.parent];
+        Node& parent = nodes[node.parent];
+
+        const WorldTransformComponent& parentWTr = scene.getComponentConst<WorldTransformComponent>(parent.entity);
 
         scene.modifyComponent<WorldTransformComponent>(trCmp.entity, 
-            [&trCmp, &parent](WorldTransformComponent& worldTrCmp){
-                worldTrCmp.worldPosition = parent.worldPosition + parent.worldRotation * (
-                    trCmp.position * parent.worldScale);
-                worldTrCmp.worldRotation = parent.worldRotation * trCmp.rotation;
-                worldTrCmp.worldScale = parent.worldScale * trCmp.scale;
+            [&trCmp, &parentWTr](WorldTransformComponent& worldTrCmp){
+                worldTrCmp.worldPosition = parentWTr.worldPosition + parentWTr.worldRotation * (
+                    trCmp.position * parentWTr.worldScale);
+                worldTrCmp.worldRotation = parentWTr.worldRotation * trCmp.rotation;
+                worldTrCmp.worldScale = parentWTr.worldScale * trCmp.scale;
             }
         );
     }
@@ -385,7 +387,7 @@ TransformSystem::initNode(TransformComponent& trCmp) {
 
     EntityID ent = trCmp.entity;
 
-    if (sparse.count(ent)) return;
+    if (entityToIndex.count(ent)) return;
 
     // If there is a world, respect it
     if (scene.hasComponent<WorldTransformComponent>(trCmp.entity)) { 
@@ -398,32 +400,29 @@ TransformSystem::initNode(TransformComponent& trCmp) {
         trCmp.scale = worldTrCmp.worldScale;
     }
 
-    dense.push_back({
-        ent,
-        trCmp.position,
-        trCmp.rotation,
-        trCmp.scale
+    nodes.push_back({
+        ent
     });
 
-    sparse[ent] = dense.size() - 1;
+    entityToIndex[ent] = nodes.size() - 1;
 
-    markDirty(dense.size() - 1);
+    markDirty(nodes.size() - 1);
 }
 
 void
 TransformSystem::destroyNode(const TransformComponent& trCmp) { 
     
-    size_t deletedIndex = sparse[trCmp.entity];
+    size_t deletedIndex = entityToIndex[trCmp.entity];
 
-    TreeNode& node = dense[deletedIndex];
+    Node& node = nodes[deletedIndex];
     
     for (size_t i = node.firstChild; i != INVALID_NODE;) {
 
-        size_t next = dense[i].nextSibling;
+        size_t next = nodes[i].nextSibling;
 
-        dense[i].parent = INVALID_NODE;
-        dense[i].previousSibling = INVALID_NODE;
-        dense[i].nextSibling = INVALID_NODE;
+        nodes[i].parent = INVALID_NODE;
+        nodes[i].previousSibling = INVALID_NODE;
+        nodes[i].nextSibling = INVALID_NODE;
 
         markDirty(i);
 
@@ -450,8 +449,9 @@ TransformSystem::addTransform(TransformComponent& trCmp) {
 
     if (eventsDisconnected) return;
 
-    if (!scene.hasComponent<WorldTransformComponent>(trCmp.entity)) {
+    initNode(trCmp);
 
+    if (!scene.hasComponent<WorldTransformComponent>(trCmp.entity)) {
         eventsDisconnected = true;
         // Very important, if not all will be 0
         scene.addComponent<WorldTransformComponent>(trCmp.entity, [&trCmp](WorldTransformComponent& worldTr){
@@ -462,8 +462,6 @@ TransformSystem::addTransform(TransformComponent& trCmp) {
 
         eventsDisconnected = false;
     }
-
-    initNode(trCmp);
 
     localToWorld(trCmp);
 }
@@ -540,13 +538,13 @@ TransformSystem::addChild(ParentComponent& childCmp) {
     EntityID childEntity = childCmp.entity;
     EntityID parentEntity = childCmp.parent;
 
-    if (!sparse.count(childEntity) || !sparse.count(parentEntity)) {
+    if (!entityToIndex.count(childEntity) || !entityToIndex.count(parentEntity)) {
         childCmp.parent = HUGO::INVALID_ENTITY;
         return;
     }
 
-    size_t parentNodeIndex = sparse[parentEntity];
-    size_t childNodeIndex = sparse[childEntity];
+    size_t parentNodeIndex = entityToIndex[parentEntity];
+    size_t childNodeIndex = entityToIndex[childEntity];
 
     attachNode(parentNodeIndex, childNodeIndex);
 }
@@ -559,25 +557,26 @@ TransformSystem::updateChild(ParentComponent& childCmp) {
     EntityID childEntity = childCmp.entity;
     EntityID parentEntity = childCmp.parent;
 
-    if (!sparse.count(childEntity) || !sparse.count(parentEntity)) {
+    if (!entityToIndex.count(childEntity) || !entityToIndex.count(parentEntity)) {
         childCmp.parent = HUGO::INVALID_ENTITY;
         return;
     }
 
-    size_t childNodeIndex = sparse[childEntity];
-    TreeNode& child = dense[childNodeIndex];
+    size_t childNodeIndex = entityToIndex[childEntity];
 
-    size_t parentNodeIndex = (parentEntity != HUGO::INVALID_ENTITY) ? 
-        sparse[parentEntity] : INVALID_NODE;
+    size_t parentNodeIndex = (parentEntity != HUGO::INVALID_ENTITY) 
+        ? entityToIndex[parentEntity] 
+        : INVALID_NODE;
 
-    if (child.parent == parentNodeIndex) return; 
+    if (nodes[childNodeIndex].parent == parentNodeIndex) return; 
 
-    if (parentNodeIndex != INVALID_NODE)
+    if (parentNodeIndex != INVALID_NODE) {
         attachNode(parentNodeIndex, childNodeIndex);
-        if (child.parent != parentNodeIndex) {
+        if (nodes[childNodeIndex].parent != parentNodeIndex) {
             // Could not attach, set as no node
             childCmp.parent = HUGO::INVALID_ENTITY;
         }
+    }
     else
         detachNode(childNodeIndex);
 }
@@ -587,9 +586,9 @@ TransformSystem::removeChild(ParentComponent& childCmp) {
 
     if (eventsDisconnected) return;
 
-    if (!sparse.count(childCmp.entity)) return;
+    if (!entityToIndex.count(childCmp.entity)) return;
 
-    size_t detached = sparse[childCmp.entity];
+    size_t detached = entityToIndex[childCmp.entity];
 
     detachNode(detached);
 }

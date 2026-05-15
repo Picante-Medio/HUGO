@@ -14,16 +14,18 @@ struct WorldTransformComponent;
 HSYSTEM(TransformSystem)
 
     struct TransformModifications;
-    struct TreeNode;
+    struct Node;
 
     // Leveled modifications, consumed in update (sync phase)
-    std::unordered_set<EntityID> dirtySet;
+    std::unordered_set<EntityID> dirtyEntities;
 
     // EntityID to node index, used for consult 
-    std::unordered_map<EntityID, size_t> sparse = 
+    std::unordered_map<EntityID, size_t> entityToIndex = 
         std::unordered_map<EntityID, size_t>();
     // Dense tree nodes, hierarchy exist here
-    std::vector<TreeNode> dense = std::vector<TreeNode>();
+    std::vector<Node> nodes = std::vector<Node>();
+
+    size_t getIndex(EntityID e) const;
 
     bool hasDirtyAncestor(size_t potentialDirtyRoot);
 
