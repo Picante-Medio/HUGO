@@ -25,7 +25,7 @@
 
 UISystem::~UISystem()
 {
-    clearAllCaches();
+    //clearAllCaches();
 }
 //====================================================
 // CACHE CREATION
