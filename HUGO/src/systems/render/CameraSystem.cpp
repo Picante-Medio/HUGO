@@ -58,13 +58,7 @@ void CameraSystem::update(uint32_t){
 }
 
 CameraSystem::~CameraSystem(){
-    //destroy all cameras
-    for(auto& c: cameraMap){
-        destroyCamera(c.first,c.second);
-    }
-    cameraMap.clear();
-    
-    sceneManager = nullptr;
+
 }
 
 void CameraSystem::registerCameraEntity(CameraComponent& cameraComp){
@@ -112,20 +106,26 @@ void CameraSystem::registerCameraEntity(CameraComponent& cameraComp){
 }
 void CameraSystem::destroyCamera(EntityID entity, CameraInfo& camInfo)
 {
-    if(camInfo.node){
+
+    try{
+        if(camInfo.node){
         camInfo.node->detachAllObjects();
         sceneManager->destroySceneNode(camInfo.node);
         camInfo.node = nullptr;
-    }
+        }
 
-    if(camInfo.ogreCamera){
-        sceneManager->destroyCamera(camInfo.ogreCamera);
-        camInfo.ogreCamera = nullptr;
-    }
+        if(camInfo.ogreCamera){
+            sceneManager->destroyCamera(camInfo.ogreCamera);
+            camInfo.ogreCamera = nullptr;
+        }
 
-    //If it was main cam, change it for the default blank camera. It is the user´s fault to not change the mainCamera before deleting the actual one
-    if(entity == m_mainCamera){
-        OgreModule::Instance().viewportToDefaultCamera();
+        //If it was main cam, change it for the default blank camera. It is the user´s fault to not change the mainCamera before deleting the actual one
+        if(entity == m_mainCamera){
+            OgreModule::Instance().viewportToDefaultCamera();
+        }
+    }
+    catch(const std::exception& e){
+        scene.log(std::make_shared<HUGO::StringError>("[CameraSystem]: " + std::string(e.what())));
     }
 }
 

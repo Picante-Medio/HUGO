@@ -25,13 +25,7 @@ void LightSystem::onLoad(){
 
 LightSystem::~LightSystem()
 {
-    //destroy all lights
-    for(auto& l: lightMap){
-        destroyLight(l.second);
-    }
-    lightMap.clear();
 
-    sceneManager = nullptr;
 }
 
 void LightSystem::update(uint32_t){
@@ -110,17 +104,22 @@ void LightSystem::registerLightEntity(LightComponent& lightComp)
 // ==================== Unregister Light Entity ====================
 void LightSystem::destroyLight(LightInfo &info)
 {
-    if(info.node)
-    {
-        info.node->detachAllObjects();
-        sceneManager->destroySceneNode(info.node);
-        info.node = nullptr;
-    }
+    try{
+        if(info.node)
+        {
+            info.node->detachAllObjects();
+            sceneManager->destroySceneNode(info.node);
+            info.node = nullptr;
+        }
 
-    if(info.ogreLight)
-    {
-        sceneManager->destroyLight(info.ogreLight);
-        info.ogreLight = nullptr;
+        if(info.ogreLight)
+        {
+            sceneManager->destroyLight(info.ogreLight);
+            info.ogreLight = nullptr;
+        }
+    }
+    catch(const std::exception& e){
+        scene.log(std::make_shared<HUGO::StringError>("[LightSystem]: " + std::string(e.what())));
     }
 }
 void LightSystem::unregisterLightEntity(LightComponent& comp)
