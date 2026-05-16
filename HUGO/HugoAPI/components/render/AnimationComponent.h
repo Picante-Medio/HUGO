@@ -1,5 +1,7 @@
 #pragma once
+
 #include <unordered_map>
+
 #include "HugoTypes.h"
 #include "HugoComponentMacros.h"
 
@@ -8,7 +10,9 @@ struct AnimationInfo{
     bool enable = false;
     float weight = 1.0;
 };
+
 HCOMPONENT(AnimationComponent)
+
     std::unordered_map<HUGO::String, AnimationInfo> anims;
     
     inline void addAnimation(const HUGO::String& animationName, bool loop = false, bool enable = false, float weight = 1.0)
