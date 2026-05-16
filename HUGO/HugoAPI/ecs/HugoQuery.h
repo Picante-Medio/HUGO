@@ -22,12 +22,6 @@ namespace HUGO {
 			: pack(components...), updateEvents(updateEvents)
 		{}
 
-		// Antiguo get
-		template<typename T>
-		T& getDeprecated() {
-			return std::get<T&>(pack);
-		}
-
 		template<typename T>
 		const T& getConst() const {
 			return std::get<T&>(pack);
