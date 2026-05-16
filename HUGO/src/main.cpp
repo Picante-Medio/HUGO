@@ -7,6 +7,7 @@
 
 // Aunque de warning esto no puede borrarse, en windows no compila porque SDL busca esta implementacion
 int main(int, char*[]) {
+    try {
     HUGO::ConfigGenerator config;
     config.generateResourcesConfig();
     config.generatePluginsConfig();
@@ -16,9 +17,12 @@ int main(int, char*[]) {
     
     if(err.isError()) std::cerr << "[ERROR] Initializing HUGO::Core: {" << err.getError().errorMessage << "}. HUGO Engine will be closing now." << '\n';
     else{
-        
-        HUGO::ErrorOrVoid error = core.run();
-        if(error.isError()) std::cerr << "[ERROR] Updating HUGO::Core: {" << error.getError().errorMessage << "}. HUGO Engine will be closing now." << '\n';
+            HUGO::ErrorOrVoid error = core.run();
+            if(error.isError()) std::cerr << "[ERROR] Updating HUGO::Core: {" << error.getError().errorMessage << "}. HUGO Engine will be closing now." << '\n';
+    }
+    }
+    catch(std::exception e) {
+        std::cerr << e.what();
     }
     return 0;
 }

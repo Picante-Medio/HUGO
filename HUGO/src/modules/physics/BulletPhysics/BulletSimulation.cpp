@@ -402,7 +402,7 @@ void BulletSimulation::removeColliderObject(HUGO::CollisionObjectID& id)
 void BulletSimulation::checkRigidBodyFlags(RigidBodyComponent& hgRB)
 {
     if(hgRB.flags != 0){
-        CollisionObject& obj = rigidBodies[rbIdToIndex[hgRB.objectID]];
+        CollisionObject obj = rigidBodies[rbIdToIndex[hgRB.objectID]];
         btRigidBody* body = btRigidBody::upcast(obj.bulletRB);
 
         if(hgRB.flags & RigidBodyComponent::MASS_UPDATED){
@@ -454,7 +454,7 @@ void BulletSimulation::checkRigidBodyFlags(RigidBodyComponent& hgRB)
 void BulletSimulation::checkColliderFlags(ColliderComponent& hgCol)
 {
     if(hgCol.flags != 0){
-        CollisionObject& obj = rigidBodies[rbIdToIndex[hgCol.objectID]];
+        CollisionObject obj = rigidBodies[rbIdToIndex[hgCol.objectID]];
 
         if(hgCol.flags & ColliderComponent::RESTITUTION_UPDATED){
             obj.bulletRB->setRestitution(hgCol.restitution);
@@ -483,7 +483,7 @@ void BulletSimulation::checkColliderFlags(ColliderComponent& hgCol)
 void BulletSimulation::updateColliderTransform(const ColliderComponent& collider,
     const WorldTransformComponent& wTransform) {
         
-    CollisionObject& obj = rigidBodies[rbIdToIndex[collider.objectID]];
+    CollisionObject obj = rigidBodies[rbIdToIndex[collider.objectID]];
 
     btTransform& tr = obj.bulletRB->getWorldTransform();
 
