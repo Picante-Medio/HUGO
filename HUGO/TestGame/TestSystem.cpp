@@ -120,7 +120,7 @@ TestSystem::init() {
     auto tweenEnt = scene.createEntity();
     scene.addComponent<TransformComponent>(tweenEnt);
 
-    scene.addComponent<TweenComponent>(tweenEnt, [](TweenComponent& tw){
+    scene.addComponent<TweenComponent>(tweenEnt, [](TweenComponent&){
         
     });
 }

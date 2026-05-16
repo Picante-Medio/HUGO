@@ -146,8 +146,8 @@ void RenderSystem::registerRenderEntity(RenderComponent& comp)
     obj.ogreEntity->setVisible(comp.isVisible);
     //store object
     ogreObjects[id] = std::move(obj);
-    if(scene.hasComponent<AnimationComponent>(id)){
-        onUpdateAnimationComponet(scene.getComponent<AnimationComponent>(id));
+    if(scene.hasComponent<AnimationComponent>(id)) {
+        scene.modifyComponent<AnimationComponent>(id, [](AnimationComponent&){});
     }
 }
 // ==================== Destroy OgreObject ====================
@@ -200,8 +200,9 @@ void RenderSystem::onUpdateRenderComponet(RenderComponent &rc)
             //clear animations
             if(scene.hasComponent<AnimationComponent>(rc.entity))
             {
-                auto& animComp = scene.getComponent<AnimationComponent>(rc.entity);
-                animComp.anims.clear();
+                scene.modifyComponent<AnimationComponent>(rc.entity, [](AnimationComponent& animComp){
+                    animComp.anims.clear();
+                });
                 clearAnimationStates(obj);
             }
         }
@@ -218,7 +219,7 @@ void RenderSystem::onUpdateAnimationComponet(AnimationComponent &animComp)
     EntityID entity = animComp.entity;
     if(!scene.hasComponent<RenderComponent>(entity)) return;
     
-    RenderComponent& rc = scene.getComponent<RenderComponent>(entity);
+    const RenderComponent& rc = scene.getComponentConst<RenderComponent>(entity);
     if(ogreObjects.find(rc.entity) == ogreObjects.end()) return;
     
     OgreObject& ogreObj = ogreObjects[rc.entity];
@@ -252,7 +253,11 @@ void RenderSystem::onUpdateAnimationComponet(AnimationComponent &animComp)
         {
             if(!ogre_ent->hasAnimationState(animName))
             {
-                scene.log(std::make_shared<HUGO::StringError>("[RenderSystem] Animation "+ animName + " does not exist in entity " + std::to_string(rc.entity)));
+                scene.log(std::make_shared<HUGO::StringError>(
+                    "[RenderSystem] Animation "+ animName 
+                    + " does not exist in entity " + std::to_string(rc.entity)
+                ));
+
                 anim = animComp.anims.erase(anim);
                 continue;
             }

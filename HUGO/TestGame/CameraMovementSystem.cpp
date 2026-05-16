@@ -58,12 +58,21 @@ void CameraMovementSystem::update(uint32_t dt) {
 
     if(scene.getInput()->wasKeyJustPressed(HUGO::KeyCode::Q)){
         if(settingCam1){
-            scene.getComponent<CameraComponent>(cam1).setMain(true);
-            scene.getComponent<CameraComponent>(cam2).setMain(false);
+
+            scene.modifyComponent<CameraComponent>(cam1, [](CameraComponent& cam1Cmp){
+                cam1Cmp.setMain(true);
+            });
+            scene.modifyComponent<CameraComponent>(cam1, [](CameraComponent& cam2Cmp){
+                cam2Cmp.setMain(false);
+            });
         }
         else{
-            scene.getComponent<CameraComponent>(cam1).setMain(false);
-            scene.getComponent<CameraComponent>(cam2).setMain(true);
+            scene.modifyComponent<CameraComponent>(cam1, [](CameraComponent& cam1Cmp){
+                cam1Cmp.setMain(false);
+            });
+            scene.modifyComponent<CameraComponent>(cam1, [](CameraComponent& cam2Cmp){
+                cam2Cmp.setMain(true);
+            });
         }
         settingCam1 = !settingCam1;
     }

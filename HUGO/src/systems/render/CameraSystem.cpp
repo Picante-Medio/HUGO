@@ -76,7 +76,7 @@ void CameraSystem::registerCameraEntity(CameraComponent& cameraComp){
         scene.log(std::make_shared<HUGO::StringError>("[CameraSystem] Camera entity " + std::to_string(entity) + " missing required components"));
         return;
     }
-    WorldTransformComponent& wTransformComp = scene.getComponent<WorldTransformComponent>(entity);
+    const WorldTransformComponent& wTransformComp = scene.getComponentConst<WorldTransformComponent>(entity);
 
     // Unique name for the camera
     std::string camName = "Camera_" + std::to_string(entity);

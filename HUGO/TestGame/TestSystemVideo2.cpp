@@ -231,7 +231,7 @@ TestSystemVideo2::update(uint32_t dt) {
 
     auto input = scene.getInput();
     float delta = static_cast<float>(dt);
-    TransformComponent& tr = scene.getComponent<TransformComponent>(sinbad);
+    const TransformComponent& tr = scene.getComponentConst<TransformComponent>(sinbad);
     scene.modifyComponent<RigidBodyComponent>(sinbad, [input, delta, &tr](RigidBodyComponent& rb) {
         if(input->isKeyPressed(HUGO::KeyCode::LEFT_ARROW)) rb.setAngularVelocity(HUGO::Vector3(0, 1.0f, 0));
         else if(input->isKeyPressed(HUGO::KeyCode::RIGHT_ARROW)) rb.setAngularVelocity(HUGO::Vector3(0, -1.0f, 0));
@@ -269,7 +269,7 @@ TestSystemVideo2::update(uint32_t dt) {
     });
 
     ColliderComponent col = scene.getComponentConst<ColliderComponent>(cubo);
-    for(EntityID col : col.getCollisionInfo()){
+    for(EntityID c : col.getCollisionInfo()){
         std::cout << "Trigger funciona\n";
     }
 }

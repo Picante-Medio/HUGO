@@ -16,7 +16,7 @@ HUGOMotionState::HUGOMotionState(const btTransform initialPos, std::shared_ptr<I
 void HUGOMotionState::updateBulletTransform()
 {
 
-    WorldTransformComponent& hugoTransform = hugoScene->getComponent<WorldTransformComponent>(entityID);
+    const WorldTransformComponent& hugoTransform = hugoScene->getComponentConst<WorldTransformComponent>(entityID);
     ColliderComponent hugoCol = hugoScene->getComponentConst<ColliderComponent>(entityID);
 
     btQuaternion q = BulletUtils::quaternionToBullet(hugoTransform.worldRotation) * BulletUtils::quaternionToBullet(hugoCol.getRotationOffset());

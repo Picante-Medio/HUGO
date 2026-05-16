@@ -8,7 +8,7 @@
 
 HUGO::Int ConsoleSystem::AUX_CONSOLE_INDEX = 0;
 
-void ConsoleSystem::printLuaOutput(TextComponent& consoleTextCmp){
+void ConsoleSystem::printLuaOutput(const TextComponent& consoleTextCmp){
     while(!ConsoleSystem::luaOutput.empty()){
         scene.modifyComponent<TextComponent>(consoleTextCmp.entity, [this](TextComponent& t){
             t.text += logIni + ConsoleSystem::luaOutput.front() + "\n";
@@ -17,7 +17,7 @@ void ConsoleSystem::printLuaOutput(TextComponent& consoleTextCmp){
     }
 }
 
-void ConsoleSystem::printLogs(TextComponent& consoleTextCmp){
+void ConsoleSystem::printLogs(const TextComponent& consoleTextCmp){
     HUGO::ErrorOrType log = scene.getNextLog();
 
     while (!log.isError())
@@ -33,7 +33,7 @@ void ConsoleSystem::printLogs(TextComponent& consoleTextCmp){
     }
 }
 
-void ConsoleSystem::printErrors(TextComponent& consoleTextCmp){
+void ConsoleSystem::printErrors(const TextComponent& consoleTextCmp){
     HUGO::ErrorOrType error = scene.getNextError();
 
     // for errors, \n is included by default
@@ -165,7 +165,7 @@ void ConsoleSystem::handleKeyInput(){
 
 void ConsoleSystem::update(uint32_t){
 
-    TextComponent& consoleTextCmp = scene.getComponent<TextComponent>(consoleText);
+    const TextComponent& consoleTextCmp = scene.getComponentConst<TextComponent>(consoleText);
 
     // Logs
     printLogs(consoleTextCmp);

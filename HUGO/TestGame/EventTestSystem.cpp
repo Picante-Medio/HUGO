@@ -33,7 +33,7 @@ EventTestSystem::update(uint32_t dt) {
         scene.addComponent<TestComponent>(ent);
 
         for(auto& elem : scene.query<TestComponent>()){ 
-            elem.modify<TestComponent>([](TestComponent& testCmp) {
+            elem.modify<TestComponent>([](TestComponent&) {
                 //testCmp.stringDePrueba = "Prueba modificada";
             });
 

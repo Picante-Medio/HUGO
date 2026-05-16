@@ -138,7 +138,7 @@ void LightSystem::onUpdateLightComponent(LightComponent &light)
         scene.log(std::make_shared<HUGO::StringError>("[LightSystem] Light " + std::to_string(entity) + " has not trasnform"));
         return;
     }
-    const WorldTransformComponent& tr = scene.getComponent<WorldTransformComponent>(entity);
+    const WorldTransformComponent& tr = scene.getComponentConst<WorldTransformComponent>(entity);
 
     // update position
     lightMap[entity].node->setPosition(HUGO::OgreUtils::vector3ToOgre(tr.worldPosition));
@@ -153,8 +153,23 @@ void LightSystem::onUpdateLightComponent(LightComponent &light)
     }
 
     // update diffuse and specular
-    lightMap[entity].ogreLight->setDiffuseColour(Ogre::ColourValue(light.getDiffuse().x, light.getDiffuse().y, light.getDiffuse().z, light.getDiffuse().w));
-    lightMap[entity].ogreLight->setSpecularColour(Ogre::ColourValue(light.getSpecular().x, light.getSpecular().y, light.getSpecular().z, light.getSpecular().w));
+    lightMap[entity].ogreLight->setDiffuseColour(
+        Ogre::ColourValue(
+            light.getDiffuse().x, 
+            light.getDiffuse().y, 
+            light.getDiffuse().z, 
+            light.getDiffuse().w
+        )
+    );
+
+    lightMap[entity].ogreLight->setSpecularColour(
+        Ogre::ColourValue(
+            light.getSpecular().x, 
+            light.getSpecular().y, 
+            light.getSpecular().z, 
+            light.getSpecular().w
+        )
+    );
     
     if (light.getLightType() == HUGO::LightType::LT_SPOTLIGHT) {
         lightMap[entity].ogreLight->setSpotlightRange(Ogre::Radian(light.getSpotInner().valueRadians())

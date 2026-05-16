@@ -25,17 +25,17 @@ protected:
   	std::unique_ptr<IComponentDenseTable> componentTable;
 	Messenger messenger;
 
-public:
-	// Entity handling
-	virtual EntityID createEntity() = 0;
-	virtual void removeEntity(EntityID entity) = 0;
-
-	template<typename T> 
+	template<typename T>
 	T &getComponent(EntityID entity) {
 		ComponentID componentID = HUGO::ComponentRegistry::getComponentId<T>();
 		return componentTable->getComponent<T>(
 			entityTable->getDenseListIndex(entity, componentID));
 	}
+
+public:
+	// Entity handling
+	virtual EntityID createEntity() = 0;
+	virtual void removeEntity(EntityID entity) = 0;
 
 	template<typename T> 
 	const T& getComponentConst(EntityID entity) const {

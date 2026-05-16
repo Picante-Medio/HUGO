@@ -230,7 +230,7 @@ TestSystemVideo3::update(uint32_t) {
     }
 
     scene.modifyComponent<TransformComponent>(sinabd, [this](TransformComponent& t){
-        t.rotation *= HUGO::Quaternion(HUGO::Radian(HUGO::Degree(rotationFactor)), HUGO::Vector3{0, 1, 0});
+        t.rotation *= HUGO::Quaternion(HUGO::Radian(HUGO::Degree(static_cast<float>(rotationFactor))), HUGO::Vector3{0, 1, 0});
     });
 }
 

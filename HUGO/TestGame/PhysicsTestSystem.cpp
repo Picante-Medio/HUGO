@@ -80,9 +80,11 @@ void PhysicsTestSystem::fixedUpdate(uint32_t) {
 
 void PhysicsTestSystem::update(uint32_t) {
 
-    for(auto collisionId : scene.getComponent<ColliderComponent>(staticBase).getCollisionInfo()){
+    for(auto collisionId : scene.getComponentConst<ColliderComponent>(staticBase).getCollisionInfo()){
         if(scene.hasComponent<TestComponent>(collisionId)){
-            scene.getComponent<RigidBodyComponent>(collisionId).applyForce(HUGO::Vector3(0, 100, 0));
+            scene.modifyComponent<RigidBodyComponent>(collisionId, [](RigidBodyComponent& rbCmp){
+                rbCmp.applyForce(HUGO::Vector3(0, 100, 0));
+            });
         }
     }
 }

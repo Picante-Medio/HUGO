@@ -41,9 +41,9 @@ static inline std::queue<HUGO::String> luaOutput = std::queue<HUGO::String>();
         return 0;
     }
 
-    void printLuaOutput(TextComponent& consoleText);
-    void printLogs(TextComponent& consoleText);
-    void printErrors(TextComponent& consoleText);
+    void printLuaOutput(const TextComponent& consoleText);
+    void printLogs(const TextComponent& consoleText);
+    void printErrors(const TextComponent& consoleText);
 
     HUGO::String getNextHistoric();
     HUGO::String getPreviousHistoric();

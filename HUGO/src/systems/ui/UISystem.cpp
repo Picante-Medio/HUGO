@@ -674,14 +674,16 @@ void UISystem::processInput()
 
 void UISystem::onUpdateProgressBarComponent(ProgressBarComponent& pb)
 {
-    PanelComponent& p = scene.getComponent<PanelComponent>(pb.entity);
-    syncProgressBar(p, pb);
+    scene.modifyComponent<PanelComponent>(pb.entity, [this, &pb](PanelComponent& p){
+        syncProgressBar(p, pb);
+    });
 }
 
 void UISystem::onUpdateSliderComponent(SliderComponent& s)
 {
-    PanelComponent& p = scene.getComponent<PanelComponent>(s.entity);
-    syncSlider(p, s);
+    scene.modifyComponent<PanelComponent>(s.entity, [this, &s](PanelComponent& p){
+        syncSlider(p, s);
+    });
 }
 //====================================================
 // CACHE MANAGEMENT
