@@ -247,7 +247,7 @@ HUGO::CollisionObjectID BulletSimulation::createColliderObject(ColliderComponent
     //add to simulation
     btWorld->addCollisionObject(obj);
 
-    //save reference to HugoRB in bulletRB. We use the collision object as its position in memory won't change
+    //save reference to HugoCollider in btCollider. We use the collision object as its position in memory won't change
     obj->setUserPointer(&getCollisionObject(id));
     
     return id;
@@ -350,7 +350,13 @@ void BulletSimulation::removeRigidBodyObject(HUGO::CollisionObjectID& id)
 
         if(rigidBodies[index].bulletRB){
 
-	        btWorld->removeRigidBody(btRigidBody::upcast(rigidBodies[index].bulletRB));
+    	    btCollisionObject* obj = rigidBodies[index].bulletRB;
+		    btRigidBody* body = btRigidBody::upcast(obj);
+        
+            if (body && body->getMotionState())
+                delete body->getMotionState();
+            
+		    btWorld->removeRigidBody(body);
             delete rigidBodies[index].bulletRB;
             rigidBodies[index].bulletRB = nullptr;
             rigidBodies[index].id = HUGO::INVALID_COL_OBJ_ID;
@@ -402,7 +408,7 @@ void BulletSimulation::removeColliderObject(HUGO::CollisionObjectID& id)
 void BulletSimulation::checkRigidBodyFlags(RigidBodyComponent& hgRB)
 {
     if(hgRB.flags != 0){
-        CollisionObject obj = rigidBodies[rbIdToIndex[hgRB.objectID]];
+        CollisionObject& obj = rigidBodies[rbIdToIndex[hgRB.objectID]];
         btRigidBody* body = btRigidBody::upcast(obj.bulletRB);
 
         if(hgRB.flags & RigidBodyComponent::MASS_UPDATED){
@@ -454,7 +460,7 @@ void BulletSimulation::checkRigidBodyFlags(RigidBodyComponent& hgRB)
 void BulletSimulation::checkColliderFlags(ColliderComponent& hgCol)
 {
     if(hgCol.flags != 0){
-        CollisionObject obj = rigidBodies[rbIdToIndex[hgCol.objectID]];
+        CollisionObject& obj = getCollisionObject(hgCol.objectID);
 
         if(hgCol.flags & ColliderComponent::RESTITUTION_UPDATED){
             obj.bulletRB->setRestitution(hgCol.restitution);
@@ -483,7 +489,7 @@ void BulletSimulation::checkColliderFlags(ColliderComponent& hgCol)
 void BulletSimulation::updateColliderTransform(const ColliderComponent& collider,
     const WorldTransformComponent& wTransform) {
         
-    CollisionObject obj = rigidBodies[rbIdToIndex[collider.objectID]];
+    CollisionObject& obj = rigidBodies[rbIdToIndex[collider.objectID]];
 
     btTransform& tr = obj.bulletRB->getWorldTransform();
 
@@ -526,6 +532,10 @@ void BulletSimulation::syncBodiesToBullet() {
                 updateColliderTransform(col, item.getConst<WorldTransformComponent>());
         });
     }
+
+    // Remove colliders and rigidbodies from deleted entities
+    scene->onRemoveComponent<ColliderComponent>().connect(this, &BulletSimulation::onRemoveCollider);
+    scene->onRemoveComponent<RigidBodyComponent>().connect(this, &BulletSimulation::onRemoveRigidBody);
 }
 
 void BulletSimulation::syncBodiesToGame() {
@@ -563,6 +573,16 @@ void BulletSimulation::syncBodiesToGame() {
     }
 }
 #pragma endregion
+
+void BulletSimulation::onRemoveCollider(ColliderComponent& collider) {
+    CollisionObject& obj = getCollisionObject(collider.objectID);
+    removeColliderObject(obj.id);
+}
+
+void BulletSimulation::onRemoveRigidBody(RigidBodyComponent& rb) {
+    CollisionObject& obj = getCollisionObject(rb.objectID);
+    removeRigidBodyObject(obj.id);
+}
 
 void BulletSimulation::debugDraw() {
     // if using Ogre

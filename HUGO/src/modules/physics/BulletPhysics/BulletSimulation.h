@@ -77,6 +77,9 @@ class BulletSimulation : public IPhysicsSimulation {
     // @brief Updates the asleep parameter of the RB using their bullet counterpart
     void syncBodiesToGame(); 
 
+    void onRemoveCollider(ColliderComponent& collider);
+    void onRemoveRigidBody(RigidBodyComponent& rb);
+
 public:
     
     BulletSimulation(std::shared_ptr<InternalScene> scene);
