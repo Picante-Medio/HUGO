@@ -522,7 +522,8 @@ void BulletSimulation::syncBodiesToBullet() {
             }
 
             checkColliderFlags(col);
-            updateColliderTransform(col, item.getConst<WorldTransformComponent>());
+            if(!scene->hasComponent<RigidBodyComponent>(col.entity))
+                updateColliderTransform(col, item.getConst<WorldTransformComponent>());
         });
     }
 }
