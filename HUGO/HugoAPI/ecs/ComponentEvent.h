@@ -74,16 +74,27 @@ class ComponentEventTemporalReference {
 public:
     ComponentEventTemporalReference(std::shared_ptr<ComponentEvent<T>> event): event(event) {}
 
-    template<typename Caller>
-    std::shared_ptr<ComponentEventFunctionHandle<T>> connect(Caller* instance, void(Caller::*method)(T&)) {
+    template<typename Caller, typename Method>
+    std::shared_ptr<ComponentEventFunctionHandle<T>> connect(Caller* instance, Method method) {
 
-        static_assert(std::is_base_of_v<HUGO::System, Caller>, "instance must inherit from System");
+        static_assert(std::is_member_function_pointer_v<Method>,
+            "method must be a member function pointer");
 
-        return event->connect([instance, method]
-            (T& component) {
-                (instance->*method)(component);
+        return event->connect([instance, method] (T& component) {
+                std::invoke(method, instance, component);
             }
         );
+    }
+
+    template<typename Func>
+    std::shared_ptr<ComponentEventFunctionHandle<T>> connect(Func func) {
+
+        static_assert(!std::is_member_function_pointer_v<Func>,
+            "Use connect(instance, method) for member functions");
+
+        return event->connect([func](T& component) {
+            std::invoke(func, component);
+        });
     }
 
     ComponentEventTemporalReference(const ComponentEventTemporalReference&) = delete;
