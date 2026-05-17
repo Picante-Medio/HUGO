@@ -22,7 +22,7 @@ int main(int, char*[]) {
     }
     }
     catch(std::exception e) {
-        std::cerr << e.what();
+        std::cerr << "[ERROR] Exception thrown: " << e.what();
     }
     catch(std::string str){
         std::cerr << "[ERROR] Exception thrown: " << str << "\n";

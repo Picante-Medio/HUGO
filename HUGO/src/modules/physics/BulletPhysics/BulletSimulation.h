@@ -59,8 +59,8 @@ class BulletSimulation : public IPhysicsSimulation {
     HUGO::CollisionObjectID createColliderObject(ColliderComponent& hgCol);
     HUGO::CollisionObjectID upgradeToRigidBodyObject(ColliderComponent& hgCol, RigidBodyComponent& hgRb);
     CollisionObject& getCollisionObject(const HUGO::CollisionObjectID id);
-    void removeRigidBodyObject(HUGO::CollisionObjectID& id);
-    void removeColliderObject(HUGO::CollisionObjectID& id);
+    void removeRigidBodyObject(const HUGO::CollisionObjectID& id);
+    void removeColliderObject(const HUGO::CollisionObjectID& id);
 
     // Check for updates on a specific RB or collider
     void checkRigidBodyFlags(RigidBodyComponent& hgRB);

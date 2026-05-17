@@ -346,7 +346,7 @@ CollisionObject& BulletSimulation::getCollisionObject(const HUGO::CollisionObjec
     return rigidBodies[rbIdToIndex[id]];
 }
 
-void BulletSimulation::removeRigidBodyObject(HUGO::CollisionObjectID& id)
+void BulletSimulation::removeRigidBodyObject(const HUGO::CollisionObjectID& id)
 {
     if(id != HUGO::INVALID_COL_OBJ_ID){
         std::size_t index = rbIdToIndex[id];
@@ -369,18 +369,17 @@ void BulletSimulation::removeRigidBodyObject(HUGO::CollisionObjectID& id)
         if (index != lastIndex) {
             // mover último objeto al hueco
             rigidBodies[index] = std::move(rigidBodies[lastIndex]);
-            rigidBodies[index].bulletRB->setUserPointer(&getCollisionObject(id));
             HUGO::CollisionObjectID movedID = rigidBodies[index].id;
             rbIdToIndex[movedID] = index;
+            rigidBodies[index].bulletRB->setUserPointer(&getCollisionObject(movedID));
         }
 
         rigidBodies.remove(lastIndex);
         freeBulletRBObjectId.push_back(id);
-        // id = HUGO::INVALID_COL_OBJ_ID;
     }
 }
     
-void BulletSimulation::removeColliderObject(HUGO::CollisionObjectID& id)
+void BulletSimulation::removeColliderObject(const HUGO::CollisionObjectID& id)
 {
     if (id != HUGO::INVALID_COL_OBJ_ID){
         
@@ -398,14 +397,13 @@ void BulletSimulation::removeColliderObject(HUGO::CollisionObjectID& id)
         if (index != lastIndex) {
             // mover último objeto al hueco
             rigidBodies[index] = std::move(rigidBodies[lastIndex]);
-            rigidBodies[index].bulletRB->setUserPointer(&getCollisionObject(id));
             HUGO::CollisionObjectID movedID = rigidBodies[index].id;
             rbIdToIndex[movedID] = index;
+            rigidBodies[index].bulletRB->setUserPointer(&getCollisionObject(movedID));
         }
 
         rigidBodies.remove(lastIndex);
         freeBulletRBObjectId.push_back(id);
-        // id = HUGO::INVALID_COL_OBJ_ID;
     }
 }
 #pragma endregion
