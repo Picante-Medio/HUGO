@@ -24,5 +24,11 @@ int main(int, char*[]) {
     catch(std::exception e) {
         std::cerr << e.what();
     }
+    catch(std::string str){
+        std::cerr << "[ERROR] Exception thrown: " << str << "\n";
+    }
+    catch(const char* str){
+        std::cerr << "[ERROR] Exception thrown: " << str << "\n";
+    }
     return 0;
 }
