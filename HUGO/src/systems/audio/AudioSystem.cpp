@@ -451,11 +451,13 @@ void AudioSystem::onAdd3DAudioComponent(Audio3DInfoComponent &c)
 
 void AudioSystem::onExit()
 {
-    for (auto& pack: scene.query<AudioComponent>()){
-        pack.modify<AudioComponent>([this](AudioComponent& a){
-            a.startTime = getAudioPosition(a.activePtr);
-        });
-        ma_sound* ptr = pack.getConst<AudioComponent>().activePtr;
-        stopAudio(ptr);
+    for (auto& pool : pools)
+    {
+        for (auto& voice : pool.voices)
+        {
+            if (voice.ptr && voice.ptr->get()){
+                stopAudio(voice.ptr->get());
+            }
+        }
     }
 }
