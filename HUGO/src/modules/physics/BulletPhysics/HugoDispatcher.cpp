@@ -42,15 +42,13 @@ void HUGODispatcher::dispatchAllCollisionPairs(btOverlappingPairCache *pairCache
             if(!hgColObj0->scene->hasComponent<ColliderComponent>(hgEnt0) || ! hgColObj1->scene->hasComponent<ColliderComponent>(hgEnt1))
                 continue;
     
-            if(hgColObj0->scene->hasComponent<ColliderComponent>(hgEnt0))
-                hgColObj0->scene->modifyComponent<ColliderComponent>(hgEnt0, [hgEnt1](ColliderComponent& col){
-                    col.collisionBuffer.push_back(hgEnt1);
-                });
+            hgColObj0->scene->modifyComponent<ColliderComponent>(hgEnt0, [hgEnt1](ColliderComponent& col){
+                col.collisionBuffer.push_back(hgEnt1);
+            });
 
-            if(hgColObj1->scene->hasComponent<ColliderComponent>(hgEnt1))
-                hgColObj1->scene->modifyComponent<ColliderComponent>(hgEnt1, [hgEnt0](ColliderComponent& col){
-                    col.collisionBuffer.push_back(hgEnt0);
-                });
+            hgColObj1->scene->modifyComponent<ColliderComponent>(hgEnt1, [hgEnt0](ColliderComponent& col){
+                col.collisionBuffer.push_back(hgEnt0);
+            });
         }
     }
 
