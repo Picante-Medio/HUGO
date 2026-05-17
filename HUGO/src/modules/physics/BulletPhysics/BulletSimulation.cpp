@@ -50,6 +50,10 @@ BulletSimulation::BulletSimulation(std::shared_ptr<InternalScene> scene)
 
     */
     PRINTER(btWorld);
+
+    // Subscribe to events when colliders and rigidbodies get removed from deleted entities
+    scene->onRemoveComponent<RigidBodyComponent>().connect(this, &BulletSimulation::onRemoveRigidBody);
+    scene->onRemoveComponent<ColliderComponent>().connect(this, &BulletSimulation::onRemoveCollider);
 }
 
 BulletSimulation::~BulletSimulation() {
@@ -399,7 +403,7 @@ void BulletSimulation::removeColliderObject(HUGO::CollisionObjectID& id)
 
         rigidBodies.remove(lastIndex);
         freeBulletRBObjectId.push_back(id);
-        id = HUGO::INVALID_COL_OBJ_ID;
+        // id = HUGO::INVALID_COL_OBJ_ID;
     }
 }
 #pragma endregion
@@ -532,10 +536,6 @@ void BulletSimulation::syncBodiesToBullet() {
                 updateColliderTransform(col, item.getConst<WorldTransformComponent>());
         });
     }
-
-    // Remove colliders and rigidbodies from deleted entities
-    scene->onRemoveComponent<ColliderComponent>().connect(this, &BulletSimulation::onRemoveCollider);
-    scene->onRemoveComponent<RigidBodyComponent>().connect(this, &BulletSimulation::onRemoveRigidBody);
 }
 
 void BulletSimulation::syncBodiesToGame() {
@@ -576,12 +576,17 @@ void BulletSimulation::syncBodiesToGame() {
 
 void BulletSimulation::onRemoveCollider(ColliderComponent& collider) {
     CollisionObject& obj = getCollisionObject(collider.objectID);
-    removeColliderObject(obj.id);
+    if(obj.id != HUGO::INVALID_COL_OBJ_ID) {
+        if(btRigidBody::upcast(obj.bulletRB))
+            removeRigidBodyObject(obj.id);
+        else removeColliderObject(obj.id);
+    }
 }
 
 void BulletSimulation::onRemoveRigidBody(RigidBodyComponent& rb) {
     CollisionObject& obj = getCollisionObject(rb.objectID);
-    removeRigidBodyObject(obj.id);
+    if(obj.id != HUGO::INVALID_COL_OBJ_ID)
+        removeRigidBodyObject(obj.id);
 }
 
 void BulletSimulation::debugDraw() {
