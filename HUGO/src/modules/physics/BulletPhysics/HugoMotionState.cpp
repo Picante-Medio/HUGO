@@ -35,6 +35,9 @@ void HUGOMotionState::setWorldTransform(const btTransform& worldTrans)
 {
     btTransformRegister = worldTrans;
 
+    if(!hugoScene->hasComponent<ColliderComponent>(entityID))
+        return;
+
     const ColliderComponent& hugoCol = hugoScene->getComponentConst<ColliderComponent>(entityID);
     const RigidBodyComponent& hugoRB = hugoScene->getComponentConst<RigidBodyComponent>(entityID);
     

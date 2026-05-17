@@ -38,6 +38,9 @@ void HUGODispatcher::dispatchAllCollisionPairs(btOverlappingPairCache *pairCache
             // Activations to not let the objects sleep if they are colliding
             co0->activate(true);
             co1->activate(true);
+
+            if(!hgColObj0->scene->hasComponent<ColliderComponent>(hgEnt0) || ! hgColObj1->scene->hasComponent<ColliderComponent>(hgEnt1))
+                continue;
     
             if(hgColObj0->scene->hasComponent<ColliderComponent>(hgEnt0))
                 hgColObj0->scene->modifyComponent<ColliderComponent>(hgEnt0, [hgEnt1](ColliderComponent& col){
