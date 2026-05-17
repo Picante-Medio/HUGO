@@ -11,19 +11,7 @@
 #include "OgreRoot.h"
 
 ParticleSystem::~ParticleSystem() {
-    for (auto& [entity, instance] : activeParticleSystems) {
-        if (instance.node && instance.ps) {
-            // deatch
-            instance.node->detachAllObjects();
 
-            // destroy ogre particle system
-            sm->destroyParticleSystem(instance.ps);
-
-            // destroy ogre scenenode
-            sm->getRootSceneNode()->removeChild(instance.node);
-            sm->destroySceneNode(instance.node);
-        }
-    }
     activeParticleSystems.clear();
 }
 void ParticleSystem::init() {
