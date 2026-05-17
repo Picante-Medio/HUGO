@@ -55,7 +55,7 @@ EntityTable::isInQuery(EntityID entity, std::bitset<MAX_COMPONENTS> queryMask) {
 DenseListIndex 
 EntityTable::getDenseListIndex(EntityID entity, ComponentID componentID) const {
   if(hasComponent(entity, componentID)) return componentDirections[entity][componentID];
-  else throw "Esto nunca deberia pasar";
+  else throw "Component not found";
 }
 
 std::vector<std::pair<ComponentID, DenseListIndex>> 
