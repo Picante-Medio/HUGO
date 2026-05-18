@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Audio.h"
+#include "miniaudio.h"
+
 #include "HugoError.h"
 #include "HugoMath.h"
 #include "HugoTypes.h"
@@ -11,21 +12,22 @@
 #include <vector>
 
 // forward declarations
+struct AudioAssetInfo;
 struct AudioComponent;
 struct AudioListenerComponent;
 struct Audio3DInfoComponent;
 struct WorldTransformComponent;
 
-/// @brief Represents a sound that an entity emmits
-struct AudioVoice
-{
-    ma_sound sound{};
-    bool initialized = false;
-	bool started = false;
-};
-
 HSYSTEM(AudioSystem)
 private:
+
+	/// @brief Represents a sound that an entity emmits
+	struct AudioVoice {
+		ma_sound sound{};
+		bool initialized = false;
+		bool started = false;
+		HUGO::AudioID id = -1;
+	};
 
 	/// @brief Engine reference, initialized in init
     std::shared_ptr<ma_engine> engine;
@@ -36,6 +38,8 @@ private:
 	/// @param name 
 	/// @return 
 	AudioVoice* getVoice(EntityID e);
+
+	void tryCreateSound(AudioAssetInfo *asset, AudioVoice& voice);
 
 	void sync(AudioComponent& audioCmp, AudioVoice& voice);
 	void sync3D(const Audio3DInfoComponent& audio3dCmp, AudioVoice& voice);

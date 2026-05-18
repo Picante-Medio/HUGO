@@ -131,7 +131,7 @@ AudioSystem::fixedUpdate(uint32_t) {
     }
 }
 
-AudioVoice* 
+AudioSystem::AudioVoice* 
 AudioSystem::getVoice(EntityID e) {
     auto it = voices.find(e);
 
@@ -141,19 +141,8 @@ AudioSystem::getVoice(EntityID e) {
     return &it->second;
 }
 
-void AudioSystem::onAddAudioComponent(AudioComponent& audioCmp) {
-
-    AudioAssetInfo* asset =
-        AudioAssetsModule::Instance().getAsset(audioCmp.audioName);
-
-    if (!asset)
-        return;
-
-    AudioVoice& v = voices[audioCmp.entity];
-
-    // This already exist, get out
-    if (v.initialized) return;
-
+void
+AudioSystem::tryCreateSound(AudioAssetInfo *asset, AudioVoice& voice) {
     if (
         ma_sound_init_from_file(
             engine.get(),
@@ -161,12 +150,33 @@ void AudioSystem::onAddAudioComponent(AudioComponent& audioCmp) {
             0,
             nullptr,
             nullptr,
-            &v.sound
-        ) 
-        == MA_SUCCESS)
+            &voice.sound
+        ) == MA_SUCCESS)
     {
-        v.initialized = true;
+        voice.initialized = true;
+        voice.id = asset->id;
     }
+    else {
+        voice.id = -1;
+        voice.initialized = false;
+    }
+}
+
+void 
+AudioSystem::onAddAudioComponent(AudioComponent& audioCmp) {
+
+    AudioAssetInfo* asset =
+        AudioAssetsModule::Instance().getAsset(audioCmp.audioName);
+
+    AudioVoice& v = voices[audioCmp.entity];
+
+    if (!asset)
+        return;
+
+    // This already exist, get out
+    if (v.initialized) return;
+
+    tryCreateSound(asset, v);
 
     if (scene.hasComponent<Audio3DInfoComponent>(audioCmp.entity)) {
         
@@ -192,7 +202,17 @@ void AudioSystem::onUpdateAudioComponent(AudioComponent& audioCmp) {
 
     AudioVoice *v = getVoice(audioCmp.entity);
 
-    if (v == nullptr || !v->initialized)
+    AudioAssetInfo* asset =
+        AudioAssetsModule::Instance().getAsset(audioCmp.audioName);
+
+    // Id is diferent, remake audio
+    if (asset->id != v->id) {
+        ma_sound_stop(&v->sound);
+        ma_sound_uninit(&v->sound);
+        tryCreateSound(asset, *v);
+    }
+
+    if (!v->initialized)
         return;
 
     sync(audioCmp, *v);
@@ -202,7 +222,8 @@ void AudioSystem::onRemoveAudioComponent(AudioComponent& audioCmp) {
 
     AudioVoice *v = getVoice(audioCmp.entity);
 
-    if (v != nullptr) {
+    if (!v->initialized) {
+        ma_sound_stop(&v->sound);
         ma_sound_uninit(&v->sound);
         voices.erase(audioCmp.entity);
     }
