@@ -35,6 +35,7 @@ namespace HUGO {
         SceneManager sceneManager;
         
         bool fullscreen = false;
+        const char* gameName;
     public:
         Core();
         HUGO::ErrorOrVoid init();

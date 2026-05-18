@@ -90,10 +90,11 @@ HUGO::ErrorOrVoid Core::init() {
         fullscreen = true;
     }
 
-
     if(!initParams.count("GAME_LIB") || !initParams.count("MAIN_SCENE")) {
         throw "[hugo.config] GAME_LIB or MAIN_SCENE field empty or missing";
     }
+
+    gameName = initParams["GAME_LIB"].c_str();
 
     //LuaBinder initialization
     initLua();
@@ -131,6 +132,8 @@ void HUGO::Core::initModules()
 
     // Input
     input->setSDLWindow(OgreModule::Instance().getSDLWindow());
+
+    SDL_SetWindowTitle(OgreModule::Instance().getSDLWindow(), gameName);
 }
 //HUGO main loop
 HUGO::ErrorOrVoid Core::run(){
