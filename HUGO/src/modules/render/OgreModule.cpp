@@ -121,8 +121,6 @@ OgreModule::~OgreModule(){
     }
     m_sceneManagers.clear();
 
-        m_sceneManagers.clear();
-
     // Destroy viewport/camera scene manager
     if(m_defaultCameraSceneManager){
         m_ogreRoot->destroySceneManager(m_defaultCameraSceneManager);
