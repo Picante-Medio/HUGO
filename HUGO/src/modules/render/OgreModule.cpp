@@ -113,12 +113,36 @@ OgreModule::OgreModule(){
 
 OgreModule::~OgreModule(){
 
+    // Destroy scene managers
     for(auto& sm: m_sceneManagers){
         if(sm.second){
             m_ogreRoot->destroySceneManager(sm.second);
         }
     }
     m_sceneManagers.clear();
+
+        m_sceneManagers.clear();
+
+    // Destroy viewport/camera scene manager
+    if(m_defaultCameraSceneManager){
+        m_ogreRoot->destroySceneManager(m_defaultCameraSceneManager);
+        m_defaultCameraSceneManager = nullptr;
+    }
+
+    Ogre::TextureManager::getSingleton().removeAll();
+    Ogre::MaterialManager::getSingleton().removeAll();
+    Ogre::MeshManager::getSingleton().removeAll();
+
+    // Unload resources
+    // Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
+
+    // auto groups = rgm.getResourceGroups();
+
+    // for (const auto& group : groups)
+    // {
+    //     rgm.clearResourceGroup(group);
+    //     rgm.destroyResourceGroup(group);
+    // }
     
     m_ogreRenderWindow->destroy();
 
