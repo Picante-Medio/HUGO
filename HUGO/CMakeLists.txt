@@ -67,7 +67,9 @@ if(HUGO_BUILD_ENGINE)
         RUNTIME_OUTPUT_DIRECTORY_RELEASE ${HUGO_BIN_DIR}
         VS_DEBUGGER_WORKING_DIRECTORY ${HUGO_BIN_DIR}
         INSTALL_RPATH "$ORIGIN"
-        BUILD_WITH_INSTALL_RPATH TRUE)
+        BUILD_WITH_INSTALL_RPATH TRUE
+        WIN32_EXECUTABLE $<$<CONFIG:Release>:TRUE>
+    )
 
 
     # Ogre plugins are independent, so they need to be explicitly copied in both platforms
