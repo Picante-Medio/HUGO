@@ -22,9 +22,6 @@ private:
     
     HUGO::String basePath;
     HUGO::AudioID nextID = 0;
-
-    HUGO::Float soundsGroupVolume = 1.0f;
-    HUGO::Float musicsGroupVolume = 1.0f;
     
     // supported audio extensions
     std::vector<HUGO::String> supportedExtensions = {".wav", ".mp3", ".flac"};
