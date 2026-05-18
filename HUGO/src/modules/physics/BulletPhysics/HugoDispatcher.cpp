@@ -25,9 +25,6 @@ void HUGODispatcher::dispatchAllCollisionPairs(btOverlappingPairCache *pairCache
 
         if (!co0 || !co1)
             continue;
-
-        if (!co0->getUserPointer() || !co1->getUserPointer())
-            continue;
         
         if(dispatcher->needsCollision(co0, co1)){
             auto id0 = static_cast<HUGO::CollisionObjectID>(reinterpret_cast<uintptr_t>(co0->getUserPointer()));
