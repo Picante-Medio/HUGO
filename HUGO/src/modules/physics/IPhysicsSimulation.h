@@ -19,4 +19,6 @@ public:
 
     // physics visual debugger
     virtual void debugDraw() = 0;
+
+    std::shared_ptr<InternalScene> getScene() { return scene; }
 };

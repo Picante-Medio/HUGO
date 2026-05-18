@@ -1,13 +1,15 @@
 #pragma once
-
+#include <memory>
 #include "btBulletDynamicsCommon.h"
 
-class HUGODispatcher : public btCollisionDispatcher
-{
+class BulletSimulation;
+
+class HUGODispatcher : public btCollisionDispatcher {
+    BulletSimulation* simulation;
 public:
 
     virtual void dispatchAllCollisionPairs(btOverlappingPairCache *pairCache, const btDispatcherInfo &dispatchInfo, btDispatcher *dispatcher) override;
 
-    HUGODispatcher(btCollisionConfiguration *collisionConfiguration);
+    HUGODispatcher(btCollisionConfiguration *collisionConfiguration, BulletSimulation* simulation);
     ~HUGODispatcher();
 };

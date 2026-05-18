@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "PagedArray.h"
 #include "btBulletDynamicsCommon.h"
 #include "IPhysicsSimulation.h"
@@ -13,7 +15,6 @@ struct ColliderComponent;
 struct Shape;
 
 struct CollisionObject{
-    std::shared_ptr<InternalScene> scene;
     HUGO::CollisionObjectID id;
     EntityID hgId;
     btCollisionObject* bulletRB = nullptr;
@@ -52,15 +53,15 @@ class BulletSimulation : public IPhysicsSimulation {
     
     HUGO::CollisionShapeID createShapeObject(ColliderComponent& col);
     ShapeObject& getShapeObject(const HUGO::CollisionShapeID id);
-    void removeShapeObject(HUGO::CollisionShapeID& id);
+    void removeShapeObject(HUGO::CollisionShapeID id);
     void destroyShapeObject(ShapeObject& shObj);
     btCollisionShape* getorCreateShape(HUGO::CollisionShapeID& id, ColliderComponent& hgCol);
 
     HUGO::CollisionObjectID createColliderObject(ColliderComponent& hgCol);
     HUGO::CollisionObjectID upgradeToRigidBodyObject(ColliderComponent& hgCol, RigidBodyComponent& hgRb);
-    CollisionObject& getCollisionObject(const HUGO::CollisionObjectID id);
-    void removeRigidBodyObject(const HUGO::CollisionObjectID& id);
-    void removeColliderObject(const HUGO::CollisionObjectID& id);
+    CollisionObject& getCollisionObject(HUGO::CollisionObjectID id);
+    void removeRigidBodyObject(HUGO::CollisionObjectID id);
+    void removeColliderObject(HUGO::CollisionObjectID id);
 
     // Check for updates on a specific RB or collider
     void checkRigidBodyFlags(RigidBodyComponent& hgRB);
@@ -91,4 +92,6 @@ public:
     void performSimulation(double dt) override;
 
     void debugDraw() override;
+
+    friend class HUGODispatcher;
 };

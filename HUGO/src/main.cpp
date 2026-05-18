@@ -22,13 +22,13 @@ int main(int, char*[]) {
     }
     }
     catch(std::exception e) {
-        std::cerr << "[ERROR] Exception thrown: " << e.what();
+        std::cerr << "[ERROR] Exception thrown: " << e.what() << '\n';
     }
     catch(std::string str){
-        std::cerr << "[ERROR] Exception thrown: " << str << "\n";
+        std::cerr << "[ERROR] Exception thrown: " << str << '\n';
     }
     catch(const char* str){
-        std::cerr << "[ERROR] Exception thrown: " << str << "\n";
+        std::cerr << "[ERROR] Exception thrown: " << str << '\n';
     }
     return 0;
 }

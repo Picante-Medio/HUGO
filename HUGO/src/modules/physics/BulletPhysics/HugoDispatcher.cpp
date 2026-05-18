@@ -3,8 +3,9 @@
 #include "ColliderComponent.h"
 #include "InternalScene.h"
 
-HUGODispatcher::HUGODispatcher(btCollisionConfiguration *collisionConfiguration)
+HUGODispatcher::HUGODispatcher(btCollisionConfiguration *collisionConfiguration, BulletSimulation* simulation)
 : btCollisionDispatcher(collisionConfiguration)
+, simulation(simulation)
 {}
 
 HUGODispatcher::~HUGODispatcher()
@@ -29,24 +30,29 @@ void HUGODispatcher::dispatchAllCollisionPairs(btOverlappingPairCache *pairCache
             continue;
         
         if(dispatcher->needsCollision(co0, co1)){
-            CollisionObject* hgColObj0 = static_cast<CollisionObject*>(co0->getUserPointer());
-            CollisionObject* hgColObj1 = static_cast<CollisionObject*>(co1->getUserPointer());
+            auto id0 = static_cast<HUGO::CollisionObjectID>(reinterpret_cast<uintptr_t>(co0->getUserPointer()));
+            auto id1 = static_cast<HUGO::CollisionObjectID>(reinterpret_cast<uintptr_t>(co1->getUserPointer()));
 
-            EntityID hgEnt0 = hgColObj0->hgId;
-            EntityID hgEnt1 = hgColObj1->hgId;
+            const CollisionObject& hgColObj0 = simulation->getCollisionObject(id0);
+            const CollisionObject& hgColObj1 = simulation->getCollisionObject(id1);
+            // CollisionObject* hgColObj0 = static_cast<CollisionObject*>(co0->getUserPointer());
+            // CollisionObject* hgColObj1 = static_cast<CollisionObject*>(co1->getUserPointer());
+
+            EntityID hgEnt0 = hgColObj0.hgId;
+            EntityID hgEnt1 = hgColObj1.hgId;
             
             // Activations to not let the objects sleep if they are colliding
             co0->activate(true);
             co1->activate(true);
 
-            if(!hgColObj0->scene->hasComponent<ColliderComponent>(hgEnt0) || ! hgColObj1->scene->hasComponent<ColliderComponent>(hgEnt1))
+            if(!simulation->getScene()->hasComponent<ColliderComponent>(hgEnt0) || !simulation->getScene()->hasComponent<ColliderComponent>(hgEnt1))
                 continue;
     
-            hgColObj0->scene->modifyComponent<ColliderComponent>(hgEnt0, [hgEnt1](ColliderComponent& col){
+            simulation->getScene()->modifyComponent<ColliderComponent>(hgEnt0, [hgEnt1](ColliderComponent& col){
                 col.collisionBuffer.push_back(hgEnt1);
             });
 
-            hgColObj1->scene->modifyComponent<ColliderComponent>(hgEnt1, [hgEnt0](ColliderComponent& col){
+            simulation->getScene()->modifyComponent<ColliderComponent>(hgEnt1, [hgEnt0](ColliderComponent& col){
                 col.collisionBuffer.push_back(hgEnt0);
             });
         }
