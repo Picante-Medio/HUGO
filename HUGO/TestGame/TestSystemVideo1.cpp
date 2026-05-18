@@ -11,6 +11,7 @@
 #include <iostream>
 #include "CameraComponent.h"
 #include "WorldTransformComponent.h"
+#include "Audio3DInfoComponent.h"
 
 void
 TestSystemVideo1::init() {
@@ -22,10 +23,10 @@ TestSystemVideo1::init() {
     audio = scene.createEntity();
     scene.addComponent<AudioComponent>(audio, [](AudioComponent& a){
         a.isPlaying = true;
-        a.type = HUGO::AudioTypes::MUSIC;
         a.audioName = "funkytown";
         a.volume = 0.0f;
     });
+    scene.addComponent<Audio3DInfoComponent>(audio);
 
     menuFondo = scene.createEntity();
 

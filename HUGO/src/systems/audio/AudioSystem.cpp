@@ -16,448 +16,275 @@
 #include <memory>
 #include <sstream>
 
-HUGO::ErrorOrType<AudioInfo> AudioSystem::createVoice(HUGO::AudioID id, HUGO::AudioTypes type)
-{
-    HUGO::StringError e;
-    AudioAssetInfo* asset = AudioAssetsModule::Instance().getAsset(id);
-    
-    if (!asset) {       
-        e.errorMessage = "[AudioSystem]: Audio ID not found";
-        return HUGO::ErrorOrType<AudioInfo>(e);
+AudioSystem::~AudioSystem() {
+
+    // Duplicated code same as of onExit(), intentional
+    // in case onExit stores data of playing timestamp to resume
+
+    for (auto& [entity, v] : voices) {
+        ma_sound_stop(&v.sound);
+        ma_sound_uninit(&v.sound);
+
+        v.initialized = false;
+        v.started = false;
     }
-    
-    AudioInfo info;
-    info.ptr = std::make_shared<Audio>();
-    
-    if (!info.ptr->init(engine.get(), asset->fullPath.c_str(), 0))
+
+    voices.clear();
+}
+
+void 
+AudioSystem::init() {
+    engine = MiniaudioModule::Instance().getMiniaudioEngine();
+
+    scene.onAddComponent<AudioComponent>().connect(this, 
+        &AudioSystem::onAddAudioComponent);
+
+    scene.onUpdateComponent<AudioComponent>().connect(this, 
+        &AudioSystem::onUpdateAudioComponent);
+
+    scene.onRemoveComponent<AudioComponent>().connect(this, 
+        &AudioSystem::onRemoveAudioComponent);
+
+
+    scene.onAddComponent<Audio3DInfoComponent>().connect(this, 
+        &AudioSystem::onAddAudio3DInfoComponent);
+    scene.onUpdateComponent<Audio3DInfoComponent>().connect(this, 
+        &AudioSystem::onUpdateAudio3DInfoComponent);
+    scene.onRemoveComponent<Audio3DInfoComponent>().connect(this, 
+        &AudioSystem::onRemoveAudio3DInfoComponent);
+}
+
+void
+AudioSystem::onLoad() {
+    for (auto& c : scene.query<AudioComponent>())
     {
-        e.errorMessage = "[AudioSystem] Failed loading audio: " + asset->fullPath;
-        return HUGO::ErrorOrType<AudioInfo>(e);
-    }
-    
-    // configuration
-    if (type == HUGO::SOUND3D)
-    {
-        ma_sound_set_spatialization_enabled(info.ptr->get(), MA_TRUE);
-        ma_sound_set_attenuation_model(info.ptr->get(), ma_attenuation_model_linear);
-    }
-    else
-    {
-        ma_sound_set_spatialization_enabled(info.ptr->get(), MA_FALSE);
-    }
-    
-    return HUGO::ErrorOrType<AudioInfo>(std::move(info));
-}
-
-void AudioSystem::ensurePoolSize()
-{
-    size_t assetCount = AudioAssetsModule::Instance().size();
-    if (pools.size() < assetCount) {
-        pools.resize(assetCount);
-    }
-}
-
-/**
- * @brief get an available sound instance from the pool.
- *
- * The system first tries to reuse a free voice from the pool. If none are
- * available, it will create a new voice as long as the pool has not reached
- * the maximum queue size. If the pool is full, a voice will be reused using
- * a round-robin stealing strategy.
- *
- * @param id Audio identifier used to select the corresponding audio pool.
- * @return Pointer to the acquired ma_sound instance.
- */
-ma_sound* AudioSystem::getSound(HUGO::AudioID id, HUGO::AudioTypes type)
-{
-    AudioPool& pool = pools[id];
-    
-    // STEP 1: reuse
-    for (auto& voice : pool.voices)
-    {
-        if (!voice.inUse)
-        {
-            voice.inUse = true;
-            ma_sound_seek_to_pcm_frame(voice.ptr->get(), 0);
-            return voice.ptr->get();
-        }
-    }
-    
-    // STEP 2: create new
-    if (pool.voices.size() < static_cast<size_t>(queueSize))
-    {   
-        HUGO::ErrorOrType<AudioInfo> result = createVoice(id, type);
-        
-        if (result.isError())
-            return nullptr;
-        
-        pool.voices.emplace_back(std::move(result.getValue()));
-        
-        AudioInfo& v = pool.voices.back();
-        v.inUse = true;
-        
-        ma_sound_set_end_callback(
-            v.ptr->get(),
-            AudioSystem::endCallback,
-            &v);
-        
-        return v.ptr->get();
-    }
-    
-    // STEP 3: steal
-    AudioInfo& stolen = pool.voices[pool.stealIndex];
-    pool.stealIndex = (pool.stealIndex + 1) % pool.voices.size();
-    
-    ma_sound_stop(stolen.ptr->get());
-    ma_sound_seek_to_pcm_frame(stolen.ptr->get(), 0);
-    
-    stolen.inUse = true;
-    
-    // reconfig using the type
-    if (type == HUGO::SOUND3D) {
-        ma_sound_set_spatialization_enabled(stolen.ptr->get(), MA_TRUE);
-        ma_sound_set_attenuation_model(stolen.ptr->get(), ma_attenuation_model_linear);
-    } else {
-        ma_sound_set_spatialization_enabled(stolen.ptr->get(), MA_FALSE);
-    }
-    
-    return stolen.ptr->get();
-}
-
-void AudioSystem::acquireVoice(AudioComponent &c)
-{
-    if (c.type < 0 || c.type >= HUGO::AudioTypes::LAST_TYPE) return;
-    if (c.activePtr == nullptr) {
-        if (c.audioId == -1 && !c.audioName.empty()) {
-            scene.modifyComponent<AudioComponent>(c.entity, [this, c](AudioComponent& a){
-                a.audioId = AudioAssetsModule::Instance().getID(c.audioName);
-            });
-        }
-
-        if (c.audioId != -1) {
-            scene.modifyComponent<AudioComponent>(c.entity, [this, c](AudioComponent& a){
-                a.activePtr = getSound(c.audioId, static_cast<HUGO::AudioTypes>(c.type));
-            });
-        }
-        if (scene.hasComponent<Audio3DInfoComponent>(c.entity))
-        {
-            const Audio3DInfoComponent& info = scene.getComponentConst<Audio3DInfoComponent>(c.entity);
-            process3DChanges(c, info);
-        }
-    }
-}
-
-void AudioSystem::endCallback(void* data, ma_sound*)
-{
-    if (!data) return;
-    AudioInfo& voice = *reinterpret_cast<AudioInfo*>(data);
-    voice.inUse = false;
-}
-
-#pragma region PLAYBACK CONTROLS
-void AudioSystem::playAudio(ma_sound* s)
-{
-    ma_sound_start(s);
-}
-
-void AudioSystem::playAudio(HUGO::AudioID id, HUGO::AudioTypes type)
-{
-    ma_sound* s = getSound(id, type);
-    playAudio(s);
-}
-
-void AudioSystem::playAudioLUA(int id, int type) {
-    if (type >= HUGO::AudioTypes::LAST_TYPE){
-        return;
-    }
-    playAudio(static_cast<HUGO::AudioID>(id), static_cast<HUGO::AudioTypes>(type));
-}
-
-void AudioSystem::stopAudio(ma_sound* s)
-{
-    ma_sound_stop(s);
-}
-
-void AudioSystem::resumeAudio(ma_sound* s)
-{
-    playAudio(s);
-}
-#pragma endregion
-
-#pragma region 2D CHANGES
-void AudioSystem::setLooping(ma_sound* s, bool loop)
-{
-    ma_sound_set_looping(s, loop);
-}
-
-void AudioSystem::setVolume(ma_sound* s, HUGO::Float vol)
-{
-    ma_sound_set_volume(s, vol);
-}
-
-void AudioSystem::setGroupVolume(HUGO::AudioTypes type, HUGO::Float volume)
-{
-    if (type == HUGO::AudioTypes::MUSIC)
-        musicsGroupVolume = volume;
-    else   
-        soundsGroupVolume = volume;
-}
-
-void AudioSystem::setPitch(ma_sound* s, HUGO::Float pitch)
-{
-    ma_sound_set_pitch(s, pitch);
-}
-
-void AudioSystem::setAudioPosition(ma_sound* s, double seconds)
-{   
-    if (seconds < 0.0) seconds = 0.0;
-    
-    ma_uint32 sr = ma_engine_get_sample_rate(engine.get());
-    ma_uint64 frame = static_cast<ma_uint64>(seconds * sr);
-    
-    ma_uint64 totalFrames = 0;
-    if (ma_sound_get_length_in_pcm_frames(s, &totalFrames) == MA_SUCCESS && frame > totalFrames)
-    {
-        frame = totalFrames;
-    }
-    
-    ma_sound_seek_to_pcm_frame(s, frame);
-}
-
-double AudioSystem::getAudioPosition(ma_sound* s)
-{
-    if (!s) return -1.0;
-    
-    ma_uint64 cursor = 0;
-    if (ma_sound_get_cursor_in_pcm_frames(s, &cursor) != MA_SUCCESS)
-        return -1.0;
-    
-    ma_uint32 sr = ma_engine_get_sample_rate(engine.get());
-    return static_cast<double>(cursor) / sr;
-}
-#pragma endregion
-
-#pragma region 3D CHANGES
-void AudioSystem::set3DPosition(ma_sound* s, const HUGO::Vector3& p)
-{
-    ma_sound_set_position(s, p.x, p.y, p.z);
-}
-
-void AudioSystem::setVelocity(ma_sound* s, const HUGO::Vector3& v)
-{
-    ma_sound_set_velocity(s, v.x, v.y, v.z);
-}
-
-void AudioSystem::setDirection(ma_sound* s, const HUGO::Vector3& d)
-{
-    ma_sound_set_direction(s, d.x, d.y, d.z);
-}
-
-void AudioSystem::setDopplerFactor(ma_sound* s, HUGO::Float factor)
-{
-    ma_sound_set_doppler_factor(s, factor);
-}
-
-void AudioSystem::set3DMinDistance(ma_sound* s, HUGO::Float distance)
-{
-    ma_sound_set_min_distance(s, distance);
-}
-
-void AudioSystem::set3DMaxDistance(ma_sound* s, HUGO::Float distance)
-{
-    ma_sound_set_max_distance(s, distance);
-}
-
-void AudioSystem::set3DRollof(ma_sound* s, HUGO::Float rolloff)
-{
-    ma_sound_set_rolloff(s, rolloff);
-}
-
-void AudioSystem::set3DCone(ma_sound* s, HUGO::Float innerAngle, HUGO::Float outerAngle, HUGO::Float outerGain)
-{
-    ma_sound_set_cone(s, innerAngle, outerAngle, outerGain);
-}
-#pragma endregion
-
-#pragma region synchronization
-void AudioSystem::updateListeners(const AudioListenerComponent& a, const WorldTransformComponent& tr)
-{
-    const HUGO::Vector3& forward = tr.worldRotation.forward();
-    const HUGO::Vector3& up = tr.worldRotation.up();
-
-    ma_engine_listener_set_position(engine.get(), 0, 
-        tr.worldPosition.x, tr.worldPosition.y, tr.worldPosition.z);
-
-    ma_engine_listener_set_direction(engine.get(), 0, forward.x, forward.y,forward.z);
-
-    ma_engine_listener_set_world_up(engine.get(), 0, up.x, up.y, up.z);
-    ma_engine_listener_set_velocity(engine.get(), 0, a.listenerVelocity.x, a.listenerVelocity.y, a.listenerVelocity.z);
-}
-
-void AudioSystem::processChanges(AudioComponent &c)
-{
-    if (!c.activePtr) {
-        acquireVoice(c);
-    }
-    if (!c.activePtr) return;
-    
-    setLooping(c.activePtr, c.loop);
-    HUGO::Float mult = c.type != HUGO::AudioTypes::MUSIC ? soundsGroupVolume : musicsGroupVolume;
-    HUGO::Float vol = c.volume * mult;    
-    setVolume(c.activePtr, vol);
-    setPitch(c.activePtr, c.pitch);
-    
-    if (c.startTime >= 0.0){
-        setAudioPosition(c.activePtr, c.startTime);
-        c.startTime = -1.0;
-    }
-
-    if (c.isPlaying && !ma_sound_is_playing(c.activePtr)){
-        playAudio(c.activePtr);
-        c.wasPlaying = true;
-    }
-    else if (!c.isPlaying && ma_sound_is_playing(c.activePtr)){
-        stopAudio(c.activePtr);
-        c.wasPlaying = false;
-    }
-}
-
-void AudioSystem::process3DChanges(const AudioComponent& a, const Audio3DInfoComponent &c)
-{
-    if (!a.activePtr) return;
-
-    set3DMinDistance(a.activePtr, c.minDistance);
-    set3DMaxDistance(a.activePtr, c.maxDistance);
-    setVelocity(a.activePtr, c.velocity); 
-    setDirection(a.activePtr, c.direction);
-    setDopplerFactor(a.activePtr, c.dopplerFactor);
-    set3DRollof(a.activePtr, c.rolloff);
-    set3DCone(a.activePtr, c.coneInnerAngle, c.coneOuterAngle, c.coneOuterGain);
-}
-#pragma endregion
-
-#pragma region UPDATES
-void AudioSystem::update(uint32_t)
-{
-    for (auto& pack : scene.query<AudioListenerComponent, WorldTransformComponent>()){
-        const AudioListenerComponent& a = pack.getConst<AudioListenerComponent>();
-        const WorldTransformComponent& tr = pack.getConst<WorldTransformComponent>();
-
-        updateListeners(a, tr);
-    }
-    //3d position
-    for (auto& pack : scene.query<AudioComponent, Audio3DInfoComponent, WorldTransformComponent>()){
-        const AudioComponent& a = pack.getConst<AudioComponent>();
-        const WorldTransformComponent& tr = pack.getConst<WorldTransformComponent>();
-        set3DPosition(a.activePtr, tr.worldPosition);
-    }
-
-    // cleanup finished voices
-    for (auto& pack : scene.query<AudioComponent>())
-    {
-        AudioComponent& c = pack.getConst<AudioComponent&>();
-        if (c.activePtr && !ma_sound_is_playing(c.activePtr) && !c.loop)
-        {
-            pack.modify<AudioComponent>([](AudioComponent& a){
-                a.activePtr = nullptr;
-                a.isPlaying = false;
-            });
-        }
-    }
-}
-
-void AudioSystem::fixedUpdate(uint32_t)
-{
-}
-
-void AudioSystem::onLoad(){
-    LuaBinder& luaBinder = LuaBinder::getInstance();
-    luaBinder.registerMethod<AudioSystem, void, int, int>(*this, &AudioSystem::playAudioLUA, "playAudio");
-
-    for (auto& pack: scene.query<AudioComponent>()){
-        pack.modify<AudioComponent>([this](AudioComponent& a){
-            processChanges(a);
+        c.modify<AudioComponent>([this](AudioComponent& audioCmp){
+            onAddAudioComponent(audioCmp);
         });
     }
 }
 
-void AudioSystem::init(){
-    engine = MiniaudioModule::Instance().getMiniaudioEngine();
-    
-    // Ensure pools are sized correctly
-    ensurePoolSize();
-
-    
-    //components events
-    scene.onAddComponent<AudioComponent>().connect(this, &AudioSystem::onAddAudioComponent);
-    scene.onAddComponent<Audio3DInfoComponent>().connect(this, &AudioSystem::onAdd3DAudioComponent);
-
-    scene.onUpdateComponent<AudioComponent>().connect(this, &AudioSystem::onUpdateAudioComponent);
-    scene.onUpdateComponent<Audio3DInfoComponent>().connect(this, &AudioSystem::onUpdate3DAudioComponent);
-    scene.onUpdateComponent<AudioListenerComponent>().connect(this, &AudioSystem::onUpdateAudioListener);
-
-}
-#pragma endregion
-
-#pragma region events
-void AudioSystem::onAddAudioComponent(AudioComponent &c)
+void 
+AudioSystem::onExit()
 {
-    acquireVoice(c);
-    processChanges(c);
-    //if it is a 3d sound without 3d sound component, add one
-    if (c.type == HUGO::SOUND3D && !scene.hasComponent<Audio3DInfoComponent>(c.entity)){
-        scene.addComponent<Audio3DInfoComponent>(c.entity);
+    // Clear all sounds, they will not be in use and sounds
+    // are referent to an audiocomponent, with the component
+    // we can remake it so we free the memory.
+    //
+    // If we used miniaudio resource manager it would be less
+    // important.
+    for (auto& [entity, v] : voices) {
+        ma_sound_stop(&v.sound);
+        ma_sound_uninit(&v.sound);
+
+        v.initialized = false;
+        v.started = false;
+    }
+
+    voices.clear();
+}
+
+void
+AudioSystem::fixedUpdate(uint32_t) {
+
+    // Update 3d audio
+    for (auto& q : scene.query<AudioComponent, Audio3DInfoComponent, WorldTransformComponent>()) {
+
+        const WorldTransformComponent& tr = q.getConst<WorldTransformComponent>();
+
+        auto it = voices.find(tr.entity);
+        if (it == voices.end() || !it->second.initialized)
+            continue;
+
+        ma_sound_set_position(&(it->second.sound),
+            tr.worldPosition.x,
+            tr.worldPosition.y,
+            tr.worldPosition.z);
+    }
+
+    auto listenersQuery = scene.query<AudioListenerComponent, WorldTransformComponent>();
+
+    if (listenersQuery.size() > 0) {
+
+        // First listener only, if there are more, well... skill issue I guess
+        HUGO::ComponentTuple<AudioListenerComponent, WorldTransformComponent>& firstListener = 
+            *listenersQuery.begin();
+
+        const WorldTransformComponent& tr = firstListener.getConst<WorldTransformComponent>();
+
+        ma_engine_listener_set_position(engine.get(), 0,
+            tr.worldPosition.x,
+            tr.worldPosition.y,
+            tr.worldPosition.z);
+
+        HUGO::Vector3 f = tr.worldRotation.forward() * -1;
+
+        ma_engine_listener_set_direction(engine.get(), 0,
+            f.x,
+            f.y,
+            f.z);
+
+        ma_engine_listener_set_world_up(engine.get(), 0,
+            tr.worldRotation.up().x,
+            tr.worldRotation.up().y,
+            tr.worldRotation.up().z);
     }
 }
-#pragma endregion
 
-void AudioSystem::onUpdateAudioComponent(AudioComponent &c)
-{
-    if (!c.activePtr && c.isPlaying) {
-        acquireVoice(c);
-    }
-    processChanges(c);
+AudioVoice* 
+AudioSystem::getVoice(EntityID e) {
+    auto it = voices.find(e);
+
+    if (it == voices.end())
+        return nullptr;
+
+    return &it->second;
 }
 
-void AudioSystem::onUpdate3DAudioComponent(Audio3DInfoComponent &c)
-{
-    EntityID id = c.entity;
-    if (!scene.hasComponent<AudioComponent>(id)) return;
+void AudioSystem::onAddAudioComponent(AudioComponent& audioCmp) {
 
-    const AudioComponent& a = scene.getComponentConst<AudioComponent>(id);
-    process3DChanges(a, c);
-}
+    AudioAssetInfo* asset =
+        AudioAssetsModule::Instance().getAsset(audioCmp.audioName);
 
-void AudioSystem::onUpdateAudioListener(AudioListenerComponent &l)
-{
-    EntityID id = l.entity;
-    if (scene.hasComponent<TransformComponent>(id)){
-        const WorldTransformComponent& tr = scene.getComponentConst<WorldTransformComponent>(id);
-        updateListeners(l, tr);
-    }
-}
+    if (!asset)
+        return;
 
-void AudioSystem::onAdd3DAudioComponent(Audio3DInfoComponent &c)
-{
-    const AudioComponent& a = scene.getComponentConst<AudioComponent>(c.entity);
-    const WorldTransformComponent& tr = scene.getComponentConst<WorldTransformComponent>(c.entity);
-    // just to be sure the type is correctly chosen
-    scene.modifyComponent<AudioComponent>(c.entity, [this, c](AudioComponent& a){
-        a.type = HUGO::AudioTypes::SOUND3D;
-    });
-    process3DChanges(a, c);
-    set3DPosition(a.activePtr, tr.worldPosition);
-}
+    AudioVoice& v = voices[audioCmp.entity];
 
-void AudioSystem::onExit()
-{
-    for (auto& pool : pools)
+    // This already exist, get out
+    if (v.initialized) return;
+
+    if (
+        ma_sound_init_from_file(
+            engine.get(),
+            asset->fullPath.c_str(),
+            0,
+            nullptr,
+            nullptr,
+            &v.sound
+        ) 
+        == MA_SUCCESS)
     {
-        for (auto& voice : pool.voices)
-        {
-            if (voice.ptr && voice.ptr->get()){
-                stopAudio(voice.ptr->get());
-            }
+        v.initialized = true;
+    }
+
+    if (scene.hasComponent<Audio3DInfoComponent>(audioCmp.entity)) {
+        
+        ma_sound_set_spatialization_enabled(&v.sound, MA_TRUE);
+
+        if (v.initialized) {
+
+            const Audio3DInfoComponent& audio3dCmp = 
+                scene.getComponentConst<Audio3DInfoComponent>(audioCmp.entity);
+
+            // Enable 3D audio
+            ma_sound_set_spatialization_enabled(&v.sound, MA_TRUE);
+            ma_sound_set_attenuation_model(&v.sound, ma_attenuation_model_linear);
+
+            sync3D(audio3dCmp, v);
         }
     }
+
+    sync(audioCmp, v);
+}
+
+void AudioSystem::onUpdateAudioComponent(AudioComponent& audioCmp) {
+
+    AudioVoice *v = getVoice(audioCmp.entity);
+
+    if (v == nullptr || !v->initialized)
+        return;
+
+    sync(audioCmp, *v);
+}
+
+void AudioSystem::onRemoveAudioComponent(AudioComponent& audioCmp) {
+
+    AudioVoice *v = getVoice(audioCmp.entity);
+
+    if (v != nullptr) {
+        ma_sound_uninit(&v->sound);
+        voices.erase(audioCmp.entity);
+    }
+}
+
+void 
+AudioSystem::onAddAudio3DInfoComponent(Audio3DInfoComponent& audio3dCmp) {
+
+    AudioVoice *v = getVoice(audio3dCmp.entity);
+
+    if (v == nullptr || !v->initialized)
+        return;
+
+    ma_sound *sound = &v->sound;
+
+    // Enable 3D audio
+    ma_sound_set_spatialization_enabled(sound, MA_TRUE);
+
+    sync3D(audio3dCmp, *v);
+}
+
+void 
+AudioSystem::onUpdateAudio3DInfoComponent(Audio3DInfoComponent& audio3dCmp) {
+
+    AudioVoice *v = getVoice(audio3dCmp.entity);
+
+    if (v == nullptr || !v->initialized)
+        return;
+
+    sync3D(audio3dCmp, *v);
+}
+
+void 
+AudioSystem::onRemoveAudio3DInfoComponent(Audio3DInfoComponent& audio3dCmp) {
+ 
+    AudioVoice *v = getVoice(audio3dCmp.entity);
+
+    if (v == nullptr || !v->initialized)
+        return;
+
+    // Back to 2D, return to monkey
+    ma_sound_set_spatialization_enabled(&v->sound, MA_FALSE);
+}
+
+
+void 
+AudioSystem::sync(AudioComponent& audioCmp, AudioVoice& voice)
+{
+    if (!voice.initialized)
+        return;
+
+    ma_sound_set_volume(&voice.sound, audioCmp.volume);
+    ma_sound_set_pitch(&voice.sound, audioCmp.pitch);
+    ma_sound_set_looping(&voice.sound, audioCmp.loop);
+
+    bool playing = ma_sound_is_playing(&voice.sound);
+
+    // Natural end of play
+    if (voice.started && audioCmp.isPlaying && !playing && !audioCmp.loop) {
+        audioCmp.isPlaying = false;
+        voice.started = false;
+    }
+
+    // Manual start
+    if (audioCmp.isPlaying && !playing) {
+        ma_sound_start(&voice.sound);
+        voice.started = true;
+    }
+    // Manual stop
+    else if (!audioCmp.isPlaying && playing) {
+        ma_sound_stop(&voice.sound);
+        voice.started = false;
+    }
+}
+
+void
+AudioSystem::sync3D(const Audio3DInfoComponent& audio3dCmp, AudioVoice& voice) {
+
+    if (!voice.initialized)
+        return;
+    
+    ma_sound_set_min_distance(&voice.sound, audio3dCmp.minDistance);
+    ma_sound_set_max_distance(&voice.sound, audio3dCmp.maxDistance);
+    ma_sound_set_rolloff(&voice.sound, audio3dCmp.rolloff);
 }

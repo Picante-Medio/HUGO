@@ -48,6 +48,9 @@ void CameraSystem::update(uint32_t){
         cameraMap[camera.entity].ogreCamera->setNearClipDistance(camera.getNearClip());
         cameraMap[camera.entity].ogreCamera->setFarClipDistance(camera.getFarClip());
 
+        auto a = cameraMap[camera.entity].node->_getDerivedPosition();
+        auto b = cameraMap[camera.entity].ogreCamera->getDerivedPosition();
+
         //Check if it is a different mainCamera tham the actual one. If it is, then change it
         if(camera.isMain() && camera.entity != m_mainCamera) {
             pack.modify<CameraComponent>([this](CameraComponent& camera) {
@@ -78,6 +81,12 @@ void CameraSystem::registerCameraEntity(CameraComponent& cameraComp){
     
     res.ogreCamera = sceneManager->createCamera(camName);
 
+    // create node and attach camera
+    res.node = sceneManager->getRootSceneNode()->createChildSceneNode(nodeName);
+    res.node->attachObject(res.ogreCamera);
+    res.node->setPosition(0., 0., 0.);
+    res.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(wTransformComp.worldRotation));
+
     // Default parameters
     res.ogreCamera->setNearClipDistance(cameraComp.getNearClip());
     res.ogreCamera->setFarClipDistance(cameraComp.getFarClip());
@@ -91,19 +100,16 @@ void CameraSystem::registerCameraEntity(CameraComponent& cameraComp){
         res.ogreCamera->setOrthoWindow(cameraComp.getOrthographicDimensions().first, cameraComp.getOrthographicDimensions().second);
     }
 
-    // create node and attach camera
-    res.node = sceneManager->getRootSceneNode()->createChildSceneNode(nodeName);
-    res.node->attachObject(res.ogreCamera);
-    res.node->setPosition(HUGO::OgreUtils::vector3ToOgre(wTransformComp.worldPosition));
-    res.node->setOrientation(HUGO::OgreUtils::quaternionToOgre(wTransformComp.worldRotation));
+    auto a = res.node->_getDerivedPosition();
+    auto b = res.ogreCamera->getDerivedPosition();
 
     cameraMap[entity] = res;
-
 
     if(cameraComp.isMain()){
         setMainCamera(cameraComp);
     }
 }
+
 void CameraSystem::destroyCamera(EntityID entity, CameraInfo& camInfo)
 {
 

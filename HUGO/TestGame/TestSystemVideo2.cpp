@@ -88,11 +88,10 @@ TestSystemVideo2::init() {
     });
     scene.addComponent<AudioComponent>(sinbad, [](AudioComponent& a){
         a.isPlaying = false;
-        a.type = HUGO::AudioTypes::SOUND2D;
         a.audioName = "scream";
-        a.startTime = 0.1f;
-        a.volume =1.5f;
+        a.volume =4.5f;
     });
+    scene.addComponent<Audio3DInfoComponent>(sinbad);
 
     //Suelo
     suelo = scene.createEntity();
@@ -197,12 +196,6 @@ TestSystemVideo2::init() {
     });
     
     scene.changeAmbientLight(HUGO::Vector3(0.1f));
-
-    auto camID = scene.createEntity();
-    scene.addComponent<WorldTransformComponent>(camID);
-    scene.addComponent<CameraComponent>(camID, [](CameraComponent& cmp){
-        cmp.setMain(true);
-    });
 }
 
 void TestSystemVideo2::createCube(EntityID cube){

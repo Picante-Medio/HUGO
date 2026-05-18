@@ -12,6 +12,7 @@
 #include "RenderComponent.h"
 #include "ButtonComponent.h"
 #include "AnimationComponent.h"
+#include "Audio3DInfoComponent.h"
 #include "WorldTransformComponent.h"
 #include "CameraComponent.h"
 
@@ -65,12 +66,12 @@ TestSystemVideo3::init() {
 
     scene.addComponent<AudioComponent>(cuboPedro, [](AudioComponent& a){
         a.isPlaying = true;
-        a.type = HUGO::AudioTypes::SOUND3D;
         a.audioName = "pedro";
         a.volume =0.5f;
         a.loop = true;
     });
-    
+    scene.addComponent<Audio3DInfoComponent>(cuboPedro);
+
     //---------------------------------------------------------------------------------------
 
     // CUBOPABLO
@@ -96,11 +97,12 @@ TestSystemVideo3::init() {
 
     scene.addComponent<AudioComponent>(cuboPablo, [](AudioComponent& a){
         a.isPlaying = true;
-        a.type = HUGO::AudioTypes::SOUND3D;
         a.audioName = "pablo";
         a.volume =0.5f;
         a.loop = true;
     });
+    scene.addComponent<Audio3DInfoComponent>(cuboPablo);
+
     // -------------------------------------------------------------------------------------
 
     // SINABD
@@ -207,12 +209,7 @@ TestSystemVideo3::init() {
         };
     });
     // -------------------------------------------------------------------------------------
-
-    auto camID = scene.createEntity();
-    scene.addComponent<WorldTransformComponent>(camID);
-    scene.addComponent<CameraComponent>(camID, [](CameraComponent& cmp){
-        cmp.setMain(true);
-    });
+    
 }
 
 
