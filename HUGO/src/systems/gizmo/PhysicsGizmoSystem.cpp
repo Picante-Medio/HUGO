@@ -34,8 +34,8 @@ HUGO::ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HU
         gizmoRender.setMaterialName("debug/WireframeMaterial");
     });
 
-    scene.modifyComponent<WorldTransformComponent>(entity, [&colliderInfo](WorldTransformComponent& gizmoTransform){
-        gizmoTransform.worldScale = colliderInfo.halfExtents * 2;
+    scene.modifyComponent<TransformComponent>(entity, [&colliderInfo](TransformComponent& gizmoTransform){
+        gizmoTransform.scale = colliderInfo.halfExtents * 2;
     });
 
     return HUGO::ErrorOrVoid();
@@ -49,9 +49,9 @@ HUGO::ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HU
         gizmoRender.setMaterialName("debug/WireframeMaterial");
     });
 
-    scene.modifyComponent<WorldTransformComponent>(entity, 
-        [&colliderInfo](WorldTransformComponent& gizmoTransform){
-        gizmoTransform.worldScale = colliderInfo.r * 2;
+    scene.modifyComponent<TransformComponent>(entity, 
+        [&colliderInfo](TransformComponent& gizmoTransform){
+        gizmoTransform.scale = colliderInfo.r * 2;
     });
 
     return HUGO::ErrorOrVoid();
@@ -65,9 +65,9 @@ HUGO::ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HU
         gizmoRender.setMaterialName("debug/WireframeMaterial");
     });
 
-    scene.modifyComponent<WorldTransformComponent>(entity, 
-        [&colliderInfo](WorldTransformComponent& gizmoTransform){
-            gizmoTransform.worldScale = colliderInfo.halfExtents * 2;
+    scene.modifyComponent<TransformComponent>(entity, 
+        [&colliderInfo](TransformComponent& gizmoTransform){
+            gizmoTransform.scale = colliderInfo.halfExtents * 2;
         }
     );
 
@@ -82,9 +82,9 @@ HUGO::ErrorOrVoid createGizmoMesh(HUGO::IScene& scene, EntityID entity, const HU
         gizmoRender.setMaterialName("debug/WireframeMaterial");
     });
 
-    scene.modifyComponent<WorldTransformComponent>(entity, 
-        [&colliderInfo](WorldTransformComponent& gizmoTransform){
-            gizmoTransform.worldScale = 
+    scene.modifyComponent<TransformComponent>(entity, 
+        [&colliderInfo](TransformComponent& gizmoTransform){
+            gizmoTransform.scale = 
                 HUGO::Vector3(colliderInfo.r * 2, colliderInfo.height, colliderInfo.r * 2);
     });
 
@@ -99,9 +99,9 @@ HUGO::ErrorOrVoid createGizmoMesh<HUGO::CapsuleColliderInfo>(HUGO::IScene& scene
         gizmoRender.setMaterialName("debug/WireframeMaterial");
     });
 
-    scene.modifyComponent<WorldTransformComponent>(entity, 
-        [&colliderInfo](WorldTransformComponent& gizmoTransform){
-            gizmoTransform.worldScale = 
+    scene.modifyComponent<TransformComponent>(entity, 
+        [&colliderInfo](TransformComponent& gizmoTransform){
+            gizmoTransform.scale = 
                 HUGO::Vector3(colliderInfo.r * 2, colliderInfo.height, colliderInfo.r * 2);
         }
     );
@@ -159,9 +159,9 @@ void PhysicsGizmoSystem::onUpdateGizmo(ColliderComponent& coll){
 void PhysicsGizmoSystem::update(uint32_t){
 #ifndef NDEBUG
     
-    for(auto pack : scene.query<ColliderComponent, WorldTransformComponent>()) {
+    for(auto pack : scene.query<ColliderComponent, TransformComponent>()) {
         const ColliderComponent& collider = pack.getConst<ColliderComponent>();
-        const WorldTransformComponent& collTr = pack.getConst<WorldTransformComponent>();
+        const TransformComponent& collTr = pack.getConst<TransformComponent>();
 
         //If we dont want gizmos, we skip all of this
         if(!collider.useGizmo) continue;
@@ -169,11 +169,11 @@ void PhysicsGizmoSystem::update(uint32_t){
         //Update transform position and rotation based on the colliders transform
         EntityID gizmoID= m_gizmoEntities[collider.entity];
 
-        scene.modifyComponent<WorldTransformComponent>(gizmoID, 
-            [&collider, &collTr](WorldTransformComponent& gizmoTr){
+        scene.modifyComponent<TransformComponent>(gizmoID, 
+            [&collider, &collTr](TransformComponent& gizmoTr){
                 
-                gizmoTr.worldPosition = collTr.worldPosition + collider.positionOffset;
-                gizmoTr.worldRotation = collTr.worldRotation * collider.rotationOffset;
+                gizmoTr.position = collTr.position + collider.positionOffset;
+                gizmoTr.rotation = collTr.rotation * collider.rotationOffset;
             }
         );
     }
