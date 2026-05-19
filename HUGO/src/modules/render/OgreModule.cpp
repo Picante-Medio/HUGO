@@ -116,6 +116,7 @@ OgreModule::~OgreModule(){
     // Destroy scene managers
     for(auto& sm: m_sceneManagers){
         if(sm.second){
+            sm.second->clearScene();
             m_ogreRoot->destroySceneManager(sm.second);
         }
     }
@@ -123,6 +124,7 @@ OgreModule::~OgreModule(){
 
     // Destroy viewport/camera scene manager
     if(m_defaultCameraSceneManager){
+        m_defaultCameraSceneManager->clearScene();
         m_ogreRoot->destroySceneManager(m_defaultCameraSceneManager);
         m_defaultCameraSceneManager = nullptr;
     }
@@ -179,6 +181,7 @@ void OgreModule::createSceneManager(HUGO::String sceneName){
 
 void OgreModule::destroySceneManager(HUGO::String sceneName){
     if (m_sceneManagers[sceneName] == m_currentSceneManager) m_currentSceneManager = nullptr;
+    m_sceneManagers[sceneName]->clearScene();
     m_ogreRoot->destroySceneManager(m_sceneManagers[sceneName]);
 
     m_sceneManagers.erase(sceneName);
