@@ -188,15 +188,18 @@ HUGO::ErrorOrVoid SceneManager::manageQueries(){
 }
 
 void SceneManager::updateCurrentScene(uint32_t dt){
-    m_currentScene.lock()->update(dt);
+    if (auto s = m_currentScene.lock())
+        s->update(dt);
 }
 
 void SceneManager::fixedUpdateCurrentScene(uint32_t dt){
-    m_currentScene.lock()->fixedUpdate(dt);
+    if (auto s = m_currentScene.lock())
+        s->fixedUpdate(dt);
 }
 
 void SceneManager::dispatchMessagesCurrentScene() {
-    m_currentScene.lock()->dispatchMessages();
+    if (auto s = m_currentScene.lock())
+        s->dispatchMessages();
 }
 
 HUGO::ErrorOrType<EntityID> SceneManager::instantiatePrefab(const HUGO::String& prefabName, std::shared_ptr<InternalScene> scene){
