@@ -13,7 +13,7 @@
 // To allow polymorphism
 class IComponentEvent {
 public:
-    ~IComponentEvent() = default;
+    virtual ~IComponentEvent() = default;
 };
 
 /// @brief List of functions to call when an event ocurs over a component of type T
