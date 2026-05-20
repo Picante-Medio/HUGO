@@ -25,7 +25,8 @@
 
 UISystem::~UISystem()
 {
-    //clearAllCaches();
+    clearAllCaches();
+    OgreModule::instance().getCurrentSceneManager()->removeRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
 }
 //====================================================
 // CACHE CREATION
@@ -724,6 +725,8 @@ void UISystem::clearAllCaches()
         hideCache(ptr.second.get(), overlayMng);
     }
     uiCache.clear();
+
+
 }
 
 
