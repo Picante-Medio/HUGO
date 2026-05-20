@@ -71,10 +71,10 @@ HUGO::ErrorOrVoid SceneManager::createScene(const HUGO::String& sceneName){
 
     //Create sceneManager from OgreModule
 
-    OgreModule::Instance().createSceneManager(sceneName);
+    OgreModule::instance().createSceneManager(sceneName);
 
     //Momentarialy sets Ogre::SceneManager to the loaded scene, then it is returned to the currentSceneManager
-    OgreModule::Instance().setCurrentSceneManager(sceneName);
+    OgreModule::instance().setCurrentSceneManager(sceneName);
 
     /*
     -> Create scene
@@ -100,11 +100,11 @@ HUGO::ErrorOrVoid SceneManager::createScene(const HUGO::String& sceneName){
         createEntity(m_sceneMap[sceneName], entityData);
     }
 
-    OgreModule::Instance().setCurrentSceneManager(m_currentSceneName);
+    OgreModule::instance().setCurrentSceneManager(m_currentSceneName);
 
 
     //When no errors occurred, we add the scene to the physics simulation
-    m_physicsModule->createSceneSimulation(sceneName, m_sceneMap[sceneName]);
+    m_physicsModule.createSceneSimulation(sceneName, m_sceneMap[sceneName]);
 
     return HUGO::ErrorOrVoid();
 }
@@ -120,11 +120,11 @@ void SceneManager::loadScene(const HUGO::String& sceneName){
 HUGO::ErrorOrVoid SceneManager::destroyScene(const HUGO::String& sceneName){
     if(m_sceneMap.find(sceneName) == m_sceneMap.end()) return HUGO::ErrorOrVoid(HUGO::StringError{"Scene " + sceneName + " can't be unloaded because it doesn't exist"});
 
-    m_physicsModule->destroySceneSimulation(sceneName);
+    m_physicsModule.destroySceneSimulation(sceneName);
     m_sceneMap.erase(sceneName);
 
     //Destroy sceneManager associated with scene as it is unloaded
-    OgreModule::Instance().destroySceneManager(sceneName);
+    OgreModule::instance().destroySceneManager(sceneName);
 
     return HUGO::ErrorOrVoid();
 }
@@ -152,7 +152,7 @@ HUGO::ErrorOrVoid SceneManager::manageQueries(){
         else if(query.queryType == SceneQuery::QueryType::CHANGE_SCENE){
             //Exit current scene
             if(!m_currentScene.expired()) m_currentScene.lock()->exit();
-            m_physicsModule->pauseSceneSimulation(m_currentSceneName);
+            m_physicsModule.pauseSceneSimulation(m_currentSceneName);
 
             if(m_sceneMap.find(query.sceneName) == m_sceneMap.end()){
                 HUGO::ErrorOrVoid err = createScene(query.sceneName);
@@ -164,8 +164,8 @@ HUGO::ErrorOrVoid SceneManager::manageQueries(){
             }
 
             //Sets current sceneManager for the new one.
-            OgreModule::Instance().setCurrentSceneManager(query.sceneName);
-            m_physicsModule->resumeSceneSimulation(query.sceneName);
+            OgreModule::instance().setCurrentSceneManager(query.sceneName);
+            m_physicsModule.resumeSceneSimulation(query.sceneName);
 
             m_currentScene = m_sceneMap[query.sceneName];
             m_currentSceneName = query.sceneName;
@@ -208,5 +208,5 @@ HUGO::ErrorOrType<EntityID> SceneManager::instantiatePrefab(const HUGO::String& 
 
 void HUGO::SceneManager::setAmbientLight(const HUGO::Vector3 &l)
 {
-    OgreModule::Instance().setAmbientLight(l);
+    OgreModule::instance().setAmbientLight(l);
 }
