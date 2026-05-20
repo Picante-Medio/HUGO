@@ -13,14 +13,14 @@ ChatParser::ChatParser(): m_sceneData(), m_prefabData(){
 
 }
 
-HUGO::ErrorOrVoid ChatParser::readChatFolder(const HUGO::String& chatFolder){
+void ChatParser::readChatFolder(const HUGO::String& chatFolder){
 
     std::filesystem::path chatFolderPath{chatFolder};
     chatFolderPath = std::filesystem::current_path()/chatFolderPath;
 
     //If dir not found or dir empty
     if(!std::filesystem::exists(chatFolderPath))
-        return HUGO::ErrorOrVoid(HUGO::StringError{HUGO::String("Folder {" + chatFolderPath.string() + "} doesn't exist")});
+        throw std::runtime_error("Folder {" + chatFolderPath.string() + "} doesn't exist");
 
     std::filesystem::directory_iterator dirIt = std::filesystem::directory_iterator(chatFolderPath);
 
@@ -29,10 +29,10 @@ HUGO::ErrorOrVoid ChatParser::readChatFolder(const HUGO::String& chatFolder){
 
         std::filesystem::path chatPath = chatFolderPath/entry.path();
         HUGO::ErrorOrVoid err = readChat(chatPath.string());
-        //If error has ben returned from reading .chat, chat parser should stop reading and return the error
+        //If error has been returned from reading .chat, chat parser should stop reading and return the error
         if (err.isError()){
-            HUGO::String message = "Error reading .chat in path {" + chatPath.filename().string()+ "}: " + err.getError().description();
-            return HUGO::ErrorOrVoid(HUGO::StringError{message});
+            throw std::runtime_error(
+                "Error reading .chat in path {" + chatPath.filename().string()+ "}: " + err.getError().description());
         }
     }
 

@@ -49,7 +49,7 @@ namespace HUGO{
 
 		//Adds to the database the data from all .chat files of chatFolder path.
 		//@param chatFolder Path relative to the executable file (normally HUGO/bin)
-		HUGO::ErrorOrVoid readChatFolder(const HUGO::String& chatFolder);
+		void readChatFolder(const HUGO::String& chatFolder);
 
 		//Returns entity data associated with prefabName
 		HUGO::ErrorOrType<EntityData> getPrefabData(const HUGO::String& prefabName);
