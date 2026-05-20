@@ -16,7 +16,6 @@
 #include "ComponentDenseTable.h"
 #include "SceneManager.h"
 #include "ComponentFactory.h"
-#include "GameLibraryLoader.h"
 #include "HStringUtils.h"
 
 InternalScene::InternalScene(std::shared_ptr<HUGO::IInput> input, HUGO::SceneManager& sceneManager) 
