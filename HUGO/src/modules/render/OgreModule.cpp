@@ -182,6 +182,8 @@ void OgreModule::createSceneManager(HUGO::String sceneName){
 }
 
 void OgreModule::destroySceneManager(HUGO::String sceneName){
+    if (!m_sceneManagers.count(sceneName)) return;
+
     if (m_sceneManagers[sceneName] == m_currentSceneManager) m_currentSceneManager = nullptr;
     m_sceneManagers[sceneName]->clearScene();
     m_ogreRoot->destroySceneManager(m_sceneManagers[sceneName]);
