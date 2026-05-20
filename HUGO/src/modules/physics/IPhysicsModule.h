@@ -20,7 +20,7 @@ public:
     explicit IPhysicsModule() {}
     virtual ~IPhysicsModule() {}
 
-    virtual void createSceneSimulation(std::string sceneName, std::shared_ptr<InternalScene> scene) = 0;
+    virtual void createSceneSimulation(std::string sceneName, InternalScene& scene) = 0;
     virtual void destroySceneSimulation(std::string sceneName) = 0;
 
     virtual void resumeSceneSimulation(std::string sceneName) = 0;

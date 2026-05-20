@@ -6,10 +6,10 @@ class InternalScene;
 
 class IPhysicsSimulation {
 protected:
-    std::shared_ptr<InternalScene> scene;
+    InternalScene& scene;
 
 public:
-    explicit IPhysicsSimulation(std::shared_ptr<InternalScene> scene) : scene(scene) {}
+    explicit IPhysicsSimulation(InternalScene& scene) : scene(scene) {}
     virtual ~IPhysicsSimulation() {}
 
     virtual void destroySimulation() = 0;
@@ -20,5 +20,5 @@ public:
     // physics visual debugger
     virtual void debugDraw() = 0;
 
-    std::shared_ptr<InternalScene> getScene() { return scene; }
+    InternalScene& getScene() { return scene; }
 };

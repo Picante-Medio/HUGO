@@ -4,7 +4,7 @@
 #include "ColliderComponent.h"
 #include "RigidBodyComponent.h"
 
-HUGOMotionState::HUGOMotionState(const btTransform initialPos, std::shared_ptr<InternalScene> scene, unsigned long int id, btTransform offset)
+HUGOMotionState::HUGOMotionState(const btTransform initialPos, InternalScene& scene, unsigned long int id, btTransform offset)
 : entityID(id)
 , hugoScene(scene)
 , btTransformRegister(initialPos)
@@ -16,8 +16,8 @@ HUGOMotionState::HUGOMotionState(const btTransform initialPos, std::shared_ptr<I
 void HUGOMotionState::updateBulletTransform()
 {
 
-    const WorldTransformComponent& hugoTransform = hugoScene->getComponentConst<WorldTransformComponent>(entityID);
-    ColliderComponent hugoCol = hugoScene->getComponentConst<ColliderComponent>(entityID);
+    const WorldTransformComponent& hugoTransform = hugoScene.getComponentConst<WorldTransformComponent>(entityID);
+    ColliderComponent hugoCol = hugoScene.getComponentConst<ColliderComponent>(entityID);
 
     btQuaternion q = BulletUtils::quaternionToBullet(hugoTransform.worldRotation) * BulletUtils::quaternionToBullet(hugoCol.getRotationOffset());
     q.normalize();
@@ -35,13 +35,13 @@ void HUGOMotionState::setWorldTransform(const btTransform& worldTrans)
 {
     btTransformRegister = worldTrans;
 
-    if(!hugoScene->hasComponent<ColliderComponent>(entityID))
+    if(!hugoScene.hasComponent<ColliderComponent>(entityID))
         return;
 
-    const ColliderComponent& hugoCol = hugoScene->getComponentConst<ColliderComponent>(entityID);
-    const RigidBodyComponent& hugoRB = hugoScene->getComponentConst<RigidBodyComponent>(entityID);
+    const ColliderComponent& hugoCol = hugoScene.getComponentConst<ColliderComponent>(entityID);
+    const RigidBodyComponent& hugoRB = hugoScene.getComponentConst<RigidBodyComponent>(entityID);
     
-    hugoScene->modifyComponent<WorldTransformComponent>(entityID, [hugoRB, hugoCol, this]
+    hugoScene.modifyComponent<WorldTransformComponent>(entityID, [hugoRB, hugoCol, this]
         (WorldTransformComponent& wTr){
             if(!hugoRB.dontRotateWithPhysicsOnDynamic){
                 btQuaternion rot = btTransformRegister.getRotation();

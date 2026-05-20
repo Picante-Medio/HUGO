@@ -11,12 +11,14 @@ int main(int, char*[]) {
         config.generateResourcesConfig();
         config.generatePluginsConfig();
 
-        HUGO::Core core = HUGO::Core();
-        HUGO::ErrorOrVoid error = core.run();
+        HUGO::Core *core = new HUGO::Core();
+        HUGO::ErrorOrVoid error = core->run();
 
         if(error.isError()) 
             std::cerr << "[ERROR] Updating HUGO::Core: {" << error.getError().errorMessage 
             << "}. HUGO Engine will be closing now." << '\n';
+
+        delete core;
     }
     catch(std::exception e) {
         std::cerr << "[ERROR] Exception thrown: " << e.what() << '\n';

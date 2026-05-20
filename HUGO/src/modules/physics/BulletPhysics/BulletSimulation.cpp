@@ -19,7 +19,7 @@ void printer(const char* name){
     std::cout << name << "\n";
 }
 
-BulletSimulation::BulletSimulation(std::shared_ptr<InternalScene> scene)
+BulletSimulation::BulletSimulation(InternalScene& scene)
 : IPhysicsSimulation(scene)
 {
     // We are using bullet's default collision configuration. Custom configuration is recommended for more complexity
@@ -52,8 +52,8 @@ BulletSimulation::BulletSimulation(std::shared_ptr<InternalScene> scene)
     PRINTER(btWorld);
 
     // Subscribe to events when colliders and rigidbodies get removed from deleted entities
-    scene->onRemoveComponent<RigidBodyComponent>().connect(this, &BulletSimulation::onRemoveRigidBody);
-    scene->onRemoveComponent<ColliderComponent>().connect(this, &BulletSimulation::onRemoveCollider);
+    scene.onRemoveComponent<RigidBodyComponent>().connect(this, &BulletSimulation::onRemoveRigidBody);
+    scene.onRemoveComponent<ColliderComponent>().connect(this, &BulletSimulation::onRemoveCollider);
 }
 
 BulletSimulation::~BulletSimulation() {
@@ -278,11 +278,11 @@ BulletSimulation::upgradeToRigidBodyObject(ColliderComponent& hgCol, RigidBodyCo
     if(hgRb.getMass() > 0) shape->calculateLocalInertia(hgRb.getMass(), startingInertia);
 
     btQuaternion q = BulletUtils::quaternionToBullet(
-        scene->getComponentConst<WorldTransformComponent>(hgCol.entity).worldRotation);
+        scene.getComponentConst<WorldTransformComponent>(hgCol.entity).worldRotation);
     q.normalize();
     bodyTransform.setRotation(q);
     bodyTransform.setOrigin(BulletUtils::vector3ToBullet(
-        scene->getComponentConst<WorldTransformComponent>(hgRb.entity).worldPosition));
+        scene.getComponentConst<WorldTransformComponent>(hgRb.entity).worldPosition));
     
     // Create state
     HUGOMotionState* state = new HUGOMotionState(bodyTransform, scene, hgRb.entity);
@@ -513,7 +513,7 @@ void BulletSimulation::updateColliderTransform(const ColliderComponent& collider
 void BulletSimulation::syncBodiesToBullet() {
     
     // Add new rigidBodies to simulation and Update kinematic bodies
-    for(auto& item : scene->query<ColliderComponent, RigidBodyComponent, TransformComponent>()) {
+    for(auto& item : scene.query<ColliderComponent, RigidBodyComponent, TransformComponent>()) {
         item.modify<RigidBodyComponent>([&item, this](RigidBodyComponent &rb){
 
             if (rb.objectID == HUGO::INVALID_COL_OBJ_ID) {
@@ -533,7 +533,7 @@ void BulletSimulation::syncBodiesToBullet() {
     }
 
     // Add colliders to simulation
-     for(auto& item : scene->query<ColliderComponent, WorldTransformComponent>()){
+     for(auto& item : scene.query<ColliderComponent, WorldTransformComponent>()){
         item.modify<ColliderComponent>([item, this](ColliderComponent &col){
     
             if(col.objectID == HUGO::INVALID_COL_OBJ_ID){
@@ -541,7 +541,7 @@ void BulletSimulation::syncBodiesToBullet() {
             }
 
             checkColliderFlags(col);
-            if(!scene->hasComponent<RigidBodyComponent>(col.entity))
+            if(!scene.hasComponent<RigidBodyComponent>(col.entity))
                 updateColliderTransform(col, item.getConst<WorldTransformComponent>());
         });
     }
@@ -549,7 +549,7 @@ void BulletSimulation::syncBodiesToBullet() {
 
 void BulletSimulation::syncBodiesToGame() {
 
-    for(auto& item : scene->query<ColliderComponent, RigidBodyComponent, WorldTransformComponent>()) {
+    for(auto& item : scene.query<ColliderComponent, RigidBodyComponent, WorldTransformComponent>()) {
         item.modify<RigidBodyComponent>([this](RigidBodyComponent &rb){
 
             btRigidBody* btRb = btRigidBody::upcast(getCollisionObject(rb.objectID).bulletRB);
@@ -571,7 +571,7 @@ void BulletSimulation::syncBodiesToGame() {
 
     // If substeps is 0 that means nothing happened
     if (numSubSteps != 0){
-        for(auto& item : scene->query<ColliderComponent, WorldTransformComponent>()) {
+        for(auto& item : scene.query<ColliderComponent, WorldTransformComponent>()) {
             item.modify<ColliderComponent>([this](ColliderComponent &col){
         
                 col.collisionInfo.clear();

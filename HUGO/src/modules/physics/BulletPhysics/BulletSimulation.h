@@ -83,7 +83,7 @@ class BulletSimulation : public IPhysicsSimulation {
 
 public:
     
-    BulletSimulation(std::shared_ptr<InternalScene> scene);
+    BulletSimulation(InternalScene& scene);
     ~BulletSimulation();
 
     void destroySimulation();
