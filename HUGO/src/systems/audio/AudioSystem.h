@@ -39,7 +39,7 @@ private:
 	/// @return 
 	AudioVoice* getVoice(EntityID e);
 
-	void tryCreateSound(AudioAssetInfo *asset, AudioVoice& voice, HUGO::Bool stream = false);
+	void tryCreateSound(AudioAssetInfo *asset, AudioVoice& voice, bool stream = false);
 
 	void sync(AudioComponent& audioCmp, AudioVoice& voice);
 	void sync3D(const Audio3DInfoComponent& audio3dCmp, AudioVoice& voice);
