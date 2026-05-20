@@ -29,7 +29,7 @@ void CameraSystem::update(uint32_t){
     if(cameraMap.size() == 0){
         scene.log(HUGO::StringError("[CameraSystem] No cameras in scene"));
     }
-    if(m_mainCamera == NULL){
+    if(m_mainCamera == HUGO::INVALID_ENTITY){
         scene.log(HUGO::StringError("[CameraSystem] Main camera is not set"));
     }
 
@@ -47,9 +47,6 @@ void CameraSystem::update(uint32_t){
         }
         cameraMap[camera.entity].ogreCamera->setNearClipDistance(camera.getNearClip());
         cameraMap[camera.entity].ogreCamera->setFarClipDistance(camera.getFarClip());
-
-        auto a = cameraMap[camera.entity].node->_getDerivedPosition();
-        auto b = cameraMap[camera.entity].ogreCamera->getDerivedPosition();
 
         //Check if it is a different mainCamera tham the actual one. If it is, then change it
         if(camera.isMain() && camera.entity != m_mainCamera) {
@@ -100,9 +97,6 @@ void CameraSystem::registerCameraEntity(CameraComponent& cameraComp){
         res.ogreCamera->setOrthoWindow(cameraComp.getOrthographicDimensions().first, cameraComp.getOrthographicDimensions().second);
     }
 
-    auto a = res.node->_getDerivedPosition();
-    auto b = res.ogreCamera->getDerivedPosition();
-
     cameraMap[entity] = res;
 
     if(cameraComp.isMain()){
@@ -128,6 +122,7 @@ void CameraSystem::destroyCamera(EntityID entity, CameraInfo& camInfo)
         //If it was main cam, change it for the default blank camera. It is the user´s fault to not change the mainCamera before deleting the actual one
         if(entity == m_mainCamera){
             OgreModule::instance().viewportToDefaultCamera();
+            m_mainCamera = HUGO::INVALID_ENTITY;
         }
     }
     catch(const std::exception& e){

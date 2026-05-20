@@ -19,7 +19,7 @@ HSYSTEM(CameraSystem)
 
     std::unordered_map<EntityID, CameraInfo> cameraMap; 
 
-    EntityID m_mainCamera = NULL;
+    EntityID m_mainCamera = HUGO::INVALID_ENTITY;
     void setMainCamera(const CameraComponent& camComp);
 
     // Register and unregister for cameras created outside the RenderSystem
