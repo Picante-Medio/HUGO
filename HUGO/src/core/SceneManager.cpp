@@ -11,22 +11,18 @@
 #include "WorldTransformComponent.h"
 #include "TransformComponent.h"
 
-#include "GameLibraryLoader.h"
 #include <memory>
 
 using namespace HUGO;
 
-SceneManager::SceneManager(std::shared_ptr<HUGO::IInput> inputModule): m_chatParser(), m_sceneMap(), m_input(inputModule) {
-}
+SceneManager::SceneManager(HUGO::IInput& inputModule, const HUGO::String& chatFolder, IPhysicsModule& physicsModule)
+: m_chatParser(), m_physicsModule(physicsModule), m_sceneMap(), m_input(inputModule) 
+{
+    LuaBinder::getInstance().registerMethod<SceneManager, void, HUGO::String>(
+        *this, &SceneManager::setCurrentSceneLUA, "SetCurrentScene"
+    );
 
-HUGO::ErrorOrVoid SceneManager::initializeParser(const HUGO::String& chatFolder, std::shared_ptr<IPhysicsModule> physicsModule){
-
-    //Must be called after initialization of LuaBinder
-    LuaBinder::getInstance().registerMethod<SceneManager, void, HUGO::String>(*this, &SceneManager::setCurrentSceneLUA, "SetCurrentScene");
-
-    m_physicsModule = physicsModule;
-
-    return m_chatParser.readChatFolder(chatFolder);
+    m_chatParser.readChatFolder(chatFolder);
 }
 
 HUGO::ErrorOrType<EntityID> createEntity(std::shared_ptr<InternalScene> scene, const EntityData& entityData){

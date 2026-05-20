@@ -15,6 +15,7 @@
 
 class InternalScene;
 class IPhysicsModule;
+
 namespace HUGO {
     class IInput;
 
@@ -35,10 +36,10 @@ namespace HUGO {
         HUGO::ErrorOrVoid createScene(const HUGO::String& sceneName);
 
         //Physics module
-        std::shared_ptr<IPhysicsModule> m_physicsModule;
+        IPhysicsModule& m_physicsModule;
 
         //Input module
-        std::shared_ptr<HUGO::IInput> m_input;
+        HUGO::IInput& m_input;
 
         //Checkers for scene-changing requests
         struct SceneQuery{
@@ -54,11 +55,8 @@ namespace HUGO {
 
         bool quit = false;
     public:
-        //initializeParser() must be called after this.
-        SceneManager(std::shared_ptr<HUGO::IInput> inputModule);
-
-        //Initializes the parser with chat folder and sets physicsModule
-        HUGO::ErrorOrVoid initializeParser(const HUGO::String& chatFolder, std::shared_ptr<IPhysicsModule> physicsModule);
+        //Initializes the parser with chat folder and sets physicsModule and inputModule
+        SceneManager(HUGO::IInput& inputModule, const HUGO::String& chatFolder,IPhysicsModule& physicsModule);
 
         //Unloads scene from memory
         void loadScene(const HUGO::String& sceneName);
