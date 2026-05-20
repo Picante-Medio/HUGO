@@ -29,7 +29,7 @@ AudioAssetsModule::instance(){
 void
 AudioAssetsModule::destroyInstance() {
     if (!instanceInternal) return;
-    instanceInternal.reset();
+    instanceInternal.reset(nullptr);
 }
 
 #pragma region PRIVATE HELPERS

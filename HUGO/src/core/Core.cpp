@@ -156,16 +156,16 @@ void Core::loadSceneManager() {
 }
 
 void Core::destroySceneManager() {
-    sceneManager.reset();
+    sceneManager.reset(nullptr);
 }
 
 void Core::unloadGameLibrary() {
-    gameInstance.reset();
+    gameInstance.reset(nullptr);
 }
 
 void Core::destroyDependencies() {
-
-    input.reset();
+    physicsModule.reset(nullptr);
+    input.reset(nullptr);
     OgreModule::destroyInstance();
     AudioAssetsModule::destroyInstance();
     MiniaudioModule::destroyInstance();

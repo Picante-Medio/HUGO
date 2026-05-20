@@ -57,7 +57,7 @@ OgreModule::instance(){
 void
 OgreModule::destroyInstance() {
     if (!instanceInternal) return;
-    instanceInternal.reset();
+    instanceInternal.reset(nullptr);
 }
 
 OgreModule::OgreModule(){
@@ -144,7 +144,7 @@ OgreModule::~OgreModule(){
     Ogre::MeshManager::getSingleton().removeAll();
 
     // Unload resources
-    // Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
+    Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
 
     // auto groups = rgm.getResourceGroups();
 

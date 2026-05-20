@@ -15,7 +15,7 @@ MiniaudioModule::instance(){
 void
 MiniaudioModule::destroyInstance() {
     if (!instanceInternal) return;
-    instanceInternal.reset();
+    instanceInternal.reset(nullptr);
 }
 
 MiniaudioModule::MiniaudioModule(){
