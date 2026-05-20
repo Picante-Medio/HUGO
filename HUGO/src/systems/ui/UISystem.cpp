@@ -204,7 +204,6 @@ void UISystem::syncText(const TextComponent &t)
    
     textArea->setCaption(t.text);
 
-    textArea->setCharHeight(t.characterHeight);
     if(isValidColour(t.colour)){
         textArea->setColour(Ogre::ColourValue(
             t.colour.x,
@@ -227,7 +226,6 @@ void UISystem::syncText(const TextComponent &t)
             t.colourBottom.w));
     }
     textArea->setTop(t.top);
-    textArea->setFontName(t.textFont);
     textArea->setSpaceWidth(t.spaceWidth);
     textArea->setCharHeight(t.characterHeight);
     textArea->setLeft(t.left);
@@ -692,21 +690,24 @@ void UISystem::onUpdateSliderComponent(SliderComponent& s)
 void UISystem::hideCache(UIElementCache* cache, Ogre::OverlayManager& mng)
 {
     if (!cache) return;
-
+    
     if (cache->element)
     {
+        if (cache->container) cache->container->removeChild(cache->element->getName());
         mng.destroyOverlayElement(cache->element);
         cache->element = nullptr;
     }
 
     if (cache->extra) // knob or opcional
     {
+        if (cache->container) cache->container->removeChild(cache->extra->getName());
         mng.destroyOverlayElement(cache->extra);
         cache->extra = nullptr;
     }
 
     if (cache->container)
     {
+        if (cache->overlay) cache->overlay->remove2D(cache->container);
         mng.destroyOverlayElement(cache->container);
         cache->container = nullptr;
     }
@@ -795,6 +796,7 @@ void UISystem::onAddTextComponent(TextComponent &t)
     if (!area)
         return;
     
+    area->setFontName(t.textFont);
     cache->element = area;
     onUpdateTextComponent(t);
 }
