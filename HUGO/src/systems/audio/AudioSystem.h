@@ -30,7 +30,7 @@ private:
 	};
 
 	/// @brief Engine reference, initialized in init
-    std::shared_ptr<ma_engine> engine;
+    ma_engine* engine;
 
     /// @brief Entity
     std::unordered_map<EntityID, AudioVoice> voices;

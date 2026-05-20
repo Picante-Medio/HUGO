@@ -19,7 +19,7 @@ MiniaudioModule::destroyInstance() {
 }
 
 MiniaudioModule::MiniaudioModule(){
-    m_maEngine = std::make_shared<ma_engine>();
+    m_maEngine = std::make_unique<ma_engine>();
     ma_result result = ma_engine_init(nullptr, m_maEngine.get());
     if (result != MA_SUCCESS) {
         throw std::runtime_error("Failed to initialize ma_engine");
@@ -31,6 +31,6 @@ MiniaudioModule::~MiniaudioModule(){
     ma_engine_uninit(m_maEngine.get());
 }
 
-std::shared_ptr<ma_engine> MiniaudioModule::getMiniaudioEngine(){
-    return m_maEngine;
+ma_engine& MiniaudioModule::getMiniaudioEngine(){
+    return *m_maEngine;
 }

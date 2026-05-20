@@ -4,7 +4,7 @@
 struct ma_engine;
 
 class MiniaudioModule{
-    std::shared_ptr<ma_engine> m_maEngine;
+    std::unique_ptr<ma_engine> m_maEngine;
 
     MiniaudioModule();
 
@@ -15,5 +15,5 @@ public:
 
     ~MiniaudioModule();
 
-    std::shared_ptr<ma_engine> getMiniaudioEngine();
+    ma_engine& getMiniaudioEngine();
 };

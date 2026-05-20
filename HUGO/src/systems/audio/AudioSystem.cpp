@@ -33,7 +33,7 @@ AudioSystem::~AudioSystem() {
 
 void 
 AudioSystem::init() {
-    engine = MiniaudioModule::instance().getMiniaudioEngine();
+    engine = &MiniaudioModule::instance().getMiniaudioEngine();
 
     scene.onAddComponent<AudioComponent>().connect(this, 
         &AudioSystem::onAddAudioComponent);
@@ -111,19 +111,19 @@ AudioSystem::fixedUpdate(uint32_t) {
 
         const WorldTransformComponent& tr = firstListener.getConst<WorldTransformComponent>();
 
-        ma_engine_listener_set_position(engine.get(), 0,
+        ma_engine_listener_set_position(engine, 0,
             tr.worldPosition.x,
             tr.worldPosition.y,
             tr.worldPosition.z);
 
         HUGO::Vector3 f = tr.worldRotation.forward() * -1;
 
-        ma_engine_listener_set_direction(engine.get(), 0,
+        ma_engine_listener_set_direction(engine, 0,
             f.x,
             f.y,
             f.z);
 
-        ma_engine_listener_set_world_up(engine.get(), 0,
+        ma_engine_listener_set_world_up(engine, 0,
             tr.worldRotation.up().x,
             tr.worldRotation.up().y,
             tr.worldRotation.up().z);
@@ -144,7 +144,7 @@ void
 AudioSystem::tryCreateSound(AudioAssetInfo *asset, AudioVoice& voice) {
     if (
         ma_sound_init_from_file(
-            engine.get(),
+            engine,
             asset->fullPath.c_str(),
             0,
             nullptr,
