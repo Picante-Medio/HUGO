@@ -96,7 +96,7 @@ Jugadores jóvenes y adultos (12+ / 16+).
 
 ## 2. Historia y contexto del juego
 
-Tras robar **los zapatos de *Beastie***, un demonio, este se enfada. Como castigo, el jugador queda atrapado en la casa del demonio, transformada en un **laberinto**. Por los pasillos, los demonios invocados por *Beastie* persiguen al jugador, acercándose por cada paso que da. La única forma de escapar de ese lugar, es **desactivar los rituales** que se encuentran por el laberinto, lo que hará aparecer la **puerta de salida**. Para lograrlo, el jugador deberá esquivar a los demonios y explorar el laberinto en busca de los rituales que mantienen la maldición.
+Tras robar **los zapatos de *Beastie***, un demonio, este se enfada. Como castigo, el jugador queda atrapado en la casa del demonio, transformada en un **laberinto**. Por los pasillos, los demonios invocados por *Beastie* persiguen al jugador, acercándose por cada paso que da. La única forma de escapar de ese lugar, es **desactivar los rituales** que se encuentran por el laberinto, lo que hará aparecer la **puerta de salida**. Para lograrlo, el jugador deberá esquivar al demonio y explorar el laberinto en busca de los rituales que mantienen la maldición.
   
 
 ---
@@ -109,25 +109,17 @@ Tras robar **los zapatos de *Beastie***, un demonio, este se enfada. Como castig
 
 ### 3.1. Objetivo del juego
 
-El objetivo principal del juego es **explorar el entorno para localizar y desactivar los rituales encantados**, evitando en todo momento a los monstruos que se encuentran en el nivel. Estas criaturas **avanzan de forma progresiva en función del avance del jugador**, aumentando la presión constante durante la exploración.
+El objetivo principal del juego es **explorar el entorno para localizar y desactivar los rituales encantados**, evitando en todo momento al monstruo que se encuentra en el nivel. Esta criatura **avanza de forma progresiva en función del avance del jugador**, aumentando la presión constante durante la exploración.
 
-  
-
-Si el jugador se encuentra con el monstruo, deberá **mantener inmóvil o reaccionar con rapidez para elegir una ruta de escape**, ya que cualquier error o indecisión provocará que la criatura se dirija directamente hacia él.
+Si el jugador se encuentra con el monstruo, deberá **mantenerse inmóvil o reaccionar con rapidez para elegir una ruta de escape**, ya que cualquier error o indecisión provocará que la criatura se dirija directamente hacia él.
 
   
 
 ### 3.2. Flujo del juego
 
-  
+Al iniciar el juego, el jugador es dirigido al **menú principal**, donde se presentan dos opciones: **Start** (comenzar partida) y **Exit** (salir de la aplicación). Al seleccionar **Start**, se iniciará el juego, creando un mapa generado procedimentalmente.
 
-Al iniciar el juego, el jugador es dirigido al **menú principal**, donde se presentan dos opciones: **Start** (comenzar partida) y **Exit** (salir de la aplicación). Al seleccionar **Start**, se accede al **menú de selección de niveles**, en el que estarán disponibles el último nivel alcanzado y todos los niveles previamente superados.
-
-  
-
-Una vez elegido un nivel, el jugador entra en el **bucle principal de la partida**. El personaje aparece en un punto concreto del laberinto y debe **explorar el escenario, aprender las rutas y planificar sus acciones** mientras se desplaza por el mapa. Al **desactivar todos los rituales**, se desbloquea la **puerta de salida**; al atravesarla, el jugador completa el nivel, se registra el progreso y se accede al **menú de victoria**. Si el jugador **no logra desactivar todos los rituales en el tiempo dado**, los enemigos se pondrán más frenéticos y el tiempo máximo que el jugador puede permanecer parado se reducirá.
-
-  
+Una vez generado el nivel, el jugador entra en el **bucle principal de la partida**. El personaje aparece en un punto concreto del laberinto y debe **explorar el escenario, aprender las rutas y planificar sus acciones** mientras se desplaza por el mapa. Al **desactivar todos los rituales**, se desbloquea la **puerta de salida**; al interacturar con ella, el jugador completa el nivel, se accede al **menú de victoria**. Si el jugador **no logra desactivar todos los rituales y abrir la puerta en el tiempo dado**, el juego terminará y el jugador irá al **menú de derrota**.
 
 Si el jugador es alcanzado por el monstruo, pierde la partida inmediatamente y se muestra el **menú de derrota**.
 
@@ -143,44 +135,33 @@ Si el jugador es alcanzado por el monstruo, pierde la partida inmediatamente y s
 
 ### 4.1. Movimiento del jugador
 
-El jugador puede moverse en todas las direcciones mediante las teclas **WASD**, mientras que la **rotación de la cámara** se controla con el **ratón**, permitiendo una navegación fluida y precisa por el entorno.
+El jugador puede moverse en todas las direcciones mediante las teclas **WASD**, mientras que la **rotación de la cámara** se controla con el **ratón** solo en horizontal, permitiendo una navegación fluida y precisa por el entorno.
 
   
 
 ### 4.2. Comportamiento de enemigos
 
+El **enemigo** utiliza una lógica de **comportamiento reactiva** al movimiento del jugador. Su actualización de posición depende de las acciones del jugador, creando la sensación de que el mundo responde directamente a las decisiones del jugador.
+
+Mientras el jugador se desplace, el enemigo ejecutará su lógica, que consiste en:
   
+- **Patrulla** el entorno de manera libre hasta que el jugador entre en su radio de influencia. En ese estado, no se parará cuando el jugador se pare.
 
-Los **enemigos** utilizan una lógica de **comportamiento reactiva** al movimiento del jugador. Su actualización de posición depende de las acciones del jugador, creando la sensación de que el mundo responde directamente a las decisiones del jugador.
+- En el momento que el jugador es detectado, el enemigo entra en estado de **persecución y avanza hacia** el jugador.
 
-  
-
-Mientras el jugador se desplace, los enemigos ejecutarán su lógica, que consiste en:
-
-  
-
-- **Patrullan** el entorno de manera libre hasta que el jugador entre en su radio de visión.
-
-- En el momento que el jugador es detectado, los enemigos entran en estado de **persecución y avanzan hacia** el jugador.
-
-  
-
-Si el **jugador permanece parado** los enemigos no reaccionarán. Sin embargo, tras superar un periodo de tiempo determinado, los enemigos comenzarán a avanzar igualmente, para ejercer una presión sobre el jugador.
+Si el **jugador permanece parado** y el enemigo está en el estado de persecución, este no reaccionará. Sin embargo, tras superar un periodo de tiempo determinado, los enemigos comenzarán a avanzar igualmente, para ejercer una presión sobre el jugador.
 
   
 
 ### 4.3. Objetos del mapa
 
--  **Marcas en el suelo:** el jugador dispone de un número limitado de marcas que puede colocar en el laberinto para **recordar las rutas ya recorridas**. Las marcas pueden colocarse libremente, pero al superar el límite máximo permitido, la marca más antigua se elimina automáticamente.
+-  **Marcas en el suelo:** el jugador dispone de un número limitado de marcas con forma de huella de pingüino, que puede colocar en el laberinto para **recordar las rutas ya recorridas**. Las marcas pueden colocarse libremente, pero al superar el límite máximo permitido, la marca más antigua se elimina automáticamente.
 
 - **Rituales satánicos y puerta final:** son objetos **interactuables** ubicados en puntos predefinidos del laberinto. Para poder interaccionar con la puerta, necesitas obligatoriamente visitar todos los rituales, sin importar el orden en el que hayan sido visitados.
 
-
-  
-
 ---
 
-  
+
 
 ## 5. Estética
 
@@ -188,35 +169,26 @@ Si el **jugador permanece parado** los enemigos no reaccionarán. Sin embargo, t
 
 ### 5.1. Ambientación
 
-  
-
-El juego se desarrolla en un laberinto inspirado en la estética **Backrooms**. Los espacios están formados por pasillos estrechos y salas repetitivas, con una **arquitectura monótona**, diseñada para que el jugador pierda rápidamente la noción de ubicación y orientación.
-
-  
+El juego se desarrolla en un laberinto inspirado en la estética **Backrooms**. Los espacios están formados por pasillos amplios y salas repetitivas, con una **arquitectura monótona**, diseñada para que el jugador pierda rápidamente la noción de ubicación y orientación.
 
 La visibilidad es limitada, el jugador dispondrá de una **linterna** y solo podrá ver aquello que el haz de luz ilumine directamente.
-
   
-
 En el laberinto existe **una puerta claramente distintiva**, visualmente llamativa y reconocible como una posible salida. Los rituales satánicos se destacan visualmente por su color rojo intenso, contrastando con la oscuridad del entorno. De cada rito emanan partículas rojas de forma constante.
 
-  
 
 ### 5.2. Arte gráfico
 
-  *(imágenes)*
+![Puerta final](menu_zapascape.png "Menú principal")
 
   
 
 ### 5.3. Audio
 
-La ambientación sonora es **minimalista** y **opresiva**, con silencios prolongados, sonidos de pasos de los enemigos y la respiración del jugador, que se vuelve más intensa cuando hay enemigos cerca.
-
-  
+La ambientación sonora es **minimalista** y **opresiva**, con silencios prolongados, sonidos de pasos de los enemigos y la latidos del corazón del jugador.
 
 ---
 
-  
+
 
 ## 6. Interfaces
 
@@ -224,12 +196,9 @@ La ambientación sonora es **minimalista** y **opresiva**, con silencios prolong
 
 ### 6.1. HUD
 
-  
-
-
 Durante el juego, en la pantalla aparecerá datos que informarán al jugador sobre su estado actual:
 
--   **Temporizador**: muestra el tiempo restante en formato MM:SS(minutos:segundos).
+-   **Temporizador**: muestra el tiempo restante en formato segundos.
     
 
 -   **Contador de rituales**: muestra cuántos rituales han sido desactivados y cuantos faltan para desbloquear la puerta de salida.
@@ -237,23 +206,24 @@ Durante el juego, en la pantalla aparecerá datos que informarán al jugador sob
 
 Ambos elementos del HUD están integrados de forma discreta en la pantalla.
 
-  
+![HUD](hud_zapascape.png "HUD")
+
 
 ### 6.2. Menús
 
-  
-
-
 El juego contará con varios **menús** funcionales que permiten al jugador navegar entre distintas secciones y estados del juego:
 
--   **Menú de principal**: es lo primero que aparece al entrar en la aplicación. Tendrá dos botones: uno para empezar el juego y otro para cerrar la aplicación.
-    
--   **Menú de selección de niveles**: aparece al iniciar el juego o al completar un nivel. Tendrá varios niveles (máx 3) ,de los cuales solo se podrá elegir los niveles ya desbloqueados. No se permitirá saltar niveles.
-    
+-   **Menú de principal**: es lo primero que aparece al entrar en la aplicación. Tendrá dos botones: uno para empezar el juego y otro para cerrar la aplicación.  
 
--   **Menú de Victoria**: aparece cuando el jugador llega a la puerta de salida. El jugador podrá elegir entre volver al menú principal o ir al de selección de niveles.
+![Menú principal](menu_zapascape.png "Menú principal")
+
+-   **Menú de Victoria**: aparece cuando el jugador llega a la puerta de salida. El jugador podrá elegir entre volver a jugar, que generará otro mapa, o salir del juego.
     
--   **Menú de Derrota:** aparece cuando el jugador es alcanzado por un enemigo. Ofrece opciones para reintentar el nivel o volver al menú de selección de niveles.
+![Menú de Victoria](menuVictoria_zapascape.png "Menú de Victoria")
+
+-   **Menú de Derrota:** aparece cuando el jugador es alcanzado por un enemigo. Ofrece opciones para jugar otra vez o salir del juego.
+    
+![Menú de Derrota](menuDerrota_zapascape.png "Menú de Derrota")
 
 ---
 
@@ -261,12 +231,6 @@ El juego contará con varios **menús** funcionales que permiten al jugador nave
 
 ## 7. Referencias
 
-  
-  
-
-
 El juego toma referencias de títulos y conceptos que combinan la explotación con la tensión constante por la persecución constante de los enemigos. En las principales referencias se encuentran ***Beastie*** de FreeBSD, **Hugo**, nuestro compañero de clase, y **escondite inglés.**
-
-  
 
 En cuanto a juegos ya existentes, el proyecto se inspira en juegos de horror y supervivencia como ***R.E.P.O, Granny***, ***Escape the Backrooms***, ***Phasmofobia***, ***Dark deception*** y ***Lethal Company***. De estos títulos se toman elementos como la **ambientación** y la **exploración** de ambientes cerrados con enemigos persistentes con miedo psicológico combinado con **jumpscares**.
