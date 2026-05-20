@@ -55,4 +55,7 @@ HUGO::GameLibrary::~GameLibrary() {
 
     CLOSE_DYNAMIC_LIBRARY(gameHandle);
     gameHandle = nullptr;
+
+    delete pImpl;
+    pImpl = nullptr;
 }
