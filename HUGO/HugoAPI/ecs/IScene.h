@@ -195,7 +195,7 @@ public:
 	virtual void dispatchMessages() = 0;
 
 	// Input handling
-	virtual std::shared_ptr<IInput> getInput() = 0;
+	virtual IInput& getInput() = 0;
 
     /** Scene changing
      * POSSIBLE ERROR: If the scene to change does not exist, logs an error to debug console

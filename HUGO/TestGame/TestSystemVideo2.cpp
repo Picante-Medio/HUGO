@@ -222,41 +222,41 @@ TestSystemVideo2::onLoad() {}
 void
 TestSystemVideo2::update(uint32_t dt) {
 
-    auto input = scene.getInput();
+    HUGO::IInput& input = scene.getInput();
     float delta = static_cast<float>(dt);
     const TransformComponent& tr = scene.getComponentConst<TransformComponent>(sinbad);
-    scene.modifyComponent<RigidBodyComponent>(sinbad, [input, delta, &tr](RigidBodyComponent& rb) {
-        if(input->isKeyPressed(HUGO::KeyCode::LEFT_ARROW)) rb.setAngularVelocity(HUGO::Vector3(0, 1.0f, 0));
-        else if(input->isKeyPressed(HUGO::KeyCode::RIGHT_ARROW)) rb.setAngularVelocity(HUGO::Vector3(0, -1.0f, 0));
+    scene.modifyComponent<RigidBodyComponent>(sinbad, [&input, delta, &tr](RigidBodyComponent& rb) {
+        if(input.isKeyPressed(HUGO::KeyCode::LEFT_ARROW)) rb.setAngularVelocity(HUGO::Vector3(0, 1.0f, 0));
+        else if(input.isKeyPressed(HUGO::KeyCode::RIGHT_ARROW)) rb.setAngularVelocity(HUGO::Vector3(0, -1.0f, 0));
         else rb.setAngularVelocity(HUGO::Vector3());
 
-        if(input->isKeyPressed(HUGO::KeyCode::DOWN_ARROW))rb.applyForce(tr.rotation.forward() * (-25.0f)* delta);
-        if(input->isKeyPressed(HUGO::KeyCode::UP_ARROW))rb.applyForce(tr.rotation.forward() * (25.0f)* delta);
-        if(input->isKeyPressed(HUGO::KeyCode::M)) 
+        if(input.isKeyPressed(HUGO::KeyCode::DOWN_ARROW))rb.applyForce(tr.rotation.forward() * (-25.0f)* delta);
+        if(input.isKeyPressed(HUGO::KeyCode::UP_ARROW))rb.applyForce(tr.rotation.forward() * (25.0f)* delta);
+        if(input.isKeyPressed(HUGO::KeyCode::M)) 
             rb.applyForce(tr.rotation.up() * (50.0f)* delta);
     });
 
-    scene.modifyComponent<AnimationComponent>(sinbad, [input](AnimationComponent& anim) {
-        if(input->wasKeyJustReleased(HUGO::KeyCode::DOWN_ARROW) || 
-            input->wasKeyJustReleased(HUGO::KeyCode::UP_ARROW)|| 
-            input->wasKeyJustReleased(HUGO::KeyCode::LEFT_ARROW)||
-            input->wasKeyJustReleased(HUGO::KeyCode::RIGHT_ARROW)) 
+    scene.modifyComponent<AnimationComponent>(sinbad, [&input](AnimationComponent& anim) {
+        if(input.wasKeyJustReleased(HUGO::KeyCode::DOWN_ARROW) || 
+            input.wasKeyJustReleased(HUGO::KeyCode::UP_ARROW)|| 
+            input.wasKeyJustReleased(HUGO::KeyCode::LEFT_ARROW)||
+            input.wasKeyJustReleased(HUGO::KeyCode::RIGHT_ARROW)) 
         {
             anim.setEnabled("RunBase", false);
             anim.setEnabled("RunTop", false);
         }
-        if(input->wasKeyJustPressed(HUGO::KeyCode::DOWN_ARROW) || 
-            input->wasKeyJustPressed(HUGO::KeyCode::UP_ARROW)|| 
-            input->wasKeyJustPressed(HUGO::KeyCode::LEFT_ARROW)||
-            input->wasKeyJustPressed(HUGO::KeyCode::RIGHT_ARROW)) 
+        if(input.wasKeyJustPressed(HUGO::KeyCode::DOWN_ARROW) || 
+            input.wasKeyJustPressed(HUGO::KeyCode::UP_ARROW)|| 
+            input.wasKeyJustPressed(HUGO::KeyCode::LEFT_ARROW)||
+            input.wasKeyJustPressed(HUGO::KeyCode::RIGHT_ARROW)) 
         {
             anim.setEnabled("RunBase", true);
             anim.setEnabled("RunTop", true);
         }
     });
 
-    scene.modifyComponent<AudioComponent>(sinbad, [input](AudioComponent& a) {
-        if (input->wasKeyJustPressed(HUGO::KeyCode::P)){
+    scene.modifyComponent<AudioComponent>(sinbad, [&input](AudioComponent& a) {
+        if (input.wasKeyJustPressed(HUGO::KeyCode::P)){
             a.isPlaying = true;
         }
     });

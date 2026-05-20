@@ -219,7 +219,7 @@ TestSystemVideo3::onLoad() {}
 
 void
 TestSystemVideo3::update(uint32_t) {
-    if(scene.getInput()->wasKeyJustPressed(HUGO::KeyCode::ONE)){
+    if(scene.getInput().wasKeyJustPressed(HUGO::KeyCode::ONE)){
         std::cout << "Cambiando escena...\n";
         ChangeSceneMessage c;
         c.sceneName = "TestSceneVideo1";

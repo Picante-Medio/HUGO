@@ -45,7 +45,8 @@ void OgreModule::loadResources()
 
 #pragma endregion
 
-std::unique_ptr<OgreModule> OgreModule::instanceInternal = std::make_unique<OgreModule>();
+std::unique_ptr<OgreModule> OgreModule::instanceInternal = 
+    std::unique_ptr<OgreModule>(new OgreModule());
 
 OgreModule& 
 OgreModule::instance(){

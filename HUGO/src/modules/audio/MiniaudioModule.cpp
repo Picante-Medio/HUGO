@@ -2,7 +2,8 @@
 #include "miniaudio.h"
 #include <iostream>
 
-std::unique_ptr<MiniaudioModule> MiniaudioModule::instanceInternal = std::make_unique<MiniaudioModule>();
+std::unique_ptr<MiniaudioModule> MiniaudioModule::instanceInternal = 
+    std::unique_ptr<MiniaudioModule>(new MiniaudioModule());
 
 
 MiniaudioModule& 

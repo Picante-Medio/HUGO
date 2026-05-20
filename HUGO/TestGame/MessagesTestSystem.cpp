@@ -18,7 +18,7 @@ void MessagesTestSystem::fixedUpdate(uint32_t) {
 }
 void MessagesTestSystem::update(uint32_t) {
 
-    if(scene.getInput()->wasKeyJustPressed(HUGO::KeyCode::TWO)){
+    if(scene.getInput().wasKeyJustPressed(HUGO::KeyCode::TWO)){
         std::cout << "Cambiando escena...\n";
 
         scene.sendMessage<ChangeSceneMessage>(ChangeSceneMessage{});

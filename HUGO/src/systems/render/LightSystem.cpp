@@ -9,7 +9,7 @@
 void LightSystem::init(){
     ogreRoot = Ogre::Root::getSingletonPtr();
     
-    sceneManager = OgreModule::Instance().getCurrentSceneManager();
+    sceneManager = OgreModule::instance().getCurrentSceneManager();
 
     scene.onAddComponent<LightComponent>().connect(this, &LightSystem::registerLightEntity);
     scene.onUpdateComponent<LightComponent>().connect(this, &LightSystem::onUpdateLightComponent);
@@ -20,7 +20,9 @@ void LightSystem::init(){
 }
 
 void LightSystem::onLoad(){
-    LuaBinder::getInstance().registerMethod<LightSystem, void, float, float, float>(*this, &LightSystem::setAmbientLight, "SetAmbientLight");
+    LuaBinder::getInstance().registerMethod<LightSystem, void, float, float, float>(
+        *this, &LightSystem::setAmbientLight, "SetAmbientLight"
+    );
 }
 
 LightSystem::~LightSystem()

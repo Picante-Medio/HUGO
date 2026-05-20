@@ -21,13 +21,13 @@ class InternalScene : public HUGO::IScene, public std::enable_shared_from_this<I
     std::queue<std::shared_ptr<HUGO::Error>> errorsToLog;
     std::queue<HUGO::String> stringsToLog;
 
-    std::shared_ptr<HUGO::IInput> input;
+    HUGO::IInput& input;
     HUGO::SceneManager& sceneManager;
 
     bool hasComponent(EntityID entity, ComponentID componentID);
     void removeComponentAux(EntityID entity, ComponentID componentID, DenseListIndex index);
 public:
-    InternalScene(std::shared_ptr<HUGO::IInput> input, HUGO::SceneManager& sceneManager);
+    InternalScene(HUGO::IInput& input, HUGO::SceneManager& sceneManager);
 
     //Calls load() on all systems. Must be used only by SceneManager
     void load();
@@ -70,7 +70,7 @@ public:
 
     void dispatchMessages() override;
 
-    std::shared_ptr<HUGO::IInput> getInput() override;
+    HUGO::IInput& getInput() override;
 
     void changeScene(const HUGO::String& sceneName) override;
 

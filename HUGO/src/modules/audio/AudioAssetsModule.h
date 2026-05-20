@@ -32,11 +32,11 @@ private:
     void scanDirectoryRecursive(const std::string& currentPath, const std::string& relativeRoot);
     
     AudioAssetsModule();
-    ~AudioAssetsModule();
-    
     static std::unique_ptr<AudioAssetsModule> instanceInternal;
 
 public:
+    ~AudioAssetsModule();
+
     static AudioAssetsModule& instance();
     static void destroyInstance();
 

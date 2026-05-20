@@ -33,7 +33,7 @@ AudioSystem::~AudioSystem() {
 
 void 
 AudioSystem::init() {
-    engine = MiniaudioModule::Instance().getMiniaudioEngine();
+    engine = MiniaudioModule::instance().getMiniaudioEngine();
 
     scene.onAddComponent<AudioComponent>().connect(this, 
         &AudioSystem::onAddAudioComponent);
@@ -165,7 +165,7 @@ void
 AudioSystem::onAddAudioComponent(AudioComponent& audioCmp) {
 
     AudioAssetInfo* asset =
-        AudioAssetsModule::Instance().getAsset(audioCmp.audioName);
+        AudioAssetsModule::instance().getAsset(audioCmp.audioName);
 
     AudioVoice& v = voices[audioCmp.entity];
 
@@ -202,7 +202,7 @@ void AudioSystem::onUpdateAudioComponent(AudioComponent& audioCmp) {
     AudioVoice *v = getVoice(audioCmp.entity);
 
     AudioAssetInfo* asset =
-        AudioAssetsModule::Instance().getAsset(audioCmp.audioName);
+        AudioAssetsModule::instance().getAsset(audioCmp.audioName);
 
     // Id is diferent, remake audio
     if (asset->id != v->id) {

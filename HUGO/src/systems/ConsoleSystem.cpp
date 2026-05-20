@@ -192,7 +192,7 @@ void ConsoleSystem::init(){
     LuaBinder::getInstance().setPrintFunction(consoleLuaPrint);
     active = false;
     historyIndex = 0;
-    input = std::static_pointer_cast<HUGO::Input>(scene.getInput());
+    input = static_cast<HUGO::Input*>(&scene.getInput());
     input->setConsoleActive(active);
     
     //---------------------------------------Input field

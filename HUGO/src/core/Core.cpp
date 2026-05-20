@@ -27,14 +27,23 @@
 
 #include "LuaBinder.h"
 
-#include "GameLibraryLoader.h"
+#include "GameLibrary.h"
 
 using namespace HUGO;
-Core::Core(): input(std::make_shared<Input>()), sceneManager(input)
-{}
+Core::Core() {
+    processHugoConfig();
+    initializeDependencies();
+    loadGameLibrary();
+    loadSceneManager();
+}
 
-//Initialization of HUGO modules and loading of games dynamic lib
-HUGO::ErrorOrVoid Core::init() {
+Core::~Core() {
+    destroySceneManager();
+    unloadGameLibrary();
+    destroyDependencies();
+}
+
+void Core::processHugoConfig() {
 
     std::unordered_map<std::string, std::string> initParams = std::unordered_map<std::string, std::string>();
 
@@ -66,7 +75,7 @@ HUGO::ErrorOrVoid Core::init() {
         if((key == "GAME_LIB" || key == "CHATS" || key == "MAIN_SCENE" || key == "FULLSCREEN")
         && value.size() > 0) {
             if (initParams.count(key)) {
-                std::cerr << "[hugo.config] " << key << " field duplcated at line: " << line;
+                std::cerr << "[hugo.config] " << key << " field duplcated at line: " << line << "\n";
                 continue;
             }
 
@@ -94,49 +103,80 @@ HUGO::ErrorOrVoid Core::init() {
         throw "[hugo.config] GAME_LIB or MAIN_SCENE field empty or missing";
     }
 
-    gameName = initParams["GAME_LIB"].c_str();
+    gameName = initParams["GAME_LIB"];
+    chatsDirectory = initParams["CHATS"];
+    initialScene = initParams["MAIN_SCENE"];
+}
+
+void Core::initializeDependencies() {
 
     //LuaBinder initialization
     initLua();
 
-    // Load game as dll
-    GameLibraryLoader::init(initParams["GAME_LIB"]);
-
-    vt.reset();
-    initModules();
-
-    HUGO::ErrorOrVoid err = sceneManager.initializeParser(initParams["CHATS"], physicsModule);
-
-    if(err.isError()) return err;
-    
-    sceneManager.setCurrentScene(initParams["MAIN_SCENE"]);
-
-    return HUGO::ErrorOrVoid();
-}
-
-//--------------------------- IMODULES INITIALIZATION --------------------
-
-void HUGO::Core::initModules()
-{
     //MiniaudioModule init
-    MiniaudioModule::Instance();
-    //Audio assets init
-    initAudioAssets();
+    MiniaudioModule::instance();
+
+    // set base path
+    AudioAssetsModule::instance().setBasePath("../Resources/audios/");
+    // automatically scan and register all audio files
+    AudioAssetsModule::instance().scanAndRegisterAll();
 
     //OgreModule init
-    OgreModule::Instance();
-    OgreModule::Instance().setFullscreen(fullscreen);
+    OgreModule::instance();
+    OgreModule::instance().setFullscreen(fullscreen);
 
     //BulletoModule init
-    physicsModule = std::make_shared<BulletModule>();
+    physicsModule = std::make_unique<BulletModule>();
 
     // Input
-    input->setSDLWindow(OgreModule::Instance().getSDLWindow());
-
-    SDL_SetWindowTitle(OgreModule::Instance().getSDLWindow(), gameName);
+    input = std::make_unique<Input>();
+    input->setSDLWindow(OgreModule::instance().getSDLWindow());
+    SDL_SetWindowTitle(OgreModule::instance().getSDLWindow(), gameName.c_str());
 }
+
+void 
+Core::initLua() {
+    //LuaBinder init
+    const std::filesystem::path luaPath = std::filesystem::absolute(
+        std::filesystem::path("..") / "src" / "lua"
+    );
+
+    if(std::filesystem::exists(luaPath))
+        LuaBinder::getInstance().requireFolder(luaPath.string());
+    
+}
+
+void Core::loadGameLibrary() {
+    gameInstance = std::make_unique<GameLibrary>(gameName);
+}
+
+void Core::loadSceneManager() {
+    sceneManager = std::make_unique<SceneManager>(*input, chatsDirectory, *physicsModule);
+    sceneManager->setCurrentScene(initialScene);
+}
+
+void Core::destroySceneManager() {
+    sceneManager.reset();
+}
+
+void Core::unloadGameLibrary() {
+    gameInstance.reset();
+}
+
+void Core::destroyDependencies() {
+
+    input.reset();
+    OgreModule::destroyInstance();
+    AudioAssetsModule::destroyInstance();
+    MiniaudioModule::destroyInstance();
+    // Lua is not necesary to destroy
+}
+
 //HUGO main loop
 HUGO::ErrorOrVoid Core::run(){
+
+    vt.reset();
+
     bool exit = false;
     //If an error is detected, this value is returned
     HUGO::ErrorOrVoid exitValue = HUGO::ErrorOrVoid();
@@ -149,11 +189,11 @@ HUGO::ErrorOrVoid Core::run(){
         uint32_t frameTime = vt.getDeltaTime(); //ms
         accumulator += frameTime;
 
-        exitValue = sceneManager.manageQueries();
-        if(sceneManager.getQuit() || exitValue.isError()) exit = true;
+        exitValue = sceneManager->manageQueries();
+        if(sceneManager->getQuit() || exitValue.isError()) exit = true;
         else{
             while(accumulator > FIXED_STEP) {
-                sceneManager.fixedUpdateCurrentScene(FIXED_STEP);
+                sceneManager->fixedUpdateCurrentScene(FIXED_STEP);
                 physicsModule->performSimulations(FIXED_STEP);
                 accumulator -= FIXED_STEP;
             }
@@ -163,13 +203,13 @@ HUGO::ErrorOrVoid Core::run(){
                 exit = true;
             }
             if(input->windowHasChanged()){   
-                OgreModule::Instance().updateWindowDimensions();
+                OgreModule::instance().updateWindowDimensions();
                 input->clearWindowFlag();
             }
-            sceneManager.updateCurrentScene(frameTime);
-            sceneManager.dispatchMessagesCurrentScene();
+            sceneManager->updateCurrentScene(frameTime);
+            sceneManager->dispatchMessagesCurrentScene();
             
-            OgreModule::Instance().renderOneFrame();
+            OgreModule::instance().renderOneFrame();
 
         }
 
@@ -178,27 +218,3 @@ HUGO::ErrorOrVoid Core::run(){
     return exitValue;
 }
 
-
-void 
-Core::initLua() {
-    //LuaBinder init
-
-    const std::filesystem::path luaPath = std::filesystem::absolute(
-        std::filesystem::path("..") / "src" / "lua"
-    );
-
-    if(std::filesystem::exists(luaPath))
-        LuaBinder::getInstance().requireFolder(luaPath.string());
-    
-}
-
-void HUGO::Core::initAudioAssets()
-{
-    auto& assets = AudioAssetsModule::Instance();
-    
-    // set base path
-    assets.setBasePath("../Resources/audios/");
-    
-    // automatically scan and register all audio files
-    assets.scanAndRegisterAll();
-}

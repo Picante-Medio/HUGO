@@ -18,7 +18,7 @@
 #include "ComponentFactory.h"
 #include "HStringUtils.h"
 
-InternalScene::InternalScene(std::shared_ptr<HUGO::IInput> input, HUGO::SceneManager& sceneManager) 
+InternalScene::InternalScene(HUGO::IInput& input, HUGO::SceneManager& sceneManager) 
     : input(input), sceneManager(sceneManager)
 {
 	entityTable = std::make_unique<EntityTable>();
@@ -220,7 +220,7 @@ InternalScene::dispatchMessages() {
 	messenger.sendAll();
 }
 
-std::shared_ptr<HUGO::IInput>
+HUGO::IInput&
 InternalScene::getInput() {
 	return input;
 }

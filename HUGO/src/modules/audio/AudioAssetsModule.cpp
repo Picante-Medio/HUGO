@@ -17,7 +17,8 @@ AudioAssetsModule::~AudioAssetsModule()
     clear();
 }
 
-std::unique_ptr<AudioAssetsModule> AudioAssetsModule::instanceInternal = std::make_unique<AudioAssetsModule>();
+std::unique_ptr<AudioAssetsModule> AudioAssetsModule::instanceInternal = 
+    std::unique_ptr<AudioAssetsModule>(new AudioAssetsModule());
 
 AudioAssetsModule& 
 AudioAssetsModule::instance(){
