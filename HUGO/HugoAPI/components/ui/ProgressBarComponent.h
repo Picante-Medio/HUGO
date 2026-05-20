@@ -15,10 +15,6 @@ HCOMPONENT(ProgressBarComponent)
     // name of the fill element
     DEFAULT_SERIALIZED_MEMBER(HUGO::String, fillElementName, "");
 
-    // relative width and height
-    HUGO::Float fillWidth = 0.0f;
-    HUGO::Float fillHeight = 0.0f;
-    
     // material
     DEFAULT_SERIALIZED_MEMBER(HUGO::String, fillMaterial, "");
 END_HCOMPONENT()

@@ -271,35 +271,35 @@ void UISystem::syncProgressBar(const PanelComponent& p, const ProgressBarCompone
     HUGO::Float percent = (pr.currentValue - pr.minValue) / (pr.maxValue - pr.minValue);
     percent = std::clamp(percent, 0.0f, 1.0f);
 
-    // sync fill
+       // sync fill
     switch (pr.fillMode)
     {
         case HUGO::ProgressBarFillMode::HORIZONTAL_LEFT_TO_RIGHT:
             cache->element->setLeft(0.0f);
-            cache->element->setWidth(p.width * pr.fillWidth * percent);
+            cache->element->setWidth(p.width * percent);
             cache->element->setTop(0.0f);
-            cache->element->setHeight(p.height * pr.fillHeight);
+            cache->element->setHeight(p.height);
             break;
 
         case HUGO::ProgressBarFillMode::HORIZONTAL_RIGHT_TO_LEFT:
-            cache->element->setLeft(p.width * pr.fillWidth * (1.0f - percent));
-            cache->element->setWidth(p.width * pr.fillWidth *percent);
+            cache->element->setLeft(p.width * (1.0f - percent));
+            cache->element->setWidth(p.width*percent);
             cache->element->setTop(0.0f);
-            cache->element->setHeight(p.height * pr.fillHeight);
+            cache->element->setHeight(p.height);
             break;
 
         case HUGO::ProgressBarFillMode::VERTICAL_BOTTOM_TO_TOP:
-            cache->element->setTop(p.height * pr.fillHeight * (1.0f - percent));
-            cache->element->setHeight(p.height * pr.fillWidth * percent);
+            cache->element->setTop(p.height * (1.0f - percent));
+            cache->element->setHeight(p.height * percent);
             cache->element->setLeft(0.0f);
-            cache->element->setWidth(p.width* pr.fillWidth);
+            cache->element->setWidth(p.width);
             break;
 
         case HUGO::ProgressBarFillMode::VERTICAL_TOP_TO_BOTTOM:
             cache->element->setTop(0.0f);
-            cache->element->setHeight(p.height *pr.fillHeight * percent);
+            cache->element->setHeight(p.height * percent);
             cache->element->setLeft(0.0f);
-            cache->element->setWidth(p.width * pr.fillWidth);
+            cache->element->setWidth(p.width);
             break;
     }
     // sync materials
