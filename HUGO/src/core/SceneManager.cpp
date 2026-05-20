@@ -138,8 +138,8 @@ void SceneManager::setCurrentScene(const HUGO::String& sceneName){
 }
 
 void SceneManager::setCurrentSceneAndDestroyPrevious(const HUGO::String& sceneName){
-    m_sceneQueries.push_back({SceneQuery::QueryType::CHANGE_SCENE, sceneName});
     m_sceneQueries.push_back({SceneQuery::QueryType::DELETE_SCENE, m_currentSceneName});
+    m_sceneQueries.push_back({SceneQuery::QueryType::CHANGE_SCENE, sceneName});
 
 }
 
