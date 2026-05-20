@@ -34,9 +34,12 @@ private:
     AudioAssetsModule();
     ~AudioAssetsModule();
     
+    static std::unique_ptr<AudioAssetsModule> instanceInternal;
+
 public:
-    static AudioAssetsModule& Instance();
-    
+    static AudioAssetsModule& instance();
+    static void destroyInstance();
+
     // delete copy constructors
     AudioAssetsModule(const AudioAssetsModule&) = delete;
     AudioAssetsModule& operator=(const AudioAssetsModule&) = delete;

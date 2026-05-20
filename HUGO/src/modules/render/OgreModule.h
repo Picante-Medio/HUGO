@@ -44,9 +44,12 @@ class OgreModule{
     //Initializes Ogre Singletons and SDL window
     OgreModule();
     void loadResources();
+
+    static std::unique_ptr<OgreModule> instanceInternal;
 public:
 
-    static OgreModule& Instance();
+    static OgreModule& instance();
+    static void destroyInstance();    
 
     //Sets the current sceneManager that scene systems will use
     void setCurrentSceneManager(HUGO::String sceneName);

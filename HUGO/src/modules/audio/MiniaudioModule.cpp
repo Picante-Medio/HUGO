@@ -2,10 +2,19 @@
 #include "miniaudio.h"
 #include <iostream>
 
-MiniaudioModule& MiniaudioModule::Instance(){
-    static MiniaudioModule instance;
+std::unique_ptr<MiniaudioModule> MiniaudioModule::instanceInternal = std::make_unique<MiniaudioModule>();
 
+
+MiniaudioModule& 
+MiniaudioModule::instance(){
+    static MiniaudioModule& instance = *instanceInternal;
     return instance;
+}
+
+void
+MiniaudioModule::destroyInstance() {
+    if (!instanceInternal) return;
+    instanceInternal.reset();
 }
 
 MiniaudioModule::MiniaudioModule(){

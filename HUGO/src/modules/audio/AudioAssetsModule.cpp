@@ -17,10 +17,18 @@ AudioAssetsModule::~AudioAssetsModule()
     clear();
 }
 
-AudioAssetsModule& AudioAssetsModule::Instance()
-{
-    static AudioAssetsModule instance;
+std::unique_ptr<AudioAssetsModule> AudioAssetsModule::instanceInternal = std::make_unique<AudioAssetsModule>();
+
+AudioAssetsModule& 
+AudioAssetsModule::instance(){
+    static AudioAssetsModule& instance = *instanceInternal;
     return instance;
+}
+
+void
+AudioAssetsModule::destroyInstance() {
+    if (!instanceInternal) return;
+    instanceInternal.reset();
 }
 
 #pragma region PRIVATE HELPERS

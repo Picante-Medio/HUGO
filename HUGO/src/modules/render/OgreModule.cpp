@@ -45,9 +45,18 @@ void OgreModule::loadResources()
 
 #pragma endregion
 
-OgreModule& OgreModule::Instance(){
-    static OgreModule instance;
+std::unique_ptr<OgreModule> OgreModule::instanceInternal = std::make_unique<OgreModule>();
+
+OgreModule& 
+OgreModule::instance(){
+    static OgreModule& instance = *instanceInternal;
     return instance;
+}
+
+void
+OgreModule::destroyInstance() {
+    if (!instanceInternal) return;
+    instanceInternal.reset();
 }
 
 OgreModule::OgreModule(){
@@ -204,7 +213,7 @@ void OgreModule::renderOneFrame(){
 void OgreModule::updateWindowDimensions()
 {
     int w,h;
-    SDL_GetWindowSize(OgreModule::Instance().getSDLWindow(), &w, &h);
+    SDL_GetWindowSize(OgreModule::instance().getSDLWindow(), &w, &h);
     if (w > 0 && h > 0)
     {
         m_ogreRenderWindow->resize(w, h);
