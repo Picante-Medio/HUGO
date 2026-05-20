@@ -35,8 +35,6 @@ void ChatParser::readChatFolder(const HUGO::String& chatFolder){
                 "Error reading .chat in path {" + chatPath.filename().string()+ "}: " + err.getError().description());
         }
     }
-
-    return HUGO::ErrorOrVoid();
 }
 
 HUGO::ErrorOrVoid ChatParser::readChat(const HUGO::String& chatPath){
