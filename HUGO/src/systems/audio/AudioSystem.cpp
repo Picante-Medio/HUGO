@@ -83,6 +83,21 @@ AudioSystem::onExit()
     voices.clear();
 }
 
+void 
+AudioSystem::update(uint32_t){
+    for (auto& pack : scene.query<AudioComponent>()){
+        pack.modify<AudioComponent>([this](AudioComponent& a){
+            AudioVoice& v = *getVoice(a.entity); 
+            bool miniaudioPlaying = ma_sound_is_playing(&v.sound);
+            // Natural end of play
+            if (v.started && a.isPlaying && !miniaudioPlaying && !a.loop) {
+                a.isPlaying = false;
+                v.started = false;
+            }
+        });
+    }
+}
+
 void
 AudioSystem::fixedUpdate(uint32_t) {
 
@@ -116,7 +131,7 @@ AudioSystem::fixedUpdate(uint32_t) {
             tr.worldPosition.y,
             tr.worldPosition.z);
 
-        HUGO::Vector3 f = tr.worldRotation.forward() * -1;
+        HUGO::Vector3 f = tr.worldRotation.forward();
 
         ma_engine_listener_set_direction(engine, 0,
             f.x,
@@ -141,7 +156,8 @@ AudioSystem::getVoice(EntityID e) {
 }
 
 void
-AudioSystem::tryCreateSound(AudioAssetInfo *asset, AudioVoice& voice) {
+AudioSystem::tryCreateSound(AudioAssetInfo *asset, AudioVoice& voice, HUGO::Bool stream) {
+    HUGO::Int strm = stream ? MA_SOUND_FLAG_STREAM : 0; 
     if (
         ma_sound_init_from_file(
             engine,
@@ -175,7 +191,7 @@ AudioSystem::onAddAudioComponent(AudioComponent& audioCmp) {
     // This already exist, get out
     if (v.initialized) return;
 
-    tryCreateSound(asset, v);
+    tryCreateSound(asset, v, audioCmp.streaming);
 
     if (scene.hasComponent<Audio3DInfoComponent>(audioCmp.entity)) {
         
@@ -192,6 +208,9 @@ AudioSystem::onAddAudioComponent(AudioComponent& audioCmp) {
 
             sync3D(audio3dCmp, v);
         }
+    }
+    else {
+        ma_sound_set_spatialization_enabled(&v.sound, MA_FALSE);
     }
 
     sync(audioCmp, v);
@@ -221,7 +240,7 @@ void AudioSystem::onRemoveAudioComponent(AudioComponent& audioCmp) {
 
     AudioVoice *v = getVoice(audioCmp.entity);
 
-    if (!v->initialized) {
+    if (v->initialized) {
         ma_sound_stop(&v->sound);
         ma_sound_uninit(&v->sound);
         voices.erase(audioCmp.entity);

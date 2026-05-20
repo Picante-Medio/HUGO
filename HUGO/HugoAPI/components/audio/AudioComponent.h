@@ -8,6 +8,7 @@ HCOMPONENT(AudioComponent)
     DEFAULT_SERIALIZED_MEMBER(HUGO::String, audioName, "");
 
     DEFAULT_SERIALIZED_MEMBER(HUGO::Bool, loop, false);
+    DEFAULT_SERIALIZED_MEMBER(HUGO::Bool, streaming, false);
     DEFAULT_SERIALIZED_MEMBER(HUGO::Bool, isPlaying, false)
 
     DEFAULT_SERIALIZED_MEMBER(HUGO::Float, volume, 1.0f);

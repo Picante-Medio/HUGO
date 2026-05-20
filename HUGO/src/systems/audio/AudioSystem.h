@@ -39,7 +39,7 @@ private:
 	/// @return 
 	AudioVoice* getVoice(EntityID e);
 
-	void tryCreateSound(AudioAssetInfo *asset, AudioVoice& voice);
+	void tryCreateSound(AudioAssetInfo *asset, AudioVoice& voice, HUGO::Bool stream = false);
 
 	void sync(AudioComponent& audioCmp, AudioVoice& voice);
 	void sync3D(const Audio3DInfoComponent& audio3dCmp, AudioVoice& voice);
@@ -57,7 +57,7 @@ public:
     virtual ~AudioSystem();
 
 	// updates
-	void update(uint32_t) override {}
+	void update(uint32_t) override;
 	void fixedUpdate(uint32_t) override;
 
 	void onLoad() override;
