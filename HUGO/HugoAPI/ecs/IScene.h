@@ -170,8 +170,8 @@ public:
 		return returnedQuery;
 	}
 
-    virtual void log(HUGO::String message) = 0; 
-    virtual void log(std::shared_ptr<Error>) = 0;
+    virtual void log(const HUGO::String& message) = 0; 
+    virtual void log(const HUGO::StringError&) = 0;
 
     virtual HUGO::ErrorOrType<HUGO::String> getNextError() = 0;
     virtual HUGO::ErrorOrType<HUGO::String> getNextLog() = 0;

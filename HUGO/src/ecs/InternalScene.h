@@ -18,7 +18,7 @@ namespace HUGO {
 class InternalScene : public HUGO::IScene, public std::enable_shared_from_this<InternalScene>
 {
     std::vector<std::shared_ptr<HUGO::System>> systems;
-    std::queue<std::shared_ptr<HUGO::Error>> errorsToLog;
+    std::queue<HUGO::StringError> errorsToLog;
     std::queue<HUGO::String> stringsToLog;
 
     HUGO::IInput& input;
@@ -62,8 +62,8 @@ public:
     void printEntity(int id);
     void printEntities();
 
-    void log(std::shared_ptr<HUGO::Error> error) override;
-    void log(HUGO::String log) override;
+    void log(const HUGO::StringError& error) override;
+    void log(const HUGO::String& log) override;
 
     HUGO::ErrorOrType<HUGO::String> getNextError() override;
     HUGO::ErrorOrType<HUGO::String> getNextLog() override;

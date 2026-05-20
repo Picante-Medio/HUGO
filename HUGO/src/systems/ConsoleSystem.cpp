@@ -18,7 +18,7 @@ void ConsoleSystem::printLuaOutput(const TextComponent& consoleTextCmp){
 }
 
 void ConsoleSystem::printLogs(const TextComponent& consoleTextCmp){
-    HUGO::ErrorOrType log = scene.getNextLog();
+    HUGO::ErrorOrType<HUGO::String> log = scene.getNextLog();
 
     while (!log.isError())
     {
@@ -34,7 +34,7 @@ void ConsoleSystem::printLogs(const TextComponent& consoleTextCmp){
 }
 
 void ConsoleSystem::printErrors(const TextComponent& consoleTextCmp){
-    HUGO::ErrorOrType error = scene.getNextError();
+    HUGO::ErrorOrType<HUGO::String> error = scene.getNextError();
 
     // for errors, \n is included by default
     while(!error.isError()){
@@ -109,11 +109,11 @@ void ConsoleSystem::receiveInput(const HUGO::String& inputText){
             HUGO::ErrorOrType<HUGO::String> returnedInfo = LuaBinder::getInstance().getFromString<HUGO::String>(command);
             handleReturn<HUGO::String>(returnedInfo);
         }
-        else scene.log(std::shared_ptr<HUGO::Error>(new HUGO::StringError("LUA: Invalid return type")));
+        else scene.log(HUGO::StringError("LUA: Invalid return type"));
     }
     else{
         HUGO::ErrorOrVoid error = LuaBinder::getInstance().interpretString(command);
-        if(error.isError()) scene.log(std::make_shared<HUGO::StringError>(error.getError()));
+        if(error.isError()) scene.log(HUGO::StringError(error.getError()));
     }
 }
 

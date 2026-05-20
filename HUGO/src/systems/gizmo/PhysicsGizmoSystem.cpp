@@ -126,7 +126,7 @@ void PhysicsGizmoSystem::createGizmo(ColliderComponent& collider){
     HUGO::ErrorOrVoid res = std::visit([&](auto&& info) {return createGizmoMesh(scene, newID, info);}, collider.info);
 
     if(res.isError()) {
-        scene.log(std::make_shared<HUGO::StringError>("[PhysicsGizmoSystem] Error creating Gizmo: "+ res.getError().errorMessage));
+        scene.log(HUGO::StringError("[PhysicsGizmoSystem] Error creating Gizmo: "+ res.getError().errorMessage));
         return;
     }
 

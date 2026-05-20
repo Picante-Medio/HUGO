@@ -15,7 +15,7 @@ void TweenSystem::update(uint32_t dt) {
             HUGO::ErrorOrType<bool> res = it->get()->tweenParameter(scene, static_cast<HUGO::Float>(dt));
 
             if(res.isError()){
-                scene.log(std::make_shared<HUGO::StringError>("[TweenSystem] " + res.getError().errorMessage));
+                scene.log(HUGO::StringError("[TweenSystem] " + res.getError().errorMessage));
                 //Write in console the error
                 it = comp.currentTweens.erase(it);
             }

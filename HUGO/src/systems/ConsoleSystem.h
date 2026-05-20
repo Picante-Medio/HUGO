@@ -57,7 +57,7 @@ HSYSTEM(ConsoleSystem)
 
         std::variant<int, float, bool, HUGO::String>  lastValueReturned;
 
-        if(returnedInfo.isError()) scene.log(std::make_shared<HUGO::StringError>(returnedInfo.getError()));
+        if(returnedInfo.isError()) scene.log(HUGO::StringError(returnedInfo.getError()));
         else lastValueReturned = returnedInfo.getValue();
 
         if(std::holds_alternative<HUGO::Int>(lastValueReturned)){

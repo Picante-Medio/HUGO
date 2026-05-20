@@ -129,7 +129,7 @@ void RenderSystem::registerRenderEntity(RenderComponent& comp)
         if (ent) sceneManager->destroyEntity(ent);
         if (node) sceneManager->destroySceneNode(node);
         
-        scene.log(std::make_shared<HUGO::StringError>(err));
+        scene.log(HUGO::StringError(err));
         return;
     }
     
@@ -158,7 +158,7 @@ void RenderSystem::destroyOgreObject(OgreObject &obj)
         }
     }
     catch(const std::exception& e){
-        scene.log(std::make_shared<HUGO::StringError>("[RenderSystem]: " + std::string(e.what())));
+        scene.log(HUGO::StringError("[RenderSystem]: " + std::string(e.what())));
     }
 }
 void RenderSystem::unregisterRenderEntity(RenderComponent& comp)
@@ -224,7 +224,7 @@ void RenderSystem::onUpdateAnimationComponet(AnimationComponent &animComp)
     Ogre::Entity* ogre_ent = ogreObj.ogreEntity;
 
     if(!ogre_ent) {
-        scene.log(std::make_shared<HUGO::StringError>("[RenderSystem] Entity "+  std::to_string(entity) + " has not created the Ogre Entity"));
+        scene.log(HUGO::StringError("[RenderSystem] Entity "+  std::to_string(entity) + " has not created the Ogre Entity"));
         return;
     }
     //remove animations that does exist in the Component
@@ -251,7 +251,7 @@ void RenderSystem::onUpdateAnimationComponet(AnimationComponent &animComp)
         {
             if(!ogre_ent->hasAnimationState(animName))
             {
-                scene.log(std::make_shared<HUGO::StringError>(
+                scene.log(HUGO::StringError(
                     "[RenderSystem] Animation "+ animName 
                     + " does not exist in entity " + std::to_string(rc.entity)
                 ));

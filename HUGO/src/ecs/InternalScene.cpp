@@ -188,12 +188,12 @@ InternalScene::printEntities() {
 }
 
 void 
-InternalScene::log(std::shared_ptr<HUGO::Error> error) {
+InternalScene::log(const HUGO::StringError& error) {
     errorsToLog.push(error);
 }
 
 void 
-InternalScene::log(HUGO::String log) {
+InternalScene::log(const HUGO::String& log) {
     stringsToLog.push(log);
 }
 
@@ -201,7 +201,7 @@ HUGO::ErrorOrType<HUGO::String>
 InternalScene::getNextError() {
     if(errorsToLog.empty()) return HUGO::ErrorOrType<HUGO::String>(HUGO::StringError{"La cola está vacía"});
 
-    HUGO::String ret = errorsToLog.front()->description();
+    HUGO::String ret = errorsToLog.front().description();
     errorsToLog.pop();
     return HUGO::ErrorOrType<HUGO::String>(ret);
 }
@@ -256,7 +256,7 @@ InternalScene::changeAndDestroyPreviousScene(const HUGO::String& sceneName) {
 HUGO::ErrorOrType<EntityID> InternalScene::instantiatePrefab(const HUGO::String& prefabName){
 	HUGO::ErrorOrType<EntityID> prefabID = sceneManager.instantiatePrefab(prefabName, shared_from_this());
 
-	if(prefabID.isError()) log(std::make_shared<HUGO::StringError>("Error instantiating prefab " + prefabName + ": "+ prefabID.getError().description()));
+	if(prefabID.isError()) log(HUGO::StringError("Error instantiating prefab " + prefabName + ": "+ prefabID.getError().description()));
 
 	return prefabID;
 }
