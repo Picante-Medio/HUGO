@@ -3,6 +3,7 @@
 
 #include <Ogre.h>
 #include <OgreRoot.h>
+#include <OgreOverlayManager.h>
 #include "OgreRenderWindow.h"
 #include "OgreOverlaySystem.h"
 
@@ -61,7 +62,7 @@ OgreModule::destroyInstance() {
 }
 
 OgreModule::OgreModule(){
-    m_ogreRoot = std::make_shared<Ogre::Root>("plugins.cfg", "ogre.cfg");
+    m_ogreRoot = std::make_unique<Ogre::Root>("plugins.cfg", "ogre.cfg");
     if (!m_ogreRoot->restoreConfig()) {
         Ogre::LogManager::getSingleton().logMessage("Initialize::configure_ogre => " +
         std::string("ERROR: unable to configure Ogre"));
@@ -77,7 +78,7 @@ OgreModule::OgreModule(){
     m_ogreRoot->getRenderSystem()->setConfigOption("Full Screen", "No");
 
     //Must be done before initializing Ogre::Root
-    m_ogreOverlaySystem = std::make_shared<Ogre::OverlaySystem>();
+    m_ogreOverlaySystem = std::make_unique<Ogre::OverlaySystem>();
 
     m_ogreRoot->initialise(false);
 
@@ -142,21 +143,12 @@ OgreModule::~OgreModule(){
     Ogre::TextureManager::getSingleton().removeAll();
     Ogre::MaterialManager::getSingleton().removeAll();
     Ogre::MeshManager::getSingleton().removeAll();
+    Ogre::OverlayManager::getSingleton().destroyAll();
 
-    // Unload resources
-    Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
-
-    // auto groups = rgm.getResourceGroups();
-
-    // for (const auto& group : groups)
-    // {
-    //     rgm.clearResourceGroup(group);
-    //     rgm.destroyResourceGroup(group);
-    // }
-    
     m_ogreRenderWindow->destroy();
 
-    m_ogreRoot->shutdown();
+    m_ogreOverlaySystem.reset(nullptr);
+    m_ogreRoot.reset(nullptr);
 
     SDL_DestroyWindow(m_sdlWindow);
     SDL_Quit();

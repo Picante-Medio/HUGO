@@ -24,8 +24,8 @@ class OgreModule{
     const char* OGRE_WINDOW_NAME = "HUGO Window";
 
     //Ogre Singletons. Can be obtained using ::getInstance() of the class.
-    std::shared_ptr<Ogre::Root> m_ogreRoot;
-    std::shared_ptr<Ogre::OverlaySystem> m_ogreOverlaySystem;
+    std::unique_ptr<Ogre::Root> m_ogreRoot;
+    std::unique_ptr<Ogre::OverlaySystem> m_ogreOverlaySystem;
     
     Ogre::RenderWindow* m_ogreRenderWindow = nullptr;
     SDL_Window* m_sdlWindow = nullptr;
