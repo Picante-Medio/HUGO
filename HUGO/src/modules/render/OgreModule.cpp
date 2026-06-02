@@ -45,20 +45,30 @@ void OgreModule::loadResources()
 }
 
 #pragma endregion
+OgreModule* OgreModule::instance = nullptr;
 
-std::unique_ptr<OgreModule> OgreModule::instanceInternal = 
-    std::unique_ptr<OgreModule>(new OgreModule());
+OgreModule&
+OgreModule::getInstance() {
+    if(instance) 
+        return *instance;
+    else 
+        throw "Tried to access OgreModule instance before initialization or after destruction";
+}
 
-OgreModule& 
-OgreModule::instance(){
-    static OgreModule& instance = *instanceInternal;
-    return instance;
+void 
+OgreModule::createInstance() {
+    if(instance) 
+        delete instance;
+        
+    instance = new OgreModule();
 }
 
 void
 OgreModule::destroyInstance() {
-    if (!instanceInternal) return;
-    instanceInternal.reset(nullptr);
+    if (!instance) return;
+
+    delete instance;
+    instance = nullptr;
 }
 
 OgreModule::OgreModule(){
@@ -208,7 +218,7 @@ void OgreModule::renderOneFrame(){
 void OgreModule::updateWindowDimensions()
 {
     int w,h;
-    SDL_GetWindowSize(OgreModule::instance().getSDLWindow(), &w, &h);
+    SDL_GetWindowSize(OgreModule::getInstance().getSDLWindow(), &w, &h);
     if (w > 0 && h > 0)
     {
         m_ogreRenderWindow->resize(w, h);

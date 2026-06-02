@@ -18,7 +18,7 @@ namespace Ogre{
 
 struct SDL_Window;
 
-class OgreModule{
+class OgreModule {
 
     //Not the name of the application window, but the internal name of the window inside Ogre.
     const char* OGRE_WINDOW_NAME = "HUGO Window";
@@ -41,14 +41,15 @@ class OgreModule{
     Ogre::Camera* m_defaultCamera;
     Ogre::SceneManager* m_defaultCameraSceneManager;
 
+    static OgreModule* instance;
+
     //Initializes Ogre Singletons and SDL window
     OgreModule();
     void loadResources();
 
-    static std::unique_ptr<OgreModule> instanceInternal;
-public:
-
-    static OgreModule& instance();
+    public:
+    static OgreModule& getInstance();
+    static void createInstance();
     static void destroyInstance();    
 
     //Sets the current sceneManager that scene systems will use

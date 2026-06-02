@@ -7,7 +7,7 @@
 void CameraSystem::init(){
 
     ogreRoot = Ogre::Root::getSingletonPtr();
-    sceneManager = OgreModule::instance().getCurrentSceneManager();
+    sceneManager = OgreModule::getInstance().getCurrentSceneManager();
 
     scene.onAddComponent<CameraComponent>().connect(this, &CameraSystem::registerCameraEntity);
     scene.onRemoveComponent<CameraComponent>().connect(this, &CameraSystem::unregisterCameraEntity); 
@@ -121,7 +121,7 @@ void CameraSystem::destroyCamera(EntityID entity, CameraInfo& camInfo)
 
         //If it was main cam, change it for the default blank camera. It is the user´s fault to not change the mainCamera before deleting the actual one
         if(entity == m_mainCamera){
-            OgreModule::instance().viewportToDefaultCamera();
+            OgreModule::getInstance().viewportToDefaultCamera();
             m_mainCamera = HUGO::INVALID_ENTITY;
         }
     }
@@ -139,7 +139,8 @@ void CameraSystem::unregisterCameraEntity(CameraComponent& comp){
 
 void CameraSystem::setMainCamera(const CameraComponent& camComp){
     EntityID camID = camComp.entity;
-    Ogre::Viewport* viewport = OgreModule::instance().getViewport();
+
+    Ogre::Viewport* viewport = OgreModule::getInstance().getViewport();
     viewport->setCamera(cameraMap[camID].ogreCamera);
 
     viewport->setBackgroundColour(Ogre::ColourValue(

@@ -23,8 +23,7 @@ RenderSystem::~RenderSystem()
 void RenderSystem::init(){
 
     ogreRoot = Ogre::Root::getSingletonPtr();
-    
-    sceneManager = OgreModule::instance().getCurrentSceneManager();
+    sceneManager = OgreModule::getInstance().getCurrentSceneManager();
 
     //components events
     scene.onAddComponent<RenderComponent>().connect(this, &RenderSystem::registerRenderEntity);

@@ -88,5 +88,4 @@ namespace HUGO {
         
         void setAmbientLight(const HUGO::Vector3& l);
     };
-
 }

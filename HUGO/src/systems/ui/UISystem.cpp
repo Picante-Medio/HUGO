@@ -26,7 +26,7 @@
 UISystem::~UISystem()
 {
     clearAllCaches();
-    OgreModule::instance().getCurrentSceneManager()->removeRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
+    OgreModule::getInstance().getCurrentSceneManager()->removeRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
 }
 //====================================================
 // CACHE CREATION
@@ -74,7 +74,7 @@ bool UISystem::isMouseOver(HUGO::Float left, HUGO::Float top, HUGO::Float width,
 bool UISystem::isMouseOverPanel(const PanelComponent &panel, HUGO::Float mouseX, HUGO::Float mouseY)
 {
     int screenPixelsW, screenPixelsH;
-    SDL_GL_GetDrawableSize(OgreModule::instance().getSDLWindow(), &screenPixelsW, &screenPixelsH);
+    SDL_GL_GetDrawableSize(OgreModule::getInstance().getSDLWindow(), &screenPixelsW, &screenPixelsH);
     
     float mouseXPixels = mouseX * screenPixelsW;
     float mouseYPixels = mouseY * screenPixelsH;
@@ -737,8 +737,8 @@ void UISystem::clearAllCaches()
 
 void UISystem::init()
 {
-    renderWindow = OgreModule::instance().getOgreRenderWindow();
-    OgreModule::instance().getCurrentSceneManager()->addRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
+    renderWindow = OgreModule::getInstance().getOgreRenderWindow();
+    OgreModule::getInstance().getCurrentSceneManager()->addRenderQueueListener(Ogre::OverlaySystem::getSingletonPtr());
 
     //component events
     scene.onAddComponent<PanelComponent>().connect(this, &UISystem::onAddPanelComponent);

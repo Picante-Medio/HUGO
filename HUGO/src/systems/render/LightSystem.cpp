@@ -8,8 +8,7 @@
 
 void LightSystem::init(){
     ogreRoot = Ogre::Root::getSingletonPtr();
-    
-    sceneManager = OgreModule::instance().getCurrentSceneManager();
+    sceneManager = OgreModule::getInstance().getCurrentSceneManager();
 
     scene.onAddComponent<LightComponent>().connect(this, &LightSystem::registerLightEntity);
     scene.onUpdateComponent<LightComponent>().connect(this, &LightSystem::onUpdateLightComponent);

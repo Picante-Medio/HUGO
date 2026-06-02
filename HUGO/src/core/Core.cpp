@@ -122,16 +122,17 @@ void Core::initializeDependencies() {
     AudioAssetsModule::instance().scanAndRegisterAll();
 
     //OgreModule init
-    OgreModule::instance();
-    OgreModule::instance().setFullscreen(fullscreen);
+    OgreModule::createInstance();
+    OgreModule& ogreModule = OgreModule::getInstance();
+    ogreModule.setFullscreen(fullscreen);
 
     //BulletoModule init
     physicsModule = std::make_unique<BulletModule>();
 
     // Input
     input = std::make_unique<Input>();
-    input->setSDLWindow(OgreModule::instance().getSDLWindow());
-    SDL_SetWindowTitle(OgreModule::instance().getSDLWindow(), gameName.c_str());
+    input->setSDLWindow(ogreModule.getSDLWindow());
+    SDL_SetWindowTitle(ogreModule.getSDLWindow(), gameName.c_str());
 }
 
 void 
@@ -197,20 +198,20 @@ HUGO::ErrorOrVoid Core::run(){
                 physicsModule->performSimulations(FIXED_STEP);
                 accumulator -= FIXED_STEP;
             }
-    
+
             input->handleInput();
             if(input->isQuitPressed()) {
                 exit = true;
             }
             if(input->windowHasChanged()){   
-                OgreModule::instance().updateWindowDimensions();
+
+                OgreModule::getInstance().updateWindowDimensions();
                 input->clearWindowFlag();
             }
             sceneManager->updateCurrentScene(frameTime);
             sceneManager->dispatchMessagesCurrentScene();
             
-            OgreModule::instance().renderOneFrame();
-
+            OgreModule::getInstance().renderOneFrame();
         }
 
 	}

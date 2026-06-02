@@ -15,7 +15,7 @@ ParticleSystem::~ParticleSystem() {
     activeParticleSystems.clear();
 }
 void ParticleSystem::init() {
-    sm = OgreModule::instance().getCurrentSceneManager();
+    sm = OgreModule::getInstance().getCurrentSceneManager();
 
     scene.onAddComponent<ParticleEmitterComponent>().connect(this, &ParticleSystem::onAddParticleEmitterComponent);
     scene.onUpdateComponent<ParticleEmitterComponent>().connect(this, &ParticleSystem::onUpdateParticleEmitterComponent);
