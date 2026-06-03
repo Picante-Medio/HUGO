@@ -193,7 +193,7 @@ void LightSystem::onUpdateLightComponent(LightComponent &light)
 }
 #pragma endregion
 
-void LightSystem::setAmbientLight(HUGO::Float r, HUGO::Float g, HUGO::Float b)
+void LightSystem::setAmbientLight(float r, float g, float b)
 {
     sceneManager->setAmbientLight(Ogre::ColourValue(r, g, b));
 }

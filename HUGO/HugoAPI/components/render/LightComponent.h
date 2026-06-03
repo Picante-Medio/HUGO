@@ -9,8 +9,8 @@ private:
     DEFAULT_SERIALIZED_MEMBER(HUGO::Vector4, specular, HUGO::Vector4(1.0f, 1.0f, 1.0f, 1.0f));
     DEFAULT_SERIALIZED_MEMBER(HUGO::LightType, lightType, HUGO::LightType::LT_POINT);
 
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, spotFalloff, 1.0f);
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, spotNearClip, 1.0f);
+    DEFAULT_SERIALIZED_MEMBER(float, spotFalloff, 1.0f);
+    DEFAULT_SERIALIZED_MEMBER(float, spotNearClip, 1.0f);
     DEFAULT_SERIALIZED_MEMBER(HUGO::Radian, spotOuter, HUGO::Radian(0.7f));
     DEFAULT_SERIALIZED_MEMBER(HUGO::Radian, spotInner, HUGO::Radian(0.6f));
 
@@ -19,14 +19,14 @@ private:
     // constant	- The constant factor in the attenuation formula: 1.0 means never attenuate, 0.0 is complete attenuation.
     // linear - The linear factor in the attenuation formula: 1 means attenuate evenly over the distance.
     // quadratic - The quadratic factor in the attenuation formula: adds a curvature to the attenuation formula.
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, shadowFarDist, 1.0f);
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, shadowFarDistSquared, 1.0f);
+    DEFAULT_SERIALIZED_MEMBER(float, shadowFarDist, 1.0f);
+    DEFAULT_SERIALIZED_MEMBER(float, shadowFarDistSquared, 1.0f);
     DEFAULT_SERIALIZED_MEMBER(HUGO::Vector4, attenuation, HUGO::Vector4(1.0f, 0.5f, 0.0f, 10000.0f)); //range, constant, linear, quadratic
 
     size_t indexInFrame = 0;
 
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, shadowNearClipDist, 0.1f);
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, shadowFarClipDist, 300.0f);
+    DEFAULT_SERIALIZED_MEMBER(float, shadowNearClipDist, 0.1f);
+    DEFAULT_SERIALIZED_MEMBER(float, shadowFarClipDist, 300.0f);
 
 public:
     // Setters

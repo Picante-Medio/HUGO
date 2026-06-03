@@ -10,15 +10,15 @@ namespace HUGO {
 // Generic struct error
 struct Error {
 	virtual ~Error() = default;
-	virtual HUGO::String description() = 0;
+	virtual std::string description() = 0;
 };
 
 // Default error
 struct StringError : Error {
-	HUGO::String errorMessage;
-	StringError(HUGO::String error) : errorMessage(error) {};
+	std::string errorMessage;
+	StringError(std::string error) : errorMessage(error) {};
 	StringError() {};
-	HUGO::String description() override { return errorMessage; }
+	std::string description() override { return errorMessage; }
 };
 
 // Error class using variants

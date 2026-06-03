@@ -5,15 +5,9 @@
 
 namespace HUGO{
 
-    using String = std::string;
-
-    using Bool = bool;
-
     using Int = int32_t;
-	using Float = float;
-    using Double = double;
-
-	constexpr Float PI = 3.14159265358979323846f;
+    
+	constexpr float PI = 3.14159265358979323846f;
 
     // AUDIO TYPES
     using AudioID = int;

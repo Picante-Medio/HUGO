@@ -170,11 +170,11 @@ public:
 		return returnedQuery;
 	}
 
-    virtual void log(const HUGO::String& message) = 0; 
+    virtual void log(const std::string& message) = 0; 
     virtual void log(const HUGO::StringError&) = 0;
 
-    virtual HUGO::ErrorOrType<HUGO::String> getNextError() = 0;
-    virtual HUGO::ErrorOrType<HUGO::String> getNextLog() = 0;
+    virtual HUGO::ErrorOrType<std::string> getNextError() = 0;
+    virtual HUGO::ErrorOrType<std::string> getNextLog() = 0;
 
 
 	// Message handling
@@ -200,15 +200,15 @@ public:
     /** Scene changing
      * POSSIBLE ERROR: If the scene to change does not exist, logs an error to debug console
      */
-    virtual void changeScene(const HUGO::String& sceneName) = 0;
-	virtual void changeAndDestroyPreviousScene(const HUGO::String& sceneName) = 0;
+    virtual void changeScene(const std::string& sceneName) = 0;
+	virtual void changeAndDestroyPreviousScene(const std::string& sceneName) = 0;
 
     virtual void exitGame() = 0;
-	virtual HUGO::ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName) =0;
+	virtual HUGO::ErrorOrType<EntityID> instantiatePrefab(const std::string& prefabName) =0;
 	virtual void changeAmbientLight(const HUGO::Vector3& l) = 0;
 
-    virtual void loadScene(const HUGO::String& sceneName) = 0;
-	virtual void unloadScene(const HUGO::String& sceneName) = 0;
+    virtual void loadScene(const std::string& sceneName) = 0;
+	virtual void unloadScene(const std::string& sceneName) = 0;
 };
 
 }

@@ -24,9 +24,9 @@ struct UIElementCache
 
 namespace HUGO {
     struct Rect {
-        Float left =0.0f;
-        Float top = 0.0f;
-        Float width = 1.0f;
-        Float height= 1.0f;
+        float left =0.0f;
+        float top = 0.0f;
+        float width = 1.0f;
+        float height= 1.0f;
     };
 }

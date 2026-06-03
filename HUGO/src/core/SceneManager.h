@@ -23,17 +23,17 @@ namespace HUGO {
 
         HUGO::ChatParser m_chatParser;
         //Scene map that stores created game scenes.
-        std::unordered_map<HUGO::String, std::shared_ptr<InternalScene>> m_sceneMap;
+        std::unordered_map<std::string, std::shared_ptr<InternalScene>> m_sceneMap;
 
         //Pointer to a scene inside m_sceneMap. It is the scene that will be updated in the main loop.
         std::weak_ptr<InternalScene> m_currentScene;
-        HUGO::String m_currentSceneName;
+        std::string m_currentSceneName;
 
         //Removes a scene from m_sceneMap, to free space that is not used.
-        HUGO::ErrorOrVoid destroyScene(const HUGO::String& sceneName);
+        HUGO::ErrorOrVoid destroyScene(const std::string& sceneName);
 
         //Reads chatParser, creates a scene based on the SceneData, and indexes it in m_sceneMap.
-        HUGO::ErrorOrVoid createScene(const HUGO::String& sceneName);
+        HUGO::ErrorOrVoid createScene(const std::string& sceneName);
 
         //Physics module
         IPhysicsModule& m_physicsModule;
@@ -48,7 +48,7 @@ namespace HUGO {
             };
 
             QueryType queryType;
-            HUGO::String sceneName;
+            std::string sceneName;
         };
 
         std::vector<SceneQuery> m_sceneQueries;
@@ -56,22 +56,22 @@ namespace HUGO {
         bool quit = false;
     public:
         //Initializes the parser with chat folder and sets physicsModule and inputModule
-        SceneManager(HUGO::IInput& inputModule, const HUGO::String& chatFolder,IPhysicsModule& physicsModule);
+        SceneManager(HUGO::IInput& inputModule, const std::string& chatFolder,IPhysicsModule& physicsModule);
 
         //Unloads scene from memory
-        void loadScene(const HUGO::String& sceneName);
+        void loadScene(const std::string& sceneName);
 
         //Unloads scene from memory
-        void unloadScene(const HUGO::String& sceneName);
+        void unloadScene(const std::string& sceneName);
 
         /*
         Requests SceneManager to change to scene [sceneName].
         It requests it because the current update cycle needs to finish before m_currentScene can change.
         */
-        void setCurrentScene(const HUGO::String& sceneName);
-        void setCurrentSceneAndDestroyPrevious(const HUGO::String& sceneName);
+        void setCurrentScene(const std::string& sceneName);
+        void setCurrentSceneAndDestroyPrevious(const std::string& sceneName);
         
-        void setCurrentSceneLUA(const HUGO::String sceneName);
+        void setCurrentSceneLUA(const std::string sceneName);
 
         //Called by HUGO::Core. If there is a request for a scene change, change m_currentScene
         HUGO::ErrorOrVoid manageQueries();
@@ -81,7 +81,7 @@ namespace HUGO {
         void fixedUpdateCurrentScene(uint32_t dt);
         void dispatchMessagesCurrentScene();
 
-        HUGO::ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName, std::shared_ptr<InternalScene> scene);
+        HUGO::ErrorOrType<EntityID> instantiatePrefab(const std::string& prefabName, std::shared_ptr<InternalScene> scene);
 
         inline bool getQuit() const { return quit; }
         inline void setQuit(bool newQuit) { quit = newQuit; }

@@ -17,10 +17,10 @@
 #include "CameraComponent.h"
 
 struct Aux {
-    HUGO::String pname = "Particle/Smoke";
-    HUGO::Bool emmiting = true;
-    HUGO::Bool active = true;
-    HUGO::String material = "debug/Smoke";
+    std::string pname = "Particle/Smoke";
+    bool emmiting = true;
+    bool active = true;
+    std::string material = "debug/Smoke";
 };
 
 void
@@ -29,7 +29,7 @@ TestSystemVideo3::init() {
     // CONSTANTES
     // -------------------------------------------------------------------------------------
     const Aux pInfo;
-    constexpr HUGO::Float offset = 10.0f;
+    constexpr float offset = 10.0f;
     // -------------------------------------------------------------------------------------
 
     // MENSAJES
@@ -153,7 +153,7 @@ TestSystemVideo3::init() {
         s.trackMaterial = "UI/Track";
         s.knobWidth = 0.05f;
         s.knobHeight =0.05f;
-        s.onChangeCallback = [this](HUGO::Float value){
+        s.onChangeCallback = [this](float value){
             scene.modifyComponent<AudioComponent>(this->cuboPedro, [value](AudioComponent& a){
                 a.volume = std::clamp(value, 0.0f, 1.0f);
             });
@@ -164,7 +164,7 @@ TestSystemVideo3::init() {
         };
     });
 
-    HUGO::String aux = "Menu/Mierdas35FAFAWFW";
+    std::string aux = "Menu/Mierdas35FAFAWFW";
     EntityID volumeText = scene.createEntity();
     scene.addComponent<PanelComponent>(volumeText, [&aux](PanelComponent& panel){
         panel.overlayName = aux;

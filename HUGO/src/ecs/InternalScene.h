@@ -19,7 +19,7 @@ class InternalScene : public HUGO::IScene, public std::enable_shared_from_this<I
 {
     std::vector<std::shared_ptr<HUGO::System>> systems;
     std::queue<HUGO::StringError> errorsToLog;
-    std::queue<HUGO::String> stringsToLog;
+    std::queue<std::string> stringsToLog;
 
     HUGO::IInput& input;
     HUGO::SceneManager& sceneManager;
@@ -63,26 +63,26 @@ public:
     void printEntities();
 
     void log(const HUGO::StringError& error) override;
-    void log(const HUGO::String& log) override;
+    void log(const std::string& log) override;
 
-    HUGO::ErrorOrType<HUGO::String> getNextError() override;
-    HUGO::ErrorOrType<HUGO::String> getNextLog() override;
+    HUGO::ErrorOrType<std::string> getNextError() override;
+    HUGO::ErrorOrType<std::string> getNextLog() override;
 
     void dispatchMessages() override;
 
     HUGO::IInput& getInput() override;
 
-    void changeScene(const HUGO::String& sceneName) override;
+    void changeScene(const std::string& sceneName) override;
 
-    void changeAndDestroyPreviousScene(const HUGO::String& sceneName) override;
+    void changeAndDestroyPreviousScene(const std::string& sceneName) override;
 
-    HUGO::ErrorOrType<EntityID> instantiatePrefab(const HUGO::String& prefabName) override;
+    HUGO::ErrorOrType<EntityID> instantiatePrefab(const std::string& prefabName) override;
 
     void exitGame() override;
     void changeAmbientLight(const HUGO::Vector3& l) override;
 
-    void loadScene(const HUGO::String& sceneName) override;
-    void unloadScene(const HUGO::String& sceneName) override;
+    void loadScene(const std::string& sceneName) override;
+    void unloadScene(const std::string& sceneName) override;
 
     using IScene::hasComponent; 
 };

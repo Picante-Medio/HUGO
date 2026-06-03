@@ -33,9 +33,9 @@ namespace HUGO {
     };
 
     struct OgreOverlayUtils{
-        static HUGO::ErrorOrType<Ogre::Overlay*> getOverlay(const HUGO::String& name);
-        static HUGO::ErrorOrType<Ogre::OverlayElement*> getElement(const HUGO::String& name, bool isTextArea = false, Ogre::OverlayContainer* containerToAdd = nullptr);
-        static HUGO::ErrorOrType<Ogre::OverlayContainer*> getContainer(const HUGO::String& name, Ogre::Overlay* overlayToAdd = nullptr);
+        static HUGO::ErrorOrType<Ogre::Overlay*> getOverlay(const std::string& name);
+        static HUGO::ErrorOrType<Ogre::OverlayElement*> getElement(const std::string& name, bool isTextArea = false, Ogre::OverlayContainer* containerToAdd = nullptr);
+        static HUGO::ErrorOrType<Ogre::OverlayContainer*> getContainer(const std::string& name, Ogre::Overlay* overlayToAdd = nullptr);
     };
 
 }

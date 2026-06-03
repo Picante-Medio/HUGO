@@ -31,7 +31,7 @@ class OgreModule {
     SDL_Window* m_sdlWindow = nullptr;
     
 
-    std::unordered_map<HUGO::String, Ogre::SceneManager*> m_sceneManagers;
+    std::unordered_map<std::string, Ogre::SceneManager*> m_sceneManagers;
 
     Ogre::SceneManager* m_currentSceneManager;
 
@@ -53,13 +53,13 @@ class OgreModule {
     static void destroyInstance();    
 
     //Sets the current sceneManager that scene systems will use
-    void setCurrentSceneManager(HUGO::String sceneName);
+    void setCurrentSceneManager(std::string sceneName);
 
     //Loads a sceneManager into memory. 
-    void createSceneManager(HUGO::String sceneName);
+    void createSceneManager(std::string sceneName);
 
     //Destroys a sceneManager. It will unload all of Ogres resources being used by it.
-    void destroySceneManager(HUGO::String sceneName);
+    void destroySceneManager(std::string sceneName);
 
     Ogre::SceneManager* getCurrentSceneManager();
     Ogre::Viewport* getViewport();

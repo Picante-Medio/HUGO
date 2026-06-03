@@ -24,14 +24,14 @@ T lua_get(lua_State* lua, int idx) {
     if constexpr (std::is_same_v<T, HUGO::Int> || std::is_same_v<T, int>)
         return (HUGO::Int)luaL_checknumber(lua, idx);
 
-    else if constexpr(std::is_same_v<T, HUGO::Float> || std::is_same_v<T, double> || std::is_same_v<T, float>)
-        return (HUGO::Float)luaL_checknumber(lua, idx);
+    else if constexpr(std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, float>)
+        return (float)luaL_checknumber(lua, idx);
 
     else if constexpr (std::is_same_v<T, bool>)
         return lua_toboolean(lua, idx);
 
-    else if constexpr (std::is_same_v<T, HUGO::String> || std::is_same_v<T, std::string>)
-        return HUGO::String(luaL_checkstring(lua, idx));
+    else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string>)
+        return std::string(luaL_checkstring(lua, idx));
     else
         throw "Lua: You should only declare functions with parameters of basic types that lua can read";
 }
@@ -42,13 +42,13 @@ static void lua_push_result(lua_State* lua, T value) {
     if constexpr (std::is_same_v<T, HUGO::Int> || std::is_same_v<T, int>)
         lua_pushinteger(lua, value);
 
-    else if constexpr (std::is_same_v<T, HUGO::Float> || std::is_same_v<T, double> || std::is_same_v<T, float>)
+    else if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, float>)
         lua_pushnumber(lua, value);
 
     else if  constexpr (std::is_same_v<T, bool>)
         lua_pushboolean(lua, value);
 
-    else if constexpr (std::is_same_v<T, HUGO::String> || std::is_same_v<T, std::string>)
+    else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string>)
         lua_pushstring(lua, value.c_str());
 
     else 
@@ -58,10 +58,10 @@ static void lua_push_result(lua_State* lua, T value) {
 
 #pragma region error
 struct LuaRuntimeError : HUGO::Error {
-    HUGO::String error;
-    HUGO::String description() override { return error; }
+    std::string error;
+    std::string description() override { return error; }
 
-    LuaRuntimeError(HUGO::String errorDesc) : error(errorDesc) {}
+    LuaRuntimeError(std::string errorDesc) : error(errorDesc) {}
 };
 #pragma endregion
 
@@ -96,7 +96,7 @@ class UTILS_API LuaBinder {
         }
     }
 
-    void setLuaPath(HUGO::String path);
+    void setLuaPath(std::string path);
 public:
 
     LuaBinder();
@@ -111,7 +111,7 @@ public:
     LuaBinder::Instance().registerFunc<int, int, int>(add, "add");
     */
     template<typename ReturnType, typename ...ArgTypes>
-    void registerFunc(ReturnType(*function)(ArgTypes...), HUGO::String luaName) {
+    void registerFunc(ReturnType(*function)(ArgTypes...), std::string luaName) {
         using Function = ReturnType(*)(ArgTypes...);
 
         // Create the function pointer in cpp
@@ -132,7 +132,7 @@ public:
         LuaBinder::Instance().registerMethod<Adder, int, int, int>(*adderPtr, &Adder::add, "add");
     */
     template<typename ClassType, typename ReturnType, typename... ArgTypes>
-    void registerMethod(ClassType& obj, ReturnType(ClassType::*fn)(ArgTypes...), HUGO::String name) {
+    void registerMethod(ClassType& obj, ReturnType(ClassType::*fn)(ArgTypes...), std::string name) {
         using Function = ReturnType(ClassType::*)(ArgTypes...);
 
         struct Method { ClassType* object; Function func; };
@@ -154,17 +154,17 @@ public:
     // Call a lua script and get its value as a T. If the value can't be converted to T.
     // it returns an error if the file is not found, lua rises an error or the value is not a T
     template<typename T>
-    HUGO::ErrorOrType<T, HUGO::StringError> getFromFile(HUGO::String path) {
+    HUGO::ErrorOrType<T, HUGO::StringError> getFromFile(std::string path) {
         // If path is invalid
        if (luaL_loadfile(lua, path.c_str()) != LUA_OK) {
-            HUGO::StringError error = HUGO::StringError(HUGO::String(lua_tostring(lua, -1)));
+            HUGO::StringError error = HUGO::StringError(std::string(lua_tostring(lua, -1)));
             lua_pop(lua, 1);
             return HUGO::ErrorOrType<T, HUGO::StringError>(error);
         }
 
         // If lua crashes on runtime or returns nil
         if (lua_pcall(lua, 0, 1, 0) != LUA_OK) {
-            HUGO::StringError error = HUGO::StringError(HUGO::String(lua_tostring(lua, -1)));
+            HUGO::StringError error = HUGO::StringError(std::string(lua_tostring(lua, -1)));
             lua_pop(lua, 1);
             return HUGO::ErrorOrType<T, HUGO::StringError>(error);
         }
@@ -179,19 +179,19 @@ public:
 
     // Interpret a cpp string like its a standalone lua statement and ignore its return value if it exists.
     // it returns an error if the string cannot be interpreted as valid lua or if lua rises an error
-    HUGO::ErrorOrVoid interpretString(HUGO::String command);
+    HUGO::ErrorOrVoid interpretString(std::string command);
 
     // Interpret a cpp string like its a standalone lua statement and get its return value as a T.
     // it returns an error if the string cannot be interpreted as valid lua, if lua rises an error or if the value is not a T
     template<typename T>
-    HUGO::ErrorOrType<T> getFromString(HUGO::String command) {
+    HUGO::ErrorOrType<T> getFromString(std::string command) {
         // Add return statement to ensure the return value is written to the stack
         // This will fail if the function's return type is 'nil' - I don't know how to change that
-        HUGO::String returnCommand = "return " + command;
+        std::string returnCommand = "return " + command;
 
         //if string is invalid
         if (luaL_dostring(lua, returnCommand.c_str()) != LUA_OK) {
-            HUGO::StringError error = HUGO::StringError(HUGO::String(lua_tostring(lua, -1)));
+            HUGO::StringError error = HUGO::StringError(std::string(lua_tostring(lua, -1)));
             lua_pop(lua, 1);
             return HUGO::ErrorOrType<T>(error);
         }
@@ -205,7 +205,7 @@ public:
     // Send a vector to lua as an ipair iterable table (table as an array).
     // The name of the lua table will can be optionally set, if not it will allways be "arrayTable"
     template<typename T>
-    void sendTable(std::vector<T> array, HUGO::String luaGlobalName = "arrayTable") {
+    void sendTable(std::vector<T> array, std::string luaGlobalName = "arrayTable") {
         // Create the "array"
         lua_newtable(lua);
 
@@ -223,5 +223,5 @@ public:
         lua_setglobal(lua, luaGlobalName.c_str());
     }
 
-    void requireFolder(HUGO::String folderPath);
+    void requireFolder(std::string folderPath);
 };

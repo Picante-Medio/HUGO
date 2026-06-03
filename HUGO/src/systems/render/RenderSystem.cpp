@@ -58,7 +58,7 @@ void RenderSystem::updateAnimations(double dt)
 
         //updates all enable animations
         for(auto& a: animComp.anims){
-            const HUGO::String& animName = a.first;
+            const std::string& animName = a.first;
             const AnimationInfo& animInfo = a.second;
 
             if(!animInfo.enable) continue;
@@ -238,7 +238,7 @@ void RenderSystem::onUpdateAnimationComponet(AnimationComponent &animComp)
 
     //Update or create animations that are in the component
     for(auto anim = animComp.anims.begin(); anim != animComp.anims.end();){
-        const HUGO::String& animName = anim->first;
+        const std::string& animName = anim->first;
         const AnimationInfo& animInfo = anim->second;
 
         Ogre::AnimationState* animState = nullptr;

@@ -42,15 +42,15 @@ private:
     // CACHE CREATION
     //====================================================
         
-    std::shared_ptr<UIElementCache> createElementCache(EntityID entity, const HUGO::String& overlayName, const HUGO::String& containerName);
+    std::shared_ptr<UIElementCache> createElementCache(EntityID entity, const std::string& overlayName, const std::string& containerName);
     UIElementCache* getCache(EntityID entity);
 
     //====================================================
     // HELPERS
     //====================================================
     //helper to calculate if the mouse cursor is above a panel
-    bool isMouseOver(HUGO::Float left, HUGO::Float top, HUGO::Float width, HUGO::Float height, HUGO::Float mouseX, HUGO::Float mouseY);
-    bool isMouseOverPanel(const PanelComponent& panel, HUGO::Float mouseX, HUGO::Float mouseY);
+    bool isMouseOver(float left, float top, float width, float height, float mouseX, float mouseY);
+    bool isMouseOverPanel(const PanelComponent& panel, float mouseX, float mouseY);
     //====================================================
     // SYNCHRONIZATION
     //====================================================
@@ -58,7 +58,7 @@ private:
     void syncPanel(const PanelComponent& p);
     void syncText(const TextComponent& t);
     bool isValidColour(const HUGO::Vector4& colour);
-    HUGO::String formatText(const HUGO::String& text, Ogre::TextAreaOverlayElement* textArea,HUGO::Float maxWidth,HUGO::Float maxHeight);
+    std::string formatText(const std::string& text, Ogre::TextAreaOverlayElement* textArea,float maxWidth,float maxHeight);
     void syncButton(const ButtonComponent& b);
     void syncProgressBar(const PanelComponent& p, const ProgressBarComponent& pr);
     void syncSlider(const PanelComponent& p, SliderComponent& s);

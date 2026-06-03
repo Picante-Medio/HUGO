@@ -13,29 +13,29 @@ struct AnimationInfo{
 
 HCOMPONENT(AnimationComponent)
 
-    std::unordered_map<HUGO::String, AnimationInfo> anims;
+    std::unordered_map<std::string, AnimationInfo> anims;
     
-    inline void addAnimation(const HUGO::String& animationName, bool loop = false, bool enable = false, float weight = 1.0)
+    inline void addAnimation(const std::string& animationName, bool loop = false, bool enable = false, float weight = 1.0)
     {
         anims.insert({animationName, {loop, enable, weight}}); 
     }
     
-    inline void removeAnimation(const HUGO::String& animationName)
+    inline void removeAnimation(const std::string& animationName)
     {
         anims.erase(animationName);
     };
 
-    inline void setLoop(const HUGO::String& animationName, bool loop)
+    inline void setLoop(const std::string& animationName, bool loop)
     {
         anims[animationName].loop = loop;
     };
     
-    inline void setEnabled(const HUGO::String& animationName, bool enable)
+    inline void setEnabled(const std::string& animationName, bool enable)
     {
         anims[animationName].enable = enable;
     };
 
-    inline void setWeight(const HUGO::String& animationName, float weight)
+    inline void setWeight(const std::string& animationName, float weight)
     {
         anims[animationName].weight = weight;
     };

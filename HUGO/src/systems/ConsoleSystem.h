@@ -13,7 +13,7 @@ namespace HUGO{
 }
 HSYSTEM(ConsoleSystem)
 
-    std::vector<HUGO::String> history;
+    std::vector<std::string> history;
     size_t historyIndex; // Constant access and reset
     EntityID consoleInput;
     EntityID consoleText;
@@ -21,11 +21,11 @@ HSYSTEM(ConsoleSystem)
 
     HUGO::Input* input;
 
-    HUGO::String logIni = ">  ";
+    std::string logIni = ">  ";
     bool active; // to set weather the console is active or not
 
     static HUGO::Int AUX_CONSOLE_INDEX;
-    static inline std::queue<HUGO::String> luaOutput = std::queue<HUGO::String>();
+    static inline std::queue<std::string> luaOutput = std::queue<std::string>();
 
     static int consoleLuaPrint(lua_State* lua){
     
@@ -34,7 +34,7 @@ HSYSTEM(ConsoleSystem)
             return 0;
         }
 
-        HUGO::String out = HUGO::String(lua_tostring(lua, -1));
+        std::string out = std::string(lua_tostring(lua, -1));
         lua_pop(lua, -1);
         ConsoleSystem::luaOutput.push(out);
 
@@ -45,17 +45,17 @@ HSYSTEM(ConsoleSystem)
     void printLogs(const TextComponent& consoleText);
     void printErrors(const TextComponent& consoleText);
 
-    HUGO::String getNextHistoric();
-    HUGO::String getPreviousHistoric();
+    std::string getNextHistoric();
+    std::string getPreviousHistoric();
 
-    void receiveInput(const HUGO::String& inputText);
+    void receiveInput(const std::string& inputText);
     void handleKeyInput();
-    void updateInputField(HUGO::String nText);
+    void updateInputField(std::string nText);
 
     template<typename T>
     void handleReturn(HUGO::ErrorOrType<T>& returnedInfo){
 
-        std::variant<int, float, bool, HUGO::String>  lastValueReturned;
+        std::variant<int, float, bool, std::string>  lastValueReturned;
 
         if(returnedInfo.isError()) scene.log(HUGO::StringError(returnedInfo.getError()));
         else lastValueReturned = returnedInfo.getValue();
@@ -63,7 +63,7 @@ HSYSTEM(ConsoleSystem)
         if(std::holds_alternative<HUGO::Int>(lastValueReturned)){
             scene.log(std::to_string(std::get<HUGO::Int>(lastValueReturned)) + "\n");
         }
-        else if(std::holds_alternative<HUGO::Float>(lastValueReturned)){
+        else if(std::holds_alternative<float>(lastValueReturned)){
             scene.log(std::to_string(std::get<HUGO::Int>(lastValueReturned)) + "\n");
         }
         else if(std::holds_alternative<bool>(lastValueReturned)){
@@ -72,7 +72,7 @@ HSYSTEM(ConsoleSystem)
             else scene.log("false\n");
         }
         else{
-            scene.log(std::get<HUGO::String>(lastValueReturned) + "\n");
+            scene.log(std::get<std::string>(lastValueReturned) + "\n");
         }
     }
 

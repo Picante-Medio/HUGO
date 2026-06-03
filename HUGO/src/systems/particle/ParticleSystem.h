@@ -21,7 +21,7 @@ private:
     std::unordered_map<EntityID, ParticleInstance> activeParticleSystems;
     Ogre::SceneManager* sm = nullptr;
 
-    void createParticleSystem(EntityID id, const HUGO::String& particleName, ParticleEmitterComponent& pe, const HUGO::Vector3& iniPos);
+    void createParticleSystem(EntityID id, const std::string& particleName, ParticleEmitterComponent& pe, const HUGO::Vector3& iniPos);
     void destroyParticleSystem(EntityID id);
     void processChanges(const ParticleEmitterComponent& pe, const WorldTransformComponent& tr);
     void processPosition(const WorldTransformComponent &tr);

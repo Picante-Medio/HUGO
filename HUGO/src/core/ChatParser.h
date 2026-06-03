@@ -9,8 +9,8 @@
 
 namespace HUGO{
 	struct ComponentData {
-		HUGO::String componentName;
-		std::unordered_map<HUGO::String, HVariant> parameters;
+		std::string componentName;
+		std::unordered_map<std::string, HVariant> parameters;
 	};
 
 	struct EntityData{
@@ -21,18 +21,18 @@ namespace HUGO{
 	struct SceneData {
 		
 		std::vector<EntityData> entities;
-		std::vector<HUGO::String> systems;
+		std::vector<std::string> systems;
 	};
 
 	class ChatParser {
 	private:
 		
 		//Data that can be queried
-		std::unordered_map<HUGO::String, SceneData> m_sceneData;
-		std::unordered_map<HUGO::String, EntityData> m_prefabData;
+		std::unordered_map<std::string, SceneData> m_sceneData;
+		std::unordered_map<std::string, EntityData> m_prefabData;
 
 		//Open .chat file and read it
-		HUGO::ErrorOrVoid readChat(const HUGO::String& chatPath);
+		HUGO::ErrorOrVoid readChat(const std::string& chatPath);
 
 		//Read previously opened file as Scene.
 		HUGO::ErrorOrVoid handleSceneType();
@@ -49,13 +49,13 @@ namespace HUGO{
 
 		//Adds to the database the data from all .chat files of chatFolder path.
 		//@param chatFolder Path relative to the executable file (normally HUGO/bin)
-		void readChatFolder(const HUGO::String& chatFolder);
+		void readChatFolder(const std::string& chatFolder);
 
 		//Returns entity data associated with prefabName
-		HUGO::ErrorOrType<EntityData> getPrefabData(const HUGO::String& prefabName);
+		HUGO::ErrorOrType<EntityData> getPrefabData(const std::string& prefabName);
 
 		//Returns scene data associated with sceneName
-		HUGO::ErrorOrType<SceneData> getSceneData(const HUGO::String& sceneName);
+		HUGO::ErrorOrType<SceneData> getSceneData(const std::string& sceneName);
 	};
 
 }

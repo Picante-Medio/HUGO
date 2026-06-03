@@ -13,7 +13,7 @@ ChatParser::ChatParser(): m_sceneData(), m_prefabData(){
 
 }
 
-void ChatParser::readChatFolder(const HUGO::String& chatFolder){
+void ChatParser::readChatFolder(const std::string& chatFolder){
 
     std::filesystem::path chatFolderPath{chatFolder};
     chatFolderPath = std::filesystem::current_path()/chatFolderPath;
@@ -37,14 +37,14 @@ void ChatParser::readChatFolder(const HUGO::String& chatFolder){
     }
 }
 
-HUGO::ErrorOrVoid ChatParser::readChat(const HUGO::String& chatPath){
+HUGO::ErrorOrVoid ChatParser::readChat(const std::string& chatPath){
     std::ifstream file(chatPath);
     if(!file.is_open())
-        return HUGO::ErrorOrVoid(HUGO::StringError{HUGO::String("File can't be opened")});
+        return HUGO::ErrorOrVoid(StringError{std::string("File can't be opened")});
 
     std::streambuf* cinbuf = std::cin.rdbuf(file.rdbuf());
 
-    HUGO::String chatType;
+    std::string chatType;
 
     std::cin >> chatType;
 
@@ -55,7 +55,7 @@ HUGO::ErrorOrVoid ChatParser::readChat(const HUGO::String& chatPath){
     else if(chatType == "PREFAB"){
         err = handlePrefabType();
     }
-    else return HUGO::ErrorOrVoid(HUGO::StringError{"Chat file is neither a scene or a prefab"});
+    else return HUGO::ErrorOrVoid(StringError{"Chat file is neither a scene or a prefab"});
 
     std::cin.rdbuf(cinbuf);
     file.close();
@@ -69,25 +69,25 @@ HUGO::ErrorOrVoid ChatParser::readChat(const HUGO::String& chatPath){
 HUGO::ErrorOrType<HUGO::Vector2> readVector2(){
     Vector2 res;
     if (std::cin >> res.x >> res.y) return HUGO::ErrorOrType<HUGO::Vector2>(res);
-    else return HUGO::ErrorOrType<HUGO::Vector2>(HUGO::StringError{HUGO::String("Error reading VECTOR_2")});
+    else return HUGO::ErrorOrType<HUGO::Vector2>(StringError{std::string("Error reading VECTOR_2")});
 }
 
 HUGO::ErrorOrType<HUGO::Vector3> readVector3(){
     Vector3 res;
     if (std::cin >> res.x >> res.y >> res.z) return HUGO::ErrorOrType<HUGO::Vector3>(res);
-    else return HUGO::ErrorOrType<HUGO::Vector3>(HUGO::StringError{HUGO::String("Error reading VECTOR_3")});
+    else return HUGO::ErrorOrType<HUGO::Vector3>(StringError{std::string("Error reading VECTOR_3")});
 }
 
 HUGO::ErrorOrType<HUGO::Vector4> readVector4(){
     Vector4 res;
     if (std::cin >> res.x >> res.y >> res.z >> res.w) return HUGO::ErrorOrType<HUGO::Vector4>(res);
-    else return HUGO::ErrorOrType<HUGO::Vector4>(HUGO::StringError{HUGO::String("Error reading VECTOR_4")});
+    else return HUGO::ErrorOrType<HUGO::Vector4>(StringError{std::string("Error reading VECTOR_4")});
 }
 
 HUGO::ErrorOrType<HUGO::Quaternion> readQuaternion(){
     HUGO::ErrorOrType<HUGO::Vector4> vec4 = readVector4();
     if(!vec4.isError()) return HUGO::ErrorOrType<HUGO::Quaternion>(vec4.getValue());
-    else return HUGO::ErrorOrType<HUGO::Quaternion>(HUGO::StringError{HUGO::String("Error reading QUATERNION")});
+    else return HUGO::ErrorOrType<HUGO::Quaternion>(StringError{std::string("Error reading QUATERNION")});
 }
 
 
@@ -96,42 +96,42 @@ HUGO::ErrorOrType<HUGO::Int> readInt(){
     HUGO::Int res;
     if (std::cin >> res) return HUGO::ErrorOrType<HUGO::Int>(res);
 
-    HUGO::StringError err;
+    StringError err;
     err.errorMessage = "Error reading INT";
     return HUGO::ErrorOrType<HUGO::Int>(err);
 }
 
-HUGO::ErrorOrType<HUGO::Float> readFloat(){
-    HUGO::Float res;
-    if (std::cin >> res) return HUGO::ErrorOrType<HUGO::Float>(res);
-    else return HUGO::ErrorOrType<HUGO::Float>(HUGO::StringError{HUGO::String("Error reading FLOAT")});
+HUGO::ErrorOrType<float> readFloat(){
+    float res;
+    if (std::cin >> res) return HUGO::ErrorOrType<float>(res);
+    else return HUGO::ErrorOrType<float>(StringError{std::string("Error reading FLOAT")});
 }
 
-HUGO::ErrorOrType<HUGO::Double> readDouble(){
-    HUGO::Double res;
-    if (std::cin >> res) return HUGO::ErrorOrType<HUGO::Double>(res);
-    else return HUGO::ErrorOrType<HUGO::Double>(HUGO::StringError{HUGO::String("Error reading DOUBLE")});
+HUGO::ErrorOrType<double> readDouble(){
+    double res;
+    if (std::cin >> res) return HUGO::ErrorOrType<double>(res);
+    else return HUGO::ErrorOrType<double>(StringError{std::string("Error reading DOUBLE")});
 }
 
-HUGO::ErrorOrType<HUGO::String> readString(){
-    HUGO::String res;
-    if (getline(std::cin, res)) return HUGO::ErrorOrType<HUGO::String>(res);
-    else return HUGO::ErrorOrType<HUGO::String>("Error reading STRING");
+HUGO::ErrorOrType<std::string> readString(){
+    std::string res;
+    if (getline(std::cin, res)) return HUGO::ErrorOrType<std::string>(res);
+    else return HUGO::ErrorOrType<std::string>("Error reading STRING");
 }
 
-HUGO::ErrorOrType<HUGO::Bool> readBool(){
-    HUGO::String res;
+HUGO::ErrorOrType<bool> readBool(){
+    std::string res;
     if (std::cin >> res) {
-        if(res == "true") return HUGO::ErrorOrType<HUGO::Bool>(true);
-        if(res == "false") return HUGO::ErrorOrType<HUGO::Bool>(false);
+        if(res == "true") return HUGO::ErrorOrType<bool>(true);
+        if(res == "false") return HUGO::ErrorOrType<bool>(false);
     }
-    return HUGO::ErrorOrType<HUGO::Bool>("Error reading BOOL");
+    return HUGO::ErrorOrType<bool>("Error reading BOOL");
 }
 
 HUGO::ErrorOrType <HUGO::ColliderInfo> readColliderInfo(){
     HUGO::ColliderInfo res;
 
-    HUGO::String col_shape;
+    std::string col_shape;
     std::cin >> col_shape;
 
     if(col_shape == "BOX_COLLIDER"){
@@ -145,7 +145,7 @@ HUGO::ErrorOrType <HUGO::ColliderInfo> readColliderInfo(){
 
     if(col_shape == "SPHERE_COLLIDER"){
         //float radius
-        HUGO::ErrorOrType<Float> radius = readFloat();
+        HUGO::ErrorOrType<float> radius = readFloat();
         if(radius.isError()) return HUGO::ErrorOrType<HUGO::ColliderInfo>(radius.getError());
         res = SphereColliderInfo{radius.getValue()};
 
@@ -154,11 +154,11 @@ HUGO::ErrorOrType <HUGO::ColliderInfo> readColliderInfo(){
 
     if(col_shape == "CAPSULE_COLLIDER"){
         //float radius
-        HUGO::ErrorOrType<Float> radius = readFloat();
+        HUGO::ErrorOrType<float> radius = readFloat();
         if(radius.isError()) return HUGO::ErrorOrType<HUGO::ColliderInfo>(radius.getError());
 
         //float height
-        HUGO::ErrorOrType<Float> height = readFloat();
+        HUGO::ErrorOrType<float> height = readFloat();
         if(height.isError()) return HUGO::ErrorOrType<HUGO::ColliderInfo>(height.getError());
         res = CapsuleColliderInfo{radius.getValue(), height.getValue()};
 
@@ -176,24 +176,24 @@ HUGO::ErrorOrType <HUGO::ColliderInfo> readColliderInfo(){
 
     if(col_shape == "CONE_COLLIDER"){
         //float radius
-        HUGO::ErrorOrType<Float> radius = readFloat();
+        HUGO::ErrorOrType<float> radius = readFloat();
         if(radius.isError()) return HUGO::ErrorOrType<HUGO::ColliderInfo>(radius.getError());
 
         //float height
-        HUGO::ErrorOrType<Float> height = readFloat();
+        HUGO::ErrorOrType<float> height = readFloat();
         if(height.isError()) return HUGO::ErrorOrType<HUGO::ColliderInfo>(height.getError());
         res = ConeColliderInfo{radius.getValue(), height.getValue()};
 
         return HUGO::ErrorOrType<HUGO::ColliderInfo>(res);
     }
 
-    return HUGO::ErrorOrType<HUGO::ColliderInfo>(HUGO::StringError{"Error reading ColliderInfo"});
+    return HUGO::ErrorOrType<HUGO::ColliderInfo>(StringError{"Error reading ColliderInfo"});
 }
 
 //Checks if input is BOOL, VEC3, FLOAT, INT, STRING... and adds it to the parameters of compData. If an error occurred, returns the error.
-HUGO::ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData& compData){
+HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData& compData){
         if(input == "VECTOR_2"){
-            HUGO::String parameterName;
+            std::string parameterName;
             std::cin >> parameterName;
 
             HUGO::ErrorOrType<HUGO::Vector2> vec2 = readVector2();
@@ -203,7 +203,7 @@ HUGO::ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData
         }
 
         if(input == "VECTOR_3"){
-            HUGO::String parameterName;
+            std::string parameterName;
             std::cin >> parameterName;
 
             HUGO::ErrorOrType<HUGO::Vector3> vec3 = readVector3();
@@ -213,7 +213,7 @@ HUGO::ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData
         }
 
         if(input == "VECTOR_4"){
-            HUGO::String parameterName;
+            std::string parameterName;
             std::cin >> parameterName;
 
             HUGO::ErrorOrType<HUGO::Vector4> vec4 = readVector4();
@@ -223,7 +223,7 @@ HUGO::ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData
         }
 
         if(input == "QUATERNION"){
-            HUGO::String parameterName;
+            std::string parameterName;
             std::cin >> parameterName;
 
             HUGO::ErrorOrType<HUGO::Quaternion> quat = readQuaternion();
@@ -233,10 +233,10 @@ HUGO::ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData
         }
 
         if(input == "FLOAT"){
-            HUGO::String parameterName;
+            std::string parameterName;
             std::cin >> parameterName;
 
-            HUGO::ErrorOrType<HUGO::Float> f = readFloat();
+            HUGO::ErrorOrType<float> f = readFloat();
 
             if(f.isError()) return HUGO::ErrorOrVoid(f.getError());
 
@@ -244,10 +244,10 @@ HUGO::ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData
         }
 
         if(input == "DOUBLE"){
-            HUGO::String parameterName;
+            std::string parameterName;
             std::cin >> parameterName;
 
-            HUGO::ErrorOrType<HUGO::Double> d = readDouble();
+            HUGO::ErrorOrType<double> d = readDouble();
 
             if(d.isError()) return HUGO::ErrorOrVoid(d.getError());
 
@@ -255,7 +255,7 @@ HUGO::ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData
         }
 
         if(input == "INT"){
-            HUGO::String parameterName;
+            std::string parameterName;
             std::cin >> parameterName;
 
             HUGO::ErrorOrType<HUGO::Int> i = readInt();
@@ -266,11 +266,11 @@ HUGO::ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData
         }
 
         if(input == "STRING"){
-            HUGO::String parameterName;
+            std::string parameterName;
             std::cin >> parameterName;
 
             std::cin.get();
-            HUGO::ErrorOrType<HUGO::String> s = readString();
+            HUGO::ErrorOrType<std::string> s = readString();
 
             if(s.isError()) return HUGO::ErrorOrVoid(s.getError());
 
@@ -278,11 +278,11 @@ HUGO::ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData
         }
 
         if(input == "BOOL"){
-            HUGO::String parameterName;
+            std::string parameterName;
             std::cin >> parameterName;
 
             std::cin.get();
-            HUGO::ErrorOrType<HUGO::Bool> b = readBool();
+            HUGO::ErrorOrType<bool> b = readBool();
 
             if(b.isError()) return HUGO::ErrorOrVoid(b.getError());
 
@@ -290,7 +290,7 @@ HUGO::ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData
         }
 
         if(input == "COLLIDER_INFO"){
-            HUGO::String parameterName;
+            std::string parameterName;
             std::cin >> parameterName;
 
             std::cin.get();
@@ -308,20 +308,20 @@ HUGO::ErrorOrVoid parameterReaderHelper(const HUGO::String& input, ComponentData
 HUGO::ErrorOrVoid ChatParser::handleSceneType(){
     std::cin.get();
 
-    HUGO::String sceneName;
+    std::string sceneName;
     getline(std::cin, sceneName);
 
     //Initialize scene data of name sceneName
     m_sceneData[sceneName].entities = std::vector<EntityData>();
-    m_sceneData[sceneName].systems = std::vector<HUGO::String>();
+    m_sceneData[sceneName].systems = std::vector<std::string>();
 
-    HUGO::String input;
+    std::string input;
     std::cin >> input;
 
     while(std::cin){
 
         if(input == "SYSTEM"){
-            HUGO::String systemName;
+            std::string systemName;
             std::cin >> systemName;
 
             m_sceneData[sceneName].systems.push_back(systemName);
@@ -344,14 +344,14 @@ HUGO::ErrorOrVoid ChatParser::handleSceneType(){
 
 HUGO::ErrorOrVoid ChatParser::handlePrefabType(){
     
-    HUGO::String prefabName;
+    std::string prefabName;
     std::cin >> prefabName;
 
-    HUGO::String input;
+    std::string input;
     std::cin >> input;
 
     if(input != "ENTITY"){
-        return HUGO::ErrorOrVoid(HUGO::StringError{"Bad format in prefab .chat"});
+        return HUGO::ErrorOrVoid(StringError{"Bad format in prefab .chat"});
     }
 
     HUGO::ErrorOrType<EntityData> entData = handleEntity();
@@ -366,11 +366,11 @@ HUGO::ErrorOrVoid ChatParser::handlePrefabType(){
 
 HUGO::ErrorOrType<EntityData> ChatParser::handleEntity(){
     EntityData entityData;
-    HUGO::String entityName;
+    std::string entityName;
     HUGO::Int entityID;
     std::cin >> entityName >> entityID;
 
-    HUGO::String input;
+    std::string input;
     std::cin >> input;
     while(input != "END_ENTITY"){
         if(input == "COMPONENT"){
@@ -400,19 +400,19 @@ HUGO::ErrorOrType<EntityData> ChatParser::handleEntity(){
     return HUGO::ErrorOrType<EntityData>(entityData);
 }
 
-HUGO::ErrorOrType<EntityData> ChatParser::getPrefabData(const HUGO::String& prefabName){
-    std::unordered_map<HUGO::String, EntityData>::iterator res = m_prefabData.find(prefabName);
+HUGO::ErrorOrType<EntityData> ChatParser::getPrefabData(const std::string& prefabName){
+    std::unordered_map<std::string, EntityData>::iterator res = m_prefabData.find(prefabName);
 
     if(res == m_prefabData.end()) 
-        return HUGO::ErrorOrType<EntityData>(HUGO::StringError{HUGO::String("Queried prefab doesn't exist")});
+        return HUGO::ErrorOrType<EntityData>(StringError{std::string("Queried prefab doesn't exist")});
 
     return HUGO::ErrorOrType<EntityData>(res->second);
 }
 
-HUGO::ErrorOrType<SceneData> ChatParser::getSceneData(const HUGO::String & sceneName){
-    std::unordered_map<HUGO::String, SceneData>::iterator res = m_sceneData.find(sceneName);
+HUGO::ErrorOrType<SceneData> ChatParser::getSceneData(const std::string & sceneName){
+    std::unordered_map<std::string, SceneData>::iterator res = m_sceneData.find(sceneName);
     if(res == m_sceneData.end()) 
-        return HUGO::ErrorOrType<SceneData>(HUGO::StringError{HUGO::String("Queried scene named " + sceneName + " doesn't exist")});
+        return HUGO::ErrorOrType<SceneData>(StringError{std::string("Queried scene named " + sceneName + " doesn't exist")});
 
     return HUGO::ErrorOrType<SceneData>(res->second);
 }

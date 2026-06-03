@@ -8,12 +8,12 @@ HCOMPONENT(ButtonComponent)
     HUGO::TrayLocationTypes mTrayLoc;
 
     std::function<void()> onClickCallback;
-    HUGO::Bool wasOver = false;
+    bool wasOver = false;
     
     // appearance - normal state
-    DEFAULT_SERIALIZED_MEMBER(HUGO::String, normalMaterial, "Button/Normal");
-    DEFAULT_SERIALIZED_MEMBER(HUGO::String, hoverMaterial, "Button/Hover");
-    DEFAULT_SERIALIZED_MEMBER(HUGO::String, pressedMaterial, "Button/Pressed");
-    DEFAULT_SERIALIZED_MEMBER(HUGO::String, disabledMaterial, "Button/Disabled");
+    DEFAULT_SERIALIZED_MEMBER(std::string, normalMaterial, "Button/Normal");
+    DEFAULT_SERIALIZED_MEMBER(std::string, hoverMaterial, "Button/Hover");
+    DEFAULT_SERIALIZED_MEMBER(std::string, pressedMaterial, "Button/Pressed");
+    DEFAULT_SERIALIZED_MEMBER(std::string, disabledMaterial, "Button/Disabled");
 END_HCOMPONENT()
 

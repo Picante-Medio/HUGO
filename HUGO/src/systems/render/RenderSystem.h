@@ -19,8 +19,8 @@ HSYSTEM(RenderSystem)
     struct OgreObject{
         Ogre::Entity* ogreEntity = nullptr;
         Ogre::SceneNode* ogreSceneNode = nullptr;   // Scene node for transform
-        std::unordered_map<HUGO::String, Ogre::AnimationState*> animationStates; //Stored animation states
-        HUGO::String meshName;
+        std::unordered_map<std::string, Ogre::AnimationState*> animationStates; //Stored animation states
+        std::string meshName;
     };
 
     //Ogre References

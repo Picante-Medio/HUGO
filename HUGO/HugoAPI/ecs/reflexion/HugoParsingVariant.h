@@ -9,14 +9,14 @@
 using HVariant = std::variant<
     //---------------------OBLIGATORY CONCRETE TYPES FOR PARSING-------------
     HUGO::Int, //INT
-    HUGO::Float, //FLOAT
-    HUGO::Double, //DOUBLE N
-    HUGO::String, //STRIRNG
+    float, //FLOAT
+    double, //DOUBLE N
+    std::string, //STRIRNG
     HUGO::Vector4, //N
     HUGO::Vector3, //VECTOR_3
     HUGO::Vector2, //VECTOR_2 N
     HUGO::Quaternion, //VECTOR_4 N
-    HUGO::Bool, //BOOL
+    bool, //BOOL
     
     //----------------------VALUES THAT CAN BE REPRESENTED AS FLOATS-------------
     HUGO::Degree, //FLOAT

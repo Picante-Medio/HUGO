@@ -12,7 +12,7 @@ void TweenSystem::update(uint32_t dt) {
         pack.modify<TweenComponent>([this, dt](TweenComponent& comp){
             for(auto it = comp.currentTweens.begin(); it != comp.currentTweens.end();){
 
-            HUGO::ErrorOrType<bool> res = it->get()->tweenParameter(scene, static_cast<HUGO::Float>(dt));
+            HUGO::ErrorOrType<bool> res = it->get()->tweenParameter(scene, static_cast<float>(dt));
 
             if(res.isError()){
                 scene.log(HUGO::StringError("[TweenSystem] " + res.getError().errorMessage));

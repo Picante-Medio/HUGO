@@ -5,12 +5,12 @@
 #include "HugoComponentMacros.h"
 
 HCOMPONENT(AudioComponent)
-    DEFAULT_SERIALIZED_MEMBER(HUGO::String, audioName, "");
+    DEFAULT_SERIALIZED_MEMBER(std::string, audioName, "");
 
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Bool, loop, false);
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Bool, streaming, false);
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Bool, isPlaying, false)
+    DEFAULT_SERIALIZED_MEMBER(bool, loop, false);
+    DEFAULT_SERIALIZED_MEMBER(bool, streaming, false);
+    DEFAULT_SERIALIZED_MEMBER(bool, isPlaying, false)
 
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, volume, 1.0f);
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, pitch, 1.0f);
+    DEFAULT_SERIALIZED_MEMBER(float, volume, 1.0f);
+    DEFAULT_SERIALIZED_MEMBER(float, pitch, 1.0f);
 END_HCOMPONENT()

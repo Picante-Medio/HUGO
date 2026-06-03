@@ -114,9 +114,9 @@ Ogre::Light::LightTypes HUGO::OgreUtils::toOgre(HUGO::LightType type)
     }
 }
 
-HUGO::ErrorOrType<Ogre::Overlay*> HUGO::OgreOverlayUtils::getOverlay(const HUGO::String& name)
+HUGO::ErrorOrType<Ogre::Overlay*> HUGO::OgreOverlayUtils::getOverlay(const std::string& name)
 {
-    HUGO::StringError e;
+    StringError e;
     if (name.empty()) {
         e.errorMessage = "Overlay name is empty";
         return HUGO::ErrorOrType<Ogre::Overlay*>(e);
@@ -133,10 +133,10 @@ HUGO::ErrorOrType<Ogre::Overlay*> HUGO::OgreOverlayUtils::getOverlay(const HUGO:
     }
     return HUGO::ErrorOrType<Ogre::Overlay*>(overlay);
 }
-HUGO::ErrorOrType<Ogre::OverlayElement*> HUGO::OgreOverlayUtils::getElement(const HUGO::String& name, bool isTextArea,
+HUGO::ErrorOrType<Ogre::OverlayElement*> HUGO::OgreOverlayUtils::getElement(const std::string& name, bool isTextArea,
     Ogre::OverlayContainer* containerToAdd)
 {
-    HUGO::StringError e;
+    StringError e;
 
     if (name.empty())
     {
@@ -166,9 +166,9 @@ HUGO::ErrorOrType<Ogre::OverlayElement*> HUGO::OgreOverlayUtils::getElement(cons
 }
 
 
-HUGO::ErrorOrType<Ogre::OverlayContainer*> HUGO::OgreOverlayUtils::getContainer(const HUGO::String& name, Ogre::Overlay* overlayToAdd)
+HUGO::ErrorOrType<Ogre::OverlayContainer*> HUGO::OgreOverlayUtils::getContainer(const std::string& name, Ogre::Overlay* overlayToAdd)
 {
-    HUGO::StringError e;
+    StringError e;
     HUGO::ErrorOrType<Ogre::OverlayElement*> elementResult = getElement(name);
     if (elementResult.isError()){
         e.errorMessage = elementResult.getError().errorMessage;

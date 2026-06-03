@@ -176,7 +176,7 @@ TestSystemVideo2::init() {
          lg.setSpecular(HUGO::Vector4(0.3f, 0.3f, 0.3f, 1.0f));
     });
 
-    HUGO::String aux = "Menu/Mierdas25";
+    std::string aux = "Menu/Mierdas25";
     EntityID aText = scene.createEntity();
     scene.addComponent<PanelComponent>(aText, [&aux](PanelComponent& panel){
         panel.overlayName = aux;

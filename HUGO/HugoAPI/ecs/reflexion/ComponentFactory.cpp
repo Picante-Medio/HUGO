@@ -33,7 +33,7 @@ namespace HUGO {
             return HUGO::ErrorOrVoid();
         }
 
-        HUGO::StringError err;
+        StringError err;
         err.errorMessage = "El componente solicitado (" + name + ") no existe o no ha sido registrado para fabricar";
         return HUGO::ErrorOrVoid(err);
     }
@@ -46,7 +46,7 @@ namespace HUGO {
             return HUGO::ErrorOrVoid();
         }
 
-        HUGO::StringError err;
+        StringError err;
         err.errorMessage = "El componente solicitado (" + name + ") no existe o no ha sido registrado para fabricar";
         return HUGO::ErrorOrVoid(err);
     }

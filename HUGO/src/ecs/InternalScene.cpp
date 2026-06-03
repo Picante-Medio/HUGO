@@ -93,9 +93,9 @@ InternalScene::addComponentLUA(int entityID, std::string& componentData) {
 
 		if(parameterType == "") parameterType = stringValue;
 		else if(parameterNameBuffer == "") parameterNameBuffer = stringValue;
-		else if(parameterType == "float") parameterValue = static_cast<HUGO::Float>(std::stof(stringValue));
+		else if(parameterType == "float") parameterValue = static_cast<float>(std::stof(stringValue));
 		else if(parameterType == "int") parameterValue = static_cast<HUGO::Int>(std::stoi(stringValue));
-		else if(parameterType == "string") parameterValue = static_cast<HUGO::String>(stringValue);
+		else if(parameterType == "string") parameterValue = static_cast<std::string>(stringValue);
 		else if(parameterType == "vector2") {
 			float x = std::stof(stringValue);
 			float y = 0;
@@ -170,7 +170,7 @@ InternalScene::printEntity(int id) {
 	std::vector<std::bitset<MAX_COMPONENTS>> masks = entityTable->getComponentMask();
 
 	//Imprime la bitmask de todas las entidad de forma provisional
-	log(static_cast<HUGO::String>("ENTITY WITH ID: " + std::to_string(id) + " has components " + masks[id].to_string() + "\n"));
+	log(static_cast<std::string>("ENTITY WITH ID: " + std::to_string(id) + " has components " + masks[id].to_string() + "\n"));
 }
 
 void 
@@ -182,7 +182,7 @@ InternalScene::printEntities() {
 
 	int index = 0;
 	for(std::bitset mask : masks) {
-		log(static_cast<HUGO::String>("ENTITY WITH ID: " + std::to_string(index) + " has components " + mask.to_string() + "\n"));
+		log(static_cast<std::string>("ENTITY WITH ID: " + std::to_string(index) + " has components " + mask.to_string() + "\n"));
 		index += 1;
 	}
 }
@@ -193,26 +193,26 @@ InternalScene::log(const HUGO::StringError& error) {
 }
 
 void 
-InternalScene::log(const HUGO::String& log) {
+InternalScene::log(const std::string& log) {
     stringsToLog.push(log);
 }
 
-HUGO::ErrorOrType<HUGO::String> 
+HUGO::ErrorOrType<std::string> 
 InternalScene::getNextError() {
-    if(errorsToLog.empty()) return HUGO::ErrorOrType<HUGO::String>(HUGO::StringError{"La cola está vacía"});
+    if(errorsToLog.empty()) return HUGO::ErrorOrType<std::string>(HUGO::StringError{"La cola está vacía"});
 
-    HUGO::String ret = errorsToLog.front().description();
+    std::string ret = errorsToLog.front().description();
     errorsToLog.pop();
-    return HUGO::ErrorOrType<HUGO::String>(ret);
+    return HUGO::ErrorOrType<std::string>(ret);
 }
 
-HUGO::ErrorOrType<HUGO::String> 
+HUGO::ErrorOrType<std::string> 
 InternalScene::getNextLog() {
-    if(stringsToLog.empty()) return HUGO::ErrorOrType<HUGO::String>(HUGO::StringError{"La cola está vacía"});
+    if(stringsToLog.empty()) return HUGO::ErrorOrType<std::string>(HUGO::StringError{"La cola está vacía"});
 
-    HUGO::String ret = stringsToLog.front();
+    std::string ret = stringsToLog.front();
     stringsToLog.pop();
-    return HUGO::ErrorOrType<HUGO::String>(ret);
+    return HUGO::ErrorOrType<std::string>(ret);
 }
 
 void
@@ -244,16 +244,16 @@ InternalScene::removeComponentAux(EntityID entity, ComponentID componentID, Dens
 }
 
 void 
-InternalScene::changeScene(const HUGO::String& sceneName) {
+InternalScene::changeScene(const std::string& sceneName) {
     sceneManager.setCurrentScene(sceneName);
 }
 
 void 
-InternalScene::changeAndDestroyPreviousScene(const HUGO::String& sceneName) {
+InternalScene::changeAndDestroyPreviousScene(const std::string& sceneName) {
     sceneManager.setCurrentSceneAndDestroyPrevious(sceneName);
 }
 
-HUGO::ErrorOrType<EntityID> InternalScene::instantiatePrefab(const HUGO::String& prefabName){
+HUGO::ErrorOrType<EntityID> InternalScene::instantiatePrefab(const std::string& prefabName){
 	HUGO::ErrorOrType<EntityID> prefabID = sceneManager.instantiatePrefab(prefabName, shared_from_this());
 
 	if(prefabID.isError()) log(HUGO::StringError("Error instantiating prefab " + prefabName + ": "+ prefabID.getError().description()));
@@ -271,11 +271,11 @@ InternalScene::changeAmbientLight(const HUGO::Vector3& l){
 }
 
 void
-InternalScene::loadScene(const HUGO::String& sceneName) {
+InternalScene::loadScene(const std::string& sceneName) {
     sceneManager.loadScene(sceneName);
 }
 
 void
-InternalScene::unloadScene(const HUGO::String& sceneName) {
+InternalScene::unloadScene(const std::string& sceneName) {
     sceneManager.unloadScene(sceneName);
 }

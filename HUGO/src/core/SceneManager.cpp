@@ -15,10 +15,10 @@
 
 using namespace HUGO;
 
-SceneManager::SceneManager(HUGO::IInput& inputModule, const HUGO::String& chatFolder, IPhysicsModule& physicsModule)
+SceneManager::SceneManager(HUGO::IInput& inputModule, const std::string& chatFolder, IPhysicsModule& physicsModule)
 : m_chatParser(), m_physicsModule(physicsModule), m_sceneMap(), m_input(inputModule) 
 {
-    LuaBinder::getInstance().registerMethod<SceneManager, void, HUGO::String>(
+    LuaBinder::getInstance().registerMethod<SceneManager, void, std::string>(
         *this, &SceneManager::setCurrentSceneLUA, "SetCurrentScene"
     );
 
@@ -64,7 +64,7 @@ HUGO::ErrorOrType<EntityID> createEntity(std::shared_ptr<InternalScene> scene, c
     return HUGO::ErrorOrType<EntityID>(currEntity);
 }
 
-HUGO::ErrorOrVoid SceneManager::createScene(const HUGO::String& sceneName){
+HUGO::ErrorOrVoid SceneManager::createScene(const std::string& sceneName){
     HUGO::ErrorOrType<HUGO::SceneData> sceneData = m_chatParser.getSceneData(sceneName);
 
     if(sceneData.isError()) 
@@ -109,16 +109,16 @@ HUGO::ErrorOrVoid SceneManager::createScene(const HUGO::String& sceneName){
     return HUGO::ErrorOrVoid();
 }
 
-void SceneManager::unloadScene(const HUGO::String& sceneName){
+void SceneManager::unloadScene(const std::string& sceneName){
     m_sceneQueries.push_back({SceneQuery::QueryType::DELETE_SCENE, sceneName});
 }
 
-void SceneManager::loadScene(const HUGO::String& sceneName){
+void SceneManager::loadScene(const std::string& sceneName){
     m_sceneQueries.push_back({SceneQuery::QueryType::LOAD_SCENE, sceneName});
 }
 
-HUGO::ErrorOrVoid SceneManager::destroyScene(const HUGO::String& sceneName){
-    if(m_sceneMap.find(sceneName) == m_sceneMap.end()) return HUGO::ErrorOrVoid(HUGO::StringError{"Scene " + sceneName + " can't be unloaded because it doesn't exist"});
+HUGO::ErrorOrVoid SceneManager::destroyScene(const std::string& sceneName){
+    if(m_sceneMap.find(sceneName) == m_sceneMap.end()) return HUGO::ErrorOrVoid(StringError{"Scene " + sceneName + " can't be unloaded because it doesn't exist"});
 
     m_physicsModule.destroySceneSimulation(sceneName);
     m_sceneMap.erase(sceneName);
@@ -129,15 +129,15 @@ HUGO::ErrorOrVoid SceneManager::destroyScene(const HUGO::String& sceneName){
     return HUGO::ErrorOrVoid();
 }
 
-void SceneManager::setCurrentSceneLUA(const HUGO::String sceneName){
+void SceneManager::setCurrentSceneLUA(const std::string sceneName){
     setCurrentScene(sceneName);
 }
 
-void SceneManager::setCurrentScene(const HUGO::String& sceneName){
+void SceneManager::setCurrentScene(const std::string& sceneName){
     m_sceneQueries.push_back({SceneQuery::QueryType::CHANGE_SCENE, sceneName});
 }
 
-void SceneManager::setCurrentSceneAndDestroyPrevious(const HUGO::String& sceneName){
+void SceneManager::setCurrentSceneAndDestroyPrevious(const std::string& sceneName){
     m_sceneQueries.push_back({SceneQuery::QueryType::DELETE_SCENE, m_currentSceneName});
     m_sceneQueries.push_back({SceneQuery::QueryType::CHANGE_SCENE, sceneName});
 
@@ -198,7 +198,7 @@ void SceneManager::dispatchMessagesCurrentScene() {
         s->dispatchMessages();
 }
 
-HUGO::ErrorOrType<EntityID> SceneManager::instantiatePrefab(const HUGO::String& prefabName, std::shared_ptr<InternalScene> scene){
+HUGO::ErrorOrType<EntityID> SceneManager::instantiatePrefab(const std::string& prefabName, std::shared_ptr<InternalScene> scene){
     HUGO::ErrorOrType<EntityData> prefabData = m_chatParser.getPrefabData(prefabName);
     
     if(prefabData.isError()) return HUGO::ErrorOrType<EntityID>(prefabData.getError().description());

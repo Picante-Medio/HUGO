@@ -186,8 +186,8 @@ namespace HUGO
         MousePosition mpABS = getMousePosition();
         int w, h;
         SDL_GetWindowSize(sdlWindow, &w, &h);
-        mp.x = static_cast<HUGO::Float>(mpABS.x) / static_cast<HUGO::Float>(w);
-        mp.y = static_cast<HUGO::Float>(mpABS.y) / static_cast<HUGO::Float>(h);
+        mp.x = static_cast<float>(mpABS.x) / static_cast<float>(w);
+        mp.y = static_cast<float>(mpABS.y) / static_cast<float>(h);
         return mp;
     }
     const std::string &Input::getTextInput() const

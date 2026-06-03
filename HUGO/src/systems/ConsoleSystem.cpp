@@ -18,12 +18,12 @@ void ConsoleSystem::printLuaOutput(const TextComponent& consoleTextCmp){
 }
 
 void ConsoleSystem::printLogs(const TextComponent& consoleTextCmp){
-    HUGO::ErrorOrType<HUGO::String> log = scene.getNextLog();
+    HUGO::ErrorOrType<std::string> log = scene.getNextLog();
 
     while (!log.isError())
     {
         // if not explicitly specified, no \n is included
-        const HUGO::String& logText = log.getValue();
+        const std::string& logText = log.getValue();
 
         scene.modifyComponent<TextComponent>(consoleTextCmp.entity, [this, logText](TextComponent& t){
             t.text += logIni + logText;
@@ -34,11 +34,11 @@ void ConsoleSystem::printLogs(const TextComponent& consoleTextCmp){
 }
 
 void ConsoleSystem::printErrors(const TextComponent& consoleTextCmp){
-    HUGO::ErrorOrType<HUGO::String> error = scene.getNextError();
+    HUGO::ErrorOrType<std::string> error = scene.getNextError();
 
     // for errors, \n is included by default
     while(!error.isError()){
-        const HUGO::String& errorText = error.getValue();
+        const std::string& errorText = error.getValue();
 
         scene.modifyComponent<TextComponent>(consoleTextCmp.entity, [this, errorText](TextComponent& t){
             t.text += logIni + "ERROR: " + errorText + "\n";
@@ -48,8 +48,8 @@ void ConsoleSystem::printErrors(const TextComponent& consoleTextCmp){
     }
 }
 
-HUGO::String ConsoleSystem::getNextHistoric(){
-    HUGO::String item = "-";
+std::string ConsoleSystem::getNextHistoric(){
+    std::string item = "-";
 
     if(historyIndex > 0){ 
         historyIndex--;
@@ -59,8 +59,8 @@ HUGO::String ConsoleSystem::getNextHistoric(){
     return item;
 }
 
-HUGO::String ConsoleSystem::getPreviousHistoric(){
-    HUGO::String item = " ";
+std::string ConsoleSystem::getPreviousHistoric(){
+    std::string item = " ";
 
     if(historyIndex < history.size()){
         // item inside of if so when history.size() is reached "" is returned
@@ -70,7 +70,7 @@ HUGO::String ConsoleSystem::getPreviousHistoric(){
     return item;
 }
 
-void ConsoleSystem::receiveInput(const HUGO::String& inputText){
+void ConsoleSystem::receiveInput(const std::string& inputText){
 
     // Register input in history and log it to console
     history.push_back(inputText);
@@ -80,8 +80,8 @@ void ConsoleSystem::receiveInput(const HUGO::String& inputText){
     // Check input
     size_t start = 0;
     size_t end = inputText.find('|');
-    HUGO::String command = "";
-    HUGO::String type = "";
+    std::string command = "";
+    std::string type = "";
     bool expectsReturn = false;
 
     if(end != std::string::npos) {
@@ -98,16 +98,16 @@ void ConsoleSystem::receiveInput(const HUGO::String& inputText){
             handleReturn<HUGO::Int>(returnedInfo);
         }
         else if(type == "float"){
-            HUGO::ErrorOrType<HUGO::Float> returnedInfo = LuaBinder::getInstance().getFromString<HUGO::Float>(command);
-            handleReturn<HUGO::Float>(returnedInfo);
+            HUGO::ErrorOrType<float> returnedInfo = LuaBinder::getInstance().getFromString<float>(command);
+            handleReturn<float>(returnedInfo);
         }
         else if (type == "bool"){
             HUGO::ErrorOrType<bool> returnedInfo = LuaBinder::getInstance().getFromString<bool>(command);
             handleReturn<bool>(returnedInfo);
         }
         else if (type == "string"){
-            HUGO::ErrorOrType<HUGO::String> returnedInfo = LuaBinder::getInstance().getFromString<HUGO::String>(command);
-            handleReturn<HUGO::String>(returnedInfo);
+            HUGO::ErrorOrType<std::string> returnedInfo = LuaBinder::getInstance().getFromString<std::string>(command);
+            handleReturn<std::string>(returnedInfo);
         }
         else scene.log(HUGO::StringError("LUA: Invalid return type"));
     }
@@ -117,7 +117,7 @@ void ConsoleSystem::receiveInput(const HUGO::String& inputText){
     }
 }
 
-void ConsoleSystem::updateInputField(HUGO::String nText){
+void ConsoleSystem::updateInputField(std::string nText){
 
     scene.modifyComponent<InputFieldComponent>(consoleInput, [nText](InputFieldComponent& i){
         i.fullText = nText;
@@ -130,7 +130,7 @@ void ConsoleSystem::updateInputField(HUGO::String nText){
 
 void ConsoleSystem::handleKeyInput(){
 
-    HUGO::String result = "";
+    std::string result = "";
     if(active && input->wasConsoleKeyJustPressed(HUGO::KeyCode::UP_ARROW)){
         result = getNextHistoric();
         updateInputField(result);
@@ -228,7 +228,7 @@ void ConsoleSystem::init(){
         input.isActive = active;
         input.originalText = "| ";
         input.deactiveText = "Click to write...";
-        input.onChangeCallback = [this](const HUGO::String& inputText){
+        input.onChangeCallback = [this](const std::string& inputText){
             receiveInput(inputText);
         };
     });

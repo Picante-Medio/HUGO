@@ -10,25 +10,25 @@
 
 // complete information for an audio asset
 struct AudioAssetInfo {
-    HUGO::String fullPath;     // full path for loading
+    std::string fullPath;     // full path for loading
     HUGO::AudioID id;          // unique id
 };
 
 // module for managing all audio assets globally
 class AudioAssetsModule {
 private:
-    std::unordered_map<HUGO::String, std::shared_ptr<AudioAssetInfo>> nameToAsset;
-    std::unordered_map<HUGO::AudioID, HUGO::String> idToName;
+    std::unordered_map<std::string, std::shared_ptr<AudioAssetInfo>> nameToAsset;
+    std::unordered_map<HUGO::AudioID, std::string> idToName;
     
-    HUGO::String basePath;
+    std::string basePath;
     HUGO::AudioID nextID = 0;
     
     // supported audio extensions
-    std::vector<HUGO::String> supportedExtensions = {".wav", ".mp3", ".flac"};
+    std::vector<std::string> supportedExtensions = {".wav", ".mp3", ".flac"};
     
     // Private helper functions
-    bool isSupportedAudioFile(const HUGO::String& filename) const;
-    HUGO::String generateName(const HUGO::String& relativePath) const;
+    bool isSupportedAudioFile(const std::string& filename) const;
+    std::string generateName(const std::string& relativePath) const;
     void scanDirectoryRecursive(const std::string& currentPath, const std::string& relativeRoot);
     
     AudioAssetsModule();
@@ -49,7 +49,7 @@ public:
     // ========================================================================
     
     // register an audio file manually
-    HUGO::AudioID registerAudio(const HUGO::String& name, const HUGO::String& filepath);
+    HUGO::AudioID registerAudio(const std::string& name, const std::string& filepath);
     
     // scan base directory and register all audio files automatically (type auto-detected)
     size_t scanAndRegisterAll();
@@ -62,16 +62,16 @@ public:
     // ========================================================================
     
     // get asset
-    AudioAssetInfo* getAsset(const HUGO::String& name) const;
+    AudioAssetInfo* getAsset(const std::string& name) const;
     AudioAssetInfo* getAsset(HUGO::AudioID id) const;
     // get id by name
-    HUGO::AudioID getID(const HUGO::String& name) const;
+    HUGO::AudioID getID(const std::string& name) const;
 
     // get all registered names
-    std::vector<HUGO::String> getAllNames() const;
+    std::vector<std::string> getAllNames() const;
     
     // check if exists by name
-    bool exists(const HUGO::String& name) const;
+    bool exists(const std::string& name) const;
     
     // check if exists by ID
     bool exists(HUGO::AudioID id) const;
@@ -84,14 +84,14 @@ public:
     // ========================================================================
     
     // set base path for audio files
-    void setBasePath(const HUGO::String& path);
+    void setBasePath(const std::string& path);
     
     // get base path
-    const HUGO::String& getBasePath() const;
+    const std::string& getBasePath() const;
     
     // ========================================================================
     // debug
     // ========================================================================
     // save all registered audio assets to a text file for debugging
-    bool saveToDebugFile(const HUGO::String& filename = "AudioAssetsDebug.log") const;
+    bool saveToDebugFile(const std::string& filename = "AudioAssetsDebug.log") const;
 };

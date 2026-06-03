@@ -33,12 +33,12 @@ AudioAssetsModule::destroyInstance() {
 }
 
 #pragma region PRIVATE HELPERS
-bool AudioAssetsModule::isSupportedAudioFile(const HUGO::String& filename) const
+bool AudioAssetsModule::isSupportedAudioFile(const std::string& filename) const
 {
     size_t dotPos = filename.find_last_of('.');
     if (dotPos == std::string::npos) return false;
     
-    HUGO::String ext = filename.substr(dotPos);
+    std::string ext = filename.substr(dotPos);
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
     
     for (const auto& supportedExt : supportedExtensions) {
@@ -49,10 +49,10 @@ bool AudioAssetsModule::isSupportedAudioFile(const HUGO::String& filename) const
     return false;
 }
 
-HUGO::String AudioAssetsModule::generateName(const HUGO::String& relativePath) const
+std::string AudioAssetsModule::generateName(const std::string& relativePath) const
 {
     // extract only the filename from the path
-    HUGO::String filename = relativePath;
+    std::string filename = relativePath;
     
     // remove any directory path
     size_t slashPos = filename.find_last_of("/\\");
@@ -81,14 +81,14 @@ void AudioAssetsModule::scanDirectoryRecursive(const std::string& currentPath, c
                 scanDirectoryRecursive(entry.path().string(), relativeRoot);
             } 
             else if (entry.is_regular_file()) {
-                HUGO::String filename = entry.path().filename().string();
+                std::string filename = entry.path().filename().string();
                 
                 if (isSupportedAudioFile(filename)) {
                     // get relative path from base directory
-                    HUGO::String relativePath = fs::relative(entry.path(), relativeRoot).string();
+                    std::string relativePath = fs::relative(entry.path(), relativeRoot).string();
                     
                     // generate name
-                    HUGO::String name = generateName(relativePath);
+                    std::string name = generateName(relativePath);
                     
                     // register audio
                     registerAudio(name, relativePath.c_str());
@@ -107,14 +107,14 @@ void AudioAssetsModule::scanDirectoryRecursive(const std::string& currentPath, c
 
 #pragma region PUBLIC API
 // Registration
-HUGO::AudioID AudioAssetsModule::registerAudio(const HUGO::String& name, const HUGO::String& filepath)
+HUGO::AudioID AudioAssetsModule::registerAudio(const std::string& name, const std::string& filepath)
 {
     auto it = nameToAsset.find(name);
     if (it != nameToAsset.end()) {
         return it->second->id;
     }
 
-    HUGO::String fullPath = basePath.empty() ? filepath : basePath + "/" + filepath;
+    std::string fullPath = basePath.empty() ? filepath : basePath + "/" + filepath;
 
     std::shared_ptr<AudioAssetInfo> asset = std::make_shared<AudioAssetInfo>();
     asset->fullPath = fullPath;
@@ -131,7 +131,7 @@ size_t AudioAssetsModule::scanAndRegisterAll()
 {
     clear();
     
-    HUGO::String fullBasePath = basePath.c_str();
+    std::string fullBasePath = basePath.c_str();
     
     if (!fs::exists(fullBasePath)) {
         std::cerr << "Base path does not exist: " << fullBasePath << "\n";
@@ -161,7 +161,7 @@ void AudioAssetsModule::clear()
 }
 
 // Getters
-AudioAssetInfo* AudioAssetsModule::getAsset(const HUGO::String &name) const
+AudioAssetInfo* AudioAssetsModule::getAsset(const std::string &name) const
 {
     auto it = nameToAsset.find(name);
     return it != nameToAsset.end() ? it->second.get() : nullptr;
@@ -176,7 +176,7 @@ AudioAssetInfo* AudioAssetsModule::getAsset(HUGO::AudioID id) const
     return (it2 != nameToAsset.end()) ? it2->second.get() : nullptr;
 }
 
-HUGO::AudioID AudioAssetsModule::getID(const HUGO::String &name) const
+HUGO::AudioID AudioAssetsModule::getID(const std::string &name) const
 {
     auto it = nameToAsset.find(name);
     
@@ -188,9 +188,9 @@ HUGO::AudioID AudioAssetsModule::getID(const HUGO::String &name) const
     return -1;
 }
 
-std::vector<HUGO::String> AudioAssetsModule::getAllNames() const
+std::vector<std::string> AudioAssetsModule::getAllNames() const
 {
-    std::vector<HUGO::String> names;
+    std::vector<std::string> names;
     names.reserve(nameToAsset.size());
     for (const auto& pair : nameToAsset) {
         names.push_back(pair.first);
@@ -199,7 +199,7 @@ std::vector<HUGO::String> AudioAssetsModule::getAllNames() const
 }
 
 // ask if a sound exists
-bool AudioAssetsModule::exists(const HUGO::String& name) const
+bool AudioAssetsModule::exists(const std::string& name) const
 {
     return nameToAsset.find(name) != nameToAsset.end();
 }
@@ -215,20 +215,20 @@ size_t AudioAssetsModule::size() const
 }
 
 // configuration
-void AudioAssetsModule::setBasePath(const HUGO::String& path)
+void AudioAssetsModule::setBasePath(const std::string& path)
 {
     basePath = path;
 }
 
-const HUGO::String& AudioAssetsModule::getBasePath() const
+const std::string& AudioAssetsModule::getBasePath() const
 {
     return basePath;
 }
 
 // debug
-bool AudioAssetsModule::saveToDebugFile(const HUGO::String& filename) const
+bool AudioAssetsModule::saveToDebugFile(const std::string& filename) const
 {
-    HUGO::String filepath = basePath + filename;
+    std::string filepath = basePath + filename;
     std::ofstream file(filepath);
     
     if (!file.is_open()) {
@@ -245,7 +245,7 @@ bool AudioAssetsModule::saveToDebugFile(const HUGO::String& filename) const
     
     int index = 1;
     for (const auto& pair : nameToAsset) {
-        const HUGO::String& name = pair.first;
+        const std::string& name = pair.first;
         const AudioAssetInfo* info = pair.second.get();
         
         file << index++ << ". " << name << "\n";

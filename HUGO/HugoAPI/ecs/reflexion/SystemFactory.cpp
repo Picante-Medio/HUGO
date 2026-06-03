@@ -20,7 +20,7 @@ SystemFactory::makeSystem(HUGO::IScene& scene, const std::string& name) {
         return generators()[name](scene);
     }
 
-    HUGO::StringError err;
+    StringError err;
     err.errorMessage = "Requested system doesn't exist or hasn't been registered for creation";
     return HUGO::ErrorOrType<std::shared_ptr<HUGO::System>>(err);
 }

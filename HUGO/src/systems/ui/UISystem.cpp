@@ -33,8 +33,8 @@ UISystem::~UISystem()
 //====================================================
 std::shared_ptr<UIElementCache> UISystem::createElementCache(
     EntityID entity,
-    const HUGO::String& overlayName,
-    const HUGO::String& containerName)
+    const std::string& overlayName,
+    const std::string& containerName)
 {
     // already exists
     auto it = uiCache.find(entity);
@@ -66,12 +66,12 @@ UIElementCache* UISystem::getCache(EntityID entity)
     return it->second.get();
 }
 
-bool UISystem::isMouseOver(HUGO::Float left, HUGO::Float top, HUGO::Float width, HUGO::Float height, HUGO::Float mouseX, HUGO::Float mouseY)
+bool UISystem::isMouseOver(float left, float top, float width, float height, float mouseX, float mouseY)
 {
     return (mouseX >= left && mouseX <= (left + width) && mouseY >= top  && mouseY <= (top+height));
 }
 
-bool UISystem::isMouseOverPanel(const PanelComponent &panel, HUGO::Float mouseX, HUGO::Float mouseY)
+bool UISystem::isMouseOverPanel(const PanelComponent &panel, float mouseX, float mouseY)
 {
     int screenPixelsW, screenPixelsH;
     SDL_GL_GetDrawableSize(OgreModule::getInstance().getSDLWindow(), &screenPixelsW, &screenPixelsH);
@@ -103,7 +103,7 @@ bool UISystem::isMouseOverPanel(const PanelComponent &panel, HUGO::Float mouseX,
             
         case HUGO::UIMetricsMode::GMM_RELATIVE_ASPECT_ADJUSTED:
         {
-            HUGO::Float baseSizePixels = std::min((float)screenPixelsW, (float)screenPixelsH);
+            float baseSizePixels = std::min((float)screenPixelsW, (float)screenPixelsH);
             screenRect.left = panel.left * baseSizePixels;
             screenRect.top = panel.top * baseSizePixels;
             screenRect.width = panel.width * baseSizePixels;
@@ -142,7 +142,7 @@ void UISystem::syncPanel(const PanelComponent &p)
     if (!p.material.empty()) cache->container->setMaterialName(p.material);
 }
 
-HUGO::String UISystem::formatText(const HUGO::String & text, Ogre::TextAreaOverlayElement *textArea, HUGO::Float maxWidth,HUGO::Float maxHeight)
+std::string UISystem::formatText(const std::string & text, Ogre::TextAreaOverlayElement *textArea, float maxWidth,float maxHeight)
 {
     if (!textArea || !textArea->getFont()  ||!textArea->getFont()->isLoaded() || text.empty())
         return text;
@@ -150,14 +150,14 @@ HUGO::String UISystem::formatText(const HUGO::String & text, Ogre::TextAreaOverl
     float screenWidth = static_cast<float>(renderWindow->getWidth());
     float screenHeight = static_cast<float>(renderWindow->getHeight());
 
-    HUGO::Float height = (textArea->getMetricsMode() == Ogre::GMM_RELATIVE)? textArea->getCharHeight() * screenHeight : textArea->getCharHeight();
-    HUGO::Float maxH = maxHeight * screenHeight;
-    HUGO::Float maxW = maxWidth * screenWidth;
+    float height = (textArea->getMetricsMode() == Ogre::GMM_RELATIVE)? textArea->getCharHeight() * screenHeight : textArea->getCharHeight();
+    float maxH = maxHeight * screenHeight;
+    float maxW = maxWidth * screenWidth;
     int maxLines = static_cast<int>(maxH / height);   
     
-    std::deque<HUGO::String> lines;
-    HUGO::String currentLine;
-    HUGO::Float currentWidth = 0.0f;
+    std::deque<std::string> lines;
+    std::string currentLine;
+    float currentWidth = 0.0f;
 
     for(char c : text){
         if (c == '\n')
@@ -167,7 +167,7 @@ HUGO::String UISystem::formatText(const HUGO::String & text, Ogre::TextAreaOverl
             currentWidth = 0.0f;
             continue;
         }
-        HUGO::Float charWidth = textArea->getFont()->getGlyphAspectRatio(c) * height;
+        float charWidth = textArea->getFont()->getGlyphAspectRatio(c) * height;
         if (currentWidth + charWidth > maxW)
         {
             lines.push_back(currentLine);
@@ -185,8 +185,8 @@ HUGO::String UISystem::formatText(const HUGO::String & text, Ogre::TextAreaOverl
     while(lines.size() > maxLines)
         lines.pop_front();
 
-    HUGO::String result;
-    for (const HUGO::String &l : lines)
+    std::string result;
+    for (const std::string &l : lines)
         result += l + "\n";
     return result;
 }
@@ -237,7 +237,7 @@ void UISystem::syncButton(const ButtonComponent &button)
     UIElementCache* cache = getCache(button.entity);
     if (!cache || !cache->container) return;
 
-    HUGO::String change ="";
+    std::string change ="";
 
     switch (button.state) {
         case HUGO::ButtonStateTypes::BS_UP :
@@ -268,7 +268,7 @@ void UISystem::syncProgressBar(const PanelComponent& p, const ProgressBarCompone
     cache->container->setWidth(p.width);
     cache->container->setHeight(p.height);
     // calculate percentaje
-    HUGO::Float percent = (pr.currentValue - pr.minValue) / (pr.maxValue - pr.minValue);
+    float percent = (pr.currentValue - pr.minValue) / (pr.maxValue - pr.minValue);
     percent = std::clamp(percent, 0.0f, 1.0f);
 
        // sync fill
@@ -322,10 +322,10 @@ void UISystem::syncSlider(const PanelComponent& p, SliderComponent& s)
         s.previousValue = s.currentValue;
     }
 
-    HUGO::Float percent = (s.currentValue - s.minValue) / (s.maxValue - s.minValue);
+    float percent = (s.currentValue - s.minValue) / (s.maxValue - s.minValue);
     percent = std::clamp(percent, 0.0f, 1.0f);
-    HUGO::Float knobPos;
-    HUGO::Float centerPos;
+    float knobPos;
+    float centerPos;
     // sync track and knob
     switch (s.orientation)
     {
@@ -499,8 +499,8 @@ void UISystem::processInput()
             continue;
         
         // get knob position and size
-        HUGO::Float knobLeft = cache->extra->getLeft();
-        HUGO::Float knobTop = cache->extra->getTop();
+        float knobLeft = cache->extra->getLeft();
+        float knobTop = cache->extra->getTop();
         bool mouseOverKnob = isMouseOver(knobLeft, knobTop, slider.knobWidth, slider.knobHeight, mouse.x, mouse.y);
         bool mouseOverTrack = isMouseOverPanel(panel, mouse.x, mouse.y);
 
@@ -514,9 +514,9 @@ void UISystem::processInput()
             // if clicking directly on the track, move knob to clicked position
             if (mouseOverTrack && !mouseOverKnob)
             {
-                HUGO::Float percent = 0.0f;
-                HUGO::Float trackHeight = panel.height - slider.knobHeight;                    
-                HUGO::Float trackWidth = panel.width - slider.knobWidth;
+                float percent = 0.0f;
+                float trackHeight = panel.height - slider.knobHeight;                    
+                float trackWidth = panel.width - slider.knobWidth;
                 switch (slider.orientation)
                 {
                 case HUGO::SliderOrientation::HORIZONTAL:
@@ -540,11 +540,11 @@ void UISystem::processInput()
         {
             if (input.isMouseButtonPressed(HUGO::MouseCode::MOUSE_LEFT))
             {
-                HUGO::Float percent = 0.0f;
+                float percent = 0.0f;
                 
                 // value based on mouse position
-                HUGO::Float trackWidth = panel.width - slider.knobWidth;
-                HUGO::Float trackHeight = panel.height - slider.knobHeight;
+                float trackWidth = panel.width - slider.knobWidth;
+                float trackHeight = panel.height - slider.knobHeight;
                 switch (slider.orientation)
                 {
                     case HUGO::SliderOrientation::HORIZONTAL:
@@ -558,7 +558,7 @@ void UISystem::processInput()
                         break;
                 }
                 
-                HUGO::Float newValue = slider.minValue + percent * (slider.maxValue - slider.minValue);
+                float newValue = slider.minValue + percent * (slider.maxValue - slider.minValue);
                 
                 // only update if it is needed
                 if (slider.currentValue != newValue){
@@ -577,7 +577,7 @@ void UISystem::processInput()
     }
 
     // process text for the active input field using SDL text buffer
-    const HUGO::String& textInput = input.getTextInput();
+    const std::string& textInput = input.getTextInput();
     for (auto &pack : scene.query<InputFieldComponent, TextComponent, PanelComponent>()) {
         InputFieldComponent& field = pack.getConst<InputFieldComponent&>();
         if (!field.isActive) continue;
@@ -634,16 +634,16 @@ void UISystem::processInput()
             Ogre::TextAreaOverlayElement* area = dynamic_cast<Ogre::TextAreaOverlayElement*>(cache->element);
             if (!area) continue;
 
-            const HUGO::String& full = field.fullText;
-            HUGO::Float panelWidth = panel.width;
+            const std::string& full = field.fullText;
+            float panelWidth = panel.width;
 
-            HUGO::String visible;
-            HUGO::Float width = 0.0f;
+            std::string visible;
+            float width = 0.0f;
 
             // show only the part that fits from the end
             for (int i = static_cast<int>(full.size() - 1); i >= 0; --i) {
                 char c = full[i];
-                HUGO::Float w = area->getFont()->getGlyphAspectRatio(c) * text.characterHeight;
+                float w = area->getFont()->getGlyphAspectRatio(c) * text.characterHeight;
 
                 if (width + w > panelWidth)
                     break;

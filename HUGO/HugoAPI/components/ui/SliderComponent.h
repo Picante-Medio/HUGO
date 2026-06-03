@@ -5,30 +5,30 @@
 
 HCOMPONENT(SliderComponent)
     // range
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, minValue, 0.0f);
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, maxValue, 1.0f);
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, currentValue, 0.0f);
-    HUGO::Float previousValue = 0.0f;
+    DEFAULT_SERIALIZED_MEMBER(float, minValue, 0.0f);
+    DEFAULT_SERIALIZED_MEMBER(float, maxValue, 1.0f);
+    DEFAULT_SERIALIZED_MEMBER(float, currentValue, 0.0f);
+    float previousValue = 0.0f;
     
     // orientation
     DEFAULT_SERIALIZED_MEMBER(HUGO::SliderOrientation, orientation, HUGO::SliderOrientation::HORIZONTAL);
 
     // knob name
-    DEFAULT_SERIALIZED_MEMBER(HUGO::String, trackElementName, "");
-    DEFAULT_SERIALIZED_MEMBER(HUGO::String, knobElementName, "");
+    DEFAULT_SERIALIZED_MEMBER(std::string, trackElementName, "");
+    DEFAULT_SERIALIZED_MEMBER(std::string, knobElementName, "");
 
     // materials
-    DEFAULT_SERIALIZED_MEMBER(HUGO::String, trackMaterial, "");
-    DEFAULT_SERIALIZED_MEMBER(HUGO::String, knobMaterial, "");
+    DEFAULT_SERIALIZED_MEMBER(std::string, trackMaterial, "");
+    DEFAULT_SERIALIZED_MEMBER(std::string, knobMaterial, "");
 
     // relative sizes
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, knobWidth, 0.05f);
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, knobHeight, 0.05f);
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, knobLeft, 0.0f);
-    DEFAULT_SERIALIZED_MEMBER(HUGO::Float, knobTop, 0.0f);
+    DEFAULT_SERIALIZED_MEMBER(float, knobWidth, 0.05f);
+    DEFAULT_SERIALIZED_MEMBER(float, knobHeight, 0.05f);
+    DEFAULT_SERIALIZED_MEMBER(float, knobLeft, 0.0f);
+    DEFAULT_SERIALIZED_MEMBER(float, knobTop, 0.0f);
 
-    HUGO::Bool isDragging = false;
+    bool isDragging = false;
 
-    std::function<void(HUGO::Float)> onChangeCallback = nullptr;
+    std::function<void(float)> onChangeCallback = nullptr;
 END_HCOMPONENT()
 

@@ -23,8 +23,8 @@ void ParticleSystem::init() {
 
 void ParticleSystem::onLoad() {}
 
-void ParticleSystem::createParticleSystem(EntityID id, const HUGO::String& particleName, ParticleEmitterComponent& pe, const HUGO::Vector3& iniPos) {
-    HUGO::String n = "ps" + std::to_string(id);
+void ParticleSystem::createParticleSystem(EntityID id, const std::string& particleName, ParticleEmitterComponent& pe, const HUGO::Vector3& iniPos) {
+    std::string n = "ps" + std::to_string(id);
 
     Ogre::ParticleSystem* ps = sm->createParticleSystem(n, particleName);
     ps->setEmitting(pe.emitting);
@@ -36,10 +36,10 @@ void ParticleSystem::createParticleSystem(EntityID id, const HUGO::String& parti
     Ogre::ParticleEmitter* e =  ps->getEmitter(0);
 
     // read the datas
-    HUGO::Float emissionRate = e->getEmissionRate();
+    float emissionRate = e->getEmissionRate();
     Ogre::Vector3 direction = e->getDirection();
     Ogre::ColourValue colour = e->getColour();
-    HUGO::Float timeToLive = e->getTimeToLive();
+    float timeToLive = e->getTimeToLive();
 
     // store
     pe.emissionRate = emissionRate;

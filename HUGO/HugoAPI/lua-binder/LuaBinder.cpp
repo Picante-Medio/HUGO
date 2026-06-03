@@ -19,10 +19,10 @@ LuaBinder::getInstance() {
 }
 
 HUGO::ErrorOrVoid
-LuaBinder::interpretString(HUGO::String command) {
+LuaBinder::interpretString(std::string command) {
     //if string is invalid
     if (luaL_dostring(lua, command.c_str()) != LUA_OK) {
-        HUGO::StringError error = HUGO::StringError(HUGO::String(lua_tostring(lua, -1)));
+        HUGO::StringError error = HUGO::StringError(std::string(lua_tostring(lua, -1)));
         lua_pop(lua, 1);
         return HUGO::ErrorOrVoid(error);
     }
@@ -31,7 +31,7 @@ LuaBinder::interpretString(HUGO::String command) {
     return HUGO::ErrorOrVoid();
 }
 
-void LuaBinder::setLuaPath(HUGO::String path )
+void LuaBinder::setLuaPath(std::string path )
 {
     lua_getglobal(lua, "package");
     lua_getfield(lua, -1, "path");
@@ -56,7 +56,7 @@ LuaBinder::setPrintFunction(lua_CFunction nPrint){
 }
 
 void
-LuaBinder::requireFolder(HUGO::String path) {
+LuaBinder::requireFolder(std::string path) {
     std::filesystem::path fsPath(path);
     std::filesystem::path luaPath = fsPath / "?.lua";
 
@@ -64,7 +64,7 @@ LuaBinder::requireFolder(HUGO::String path) {
 
     for (const auto& entry : std::filesystem::directory_iterator(fsPath)) {
         if (entry.is_regular_file()) {
-            HUGO::String moduleName = entry.path().stem().string();
+            std::string moduleName = entry.path().stem().string();
             interpretString("require '" + moduleName + "'");
         }
     }
