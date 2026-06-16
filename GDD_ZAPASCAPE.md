@@ -135,7 +135,9 @@ Si el jugador es alcanzado por el monstruo, pierde la partida inmediatamente y s
 
 ### 4.1. Movimiento del jugador
 
-El jugador puede moverse en todas las direcciones mediante las teclas **WASD**, mientras que la **rotación de la cámara** se controla con el **ratón** solo en horizontal, permitiendo una navegación fluida y precisa por el entorno.
+El jugador puede moverse libremente en todas las direcciones utilizando las teclas **W, A, S y D**. La **rotación de la cámara** se controla mediante el **botón derecho del ratón**, afectando únicamente al eje horizontal para proporcionar una navegación fluida y precisa por el entorno.
+
+Además, la tecla **E** permite interactuar con distintos elementos del escenario, como rituales y puerta final. Por otro lado, la tecla **F** se utiliza para colocar marcas en el suelo, facilitando la orientación y la exploración del mapa.
 
   
 
