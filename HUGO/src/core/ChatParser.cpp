@@ -42,22 +42,19 @@ HUGO::ErrorOrVoid ChatParser::readChat(const std::string& chatPath){
     if(!file.is_open())
         return HUGO::ErrorOrVoid(StringError{std::string("File can't be opened")});
 
-    std::streambuf* cinbuf = std::cin.rdbuf(file.rdbuf());
-
     std::string chatType;
 
-    std::cin >> chatType;
+    file >> chatType;
 
     HUGO::ErrorOrVoid err = HUGO::ErrorOrVoid();
     if(chatType == "SCENE"){
-        err = handleSceneType();
+        err = handleSceneType(file);
     }
     else if(chatType == "PREFAB"){
-        err = handlePrefabType();
+        err = handlePrefabType(file);
     }
     else return HUGO::ErrorOrVoid(StringError{"Chat file is neither a scene or a prefab"});
 
-    std::cin.rdbuf(cinbuf);
     file.close();
 
     //If error has returned from either of the two functions, it will be returned
@@ -66,77 +63,77 @@ HUGO::ErrorOrVoid ChatParser::readChat(const std::string& chatPath){
 
 #pragma region ReadTypeFunctions
 
-HUGO::ErrorOrType<HUGO::Vector2> readVector2(){
+HUGO::ErrorOrType<HUGO::Vector2> readVector2(std::ifstream& file){
     Vector2 res;
-    if (std::cin >> res.x >> res.y) return HUGO::ErrorOrType<HUGO::Vector2>(res);
+    if (file >> res.x >> res.y) return HUGO::ErrorOrType<HUGO::Vector2>(res);
     else return HUGO::ErrorOrType<HUGO::Vector2>(StringError{std::string("Error reading VECTOR_2")});
 }
 
-HUGO::ErrorOrType<HUGO::Vector3> readVector3(){
+HUGO::ErrorOrType<HUGO::Vector3> readVector3(std::ifstream& file){
     Vector3 res;
-    if (std::cin >> res.x >> res.y >> res.z) return HUGO::ErrorOrType<HUGO::Vector3>(res);
+    if (file >> res.x >> res.y >> res.z) return HUGO::ErrorOrType<HUGO::Vector3>(res);
     else return HUGO::ErrorOrType<HUGO::Vector3>(StringError{std::string("Error reading VECTOR_3")});
 }
 
-HUGO::ErrorOrType<HUGO::Vector4> readVector4(){
+HUGO::ErrorOrType<HUGO::Vector4> readVector4(std::ifstream& file){
     Vector4 res;
-    if (std::cin >> res.x >> res.y >> res.z >> res.w) return HUGO::ErrorOrType<HUGO::Vector4>(res);
+    if (file >> res.x >> res.y >> res.z >> res.w) return HUGO::ErrorOrType<HUGO::Vector4>(res);
     else return HUGO::ErrorOrType<HUGO::Vector4>(StringError{std::string("Error reading VECTOR_4")});
 }
 
-HUGO::ErrorOrType<HUGO::Quaternion> readQuaternion(){
-    HUGO::ErrorOrType<HUGO::Vector4> vec4 = readVector4();
+HUGO::ErrorOrType<HUGO::Quaternion> readQuaternion(std::ifstream& file){
+    HUGO::ErrorOrType<HUGO::Vector4> vec4 = readVector4(file);
     if(!vec4.isError()) return HUGO::ErrorOrType<HUGO::Quaternion>(vec4.getValue());
     else return HUGO::ErrorOrType<HUGO::Quaternion>(StringError{std::string("Error reading QUATERNION")});
 }
 
 
 
-HUGO::ErrorOrType<HUGO::Int> readInt(){
+HUGO::ErrorOrType<HUGO::Int> readInt(std::ifstream& file){
     HUGO::Int res;
-    if (std::cin >> res) return HUGO::ErrorOrType<HUGO::Int>(res);
+    if (file >> res) return HUGO::ErrorOrType<HUGO::Int>(res);
 
     StringError err;
     err.errorMessage = "Error reading INT";
     return HUGO::ErrorOrType<HUGO::Int>(err);
 }
 
-HUGO::ErrorOrType<float> readFloat(){
+HUGO::ErrorOrType<float> readFloat(std::ifstream& file){
     float res;
-    if (std::cin >> res) return HUGO::ErrorOrType<float>(res);
+    if (file >> res) return HUGO::ErrorOrType<float>(res);
     else return HUGO::ErrorOrType<float>(StringError{std::string("Error reading FLOAT")});
 }
 
-HUGO::ErrorOrType<double> readDouble(){
+HUGO::ErrorOrType<double> readDouble(std::ifstream& file){
     double res;
-    if (std::cin >> res) return HUGO::ErrorOrType<double>(res);
+    if (file >> res) return HUGO::ErrorOrType<double>(res);
     else return HUGO::ErrorOrType<double>(StringError{std::string("Error reading DOUBLE")});
 }
 
-HUGO::ErrorOrType<std::string> readString(){
+HUGO::ErrorOrType<std::string> readString(std::ifstream& file){
     std::string res;
-    if (getline(std::cin, res)) return HUGO::ErrorOrType<std::string>(res);
+    if (getline(file, res)) return HUGO::ErrorOrType<std::string>(res);
     else return HUGO::ErrorOrType<std::string>("Error reading STRING");
 }
 
-HUGO::ErrorOrType<bool> readBool(){
+HUGO::ErrorOrType<bool> readBool(std::ifstream& file){
     std::string res;
-    if (std::cin >> res) {
+    if (file >> res) {
         if(res == "true") return HUGO::ErrorOrType<bool>(true);
         if(res == "false") return HUGO::ErrorOrType<bool>(false);
     }
     return HUGO::ErrorOrType<bool>("Error reading BOOL");
 }
 
-HUGO::ErrorOrType <HUGO::ColliderInfo> readColliderInfo(){
+HUGO::ErrorOrType <HUGO::ColliderInfo> readColliderInfo(std::ifstream& file){
     HUGO::ColliderInfo res;
 
     std::string col_shape;
-    std::cin >> col_shape;
+    file >> col_shape;
 
     if(col_shape == "BOX_COLLIDER"){
         //vec3 half_extents
-        HUGO::ErrorOrType<Vector3> half_extents = readVector3();
+        HUGO::ErrorOrType<Vector3> half_extents = readVector3(file);
         if(half_extents.isError()) return HUGO::ErrorOrType<HUGO::ColliderInfo>(half_extents.getError());
         res = BoxColliderInfo{half_extents.getValue()};
 
@@ -145,7 +142,7 @@ HUGO::ErrorOrType <HUGO::ColliderInfo> readColliderInfo(){
 
     if(col_shape == "SPHERE_COLLIDER"){
         //float radius
-        HUGO::ErrorOrType<float> radius = readFloat();
+        HUGO::ErrorOrType<float> radius = readFloat(file);
         if(radius.isError()) return HUGO::ErrorOrType<HUGO::ColliderInfo>(radius.getError());
         res = SphereColliderInfo{radius.getValue()};
 
@@ -154,11 +151,11 @@ HUGO::ErrorOrType <HUGO::ColliderInfo> readColliderInfo(){
 
     if(col_shape == "CAPSULE_COLLIDER"){
         //float radius
-        HUGO::ErrorOrType<float> radius = readFloat();
+        HUGO::ErrorOrType<float> radius = readFloat(file);
         if(radius.isError()) return HUGO::ErrorOrType<HUGO::ColliderInfo>(radius.getError());
 
         //float height
-        HUGO::ErrorOrType<float> height = readFloat();
+        HUGO::ErrorOrType<float> height = readFloat(file);
         if(height.isError()) return HUGO::ErrorOrType<HUGO::ColliderInfo>(height.getError());
         res = CapsuleColliderInfo{radius.getValue(), height.getValue()};
 
@@ -167,7 +164,7 @@ HUGO::ErrorOrType <HUGO::ColliderInfo> readColliderInfo(){
 
     if(col_shape == "CYLINDER_COLLIDER"){
         //vec3 half_extents
-        HUGO::ErrorOrType<Vector3> half_extents = readVector3();
+        HUGO::ErrorOrType<Vector3> half_extents = readVector3(file);
         if(half_extents.isError()) return HUGO::ErrorOrType<HUGO::ColliderInfo>(half_extents.getError());
         res = CylinderColliderInfo{half_extents.getValue()};
 
@@ -176,11 +173,11 @@ HUGO::ErrorOrType <HUGO::ColliderInfo> readColliderInfo(){
 
     if(col_shape == "CONE_COLLIDER"){
         //float radius
-        HUGO::ErrorOrType<float> radius = readFloat();
+        HUGO::ErrorOrType<float> radius = readFloat(file);
         if(radius.isError()) return HUGO::ErrorOrType<HUGO::ColliderInfo>(radius.getError());
 
         //float height
-        HUGO::ErrorOrType<float> height = readFloat();
+        HUGO::ErrorOrType<float> height = readFloat(file);
         if(height.isError()) return HUGO::ErrorOrType<HUGO::ColliderInfo>(height.getError());
         res = ConeColliderInfo{radius.getValue(), height.getValue()};
 
@@ -191,12 +188,12 @@ HUGO::ErrorOrType <HUGO::ColliderInfo> readColliderInfo(){
 }
 
 //Checks if input is BOOL, VEC3, FLOAT, INT, STRING... and adds it to the parameters of compData. If an error occurred, returns the error.
-HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData& compData){
+HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData& compData, std::ifstream& file){
         if(input == "VECTOR_2"){
             std::string parameterName;
-            std::cin >> parameterName;
+            file >> parameterName;
 
-            HUGO::ErrorOrType<HUGO::Vector2> vec2 = readVector2();
+            HUGO::ErrorOrType<HUGO::Vector2> vec2 = readVector2(file);
 
             if(vec2.isError()) return HUGO::ErrorOrVoid(vec2.getError());
             compData.parameters[parameterName] = {vec2.getValue()};
@@ -204,9 +201,9 @@ HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData&
 
         if(input == "VECTOR_3"){
             std::string parameterName;
-            std::cin >> parameterName;
+            file >> parameterName;
 
-            HUGO::ErrorOrType<HUGO::Vector3> vec3 = readVector3();
+            HUGO::ErrorOrType<HUGO::Vector3> vec3 = readVector3(file);
 
             if(vec3.isError()) return HUGO::ErrorOrVoid(vec3.getError());
             compData.parameters[parameterName] = {vec3.getValue()};
@@ -214,9 +211,9 @@ HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData&
 
         if(input == "VECTOR_4"){
             std::string parameterName;
-            std::cin >> parameterName;
+            file >> parameterName;
 
-            HUGO::ErrorOrType<HUGO::Vector4> vec4 = readVector4();
+            HUGO::ErrorOrType<HUGO::Vector4> vec4 = readVector4(file);
 
             if(vec4.isError()) return HUGO::ErrorOrVoid(vec4.getError());
             compData.parameters[parameterName] = {vec4.getValue()};
@@ -224,9 +221,9 @@ HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData&
 
         if(input == "QUATERNION"){
             std::string parameterName;
-            std::cin >> parameterName;
+            file >> parameterName;
 
-            HUGO::ErrorOrType<HUGO::Quaternion> quat = readQuaternion();
+            HUGO::ErrorOrType<HUGO::Quaternion> quat = readQuaternion(file);
 
             if(quat.isError()) return HUGO::ErrorOrVoid(quat.getError());
             compData.parameters[parameterName] = {quat.getValue()};
@@ -234,9 +231,9 @@ HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData&
 
         if(input == "FLOAT"){
             std::string parameterName;
-            std::cin >> parameterName;
+            file >> parameterName;
 
-            HUGO::ErrorOrType<float> f = readFloat();
+            HUGO::ErrorOrType<float> f = readFloat(file);
 
             if(f.isError()) return HUGO::ErrorOrVoid(f.getError());
 
@@ -245,9 +242,9 @@ HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData&
 
         if(input == "DOUBLE"){
             std::string parameterName;
-            std::cin >> parameterName;
+            file >> parameterName;
 
-            HUGO::ErrorOrType<double> d = readDouble();
+            HUGO::ErrorOrType<double> d = readDouble(file);
 
             if(d.isError()) return HUGO::ErrorOrVoid(d.getError());
 
@@ -256,9 +253,9 @@ HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData&
 
         if(input == "INT"){
             std::string parameterName;
-            std::cin >> parameterName;
+            file >> parameterName;
 
-            HUGO::ErrorOrType<HUGO::Int> i = readInt();
+            HUGO::ErrorOrType<HUGO::Int> i = readInt(file);
 
             if(i.isError()) return HUGO::ErrorOrVoid(i.getError());
 
@@ -267,10 +264,10 @@ HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData&
 
         if(input == "STRING"){
             std::string parameterName;
-            std::cin >> parameterName;
+            file >> parameterName;
 
-            std::cin.get();
-            HUGO::ErrorOrType<std::string> s = readString();
+            file.get();
+            HUGO::ErrorOrType<std::string> s = readString(file);
 
             if(s.isError()) return HUGO::ErrorOrVoid(s.getError());
 
@@ -279,10 +276,10 @@ HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData&
 
         if(input == "BOOL"){
             std::string parameterName;
-            std::cin >> parameterName;
+            file >> parameterName;
 
-            std::cin.get();
-            HUGO::ErrorOrType<bool> b = readBool();
+            file.get();
+            HUGO::ErrorOrType<bool> b = readBool(file);
 
             if(b.isError()) return HUGO::ErrorOrVoid(b.getError());
 
@@ -291,10 +288,10 @@ HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData&
 
         if(input == "COLLIDER_INFO"){
             std::string parameterName;
-            std::cin >> parameterName;
+            file >> parameterName;
 
-            std::cin.get();
-            HUGO::ErrorOrType<HUGO::ColliderInfo> b = readColliderInfo();
+            file.get();
+            HUGO::ErrorOrType<HUGO::ColliderInfo> b = readColliderInfo(file);
             if(b.isError()) return HUGO::ErrorOrVoid(b.getError());
 
            compData.parameters[parameterName] = {b.getValue()};
@@ -305,30 +302,30 @@ HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData&
 
 #pragma endregion
 
-HUGO::ErrorOrVoid ChatParser::handleSceneType(){
-    std::cin.get();
+HUGO::ErrorOrVoid ChatParser::handleSceneType(std::ifstream& file){
+    file.get();
 
     std::string sceneName;
-    getline(std::cin, sceneName);
+    getline(file, sceneName);
 
     //Initialize scene data of name sceneName
     m_sceneData[sceneName].entities = std::vector<EntityData>();
     m_sceneData[sceneName].systems = std::vector<std::string>();
 
     std::string input;
-    std::cin >> input;
+    file >> input;
 
-    while(std::cin){
+    while(file){
 
         if(input == "SYSTEM"){
             std::string systemName;
-            std::cin >> systemName;
+            file >> systemName;
 
             m_sceneData[sceneName].systems.push_back(systemName);
         }
 
         if (input == "ENTITY"){
-            HUGO::ErrorOrType<EntityData> entData = handleEntity();
+            HUGO::ErrorOrType<EntityData> entData = handleEntity(file);
             if(entData.isError()){
                 return HUGO::ErrorOrVoid(entData.getError());
             }
@@ -336,25 +333,25 @@ HUGO::ErrorOrVoid ChatParser::handleSceneType(){
             m_sceneData[sceneName].entities.push_back(entData.getValue());
         }
 
-        std::cin >> input;
+        file >> input;
     }
 
     return HUGO::ErrorOrVoid();
 }
 
-HUGO::ErrorOrVoid ChatParser::handlePrefabType(){
+HUGO::ErrorOrVoid ChatParser::handlePrefabType(std::ifstream& file){
     
     std::string prefabName;
-    std::cin >> prefabName;
+    file >> prefabName;
 
     std::string input;
-    std::cin >> input;
+    file >> input;
 
     if(input != "ENTITY"){
         return HUGO::ErrorOrVoid(StringError{"Bad format in prefab .chat"});
     }
 
-    HUGO::ErrorOrType<EntityData> entData = handleEntity();
+    HUGO::ErrorOrType<EntityData> entData = handleEntity(file);
 
     if(entData.isError()) return HUGO::ErrorOrVoid(entData.getError());
 
@@ -364,37 +361,37 @@ HUGO::ErrorOrVoid ChatParser::handlePrefabType(){
 
 }
 
-HUGO::ErrorOrType<EntityData> ChatParser::handleEntity(){
+HUGO::ErrorOrType<EntityData> ChatParser::handleEntity(std::ifstream& file){
     EntityData entityData;
     std::string entityName;
     HUGO::Int entityID;
-    std::cin >> entityName >> entityID;
+    file >> entityName >> entityID;
 
     std::string input;
-    std::cin >> input;
+    file >> input;
     while(input != "END_ENTITY"){
         if(input == "COMPONENT"){
             ComponentData compData;
-            std::cin >> compData.componentName;
+            file >> compData.componentName;
             entityData.components.push_back(compData);
         }
         else if(input == "START_CHILDREN"){
-            std::cin >> input;
+            file >> input;
             while(input != "END_CHILDREN"){
-                HUGO::ErrorOrType<EntityData> childEnt = handleEntity();
+                HUGO::ErrorOrType<EntityData> childEnt = handleEntity(file);
                 if(childEnt.isError()) return HUGO::ErrorOrType<EntityData>(childEnt.getError());
                 entityData.children.push_back(childEnt.getValue());
 
-                std::cin >> input;
+                file >> input;
             }
         }
         //If it already has an entity and this entity has a component, it can check if possible parameters for the component have been read.
         else if(entityData.components.size() > 0){
-            HUGO::ErrorOrVoid parameterReadErr = parameterReaderHelper(input, entityData.components.back());
+            HUGO::ErrorOrVoid parameterReadErr = parameterReaderHelper(input, entityData.components.back(), file);
             if(parameterReadErr.isError()) return HUGO::ErrorOrType<EntityData>(parameterReadErr.getError());
         }
 
-        std::cin >> input;
+        file >> input;
     }
 
     return HUGO::ErrorOrType<EntityData>(entityData);

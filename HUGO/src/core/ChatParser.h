@@ -35,13 +35,13 @@ namespace HUGO{
 		HUGO::ErrorOrVoid readChat(const std::string& chatPath);
 
 		//Read previously opened file as Scene.
-		HUGO::ErrorOrVoid handleSceneType();
+		HUGO::ErrorOrVoid handleSceneType(std::ifstream& file);
 
 		//Reads Entity until it reads END_ENTITY
-		HUGO::ErrorOrType<EntityData> handleEntity();
+		HUGO::ErrorOrType<EntityData> handleEntity(std::ifstream& file);
 
 		//Read previously opened file as Prefab
-		HUGO::ErrorOrVoid handlePrefabType();
+		HUGO::ErrorOrVoid handlePrefabType(std::ifstream& file);
 	public:
 
 		//Initialize empty database. Function readChatFolder must be called to fill the database.
