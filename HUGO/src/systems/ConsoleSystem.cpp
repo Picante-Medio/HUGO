@@ -143,7 +143,6 @@ void ConsoleSystem::handleKeyInput(){
     if(input->isKeyPressed(HUGO::KeyCode::LCTRL) && input->wasKeyJustPressed(HUGO::KeyCode::T))
     {
         active = !active;
-        // input->setConsoleActive(active);
 
         HUGO::Vector4 colour = {1.0, 1.0, 1.0, 1.0};
         if(!active) colour.w = 0;
