@@ -131,20 +131,19 @@ void ConsoleSystem::updateInputField(std::string nText){
 void ConsoleSystem::handleKeyInput(){
 
     std::string result = "";
-    if(active && input->wasConsoleKeyJustPressed(HUGO::KeyCode::UP_ARROW)){
+    if(active && input->wasKeyJustPressed(HUGO::KeyCode::UP_ARROW)){
         result = getNextHistoric();
         updateInputField(result);
     }
-    if(active && input->wasConsoleKeyJustPressed(HUGO::KeyCode::DOWN_ARROW)){
+    if(active && input->wasKeyJustPressed(HUGO::KeyCode::DOWN_ARROW)){
         result = getPreviousHistoric();
         updateInputField(result);
     }
 
-    if((input->isConsoleKeyPressed(HUGO::KeyCode::LCTRL) && input->wasConsoleKeyJustPressed(HUGO::KeyCode::T)) ||
-        (input->isKeyPressed(HUGO::KeyCode::LCTRL) && input->wasKeyJustPressed(HUGO::KeyCode::T)))
+    if(input->isKeyPressed(HUGO::KeyCode::LCTRL) && input->wasKeyJustPressed(HUGO::KeyCode::T))
     {
         active = !active;
-        input->setConsoleActive(active);
+        // input->setConsoleActive(active);
 
         HUGO::Vector4 colour = {1.0, 1.0, 1.0, 1.0};
         if(!active) colour.w = 0;
@@ -193,7 +192,6 @@ void ConsoleSystem::init(){
     active = false;
     historyIndex = 0;
     input = static_cast<HUGO::Input*>(&scene.getInput());
-    input->setConsoleActive(active);
     
     //---------------------------------------Input field
     consoleInput = scene.createEntity();
@@ -224,11 +222,11 @@ void ConsoleSystem::init(){
         text.text = "Click to write...";
     });
 
-    scene.addComponent<InputFieldComponent>(consoleInput, [this](InputFieldComponent& input){
-        input.isActive = active;
-        input.originalText = "| ";
-        input.deactiveText = "Click to write...";
-        input.onChangeCallback = [this](const std::string& inputText){
+    scene.addComponent<InputFieldComponent>(consoleInput, [this](InputFieldComponent& inputField){
+        inputField.isActive = active;
+        inputField.originalText = "| ";
+        inputField.deactiveText = "Click to write...";
+        inputField.onChangeCallback = [this](const std::string& inputText){
             receiveInput(inputText);
         };
     });
