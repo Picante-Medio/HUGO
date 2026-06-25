@@ -11,7 +11,6 @@
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 #include "WorldTransformComponent.h"
 
-#include "OgreBulletDebugger.h"
 #include <cstddef>
 #define PRINTER(name) printer(#name)
 
@@ -42,13 +41,6 @@ BulletSimulation::BulletSimulation(InternalScene& scene)
     // The number of substeps start being 0
     numSubSteps = 0;
 
-    // Set visual debugging if enabled 
-    /*
-    debugDrawer = new OgreBulletDebugger();
-    debugDrawer->setDebugMode(debugDrawer->getDebugMode() | btIDebugDraw::DebugDrawModes::DBG_DrawNormals);
-    btWorld->setDebugDrawer(debugDrawer);
-
-    */
     PRINTER(btWorld);
 
     // Subscribe to events when colliders and rigidbodies get removed from deleted entities
@@ -608,9 +600,5 @@ void BulletSimulation::onRemoveRigidBody(RigidBodyComponent& rb) {
 }
 
 void BulletSimulation::debugDraw() {
-    // if using Ogre
-    OgreBulletDebugger* ogreDebugDrawer = static_cast<OgreBulletDebugger*>(debugDrawer);
-    ogreDebugDrawer->begin();
-    btWorld->debugDrawWorld();
-    ogreDebugDrawer->end();
+
 }
