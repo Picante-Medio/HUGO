@@ -11,12 +11,12 @@ namespace HUGO {
 
     class MessageHandler{
 
-    public:
-
         static inline MsgID MSGCounter() {
             static MsgID counter = 0;
             return counter++;
         }
+        
+    public:
 
         template <typename T>
         static inline MsgID getMsgID() {
