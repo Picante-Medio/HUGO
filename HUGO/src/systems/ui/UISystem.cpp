@@ -600,7 +600,7 @@ void UISystem::processInput()
         }
 
         // backspace -> remove last character
-        if (input.wasConsoleKeyJustPressed(HUGO::KeyCode::BACKSPACE) && field.cursorPos > 0) {
+        if (input.wasKeyJustPressed(HUGO::KeyCode::BACKSPACE) && field.cursorPos > 0) {
             pack.modify<InputFieldComponent>([textInput](InputFieldComponent& f){
                 f.fullText.erase(f.cursorPos - 1, 1);
                 f.cursorPos--;
@@ -609,7 +609,7 @@ void UISystem::processInput()
         }
 
         // enter -> save result and deactivate
-        if (input.wasConsoleKeyJustPressed(HUGO::KeyCode::RETURN)) {
+        if (input.wasKeyJustPressed(HUGO::KeyCode::RETURN)) {
             pack.modify<TextComponent>([field](TextComponent& t){
                 // recover the original text
                 t.text = field.originalText;
