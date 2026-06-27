@@ -21,3 +21,10 @@ add_custom_target(copy_assets ALL
     ${CMAKE_SOURCE_DIR}/TestGame/hugo.config
     $<TARGET_FILE_DIR:${PROJECT_NAME}>
     COMMAND_EXPAND_LISTS)
+
+if(MSVC)
+    set_target_properties(
+        TestGame copy_assets
+        PROPERTIES FOLDER "HUGO_engine/TestGame"
+    )
+endif()

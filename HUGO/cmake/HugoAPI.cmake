@@ -27,3 +27,10 @@ target_link_libraries(HugoAPI PUBLIC
     lua_shared)
 
 get_target_property(HUGO_INCLUDES HugoAPI INCLUDE_DIRECTORIES)
+
+if(WIN32)
+    set_target_properties(
+            HugoAPI
+            PROPERTIES FOLDER "HUGO_engine"
+    )
+endif()

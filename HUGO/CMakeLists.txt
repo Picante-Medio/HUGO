@@ -56,6 +56,13 @@ if(HUGO_BUILD_ENGINE)
     set(CMAKE_SKIP_RPATH FALSE)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 
+    if (WIN32) 
+        set_target_properties(
+                ${PROJECT_NAME}
+                PROPERTIES FOLDER "HUGO_engine"
+        )
+    endif()
+
     set_target_properties(${PROJECT_NAME} PROPERTIES
         CXX_STANDARD 17
         CXX_STANDARD_REQUIRED ON

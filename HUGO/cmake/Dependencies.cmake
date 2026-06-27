@@ -218,6 +218,17 @@ add_library(HugoDeps INTERFACE)
 target_include_directories(HugoDeps SYSTEM INTERFACE
     ${bullet3_SOURCE_DIR}/src)
 
+if(MSVC)
+    set_target_properties(
+        assimp Bullet2FileLoader Bullet3Collision Bullet3Common Bullet3Dynamics
+        Bullet3Geometry Bullet3OpenCL_clew BulletCollision BulletDynamics BulletInverseDynamics
+        BulletSoftBody Codec_Assimp Codec_STBI LinearMath lua_shared lua_static miniaudio
+        OgreGLSupport OgreMain Plugin_ParticleFX pugixml-static RenderSystem_GL RenderSystem_GL3Plus
+        sdl_headers_copy SDL2 SDL2main uninstall UpdateAssimpLibsDebugSymbolsAndDLLs zlibstatic
+        PROPERTIES FOLDER "HUGO_engine/Dependencies"
+    )
+endif()
+
 target_link_libraries(HugoDeps INTERFACE
     lua_shared
     BulletDynamics
