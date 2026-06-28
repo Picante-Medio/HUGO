@@ -63,25 +63,25 @@ HUGO::ErrorOrVoid ChatParser::readChat(const std::string& chatPath){
 
 #pragma region ReadTypeFunctions
 
-HUGO::ErrorOrType<HUGO::Vector2> readVector2(std::ifstream& file){
+HUGO::ErrorOrType<HUGO::Vector2> ChatParser::readVector2(std::ifstream& file){
     Vector2 res;
     if (file >> res.x >> res.y) return HUGO::ErrorOrType<HUGO::Vector2>(res);
     else return HUGO::ErrorOrType<HUGO::Vector2>(StringError{std::string("Error reading VECTOR_2")});
 }
 
-HUGO::ErrorOrType<HUGO::Vector3> readVector3(std::ifstream& file){
+HUGO::ErrorOrType<HUGO::Vector3> ChatParser::readVector3(std::ifstream& file){
     Vector3 res;
     if (file >> res.x >> res.y >> res.z) return HUGO::ErrorOrType<HUGO::Vector3>(res);
     else return HUGO::ErrorOrType<HUGO::Vector3>(StringError{std::string("Error reading VECTOR_3")});
 }
 
-HUGO::ErrorOrType<HUGO::Vector4> readVector4(std::ifstream& file){
+HUGO::ErrorOrType<HUGO::Vector4> ChatParser::readVector4(std::ifstream& file){
     Vector4 res;
     if (file >> res.x >> res.y >> res.z >> res.w) return HUGO::ErrorOrType<HUGO::Vector4>(res);
     else return HUGO::ErrorOrType<HUGO::Vector4>(StringError{std::string("Error reading VECTOR_4")});
 }
 
-HUGO::ErrorOrType<HUGO::Quaternion> readQuaternion(std::ifstream& file){
+HUGO::ErrorOrType<HUGO::Quaternion> ChatParser::readQuaternion(std::ifstream& file){
     HUGO::ErrorOrType<HUGO::Vector4> vec4 = readVector4(file);
     if(!vec4.isError()) return HUGO::ErrorOrType<HUGO::Quaternion>(vec4.getValue());
     else return HUGO::ErrorOrType<HUGO::Quaternion>(StringError{std::string("Error reading QUATERNION")});
@@ -89,7 +89,7 @@ HUGO::ErrorOrType<HUGO::Quaternion> readQuaternion(std::ifstream& file){
 
 
 
-HUGO::ErrorOrType<HUGO::Int> readInt(std::ifstream& file){
+HUGO::ErrorOrType<HUGO::Int> ChatParser::readInt(std::ifstream& file){
     HUGO::Int res;
     if (file >> res) return HUGO::ErrorOrType<HUGO::Int>(res);
 
@@ -98,25 +98,25 @@ HUGO::ErrorOrType<HUGO::Int> readInt(std::ifstream& file){
     return HUGO::ErrorOrType<HUGO::Int>(err);
 }
 
-HUGO::ErrorOrType<float> readFloat(std::ifstream& file){
+HUGO::ErrorOrType<float> ChatParser::readFloat(std::ifstream& file){
     float res;
     if (file >> res) return HUGO::ErrorOrType<float>(res);
     else return HUGO::ErrorOrType<float>(StringError{std::string("Error reading FLOAT")});
 }
 
-HUGO::ErrorOrType<double> readDouble(std::ifstream& file){
+HUGO::ErrorOrType<double> ChatParser::readDouble(std::ifstream& file){
     double res;
     if (file >> res) return HUGO::ErrorOrType<double>(res);
     else return HUGO::ErrorOrType<double>(StringError{std::string("Error reading DOUBLE")});
 }
 
-HUGO::ErrorOrType<std::string> readString(std::ifstream& file){
+HUGO::ErrorOrType<std::string> ChatParser::readString(std::ifstream& file){
     std::string res;
     if (getline(file, res)) return HUGO::ErrorOrType<std::string>(res);
     else return HUGO::ErrorOrType<std::string>("Error reading STRING");
 }
 
-HUGO::ErrorOrType<bool> readBool(std::ifstream& file){
+HUGO::ErrorOrType<bool> ChatParser::readBool(std::ifstream& file){
     std::string res;
     if (file >> res) {
         if(res == "true") return HUGO::ErrorOrType<bool>(true);
@@ -125,7 +125,7 @@ HUGO::ErrorOrType<bool> readBool(std::ifstream& file){
     return HUGO::ErrorOrType<bool>("Error reading BOOL");
 }
 
-HUGO::ErrorOrType <HUGO::ColliderInfo> readColliderInfo(std::ifstream& file){
+HUGO::ErrorOrType <HUGO::ColliderInfo> ChatParser::readColliderInfo(std::ifstream& file){
     HUGO::ColliderInfo res;
 
     std::string col_shape;
@@ -188,7 +188,7 @@ HUGO::ErrorOrType <HUGO::ColliderInfo> readColliderInfo(std::ifstream& file){
 }
 
 //Checks if input is BOOL, VEC3, FLOAT, INT, STRING... and adds it to the parameters of compData. If an error occurred, returns the error.
-HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData& compData, std::ifstream& file){
+HUGO::ErrorOrVoid ChatParser::parameterReaderHelper(const std::string& input, ComponentData& compData, std::ifstream& file){
         if(input == "VECTOR_2"){
             std::string parameterName;
             file >> parameterName;

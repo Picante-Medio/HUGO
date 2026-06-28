@@ -42,6 +42,22 @@ namespace HUGO{
 
 		//Read previously opened file as Prefab
 		HUGO::ErrorOrVoid handlePrefabType(std::ifstream& file);
+
+		//Read parameter types
+		HUGO::ErrorOrType<HUGO::Vector2> readVector2(std::ifstream& file);
+		HUGO::ErrorOrType<HUGO::Vector3> readVector3(std::ifstream& file);
+		HUGO::ErrorOrType<HUGO::Vector4> readVector4(std::ifstream& file);
+		HUGO::ErrorOrType<HUGO::Quaternion> readQuaternion(std::ifstream& file);
+		HUGO::ErrorOrType<HUGO::Int> readInt(std::ifstream& file);
+		HUGO::ErrorOrType<float> readFloat(std::ifstream& file);
+		HUGO::ErrorOrType<double> readDouble(std::ifstream& file);
+		HUGO::ErrorOrType<std::string> readString(std::ifstream& file);
+		HUGO::ErrorOrType<bool> readBool(std::ifstream& file);
+		HUGO::ErrorOrType <HUGO::ColliderInfo> readColliderInfo(std::ifstream& file);
+
+		//Helper function to read parameter
+		HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData& compData, std::ifstream& file);
+
 	public:
 
 		//Initialize empty database. Function readChatFolder must be called to fill the database.
