@@ -2,15 +2,10 @@
 #include "miniaudio.h"
 
 #include "Core.h"
-#include "ConfigGenerator.h"
 #include <iostream>
 
 int main(int, char*[]) {
     try {
-        HUGO::ConfigGenerator config;
-        config.generateResourcesConfig();
-        config.generatePluginsConfig();
-
         HUGO::Core *core = new HUGO::Core();
         HUGO::ErrorOrVoid error = core->run();
 

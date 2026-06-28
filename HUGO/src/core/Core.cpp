@@ -22,12 +22,10 @@
 #include "UISystem.h"
 #include "InternalScene.h"
 #include "BulletModule.h"
-
 #include "ChatParser.h"
-
 #include "LuaBinder.h"
-
 #include "GameLibrary.h"
+#include "ConfigGenerator.h"
 
 using namespace HUGO;
 Core::Core() {
