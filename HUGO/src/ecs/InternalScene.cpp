@@ -72,7 +72,7 @@ InternalScene::createEntityLUA() {
 }
 
 void
-InternalScene::addComponentLUA(int entityID, std::string& componentData) {
+InternalScene::addComponentLUA(int entityID, const std::string& componentData) {
 
 	//Input Example
 	//AddComponent Rigidbody float mass 2.5 vector3 velocity 2 2 2
@@ -139,7 +139,7 @@ InternalScene::addComponentLUA(int entityID, std::string& componentData) {
 }
 
 void
-InternalScene::removeComponentLUA(int entityID, std::string& componentName) {
+InternalScene::removeComponentLUA(int entityID, const std::string& componentName) {
 	HUGO::ErrorOrVoid result = HUGO::ComponentFactory::removeComponent(shared_from_this(), entityID, componentName);
 
 	if(result.isError()) {

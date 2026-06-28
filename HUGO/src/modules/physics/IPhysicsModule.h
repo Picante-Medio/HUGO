@@ -20,11 +20,11 @@ public:
     explicit IPhysicsModule() {}
     virtual ~IPhysicsModule() {}
 
-    virtual void createSceneSimulation(std::string sceneName, InternalScene& scene) = 0;
-    virtual void destroySceneSimulation(std::string sceneName) = 0;
+    virtual void createSceneSimulation(const std::string& sceneName, InternalScene& scene) = 0;
+    virtual void destroySceneSimulation(const std::string& sceneName) = 0;
 
-    virtual void resumeSceneSimulation(std::string sceneName) = 0;
-    virtual void pauseSceneSimulation(std::string sceneName) = 0;
+    virtual void resumeSceneSimulation(const std::string& sceneName) = 0;
+    virtual void pauseSceneSimulation(const std::string& sceneName) = 0;
 
     // sync info and step the simulation of active scenes
     virtual void performSimulations(uint32_t dt) = 0;

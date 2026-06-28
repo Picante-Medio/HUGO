@@ -73,13 +73,13 @@ class OgreModule {
     static void destroyInstance();    
 
     //Sets the current sceneManager that scene systems will use
-    void setCurrentSceneManager(std::string sceneName);
+    void setCurrentSceneManager(const std::string& sceneName);
 
     //Loads a sceneManager into memory. 
-    void createSceneManager(std::string sceneName);
+    void createSceneManager(const std::string& sceneName);
 
     //Destroys a sceneManager. It will unload all of Ogres resources being used by it.
-    void destroySceneManager(std::string sceneName);
+    void destroySceneManager(const std::string& sceneName);
 
     Ogre::SceneManager* getCurrentSceneManager();
     Ogre::Viewport* getViewport();

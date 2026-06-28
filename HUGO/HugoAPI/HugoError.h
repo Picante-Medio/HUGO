@@ -16,7 +16,7 @@ struct Error {
 // Default error
 struct StringError : Error {
 	std::string errorMessage;
-	StringError(std::string error) : errorMessage(error) {};
+	StringError(const std::string& error) : errorMessage(error) {};
 	StringError() {};
 	std::string description() override { return errorMessage; }
 };

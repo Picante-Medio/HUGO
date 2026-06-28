@@ -18,7 +18,7 @@ int main(int, char*[]) {
     catch(std::exception e) {
         std::cerr << "[ERROR] Exception thrown: " << e.what() << '\n';
     }
-    catch(std::string str){
+    catch(const std::string& str){
         std::cerr << "[ERROR] Exception thrown: " << str << '\n';
     }
     catch(const char* str){

@@ -157,7 +157,6 @@ AudioSystem::getVoice(EntityID e) {
 
 void
 AudioSystem::tryCreateSound(AudioAssetInfo *asset, AudioVoice& voice, bool stream) {
-    HUGO::Int strm = stream ? MA_SOUND_FLAG_STREAM : 0; 
     if (
         ma_sound_init_from_file(
             engine,

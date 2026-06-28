@@ -137,9 +137,9 @@ OgreModule::~OgreModule(){
     SDL_DestroyWindow(m_sdlWindow);
     SDL_Quit();
 }
-        
-void OgreModule::setCurrentSceneManager(std::string sceneName){
-    
+
+void OgreModule::setCurrentSceneManager(const std::string& sceneName){
+
     //If requested sceneManager was not created, we create it
     if(m_sceneManagers.find(sceneName) == m_sceneManagers.end()){
         createSceneManager(sceneName);
@@ -160,12 +160,12 @@ void OgreModule::viewportToDefaultCamera(){
     m_viewport->setCamera(m_defaultCamera);
 }
 
-void OgreModule::createSceneManager(std::string sceneName){
+void OgreModule::createSceneManager(const std::string& sceneName){
     if(m_sceneManagers.find(sceneName) == m_sceneManagers.end())
     m_sceneManagers[sceneName] = m_ogreRoot->createSceneManager();
 }
 
-void OgreModule::destroySceneManager(std::string sceneName){
+void OgreModule::destroySceneManager(const std::string& sceneName){
     if (!m_sceneManagers.count(sceneName)) return;
     
     if (m_sceneManagers[sceneName] == m_currentSceneManager) m_currentSceneManager = nullptr;

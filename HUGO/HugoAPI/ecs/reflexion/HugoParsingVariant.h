@@ -7,11 +7,11 @@
 #include "HugoPhysics.h"
 
 using HVariant = std::variant<
-    //---------------------OBLIGATORY CONCRETE TYPES FOR PARSING-------------
+    //---------------------MANDATORY CONCRETE TYPES FOR PARSING-------------
     HUGO::Int, //INT
     float, //FLOAT
     double, //DOUBLE N
-    std::string, //STRIRNG
+    std::string, //STRING
     HUGO::Vector4, //N
     HUGO::Vector3, //VECTOR_3
     HUGO::Vector2, //VECTOR_2 N
