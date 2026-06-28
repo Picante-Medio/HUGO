@@ -156,7 +156,7 @@ AudioSystem::getVoice(EntityID e) {
 }
 
 void
-AudioSystem::tryCreateSound(AudioAssetInfo *asset, AudioVoice& voice, bool stream) {
+AudioSystem::tryCreateSound(AudioAssetInfo *asset, AudioVoice& voice) {
     if (
         ma_sound_init_from_file(
             engine,
@@ -190,7 +190,7 @@ AudioSystem::onAddAudioComponent(AudioComponent& audioCmp) {
     // This already exist, get out
     if (v.initialized) return;
 
-    tryCreateSound(asset, v, audioCmp.streaming);
+    tryCreateSound(asset, v);
 
     if (scene.hasComponent<Audio3DInfoComponent>(audioCmp.entity)) {
         
