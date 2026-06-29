@@ -1,6 +1,7 @@
 #include "ChatParser.h"
 #include "HugoError.h"
 #include "HugoTypes.h"
+#include "TypeFactory.h"
 
 #include <iostream>
 #include <fstream>
@@ -295,6 +296,16 @@ HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData&
             if(b.isError()) return HUGO::ErrorOrVoid(b.getError());
 
            compData.parameters[parameterName] = {b.getValue()};
+        }
+
+        if(TypeFactory::IsRegistered(input)) {
+            std::string parameterName;
+            file >> parameterName;
+
+            std::string args;
+            file >> args;
+
+            compData.parameters[parameterName] = {TypeFactory::Create(input, args)};
         }
 
     return HUGO::ErrorOrVoid();
