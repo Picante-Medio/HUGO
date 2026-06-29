@@ -6,6 +6,18 @@
 #include "HugoMath.h"
 #include "HugoPhysics.h"
 
+
+// Intenta incluir el header del usuario, si no existe no pasa nada
+#if __has_include("UserTypes.h")
+    #include "UserTypes.h"
+#endif
+
+#ifndef USER_TYPES
+#define USER_TYPES
+#endif
+
+struct NullType {};
+
 using HVariant = std::variant<
     //---------------------OBLIGATORY CONCRETE TYPES FOR PARSING-------------
     HUGO::Int, //INT
@@ -33,5 +45,7 @@ using HVariant = std::variant<
     HUGO::ProjectionType, //INT
     HUGO::ProgressBarFillMode, //INT
     HUGO::SliderOrientation, //INT
-    HUGO::AudioTypes //INT
+    HUGO::AudioTypes //INT,
+    USER_TYPES 
+    NullType
 >;
