@@ -7,7 +7,7 @@
 #define REGISTER_TYPE(Type) \
     namespace { \
         static const bool registered_##Type = [] { \
-            TypeFactory::Register(STRINGIFY(Type), &Type::ConstructType); \
+            TypeFactory::Register(STRINGIFY(Type), &Type::Create); \
             return true; \
         }(); \
     }
