@@ -16,15 +16,15 @@ target_include_directories(TestGame PRIVATE ${CMAKE_SOURCE_DIR}/TestGame)
 target_link_libraries(TestGame PRIVATE 
     HugoAPI)
 
-add_custom_target(copy_assets ALL
+add_custom_target(copy_config ALL
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     ${CMAKE_SOURCE_DIR}/TestGame/hugo.config
-    $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    $<TARGET_FILE_DIR:${PROJECT_NAME}>/hugo.config
     COMMAND_EXPAND_LISTS)
 
 if(MSVC)
     set_target_properties(
-        TestGame copy_assets
+        TestGame copy_config
         PROPERTIES FOLDER "HUGO_engine/TestGame"
     )
 endif()
