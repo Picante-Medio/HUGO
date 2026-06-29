@@ -10,23 +10,15 @@
 
 class UTILS_API TypeFactory {
 public:
-    using Creator = std::unique_ptr<HVariant>(*)(const std::string&);
+    using Creator = HVariant(*)(const std::string&);
 
     //Registra una función creadora y devuelve si se ha insertado con éxito
-    static bool Register(const std::string& name, Creator creator) {
-        return creators.emplace(name, creator).second;
-    }
+    static bool Register(const std::string& name, Creator creator);
 
-    static HVariant Create(const std::string& name, const std::string& args) {
-        auto it = creators.find(name);
-        if (it == creators.end()) return NullType{};
-        return it->second(args);
-    }
+    static HVariant Create(const std::string& name, const std::string& args);
 
-    static bool IsRegistered(const std::string& name) {
-        return creators.find(name) != creators.end();
-    }
+    static bool IsRegistered(const std::string& name);
 
 private:
-    static std::unordered_map<std::string, Creator> creators;
+    inline static std::unordered_map<std::string, Creator> creators = std::unordered_map<std::string, Creator>();
 };
