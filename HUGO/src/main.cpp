@@ -2,15 +2,10 @@
 #include "miniaudio.h"
 
 #include "Core.h"
-#include "ConfigGenerator.h"
 #include <iostream>
 
 int main(int, char*[]) {
     try {
-        HUGO::ConfigGenerator config;
-        config.generateResourcesConfig();
-        config.generatePluginsConfig();
-
         HUGO::Core *core = new HUGO::Core();
         HUGO::ErrorOrVoid error = core->run();
 
@@ -23,7 +18,7 @@ int main(int, char*[]) {
     catch(std::exception e) {
         std::cerr << "[ERROR] Exception thrown: " << e.what() << '\n';
     }
-    catch(std::string str){
+    catch(const std::string& str){
         std::cerr << "[ERROR] Exception thrown: " << str << '\n';
     }
     catch(const char* str){

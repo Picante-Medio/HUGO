@@ -12,4 +12,3 @@ SYSTEM TransformSystem
 SYSTEM ParticleSystem
 SYSTEM CameraMovementSystem
 SYSTEM TestSystemVideo2
-SYSTEM MessagesTestSystem

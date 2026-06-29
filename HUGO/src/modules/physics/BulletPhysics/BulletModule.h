@@ -8,11 +8,11 @@ public:
     BulletModule();
     ~BulletModule();
 
-    void createSceneSimulation(std::string sceneName, InternalScene& scene);
-    void destroySceneSimulation(std::string sceneName);
+    void createSceneSimulation(const std::string& sceneName, InternalScene& scene) override;
+    void destroySceneSimulation(const std::string& sceneName) override;
     
-    void resumeSceneSimulation(std::string sceneName);
-    void pauseSceneSimulation(std::string sceneName);
+    void resumeSceneSimulation(const std::string& sceneName) override;
+    void pauseSceneSimulation(const std::string& sceneName) override;
 
     // sync info and step the simulation of active scenes
     void performSimulations(uint32_t dt) override;

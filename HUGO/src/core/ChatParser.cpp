@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <filesystem>
+
 
 using namespace HUGO;
 
@@ -14,21 +14,20 @@ ChatParser::ChatParser(): m_sceneData(), m_prefabData(){
 }
 
 void ChatParser::readChatFolder(const std::string& chatFolder){
+    m_chatFolderPath = std::filesystem::current_path()/m_chatFolderPath;
 
-    std::filesystem::path chatFolderPath{chatFolder};
-    chatFolderPath = std::filesystem::current_path()/chatFolderPath;
-
+    m_chatFolderPath = {chatFolder};
     //If dir not found or dir empty
-    if(!std::filesystem::exists(chatFolderPath))
-        throw std::runtime_error("Folder {" + chatFolderPath.string() + "} doesn't exist");
+    if(!std::filesystem::exists(m_chatFolderPath))
+        throw std::runtime_error("Folder {" + m_chatFolderPath.string() + "} doesn't exist");
 
-    std::filesystem::directory_iterator dirIt = std::filesystem::directory_iterator(chatFolderPath);
+    std::filesystem::directory_iterator dirIt = std::filesystem::directory_iterator(m_chatFolderPath);
 
     //Iterate all the entries found in dir
     for(const auto& entry : dirIt) {
 
-        std::filesystem::path chatPath = chatFolderPath/entry.path();
-        HUGO::ErrorOrVoid err = readChat(chatPath.string());
+        std::filesystem::path chatPath = m_chatFolderPath/entry.path();
+        HUGO::ErrorOrVoid err = readPrefab(chatPath.string());
         //If error has been returned from reading .chat, chat parser should stop reading and return the error
         if (err.isError()){
             throw std::runtime_error(
@@ -37,7 +36,7 @@ void ChatParser::readChatFolder(const std::string& chatFolder){
     }
 }
 
-HUGO::ErrorOrVoid ChatParser::readChat(const std::string& chatPath){
+HUGO::ErrorOrVoid ChatParser::readPrefab(const std::string& chatPath){
     std::ifstream file(chatPath);
     if(!file.is_open())
         return HUGO::ErrorOrVoid(StringError{std::string("File can't be opened")});
@@ -47,13 +46,35 @@ HUGO::ErrorOrVoid ChatParser::readChat(const std::string& chatPath){
     file >> chatType;
 
     HUGO::ErrorOrVoid err = HUGO::ErrorOrVoid();
-    if(chatType == "SCENE"){
-        err = handleSceneType(file);
-    }
-    else if(chatType == "PREFAB"){
+    if(chatType == "PREFAB"){
         err = handlePrefabType(file);
     }
-    else return HUGO::ErrorOrVoid(StringError{"Chat file is neither a scene or a prefab"});
+    else if(chatType != "SCENE") return HUGO::ErrorOrVoid(StringError{"Chat file is neither a scene or a prefab"});
+
+    file.close();
+
+    //If error has returned from either of the two functions, it will be returned
+    return err;
+}
+
+HUGO::ErrorOrType<SceneData> ChatParser::readScene(const std::string& chatPath, std::string& sceneName, const std::string& target){
+    std::ifstream file(chatPath);
+    if(!file.is_open())
+        return HUGO::ErrorOrType<SceneData>(StringError{std::string("File can't be opened")});
+
+    std::string chatType;
+
+    file >> chatType;
+
+    file.get();
+    getline(file, sceneName);
+
+    HUGO::ErrorOrType<SceneData> err = HUGO::ErrorOrType<SceneData>(SceneData());
+
+    if(chatType == "SCENE" && sceneName == target){
+        err = handleSceneType(file, sceneName);
+    }
+    //else if(chatType != "SCENE" || chatType != "PREFAB") err = HUGO::ErrorOrType<SceneData>(StringError{"Chat file is not a scene"});
 
     file.close();
 
@@ -63,25 +84,25 @@ HUGO::ErrorOrVoid ChatParser::readChat(const std::string& chatPath){
 
 #pragma region ReadTypeFunctions
 
-HUGO::ErrorOrType<HUGO::Vector2> readVector2(std::ifstream& file){
+HUGO::ErrorOrType<HUGO::Vector2> ChatParser::readVector2(std::ifstream& file){
     Vector2 res;
     if (file >> res.x >> res.y) return HUGO::ErrorOrType<HUGO::Vector2>(res);
     else return HUGO::ErrorOrType<HUGO::Vector2>(StringError{std::string("Error reading VECTOR_2")});
 }
 
-HUGO::ErrorOrType<HUGO::Vector3> readVector3(std::ifstream& file){
+HUGO::ErrorOrType<HUGO::Vector3> ChatParser::readVector3(std::ifstream& file){
     Vector3 res;
     if (file >> res.x >> res.y >> res.z) return HUGO::ErrorOrType<HUGO::Vector3>(res);
     else return HUGO::ErrorOrType<HUGO::Vector3>(StringError{std::string("Error reading VECTOR_3")});
 }
 
-HUGO::ErrorOrType<HUGO::Vector4> readVector4(std::ifstream& file){
+HUGO::ErrorOrType<HUGO::Vector4> ChatParser::readVector4(std::ifstream& file){
     Vector4 res;
     if (file >> res.x >> res.y >> res.z >> res.w) return HUGO::ErrorOrType<HUGO::Vector4>(res);
     else return HUGO::ErrorOrType<HUGO::Vector4>(StringError{std::string("Error reading VECTOR_4")});
 }
 
-HUGO::ErrorOrType<HUGO::Quaternion> readQuaternion(std::ifstream& file){
+HUGO::ErrorOrType<HUGO::Quaternion> ChatParser::readQuaternion(std::ifstream& file){
     HUGO::ErrorOrType<HUGO::Vector4> vec4 = readVector4(file);
     if(!vec4.isError()) return HUGO::ErrorOrType<HUGO::Quaternion>(vec4.getValue());
     else return HUGO::ErrorOrType<HUGO::Quaternion>(StringError{std::string("Error reading QUATERNION")});
@@ -89,7 +110,7 @@ HUGO::ErrorOrType<HUGO::Quaternion> readQuaternion(std::ifstream& file){
 
 
 
-HUGO::ErrorOrType<HUGO::Int> readInt(std::ifstream& file){
+HUGO::ErrorOrType<HUGO::Int> ChatParser::readInt(std::ifstream& file){
     HUGO::Int res;
     if (file >> res) return HUGO::ErrorOrType<HUGO::Int>(res);
 
@@ -98,25 +119,25 @@ HUGO::ErrorOrType<HUGO::Int> readInt(std::ifstream& file){
     return HUGO::ErrorOrType<HUGO::Int>(err);
 }
 
-HUGO::ErrorOrType<float> readFloat(std::ifstream& file){
+HUGO::ErrorOrType<float> ChatParser::readFloat(std::ifstream& file){
     float res;
     if (file >> res) return HUGO::ErrorOrType<float>(res);
     else return HUGO::ErrorOrType<float>(StringError{std::string("Error reading FLOAT")});
 }
 
-HUGO::ErrorOrType<double> readDouble(std::ifstream& file){
+HUGO::ErrorOrType<double> ChatParser::readDouble(std::ifstream& file){
     double res;
     if (file >> res) return HUGO::ErrorOrType<double>(res);
     else return HUGO::ErrorOrType<double>(StringError{std::string("Error reading DOUBLE")});
 }
 
-HUGO::ErrorOrType<std::string> readString(std::ifstream& file){
+HUGO::ErrorOrType<std::string> ChatParser::readString(std::ifstream& file){
     std::string res;
     if (getline(file, res)) return HUGO::ErrorOrType<std::string>(res);
     else return HUGO::ErrorOrType<std::string>("Error reading STRING");
 }
 
-HUGO::ErrorOrType<bool> readBool(std::ifstream& file){
+HUGO::ErrorOrType<bool> ChatParser::readBool(std::ifstream& file){
     std::string res;
     if (file >> res) {
         if(res == "true") return HUGO::ErrorOrType<bool>(true);
@@ -125,7 +146,7 @@ HUGO::ErrorOrType<bool> readBool(std::ifstream& file){
     return HUGO::ErrorOrType<bool>("Error reading BOOL");
 }
 
-HUGO::ErrorOrType <HUGO::ColliderInfo> readColliderInfo(std::ifstream& file){
+HUGO::ErrorOrType <HUGO::ColliderInfo> ChatParser::readColliderInfo(std::ifstream& file){
     HUGO::ColliderInfo res;
 
     std::string col_shape;
@@ -188,7 +209,7 @@ HUGO::ErrorOrType <HUGO::ColliderInfo> readColliderInfo(std::ifstream& file){
 }
 
 //Checks if input is BOOL, VEC3, FLOAT, INT, STRING... and adds it to the parameters of compData. If an error occurred, returns the error.
-HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData& compData, std::ifstream& file){
+HUGO::ErrorOrVoid ChatParser::parameterReaderHelper(const std::string& input, ComponentData& compData, std::ifstream& file){
         if(input == "VECTOR_2"){
             std::string parameterName;
             file >> parameterName;
@@ -302,15 +323,12 @@ HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData&
 
 #pragma endregion
 
-HUGO::ErrorOrVoid ChatParser::handleSceneType(std::ifstream& file){
-    file.get();
-
-    std::string sceneName;
-    getline(file, sceneName);
+HUGO::ErrorOrType<SceneData> ChatParser::handleSceneType(std::ifstream& file, const std::string& sceneName){
 
     //Initialize scene data of name sceneName
-    m_sceneData[sceneName].entities = std::vector<EntityData>();
-    m_sceneData[sceneName].systems = std::vector<std::string>();
+    SceneData data;
+    data.entities = std::vector<EntityData>();
+    data.systems = std::vector<std::string>();
 
     std::string input;
     file >> input;
@@ -321,22 +339,22 @@ HUGO::ErrorOrVoid ChatParser::handleSceneType(std::ifstream& file){
             std::string systemName;
             file >> systemName;
 
-            m_sceneData[sceneName].systems.push_back(systemName);
+            data.systems.push_back(systemName);
         }
 
         if (input == "ENTITY"){
             HUGO::ErrorOrType<EntityData> entData = handleEntity(file);
             if(entData.isError()){
-                return HUGO::ErrorOrVoid(entData.getError());
+                return HUGO::ErrorOrType<SceneData>(entData.getError());
             }
 
-            m_sceneData[sceneName].entities.push_back(entData.getValue());
+            data.entities.push_back(entData.getValue());
         }
 
         file >> input;
     }
-
-    return HUGO::ErrorOrVoid();
+    m_sceneData[sceneName] = data;
+    return HUGO::ErrorOrType<SceneData>(data);
 }
 
 HUGO::ErrorOrVoid ChatParser::handlePrefabType(std::ifstream& file){
@@ -407,9 +425,36 @@ HUGO::ErrorOrType<EntityData> ChatParser::getPrefabData(const std::string& prefa
 }
 
 HUGO::ErrorOrType<SceneData> ChatParser::getSceneData(const std::string & sceneName){
+    
     std::unordered_map<std::string, SceneData>::iterator res = m_sceneData.find(sceneName);
     if(res == m_sceneData.end()) 
-        return HUGO::ErrorOrType<SceneData>(StringError{std::string("Queried scene named " + sceneName + " doesn't exist")});
+        return findScene(sceneName);
 
     return HUGO::ErrorOrType<SceneData>(res->second);
+}
+
+HUGO::ErrorOrType<SceneData> ChatParser::findScene(const std::string& target){
+    //If dir not found or dir empty
+    if(!std::filesystem::exists(m_chatFolderPath))
+        throw std::runtime_error("Folder {" + m_chatFolderPath.string() + "} doesn't exist");
+
+    std::filesystem::directory_iterator dirIt = std::filesystem::directory_iterator(m_chatFolderPath);
+
+    //Iterate all the entries found in dir
+    for(const auto& entry : dirIt) {
+
+        std::filesystem::path chatPath = m_chatFolderPath/entry.path();
+        std::string sceneName;
+        HUGO::ErrorOrType<SceneData> err = readScene(chatPath.string(), sceneName, target);
+
+        if(sceneName == target) return err;
+
+        //If error has been returned from reading .chat, chat parser should stop reading and return the error
+        if (err.isError()){
+            throw std::runtime_error(
+                "Error reading .chat in path {" + chatPath.filename().string()+ "}: " + err.getError().description());
+        }
+    }
+
+    return HUGO::ErrorOrType<SceneData>(HUGO::StringError("Scene called "+ target + " doesn't exist"));
 }

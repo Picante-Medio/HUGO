@@ -7,5 +7,4 @@ SYSTEM CameraSystem
 SYSTEM UISystem
 SYSTEM ConsoleSystem
 SYSTEM CameraMovementSystem
-SYSTEM MessagesTestSystem
 SYSTEM TestSystemVideo1

@@ -8,6 +8,8 @@
 // metiendo la macro pero me parece poco cómodo. Meted el include y palante
 #include "OgreRoot.h"
 #include <unordered_map>
+#include <filesystem>
+
 #include "HugoTypes.h"
 #include "HugoMath.h"
 
@@ -35,7 +37,6 @@ class OgreModule {
 
     Ogre::SceneManager* m_currentSceneManager;
 
-
     //Things required for creating default viewport
     Ogre::Viewport* m_viewport;
     Ogre::Camera* m_defaultCamera;
@@ -45,7 +46,26 @@ class OgreModule {
 
     //Initializes Ogre Singletons and SDL window
     OgreModule();
+
+    // Resource and plugin handling
+    // Path to engine resources
+    const std::filesystem::path RESOURCES = std::filesystem::current_path() / ".." / "Resources";
+
+    // Path to game resources
+    const std::filesystem::path ASSETS = std::filesystem::current_path() / "Assets";
+
+    // Plugins required for engine functionality
+    const std::vector<std::string> requiredPlugins = {
+        "RenderSystem_GL",
+        "Codec_STBI",
+        "Plugin_ParticleFX",
+        "Codec_Assimp",
+    };
+
+    // Methods to handle resources and plugins
     void loadResources();
+    void addResourceRecursive(const std::filesystem::path& path);
+    void loadPlugins();
 
     public:
     static OgreModule& getInstance();
@@ -53,13 +73,13 @@ class OgreModule {
     static void destroyInstance();    
 
     //Sets the current sceneManager that scene systems will use
-    void setCurrentSceneManager(std::string sceneName);
+    void setCurrentSceneManager(const std::string& sceneName);
 
     //Loads a sceneManager into memory. 
-    void createSceneManager(std::string sceneName);
+    void createSceneManager(const std::string& sceneName);
 
     //Destroys a sceneManager. It will unload all of Ogres resources being used by it.
-    void destroySceneManager(std::string sceneName);
+    void destroySceneManager(const std::string& sceneName);
 
     Ogre::SceneManager* getCurrentSceneManager();
     Ogre::Viewport* getViewport();

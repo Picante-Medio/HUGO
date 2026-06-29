@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <vector>
 #include <HugoMath.h>
+#include <filesystem>
 #include "HugoError.h"
 #include "HugoParsingVariant.h"
 
@@ -30,18 +31,39 @@ namespace HUGO{
 		//Data that can be queried
 		std::unordered_map<std::string, SceneData> m_sceneData;
 		std::unordered_map<std::string, EntityData> m_prefabData;
+		std::filesystem::path m_chatFolderPath;
 
 		//Open .chat file and read it
-		HUGO::ErrorOrVoid readChat(const std::string& chatPath);
+		HUGO::ErrorOrVoid readPrefab(const std::string& chatPath);
+		HUGO::ErrorOrType<SceneData> readScene(const std::string& chatPath, std::string& sceneName, const std::string& target);
 
 		//Read previously opened file as Scene.
-		HUGO::ErrorOrVoid handleSceneType(std::ifstream& file);
+		HUGO::ErrorOrType<SceneData> handleSceneType(std::ifstream& file, const std::string& sceneName);
 
 		//Reads Entity until it reads END_ENTITY
 		HUGO::ErrorOrType<EntityData> handleEntity(std::ifstream& file);
 
 		//Read previously opened file as Prefab
 		HUGO::ErrorOrVoid handlePrefabType(std::ifstream& file);
+
+		//Read parameter types
+		HUGO::ErrorOrType<HUGO::Vector2> readVector2(std::ifstream& file);
+		HUGO::ErrorOrType<HUGO::Vector3> readVector3(std::ifstream& file);
+		HUGO::ErrorOrType<HUGO::Vector4> readVector4(std::ifstream& file);
+		HUGO::ErrorOrType<HUGO::Quaternion> readQuaternion(std::ifstream& file);
+		HUGO::ErrorOrType<HUGO::Int> readInt(std::ifstream& file);
+		HUGO::ErrorOrType<float> readFloat(std::ifstream& file);
+		HUGO::ErrorOrType<double> readDouble(std::ifstream& file);
+		HUGO::ErrorOrType<std::string> readString(std::ifstream& file);
+		HUGO::ErrorOrType<bool> readBool(std::ifstream& file);
+		HUGO::ErrorOrType <HUGO::ColliderInfo> readColliderInfo(std::ifstream& file);
+
+		//Helper function to read parameter
+		HUGO::ErrorOrVoid parameterReaderHelper(const std::string& input, ComponentData& compData, std::ifstream& file);
+		
+		//Search for a scene by name
+		HUGO::ErrorOrType<SceneData> findScene(const std::string& target);
+
 	public:
 
 		//Initialize empty database. Function readChatFolder must be called to fill the database.

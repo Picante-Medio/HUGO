@@ -61,23 +61,23 @@ namespace HUGO
         return quit;
     }
 
-    void Input::registerAction(std::string actionName,
+    void Input::registerAction(const std::string& actionName,
                                std::vector<HUGO::KeyCode> keys)
     {
         keysOfAction[actionName] = keys;
     }
 
-    void Input::registerAction(std::string actionName, HUGO::KeyCode key)
+    void Input::registerAction(const std::string& actionName, HUGO::KeyCode key)
     {
         keysOfAction[actionName] = {key};
     }
 
-    void Input::addKeyToAction(std::string actionName, HUGO::KeyCode key)
+    void Input::addKeyToAction(const std::string& actionName, HUGO::KeyCode key)
     {
         keysOfAction[actionName].push_back(key);
     }
 
-    void Input::removeKeyFromAction(std::string actionName, HUGO::KeyCode key)
+    void Input::removeKeyFromAction(const std::string& actionName, HUGO::KeyCode key)
     {
         for (auto it = keysOfAction[actionName].begin();
              it != keysOfAction[actionName].end();)
@@ -95,7 +95,7 @@ namespace HUGO
         return keyState[SDLKey] == JUST_PRESSED || keyState[SDLKey] == PRESSED;
     }
 
-    bool Input::isActionPressed(std::string action)
+    bool Input::isActionPressed(const std::string& action)
     {
 
         for (HUGO::KeyCode key : keysOfAction[action])
@@ -118,7 +118,7 @@ namespace HUGO
         return keyState[SDLKey] == JUST_PRESSED;
     }
 
-    bool Input::wasActionJustPressed(std::string action)
+    bool Input::wasActionJustPressed(const std::string& action)
     {
         for (HUGO::KeyCode key : keysOfAction[action])
         {
@@ -134,7 +134,7 @@ namespace HUGO
         return keyState[SDLKey] == JUST_RELEASED;
     }
 
-    bool Input::wasActionJustReleased(std::string action)
+    bool Input::wasActionJustReleased(const std::string& action)
     {
         for (HUGO::KeyCode key : keysOfAction[action])
         {

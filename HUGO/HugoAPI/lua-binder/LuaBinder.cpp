@@ -19,7 +19,7 @@ LuaBinder::getInstance() {
 }
 
 HUGO::ErrorOrVoid
-LuaBinder::interpretString(std::string command) {
+LuaBinder::interpretString(const std::string& command) {
     //if string is invalid
     if (luaL_dostring(lua, command.c_str()) != LUA_OK) {
         HUGO::StringError error = HUGO::StringError(std::string(lua_tostring(lua, -1)));
@@ -31,7 +31,7 @@ LuaBinder::interpretString(std::string command) {
     return HUGO::ErrorOrVoid();
 }
 
-void LuaBinder::setLuaPath(std::string path )
+void LuaBinder::setLuaPath(const std::string& path )
 {
     lua_getglobal(lua, "package");
     lua_getfield(lua, -1, "path");
@@ -56,7 +56,7 @@ LuaBinder::setPrintFunction(lua_CFunction nPrint){
 }
 
 void
-LuaBinder::requireFolder(std::string path) {
+LuaBinder::requireFolder(const std::string& path) {
     std::filesystem::path fsPath(path);
     std::filesystem::path luaPath = fsPath / "?.lua";
 

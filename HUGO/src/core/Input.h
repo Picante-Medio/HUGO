@@ -54,28 +54,28 @@ namespace HUGO {
     void handleInput();
     bool isQuitPressed() const;
 
-    // Action adition and elimination
-    void registerAction(std::string actionName, std::vector<HUGO::KeyCode> keys);
-    void registerAction(std::string actionName, HUGO::KeyCode key);
-    void addKeyToAction(std::string actionName, HUGO::KeyCode key);
+    // Action adition and removal
+    void registerAction(const std::string& actionName, std::vector<HUGO::KeyCode> keys);
+    void registerAction(const std::string& actionName, HUGO::KeyCode key);
+    void addKeyToAction(const std::string& actionName, HUGO::KeyCode key);
     
     //!!Linear in the number of actions
-    void removeKeyFromAction(std::string actionName, HUGO::KeyCode key);
+    void removeKeyFromAction(const std::string& actionName, HUGO::KeyCode key);
     
     // Accessors for input state
     bool isKeyPressed(HUGO::KeyCode key);
     bool isMouseButtonPressed(HUGO::MouseCode button);
     
-    bool isActionPressed(std::string action);
+    bool isActionPressed(const std::string& action);
     bool windowHasChanged() const;
     
     bool wasKeyJustPressed(HUGO::KeyCode key);
     bool wasMouseButtonJustPressed(HUGO::MouseCode button);
-    bool wasActionJustPressed(std::string action);
+    bool wasActionJustPressed(const std::string& action);
     
     bool wasKeyJustReleased(HUGO::KeyCode key);
     bool wasMouseButtonJustReleased(HUGO::MouseCode button);
-    bool wasActionJustReleased(std::string action);
+    bool wasActionJustReleased(const std::string& action);
     
     MousePosition getMousePosition();
     MouseRelativePosition getMouseRelativePosition();

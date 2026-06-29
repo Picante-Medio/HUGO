@@ -52,9 +52,9 @@ public:
     // LUA console stuff
     int createEntityLUA();
 
-    void addComponentLUA(int entityID, std::string &componentName);
+    void addComponentLUA(int entityID, const std::string &componentName);
 
-    void removeComponentLUA(int entityID, std::string &componentName);
+    void removeComponentLUA(int entityID, const std::string &componentName);
 
     void removeEntity(EntityID entity) override;
     void removeEntityLUA(int entity);

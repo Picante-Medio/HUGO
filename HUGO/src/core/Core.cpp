@@ -22,11 +22,8 @@
 #include "UISystem.h"
 #include "InternalScene.h"
 #include "BulletModule.h"
-
 #include "ChatParser.h"
-
 #include "LuaBinder.h"
-
 #include "GameLibrary.h"
 
 using namespace HUGO;

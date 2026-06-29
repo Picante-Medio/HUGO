@@ -12,18 +12,18 @@ BulletModule::~BulletModule() {
 
 }
 
-void BulletModule::createSceneSimulation(std::string sceneName, InternalScene& scene) {
+void BulletModule::createSceneSimulation(const std::string& sceneName, InternalScene& scene) {
     // create BulletSimulation and add it to activeSimulations container
     std::shared_ptr<IPhysicsSimulation> simulation = std::make_shared<BulletSimulation>(scene);
     activeSimulations.insert({sceneName, simulation});
 }
 
-void BulletModule::destroySceneSimulation(std::string sceneName) {
+void BulletModule::destroySceneSimulation(const std::string& sceneName) {
     // remove BulletSimulation from its container
     activeSimulations.erase(sceneName);
 }
 
-void BulletModule::resumeSceneSimulation(std::string sceneName) {
+void BulletModule::resumeSceneSimulation(const std::string& sceneName) {
     // find coresponding BulletSimulation in inactiveSimulations container
     // move it to activeSimulations container 
     auto node = inactiveSimulations.extract(sceneName);
@@ -31,7 +31,7 @@ void BulletModule::resumeSceneSimulation(std::string sceneName) {
         activeSimulations.insert({node.key(), node.mapped()});
 }
 
-void BulletModule::pauseSceneSimulation(std::string sceneName) {
+void BulletModule::pauseSceneSimulation(const std::string& sceneName) {
     // find coresponding BulletSimulation in activeSimulations container
     // move it to inactiveSimulations container 
     auto node = activeSimulations.extract(sceneName);
