@@ -12,11 +12,13 @@
     #include "UserTypes.h"
 #endif
 
-#ifndef USER_TYPES
-#define USER_TYPES
-#endif
-
 struct NullType {};
+
+#ifndef USER_TYPES 
+#define EXTRA_TYPES NullType
+#else
+#define EXTRA_TYPES USER_TYPES, NullType
+#endif
 
 using HVariant = std::variant<
     //---------------------MANDATORY CONCRETE TYPES FOR PARSING-------------
@@ -45,7 +47,6 @@ using HVariant = std::variant<
     HUGO::ProjectionType, //INT
     HUGO::ProgressBarFillMode, //INT
     HUGO::SliderOrientation, //INT
-    HUGO::AudioTypes //INT,
-    USER_TYPES 
-    NullType
+    HUGO::AudioTypes, //INT,
+    EXTRA_TYPES
 >;

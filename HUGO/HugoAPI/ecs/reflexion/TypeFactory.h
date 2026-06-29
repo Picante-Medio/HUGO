@@ -4,7 +4,11 @@
 #include <string>
 #include <unordered_map>
 
-class TypeFactory {
+#include "UtilsAPI.h"
+
+#include "HugoParsingVariant.h"
+
+class UTILS_API TypeFactory {
 public:
     using Creator = std::unique_ptr<HVariant>(*)(const std::string&);
 
