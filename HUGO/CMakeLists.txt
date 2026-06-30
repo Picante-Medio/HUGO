@@ -48,6 +48,29 @@ if(HUGO_BUILD_ENGINE)
 
     target_include_directories(${PROJECT_NAME} PRIVATE 
         ${INCLUDE_DIRS})
+    
+    # Visualizar los headers en el explorador de soluciones de visual studio
+    set(HEADER_FILES)
+
+    foreach(dir ${INCLUDE_DIRS})
+        file(GLOB_RECURSE HEADERS
+            CONFIGURE_DEPENDS
+            "${dir}/*.h"
+            "${dir}/*.hpp"
+        )
+        list(APPEND HEADER_FILES ${HEADERS})
+    endforeach()
+
+    target_sources(${PROJECT_NAME} PRIVATE
+        ${HEADER_FILES}
+    )
+
+    source_group(
+    TREE "${CMAKE_CURRENT_SOURCE_DIR}/src"
+    FILES
+        ${HEADER_FILES}
+        ${SRC_FILES}
+    )
 
     target_link_libraries(${PROJECT_NAME} PRIVATE 
         HugoDeps

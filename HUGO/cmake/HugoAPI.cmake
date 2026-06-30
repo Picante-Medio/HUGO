@@ -30,7 +30,30 @@ get_target_property(HUGO_INCLUDES HugoAPI INCLUDE_DIRECTORIES)
 
 if(WIN32)
     set_target_properties(
-            HugoAPI
-            PROPERTIES FOLDER "HUGO_engine"
+        HugoAPI
+        PROPERTIES FOLDER "HUGO_engine"
     )
 endif()
+
+# Visualizar los headers en el explorador de soluciones de visual studio
+set(HugoAPI_HEADER_FILES)
+
+foreach(dir ${HugoAPI_INCLUDE_DIRS})
+    file(GLOB_RECURSE HEADERS
+        CONFIGURE_DEPENDS
+        "${dir}/*.h"
+        "${dir}/*.hpp"
+    )
+    list(APPEND HugoAPI_HEADER_FILES ${HEADERS})
+endforeach()
+
+target_sources(HugoAPI PRIVATE
+    ${HugoAPI_HEADER_FILES}
+)
+
+source_group(
+    TREE "${CMAKE_CURRENT_SOURCE_DIR}/HugoAPI"
+    FILES
+        ${HugoAPI_SRC_FILES}
+        ${HugoAPI_HEADER_FILES}
+)

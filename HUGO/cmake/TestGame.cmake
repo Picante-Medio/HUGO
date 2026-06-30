@@ -28,3 +28,24 @@ if(MSVC)
         PROPERTIES FOLDER "HUGO_engine/TestGame"
     )
 endif()
+
+# Visualizar los headers en el explorador de soluciones de visual studio
+set(TestGame_HEADER_FILES)
+
+file(GLOB_RECURSE HEADERS
+    CONFIGURE_DEPENDS
+    "${CMAKE_SOURCE_DIR}/TestGame/*.h"
+    "${CMAKE_SOURCE_DIR}/TestGame/*.hpp"
+)
+list(APPEND TestGame_HEADER_FILES ${HEADERS})
+
+target_sources(TestGame PRIVATE
+    ${TestGame_HEADER_FILES}
+)
+
+source_group(
+    TREE "${CMAKE_CURRENT_SOURCE_DIR}/TestGame"
+    FILES
+        ${TestGame_SRC_FILES}
+        ${TestGame_HEADER_FILES}
+)
