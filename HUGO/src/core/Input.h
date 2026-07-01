@@ -13,6 +13,8 @@
 
 namespace HUGO {
 
+    class ErrorOrVoid;
+
     class Input : public HUGO::IInput
     {
         enum KeyState
@@ -35,6 +37,9 @@ namespace HUGO {
     
     bool quit;
     bool windowChanged;
+
+    int relX = 0;
+    int relY = 0;
     
     SDL_Window *sdlWindow = nullptr;
     
@@ -79,7 +84,8 @@ namespace HUGO {
     
     MousePosition getMousePosition();
     MouseRelativePosition getMouseRelativePosition();
-    
+    ErrorOrVoid captureMouse(bool capture);
+    MousePosition getMouseDelta();
     
     // Accessor for text input buffer
     const std::string &getTextInput() const;

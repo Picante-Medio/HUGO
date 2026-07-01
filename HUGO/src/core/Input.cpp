@@ -2,6 +2,7 @@
 #include <SDL_events.h>
 #include <SDL_mouse.h>
 #include "HugoTypes.h"
+#include "HugoError.h"
 namespace HUGO
 {
     Input::Input() : keyState(), toChange(), keysOfAction(), textInputBuffer(),
@@ -17,6 +18,9 @@ namespace HUGO
     {
         SDL_PumpEvents();
         SDL_Event event;
+
+        relX = 0;
+        relY = 0;
 
         processKeyQueue();
         processMouseQueue();
@@ -51,6 +55,10 @@ namespace HUGO
                 {
                     windowChanged = true;
                 }
+                break;
+            case SDL_MOUSEMOTION:
+                relX = event.motion.xrel;
+                relY = event.motion.yrel;
                 break;
             }
         }
@@ -177,6 +185,26 @@ namespace HUGO
         mp.x = static_cast<float>(mpABS.x) / static_cast<float>(w);
         mp.y = static_cast<float>(mpABS.y) / static_cast<float>(h);
         return mp;
+    }
+    ErrorOrVoid Input::captureMouse(bool capture){
+
+        int error = 0;
+
+        if(capture)
+            error = SDL_SetRelativeMouseMode(SDL_TRUE);
+        else
+            error = SDL_SetRelativeMouseMode(SDL_FALSE);
+
+        if(error)
+            return ErrorOrVoid(HUGO::StringError("Error capturing the mouse"));
+        else
+            return ErrorOrVoid();
+
+    }
+    Input::MousePosition Input::getMouseDelta(){
+        MousePosition result = {relX, relY};
+
+        return result;
     }
     const std::string &Input::getTextInput() const
     {

@@ -7,6 +7,8 @@
 
 namespace HUGO
 {
+    class ErrorOrVoid;
+
     class IInput {
 
     public:
@@ -46,6 +48,8 @@ namespace HUGO
 
         virtual MousePosition getMousePosition() = 0;
         virtual MouseRelativePosition getMouseRelativePosition() = 0;
+        virtual ErrorOrVoid captureMouse(bool capture) = 0;
+        virtual MousePosition getMouseDelta() = 0;
 
         // Accessor for text input buffer
         virtual const std::string &getTextInput() const = 0;
